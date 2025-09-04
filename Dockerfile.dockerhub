@@ -1,0 +1,60 @@
+# Dockerfile otimizado para Docker Hub
+FROM python:3.11-slim
+
+# Metadados da imagem
+LABEL maintainer="ErismanDev <erisman@example.com>"
+LABEL description="ABMEPI - Sistema de Gestão da Associação Brasileira de Médicos de Emergência Pediátrica e Infantil"
+LABEL version="1.0"
+LABEL repository="https://github.com/ErismanDev/abmepi"
+
+# Definir variáveis de ambiente
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DJANGO_SETTINGS_MODULE=abmepi.settings
+
+# Instalar dependências do sistema
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Criar diretório de trabalho
+WORKDIR /app
+
+# Criar usuário não-root
+RUN adduser --disabled-password --gecos '' appuser
+
+# Copiar requirements primeiro (para cache de layers)
+COPY requirements.txt .
+
+# Instalar dependências Python
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copiar código da aplicação
+COPY . .
+
+# Coletar arquivos estáticos
+RUN python manage.py collectstatic --noinput
+
+# Criar diretórios necessários
+RUN mkdir -p /app/staticfiles /app/media /app/logs
+
+# Definir permissões
+RUN chown -R appuser:appuser /app
+
+# Mudar para usuário não-root
+USER appuser
+
+# Expor porta
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health/ || exit 1
+
+# Comando de inicialização
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "3", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-", "abmepi.wsgi:application"]
