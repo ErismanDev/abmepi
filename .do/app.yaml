@@ -1,0 +1,49 @@
+name: abmepi
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: ErismanDev/abmepi
+    branch: master
+  run_command: gunicorn --bind 0.0.0.0:8080 --workers 3 --timeout 120 abmepi.wsgi:application
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  health_check:
+    http_path: /health/
+  envs:
+  - key: DEBUG
+    value: "False"
+  - key: ALLOWED_HOSTS
+    value: "lobster-app-pqkby.ondigitalocean.app,ondigitalocean.app,localhost,127.0.0.1"
+  - key: SECRET_KEY
+    value: "django-insecure-change-this-to-a-real-secret-key-in-production"
+  - key: DIGITALOCEAN_APP_PLATFORM
+    value: "True"
+  - key: SECURE_SSL_REDIRECT
+    value: "False"
+  - key: SESSION_COOKIE_SECURE
+    value: "True"
+  - key: CSRF_COOKIE_SECURE
+    value: "True"
+  - key: EMAIL_HOST
+    value: "smtp.gmail.com"
+  - key: EMAIL_PORT
+    value: "587"
+  - key: EMAIL_USE_TLS
+    value: "True"
+  - key: EMAIL_HOST_USER
+    value: "siteabmepi@gmail.com"
+  - key: EMAIL_HOST_PASSWORD
+    value: "tlvt twcz livv zetu"
+  - key: DEFAULT_FROM_EMAIL
+    value: "siteabmepi@gmail.com"
+  - key: SERVER_EMAIL
+    value: "siteabmepi@gmail.com"
+
+databases:
+- name: abmepi-db
+  engine: PG
+  version: "15"
+  size: db-s-dev-database
