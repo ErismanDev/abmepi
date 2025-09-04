@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Correções do Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Prevenir overflow horizontal */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Layout responsivo */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0 !important;
+            }
+        }
+        
+        /* Layout para notebooks (1024px - 1366px) */
+        @media (min-width: 769px) and (max-width: 1366px) {
+            .sidebar {
+                width: 140px !important;
+            }
+            .main-content {
+                margin-left: 140px !important;
+            }
+            .container-fluid {
+                padding-left: 5px;
+                padding-right: 5px;
+            }
+        }
+        
+        /* Layout para telas pequenas de notebook */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 120px !important;
+            }
+            .main-content {
+                margin-left: 120px !important;
+                padding: 5px !important;
+            }
+            .card {
+                margin-bottom: 5px;
+            }
+        }
+        
+        /* Layout para telas muito pequenas */
+        @media (min-width: 769px) and (max-width: 900px) {
+            .sidebar {
+                width: 100px !important;
+            }
+            .main-content {
+                margin-left: 100px !important;
+                padding: 5px !important;
+            }
+            .sidebar .nav-link span {
+                display: none;
+            }
+            .sidebar .nav-link {
+                text-align: center;
+                padding: 8px 5px !important;
+            }
+        }
+        
+        /* Estilo do sidebar */
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        /* Ajuste do conteúdo principal */
+        .main-content {
+            min-height: calc(100vh - 56px);
+            transition: margin-left 0.3s ease;
+            max-width: calc(100vw - 150px);
+        }
+        
+        /* Navbar fixo */
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Otimização para notebooks */
+        .row {
+            margin-left: -3px;
+            margin-right: -3px;
+        }
+        .col-md-6 {
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+        
+        /* Garantir que cards não ultrapassem a largura */
+        .card {
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        /* Container fluid sem padding excessivo */
+        .container-fluid {
+            max-width: 100%;
+            padding-left: 5px;
+            padding-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cogs me-2"></i>Dashboard Test
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="settingsLink">
+                            <i class="fas fa-cog me-1"></i>Configurações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="changePasswordLink">
+                            <i class="fas fa-key me-1"></i>Alterar Senha
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar bg-dark text-white" style="position: fixed; top: 56px; left: 0; width: 150px; height: calc(100vh - 56px); z-index: 1000; overflow-y: auto;">
+        <div class="p-1">
+            <h6 class="text-muted mb-1 small">MENU</h6>
+            <ul class="nav nav-pills flex-column">
+                <li class="nav-item mb-1">
+                    <a class="nav-link text-white py-1 px-2" href="#" title="Dashboard">
+                        <i class="fas fa-home"></i><br><span class="small">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a class="nav-link text-white py-1 px-2" href="#" title="Associados">
+                        <i class="fas fa-users"></i><br><span class="small">Associados</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a class="nav-link text-white py-1 px-2" href="#" title="Financeiro">
+                        <i class="fas fa-dollar-sign"></i><br><span class="small">Financeiro</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a class="nav-link text-white py-1 px-2" href="#" title="Jurídico">
+                        <i class="fas fa-gavel"></i><br><span class="small">Jurídico</span>
+                    </a>
+                </li>
+                <li class="nav-item mb-1">
+                    <a class="nav-link text-white py-1 px-2" href="#" title="Psicologia">
+                        <i class="fas fa-user-md"></i><br><span class="small">Psicologia</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" style="margin-left: 150px; margin-top: 56px; padding: 10px;">
+        <div class="container-fluid">
+            <h1 class="mb-3 h4">🧪 Teste das Correções do Dashboard</h1>
+        
+        <div class="row">
+            <div class="col-lg-6 col-md-12">
+                <div class="card mb-2">
+                    <div class="card-header py-1">
+                        <h6 class="mb-0 small"><i class="fas fa-bug me-1"></i>Testes JavaScript</h6>
+                    </div>
+                    <div class="card-body py-1">
+                        <button class="btn btn-primary btn-sm mb-1" onclick="testSaveSettingsBtn()">
+                            Testar saveSettingsBtn
+                        </button>
+                        <button class="btn btn-success btn-sm mb-1" onclick="testReinitializeMenu()">
+                            Testar reinitializeMenu
+                        </button>
+                        <button class="btn btn-info btn-sm mb-1" onclick="testNavbarInit()">
+                            Testar Navbar
+                        </button>
+                        <button class="btn btn-warning btn-sm mb-1" onclick="clearConsole()">
+                            Limpar Console
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 col-md-12">
+                <div class="card mb-2">
+                    <div class="card-header py-1">
+                        <h6 class="mb-0 small"><i class="fas fa-list me-1"></i>Resultados</h6>
+                    </div>
+                    <div class="card-body py-1">
+                        <div id="testResults">
+                            <p class="text-muted small">Clique nos botões para executar os testes...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header py-1">
+                        <h6 class="mb-0 small"><i class="fas fa-terminal me-1"></i>Console de Logs</h6>
+                    </div>
+                    <div class="card-body py-1">
+                        <div id="consoleOutput" style="background: #f8f9fa; padding: 8px; border-radius: 5px; font-family: monospace; max-height: 150px; overflow-y: auto; font-size: 0.8rem;">
+                            <p class="text-muted small">Logs aparecerão aqui...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações (simulado) -->
+    <div class="modal fade" id="userSettingsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Configurações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal de configurações simulado</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Alteração de Senha (simulado) -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Alterar Senha</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label class="form-label">Nova Senha</label>
+                            <input type="password" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="savePasswordBtn">Alterar</button>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Interceptar console.log para exibir na página
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        function addToConsole(message, type = 'log') {
+            const consoleOutput = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'text-danger' : type === 'warn' ? 'text-warning' : 'text-info';
+            consoleOutput.innerHTML += `<div class="${color}">[${timestamp}] ${message}</div>`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToConsole(args.join(' '), 'log');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addToConsole(args.join(' '), 'warn');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToConsole(args.join(' '), 'error');
+        };
+
+        // Funções de teste
+        function testSaveSettingsBtn() {
+            console.log('🧪 Testando saveSettingsBtn...');
+            try {
+                const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+                if (saveSettingsBtn) {
+                    console.log('✅ saveSettingsBtn encontrado com sucesso');
+                    updateTestResult('saveSettingsBtn', 'success', 'Elemento encontrado');
+                } else {
+                    console.error('❌ saveSettingsBtn não encontrado');
+                    updateTestResult('saveSettingsBtn', 'error', 'Elemento não encontrado');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao testar saveSettingsBtn:', error);
+                updateTestResult('saveSettingsBtn', 'error', 'Erro: ' + error.message);
+            }
+        }
+
+        function testReinitializeMenu() {
+            console.log('🧪 Testando reinitializeMenu...');
+            try {
+                if (typeof window.reinitializeMenu === 'function') {
+                    console.log('✅ Função reinitializeMenu encontrada');
+                    window.reinitializeMenu();
+                    updateTestResult('reinitializeMenu', 'success', 'Função executada com sucesso');
+                } else {
+                    console.warn('⚠️ Função reinitializeMenu não encontrada');
+                    updateTestResult('reinitializeMenu', 'warning', 'Função não encontrada');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao testar reinitializeMenu:', error);
+                updateTestResult('reinitializeMenu', 'error', 'Erro: ' + error.message);
+            }
+        }
+
+        function testNavbarInit() {
+            console.log('🧪 Testando inicialização do navbar...');
+            try {
+                const settingsLink = document.getElementById('settingsLink');
+                const changePasswordLink = document.getElementById('changePasswordLink');
+                const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+                const savePasswordBtn = document.getElementById('savePasswordBtn');
+                
+                let results = [];
+                if (settingsLink) results.push('settingsLink: OK');
+                if (changePasswordLink) results.push('changePasswordLink: OK');
+                if (saveSettingsBtn) results.push('saveSettingsBtn: OK');
+                if (savePasswordBtn) results.push('savePasswordBtn: OK');
+                
+                console.log('✅ Elementos do navbar:', results.join(', '));
+                updateTestResult('navbarInit', 'success', results.length + ' elementos encontrados');
+            } catch (error) {
+                console.error('❌ Erro ao testar navbar:', error);
+                updateTestResult('navbarInit', 'error', 'Erro: ' + error.message);
+            }
+        }
+
+        function clearConsole() {
+            document.getElementById('consoleOutput').innerHTML = '<p class="text-muted small">Console limpo...</p>';
+            document.getElementById('testResults').innerHTML = '<p class="text-muted small">Clique nos botões para executar os testes...</p>';
+        }
+
+        function updateTestResult(testName, status, message) {
+            const resultsDiv = document.getElementById('testResults');
+            const statusIcon = status === 'success' ? '✅' : status === 'warning' ? '⚠️' : '❌';
+            const statusClass = status === 'success' ? 'text-success' : status === 'warning' ? 'text-warning' : 'text-danger';
+            
+            let existingResult = resultsDiv.querySelector(`[data-test="${testName}"]`);
+            if (existingResult) {
+                existingResult.innerHTML = `${statusIcon} <strong class="small">${testName}:</strong> <span class="${statusClass} small">${message}</span>`;
+            } else {
+                const newResult = document.createElement('div');
+                newResult.setAttribute('data-test', testName);
+                newResult.className = 'small';
+                newResult.innerHTML = `${statusIcon} <strong>${testName}:</strong> <span class="${statusClass}">${message}</span>`;
+                resultsDiv.appendChild(newResult);
+            }
+        }
+
+        // Simular algumas funções que podem estar faltando
+        window.initializeSubmenus = function() {
+            console.log('🔄 Função initializeSubmenus simulada executada');
+        };
+
+        // Controle do sidebar em dispositivos móveis
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('show');
+        }
+        
+        // Ajustar layout baseado no tamanho da tela
+        function adjustLayout() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const width = window.innerWidth;
+            
+            if (width <= 768) {
+                // Mobile - sidebar oculto
+                sidebar.style.width = '250px';
+                mainContent.style.marginLeft = '0px';
+                mainContent.style.maxWidth = '100vw';
+            } else if (width <= 900) {
+                // Tela muito pequena - só ícones
+                sidebar.style.width = '100px';
+                mainContent.style.marginLeft = '100px';
+                mainContent.style.maxWidth = 'calc(100vw - 100px)';
+            } else if (width <= 1024) {
+                // Notebook pequeno
+                sidebar.style.width = '120px';
+                mainContent.style.marginLeft = '120px';
+                mainContent.style.maxWidth = 'calc(100vw - 120px)';
+            } else if (width <= 1366) {
+                // Notebook médio
+                sidebar.style.width = '140px';
+                mainContent.style.marginLeft = '140px';
+                mainContent.style.maxWidth = 'calc(100vw - 140px)';
+            } else {
+                // Desktop
+                sidebar.style.width = '150px';
+                mainContent.style.marginLeft = '150px';
+                mainContent.style.maxWidth = 'calc(100vw - 150px)';
+            }
+        }
+
+        // Executar testes automáticos ao carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página de teste carregada');
+            console.log('📋 Execute os testes clicando nos botões acima');
+            
+            // Ajustar layout inicial
+            adjustLayout();
+            
+            // Configurar toggle do sidebar para mobile
+            const navbarToggler = document.querySelector('.navbar-toggler');
+            if (navbarToggler) {
+                navbarToggler.addEventListener('click', toggleSidebar);
+            }
+            
+            // Fechar sidebar ao clicar fora dele em mobile
+            document.addEventListener('click', function(e) {
+                const sidebar = document.querySelector('.sidebar');
+                const navbarToggler = document.querySelector('.navbar-toggler');
+                
+                if (window.innerWidth <= 768 && 
+                    !sidebar.contains(e.target) && 
+                    !navbarToggler.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+        
+        // Ajustar layout ao redimensionar a janela
+        window.addEventListener('resize', adjustLayout);
+    </script>
+</body>
+</html>

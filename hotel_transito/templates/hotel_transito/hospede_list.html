@@ -1,0 +1,557 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Hóspedes - Hotel de Trânsito{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<link rel="stylesheet" href="{% static 'hotel_transito/css/error-styles.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+    }
+    
+    .stat-card h3 {
+        color: #667eea;
+        font-size: 2rem;
+        margin: 0;
+        font-weight: bold;
+    }
+    
+    .stat-card p {
+        color: #6c757d;
+        margin: 0.5rem 0 0 0;
+        font-size: 0.9rem;
+    }
+    
+    .actions-bar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-filters {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-filters select,
+    .search-filters input {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-new {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-new:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .hospede-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table th {
+        background: #f8f9fa;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .tipo-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .tipo-associado {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .tipo-visitante {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    
+    .tipo-funcionario {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .tipo-conveniado {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-ativo {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inativo {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .pagination-container {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center;
+    }
+    
+    .no-hospedes {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .no-hospedes i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .hospede-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .hospede-nome {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .hospede-documento {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .hospede-contato {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="page-header">
+        <h1><i class="fas fa-users me-3"></i>Hóspedes</h1>
+        <p>Gerencie os hóspedes do hotel de trânsito</p>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ total_hospedes }}</h3>
+            <p>Total de Hóspedes</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ hospedes_ativos }}</h3>
+            <p>Ativos</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ hospedes_associados }}</h3>
+            <p>Associados</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ hospedes_visitantes }}</h3>
+            <p>Visitantes</p>
+        </div>
+    </div>
+
+    <!-- Barra de Ações e Filtros -->
+    <div class="actions-bar">
+        <div class="search-filters">
+            <form method="get" class="d-flex gap-2">
+                <select name="tipo_hospede" class="form-select form-select-sm">
+                    <option value="">Todos os Tipos</option>
+                    <option value="associado" {% if request.GET.tipo_hospede == 'associado' %}selected{% endif %}>Associado</option>
+                    <option value="visitante" {% if request.GET.tipo_hospede == 'visitante' %}selected{% endif %}>Visitante</option>
+                    <option value="funcionario" {% if request.GET.tipo_hospede == 'funcionario' %}selected{% endif %}>Funcionário</option>
+                    <option value="conveniado" {% if request.GET.tipo_hospede == 'conveniado' %}selected{% endif %}>Conveniado</option>
+                </select>
+                <select name="ativo" class="form-select form-select-sm">
+                    <option value="">Todos</option>
+                    <option value="true" {% if request.GET.ativo == 'true' %}selected{% endif %}>Ativos</option>
+                    <option value="false" {% if request.GET.ativo == 'false' %}selected{% endif %}>Inativos</option>
+                </select>
+                <input type="text" name="search" class="form-control form-control-sm" placeholder="Buscar por nome..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-search me-1"></i>Filtrar
+                </button>
+                {% if request.GET %}
+                <a href="{% url 'hotel_transito:hospede_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times me-1"></i>Limpar
+                </a>
+                {% endif %}
+            </form>
+        </div>
+        <a href="{% url 'hotel_transito:hospede_create' %}" class="btn-new">
+            <i class="fas fa-plus me-2"></i>Novo Hóspede
+        </a>
+    </div>
+
+    <!-- Tabela de Hóspedes -->
+    <div class="hospede-table">
+        {% if hospedes %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Foto</th>
+                    <th>Hóspede</th>
+                    <th>Tipo</th>
+                    <th>Documento</th>
+                    <th>Contato</th>
+                    <th>Endereço</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hospede in hospedes %}
+                <tr>
+                    <td class="text-center">
+                        {% if hospede.associado and hospede.associado.foto %}
+                            <img src="{{ hospede.associado.foto.url }}" alt="{{ hospede.nome_completo }}" 
+                                 class="avatar-rectangular">
+                        {% elif hospede.foto %}
+                            <img src="{{ hospede.foto.url }}" alt="{{ hospede.nome_completo }}" 
+                                 class="avatar-rectangular">
+                        {% else %}
+                            <div class="avatar-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="hospede-info">
+                            <div class="hospede-nome">{{ hospede.nome_completo }}</div>
+                            {% if hospede.data_nascimento %}
+                            <div class="hospede-documento">
+                                <i class="fas fa-birthday-cake me-1"></i>
+                                {{ hospede.data_nascimento|date:"d/m/Y" }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="tipo-badge tipo-{{ hospede.tipo_hospede }}">
+                            {{ hospede.get_tipo_hospede_display }}
+                        </span>
+                        {% if hospede.associado %}
+                        <br><small class="text-muted">{{ hospede.associado.nome }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="hospede-info">
+                            <div class="hospede-documento">
+                                <strong>{{ hospede.get_tipo_documento_display }}:</strong>
+                                {{ hospede.numero_documento }}
+                            </div>
+                            {% if hospede.orgao_emissor %}
+                            <div class="hospede-documento">
+                                {{ hospede.orgao_emissor }}/{{ hospede.uf_emissor }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="hospede-info">
+                            {% if hospede.telefone %}
+                            <div class="hospede-contato">
+                                <i class="fas fa-phone me-1"></i>{{ hospede.telefone }}
+                            </div>
+                            {% endif %}
+                            {% if hospede.email %}
+                            <div class="hospede-contato">
+                                <i class="fas fa-envelope me-1"></i>{{ hospede.email }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="hospede-info">
+                            {% if hospede.endereco %}
+                            <div class="hospede-contato">
+                                {{ hospede.endereco }}, {{ hospede.numero }}
+                                {% if hospede.complemento %}- {{ hospede.complemento }}{% endif %}
+                            </div>
+                            <div class="hospede-contato">
+                                {{ hospede.bairro }} - {{ hospede.cidade }}/{{ hospede.estado }}
+                            </div>
+                            {% if hospede.cep %}
+                            <div class="hospede-contato">CEP: {{ hospede.cep }}</div>
+                            {% endif %}
+                            {% else %}
+                            <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if hospede.ativo %}
+                        <span class="status-badge status-ativo">Ativo</span>
+                        {% else %}
+                        <span class="status-badge status-inativo">Inativo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button type="button" class="btn btn-outline-info btn-sm" title="Ver Detalhes" onclick="openHospedeDetailModal({{ hospede.pk }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <a href="{% url 'hotel_transito:hospede_update' hospede.pk %}" class="btn btn-outline-warning btn-sm" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'hotel_transito:hospede_delete' hospede.pk %}" class="btn btn-outline-danger btn-sm" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-hospedes">
+            <i class="fas fa-users"></i>
+            <h4>Nenhum hóspede encontrado</h4>
+            <p>Não há hóspedes cadastrados no sistema ou os filtros aplicados não retornaram resultados.</p>
+            <a href="{% url 'hotel_transito:hospede_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Cadastrar Primeiro Hóspede
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <div class="pagination-container">
+        <nav aria-label="Paginação dos hóspedes">
+            <ul class="pagination mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.tipo_hospede %}&tipo_hospede={{ request.GET.tipo_hospede }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tipo_hospede %}&tipo_hospede={{ request.GET.tipo_hospede }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tipo_hospede %}&tipo_hospede={{ request.GET.tipo_hospede }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.tipo_hospede %}&tipo_hospede={{ request.GET.tipo_hospede }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Modal de Detalhes do Hóspede -->
+<div class="modal fade" id="hospedeDetailModal" tabindex="-1" aria-labelledby="hospedeDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="hospedeDetailModalLabel">
+                    <i class="fas fa-user me-2"></i>Detalhes do Hóspede
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body" id="hospedeDetailModalBody">
+                <!-- Conteúdo será carregado via AJAX -->
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Carregando detalhes do hóspede...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Função para abrir modal de detalhes do hóspede
+function openHospedeDetailModal(hospedeId) {
+    const modal = new bootstrap.Modal(document.getElementById('hospedeDetailModal'));
+    const modalBody = document.getElementById('hospedeDetailModalBody');
+    const modalTitle = document.getElementById('hospedeDetailModalLabel');
+    
+    // Mostrar loading
+    modalBody.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando detalhes do hóspede...</p>
+        </div>
+    `;
+    
+    // Abrir modal
+    modal.show();
+    
+    // Fazer requisição AJAX para obter detalhes
+    fetch(`/hotel_transito/hospedes/${hospedeId}/detalhes-modal/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                modalTitle.innerHTML = `<i class="fas fa-user me-2"></i>${data.hospede.nome_completo}`;
+                modalBody.innerHTML = data.html;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Erro ao carregar detalhes do hóspede: ${data.error}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            modalBody.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Erro ao carregar detalhes do hóspede. Tente novamente.
+                </div>
+            `;
+        });
+}
+
+// Inicializar tooltips e outros componentes Bootstrap
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

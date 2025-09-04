@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Editar Recebível{% else %}Novo Recebível{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-money-bill-wave me-2"></i>
+                        {% if object %}Editar Recebível{% else %}Novo Recebível{% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Associado -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.associado.id_for_label }}" class="form-label">
+                                    {{ form.associado.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.associado }}
+                                {% if form.associado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.associado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                                    Tipo de Recebimento <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo }}
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Selecione o tipo para preenchimento automático do valor
+                                    </small>
+                                    <br>
+                                    <button type="button" class="btn btn-sm btn-outline-info mt-1" onclick="testarJavaScript()">
+                                        <i class="fas fa-bug me-1"></i> Testar JavaScript
+                                    </button>
+                                </div>
+                                {% if form.tipo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Valor -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.valor.id_for_label }}" class="form-label">
+                                    {{ form.valor.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    {{ form.valor }}
+                                    <span class="input-group-text">BRL</span>
+                                </div>
+                                {% if form.valor.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.valor.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Digite o valor em reais (ex: 150,00)</small>
+                            </div>
+
+                            <!-- Data de Vencimento -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.data_vencimento.id_for_label }}" class="form-label">
+                                    {{ form.data_vencimento.label }} <span class="text-danger">*</span>
+                                </label>
+                                {% if form.data_vencimento.value %}
+                                <input type="date" 
+                                       name="{{ form.data_vencimento.name }}" 
+                                       id="{{ form.data_vencimento.id_for_label }}" 
+                                       class="{{ form.data_vencimento.field.widget.attrs.class }}"
+                                       value="{{ form.data_vencimento.value|date:'Y-m-d' }}"
+                                       required>
+                                <input type="hidden" name="data_vencimento_original" value="{{ form.data_vencimento.value|date:'Y-m-d' }}">
+                                {% else %}
+                                {{ form.data_vencimento }}
+                                {% endif %}
+
+                                <div class="form-text">
+                                    <small class="text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {% if object %}
+                                            Data de vencimento da mensalidade. Pode ser alterada se necessário.
+                                        {% else %}
+                                            Data atual preenchida automaticamente. Pode ser alterada se necessário.
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                {% if form.data_vencimento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.data_vencimento.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    {{ form.status.label }}
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.status.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Forma de Pagamento -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.forma_pagamento.id_for_label }}" class="form-label">
+                                    {{ form.forma_pagamento.label }}
+                                </label>
+                                {{ form.forma_pagamento }}
+                                {% if form.forma_pagamento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.forma_pagamento.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Observações -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    {{ form.observacoes.label }}
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.observacoes.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.observacoes.help_text %}
+                                    <small class="form-text text-muted">{{ form.observacoes.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'financeiro:mensalidade_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Atualizar{% else %}Salvar{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-preenchimento do valor baseado no tipo selecionado
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM carregado, inicializando JavaScript...');
+        
+        // Aguardar um pouco para garantir que todos os elementos estejam carregados
+        setTimeout(function() {
+            console.log('Iniciando busca pelos elementos...');
+            
+            const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+            const valorInput = document.getElementById('{{ form.valor.id_for_label }}');
+            
+            console.log('IDs dos campos:', {
+                tipo: '{{ form.tipo.id_for_label }}',
+                valor: '{{ form.valor.id_for_label }}'
+            });
+            
+            if (tipoSelect && valorInput) {
+                console.log('Elementos encontrados:', { tipoSelect, valorInput });
+                console.log('Tipos disponíveis:', {{ tipos_json|safe }});
+                
+                // Função para atualizar informações do tipo selecionado
+                function atualizarInfoTipo() {
+                    console.log('=== FUNÇÃO atualizarInfoTipo CHAMADA ===');
+                    const selectedOption = tipoSelect.options[tipoSelect.selectedIndex];
+                    console.log('Opção selecionada:', selectedOption);
+                    console.log('Valor da opção:', selectedOption ? selectedOption.value : 'N/A');
+                    
+                    if (selectedOption && selectedOption.value) {
+                        // Buscar informações do tipo selecionado
+                        const tipos = {{ tipos_json|safe }};
+                        console.log('Array de tipos:', tipos);
+                        console.log('Tipo de tipos:', typeof tipos);
+                        console.log('Tamanho de tipos:', tipos.length);
+                        
+                        const tipoSelecionado = tipos.find(t => t.id == parseInt(selectedOption.value));
+                        console.log('Tipo encontrado:', tipoSelecionado);
+                        console.log('ID buscado:', selectedOption.value);
+                        console.log('ID convertido:', parseInt(selectedOption.value));
+                        
+                        if (tipoSelecionado) {
+                            // Sempre atualizar o valor quando o tipo for selecionado
+                            console.log('Atualizando valor para:', tipoSelecionado.valor);
+                            console.log('Valor anterior:', valorInput.value);
+                            valorInput.value = tipoSelecionado.valor;
+                            console.log('Valor após atualização:', valorInput.value);
+                            
+                            // Mostrar informações adicionais
+                            mostrarInfoTipo(tipoSelecionado);
+                        } else {
+                            console.log('ERRO: Tipo não encontrado no array');
+                        }
+                    } else {
+                        // Limpar informações
+                        console.log('Limpando informações - nenhuma opção selecionada');
+                        limparInfoTipo();
+                    }
+                }
+                
+                // Função para mostrar informações do tipo
+                function mostrarInfoTipo(tipo) {
+                    // Criar ou atualizar elemento de informação
+                    let infoElement = document.getElementById('tipo-info');
+                    if (!infoElement) {
+                        infoElement = document.createElement('div');
+                        infoElement.id = 'tipo-info';
+                        infoElement.className = 'alert alert-info mt-2';
+                        tipoSelect.parentNode.appendChild(infoElement);
+                    }
+                    
+                    infoElement.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <strong>${tipo.nome}</strong> - ${tipo.descricao}
+                                <br>
+                                <small class="text-muted">
+                                    Tipo: <span class="badge bg-${tipo.recorrente ? 'primary' : 'info'}">${tipo.recorrente ? 'Recorrente' : 'Única'}</span>
+                                    | Valor padrão: <strong>R$ ${tipo.valor}</strong>
+                                </small>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Função para limpar informações
+                function limparInfoTipo() {
+                    const infoElement = document.getElementById('tipo-info');
+                    if (infoElement) {
+                        infoElement.remove();
+                    }
+                }
+                
+                // Event listener para mudança no tipo
+                console.log('Adicionando event listener para mudança no tipo');
+                tipoSelect.addEventListener('change', function() {
+                    console.log('Evento change disparado, valor:', this.value);
+                    console.log('Função atualizarInfoTipo disponível:', typeof atualizarInfoTipo);
+                    if (this.value) {
+                        atualizarInfoTipo();
+                    } else {
+                        limparInfoTipo();
+                    }
+                });
+                
+                // Inicializar se já houver um tipo selecionado
+                if (tipoSelect.value) {
+                    atualizarInfoTipo();
+                }
+                
+                // Teste automático após 2 segundos
+                setTimeout(() => {
+                    console.log('=== TESTE AUTOMÁTICO ===');
+                    console.log('Valor atual do tipo:', tipoSelect.value);
+                    console.log('Valor atual do valor:', valorInput.value);
+                    
+                    if (tipoSelect.options.length > 1) {
+                        const primeiroTipo = tipoSelect.options[1];
+                        console.log('Primeiro tipo disponível:', primeiroTipo.value, primeiroTipo.text);
+                        
+                        // Simular seleção
+                        tipoSelect.value = primeiroTipo.value;
+                        console.log('Tipo selecionado:', tipoSelect.value);
+                        
+                        // Chamar função diretamente
+                        atualizarInfoTipo();
+                    }
+                }, 2000);
+                
+                // Formatação de moeda brasileira para o campo valor
+                const valorInput = document.getElementById('{{ form.valor.id_for_label }}');
+                if (valorInput) {
+                    // Formatação ao digitar
+                    valorInput.addEventListener('input', function() {
+                        var value = this.value;
+                        
+                        // Permitir números, ponto (separador de milhares), vírgula (separador decimal)
+                        value = value.replace(/[^\d.,]/g, '');
+                        
+                        // Processar o valor para permitir formato brasileiro (1.000,00)
+                        if (value.indexOf(',') !== -1) {
+                            // Tem vírgula decimal
+                            var parts = value.split(',');
+                            var integerPart = parts[0];
+                            var decimalPart = parts[1] || '';
+                            
+                            // Remover pontos da parte inteira (são separadores de milhares)
+                            integerPart = integerPart.replace(/\./g, '');
+                            
+                            // Limitar casas decimais a 2
+                            if (decimalPart.length > 2) {
+                                decimalPart = decimalPart.substring(0, 2);
+                            }
+                            
+                            // Reconstruir o valor
+                            value = integerPart + ',' + decimalPart;
+                        } else if (value.indexOf('.') !== -1) {
+                            // Tem ponto, verificar se é separador decimal ou de milhares
+                            var lastDotIndex = value.lastIndexOf('.');
+                            var beforeLastDot = value.substring(0, lastDotIndex);
+                            var afterLastDot = value.substring(lastDotIndex + 1);
+                            
+                            // Se após o último ponto tem 1 ou 2 dígitos, é separador decimal
+                            if (afterLastDot.length <= 2 && /^\d{1,2}$/.test(afterLastDot)) {
+                                // É separador decimal, converter para vírgula
+                                value = beforeLastDot.replace(/\./g, '') + ',' + afterLastDot;
+                            } else {
+                                // É separador de milhares, manter
+                                value = value;
+                            }
+                        }
+                        
+                        this.value = value;
+                    });
+                    
+                    // Formatação ao perder o foco
+                    valorInput.addEventListener('blur', function() {
+                        var value = this.value;
+                        var valueForCalc = value.replace(',', '.');
+                        var numValue = parseFloat(valueForCalc);
+                        
+                        if (!isNaN(numValue) && numValue > 0) {
+                            // Formatar como moeda brasileira com separadores de milhares
+                            var formattedValue = numValue.toFixed(2);
+                            var parts = formattedValue.split('.');
+                            var integerPart = parts[0];
+                            var decimalPart = parts[1];
+                            
+                            // Adicionar separadores de milhares
+                            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                            
+                            // Formato final: 1.000,00
+                            this.value = integerPart + ',' + decimalPart;
+                        }
+                    });
+                }
+            } else {
+                console.log('ERRO: Elementos não encontrados');
+            }
+        }, 100);
+    });
+    
+    // Função de teste para debug
+    window.testarJavaScript = function() {
+        console.log('=== TESTE JAVASCRIPT ===');
+        
+        // Buscar elementos novamente
+        const tipoSelect = document.getElementById('{{ form.tipo.id_for_label }}');
+        const valorInput = document.getElementById('{{ form.valor.id_for_label }}');
+        
+        console.log('Tipo Select:', tipoSelect);
+        console.log('Valor Input:', valorInput);
+        console.log('Tipos JSON:', {{ tipos_json|safe }});
+        
+        if (tipoSelect && valorInput) {
+            console.log('Elementos encontrados corretamente');
+            console.log('Valor atual do tipo:', tipoSelect.value);
+            console.log('Valor atual do valor:', valorInput.value);
+            console.log('Opções disponíveis:', tipoSelect.options.length);
+            
+            // Simular seleção de um tipo
+            if (tipoSelect.options.length > 1) {
+                const primeiroTipo = tipoSelect.options[1]; // Pular a primeira opção (vazia)
+                if (primeiroTipo) {
+                    console.log('Selecionando primeiro tipo:', primeiroTipo.value, primeiroTipo.text);
+                    tipoSelect.value = primeiroTipo.value;
+                    
+                    // Disparar evento change
+                    const event = new Event('change', { bubbles: true });
+                    tipoSelect.dispatchEvent(event);
+                    
+                    console.log('Evento change disparado');
+                }
+            } else {
+                console.log('Nenhuma opção disponível para seleção');
+            }
+        } else {
+            console.log('ERRO: Elementos não encontrados');
+            console.log('Tentando buscar por outros métodos...');
+            
+            // Tentar buscar por outros métodos
+            const todosSelects = document.querySelectorAll('select');
+            const todosInputs = document.querySelectorAll('input[type="number"]');
+            console.log('Todos os selects:', todosSelects);
+            console.log('Todos os inputs numéricos:', todosInputs);
+        }
+    };
+</script>
+{% endblock %}

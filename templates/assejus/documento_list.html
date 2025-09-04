@@ -1,0 +1,1061 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documentos Jurídicos - ASSEJUS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .document-card {
+        transition: all 0.3s ease;
+        border: 1px solid #e3e6f0;
+    }
+    .document-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .file-icon {
+        font-size: 2rem;
+        color: #5a5c69;
+    }
+    .upload-area {
+        border: 2px dashed #d1d3e2;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .upload-area:hover {
+        border-color: #4e73df;
+        background-color: #f8f9fc;
+    }
+    .upload-area.dragover {
+        border-color: #4e73df;
+        background-color: #e3f2fd;
+    }
+    .progress-upload {
+        display: none;
+    }
+    .document-actions {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .document-card:hover .document-actions {
+        opacity: 1;
+    }
+    .badge-tipo {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2 text-primary"></i>
+                        Documentos Jurídicos
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Sistema completo de gerenciamento de documentos dos processos jurídicos
+                    </p>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUploadDocumento">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload Documento
+                    </button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modalUploadMultiplo">
+                        <i class="fas fa-files me-2"></i>
+                        Upload Múltiplo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total de Documentos
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_documentos }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Uploads Hoje
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ documentos_hoje }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar-day fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Processos Ativos
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="processos-ativos">-</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-gavel fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Espaço Usado
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800" id="espaco-usado">-</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-hdd fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros de busca avançados -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-filter me-2"></i>
+                        Filtros de Busca
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" id="formFiltros" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search_form.search.value|default:'' }}" 
+                                   placeholder="Título, descrição ou número do processo">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="tipo_documento" class="form-label">Tipo</label>
+                            {{ search_form.tipo_documento }}
+                        </div>
+                        <div class="col-md-3">
+                            <label for="processo" class="form-label">Processo</label>
+                            {{ search_form.processo }}
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            {{ search_form.data_inicio }}
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            {{ search_form.data_fim }}
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search me-1"></i>
+                                Filtrar
+                            </button>
+                            <a href="{% url 'assejus:documento_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>
+                                Limpar
+                            </a>
+                            <button type="button" class="btn btn-outline-info" id="btnExportar">
+                                <i class="fas fa-download me-1"></i>
+                                Exportar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de documentos -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Documentos
+                    </h5>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary active" id="btnViewCards">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="btnViewTable">
+                            <i class="fas fa-table"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <!-- Visualização em Cards -->
+                        <div id="viewCards" class="row">
+                            {% for documento in page_obj %}
+                            <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+                                <div class="card document-card h-100">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-start">
+                                            <div class="me-3">
+                                                {% if documento.arquivo.name|slice:"-4:" == ".pdf" %}
+                                                    <i class="fas fa-file-pdf file-icon text-danger"></i>
+                                                {% elif documento.arquivo.name|slice:"-4:" == ".doc" or documento.arquivo.name|slice:"-5:" == ".docx" %}
+                                                    <i class="fas fa-file-word file-icon text-primary"></i>
+                                                {% elif documento.arquivo.name|slice:"-4:" == ".jpg" or documento.arquivo.name|slice:"-5:" == ".jpeg" or documento.arquivo.name|slice:"-4:" == ".png" %}
+                                                    <i class="fas fa-file-image file-icon text-success"></i>
+                                                {% else %}
+                                                    <i class="fas fa-file-alt file-icon text-secondary"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-1">
+                                                    <a href="{% url 'assejus:documento_detail' documento.pk %}" 
+                                                       class="text-decoration-none text-dark">
+                                                        {{ documento.titulo|truncatechars:40 }}
+                                                    </a>
+                                                </h6>
+                                                <span class="badge badge-tipo bg-info mb-2">
+                                                    {{ documento.get_tipo_documento_display }}
+                                                </span>
+                                                <p class="card-text small text-muted mb-2">
+                                                    <strong>Processo:</strong> 
+                                                    <a href="{% url 'assejus:processo_detail' documento.processo.pk %}" 
+                                                       class="text-decoration-none">
+                                                        {{ documento.processo.numero_processo|truncatechars:30 }}
+                                                    </a>
+                                                </p>
+                                                <p class="card-text small text-muted mb-2">
+                                                    <strong>Cliente:</strong> {{ documento.processo.parte_cliente.nome|truncatechars:25 }}
+                                                </p>
+                                                <p class="card-text small text-muted mb-1">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    {{ documento.data_upload|date:"d/m/Y H:i" }}
+                                                </p>
+                                                <p class="card-text small text-muted mb-1">
+                                                    <i class="fas fa-user me-1"></i>
+                                                    {% if documento.usuario_upload %}
+                                                        {{ documento.usuario_upload.get_full_name|default:documento.usuario_upload.username }}
+                                                    {% else %}
+                                                        Sistema
+                                                    {% endif %}
+                                                </p>
+                                                <p class="card-text small text-muted">
+                                                    <i class="fas fa-weight me-1"></i>
+                                                    {{ documento.tamanho_arquivo }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Ações do documento -->
+                                        <div class="document-actions mt-3 pt-3 border-top">
+                                            <div class="btn-group w-100" role="group">
+                                                <a href="{% url 'assejus:documento_view' documento.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'assejus:documento_download' documento.pk %}" 
+                                                   class="btn btn-sm btn-outline-success" title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                        onclick="editarDocumento({{ documento.pk }})" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="excluirDocumento({{ documento.pk }})" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Visualização em Tabela -->
+                        <div id="viewTable" class="table-responsive" style="display: none;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Processo</th>
+                                        <th>Cliente</th>
+                                        <th>Data Upload</th>
+                                        <th>Usuário</th>
+                                        <th>Tamanho</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for documento in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'assejus:documento_detail' documento.pk %}" 
+                                               class="text-decoration-none">
+                                                <i class="fas fa-file-alt me-2 text-primary"></i>
+                                                {{ documento.titulo }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ documento.get_tipo_documento_display }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'assejus:processo_detail' documento.processo.pk %}" 
+                                               class="text-decoration-none">
+                                                {{ documento.processo.numero_processo|truncatechars:40 }}
+                                            </a>
+                                        </td>
+                                        <td>{{ documento.processo.parte_cliente.nome|truncatechars:30 }}</td>
+                                        <td>{{ documento.data_upload|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {% if documento.usuario_upload %}
+                                                {{ documento.usuario_upload.get_full_name|default:documento.usuario_upload.username }}
+                                            {% else %}
+                                                <span class="text-muted">Sistema</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ documento.tamanho_arquivo }}</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'assejus:documento_view' documento.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   target="_blank" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'assejus:documento_download' documento.pk %}" 
+                                                   class="btn btn-sm btn-outline-success" title="Download">
+                                                    <i class="fas fa-download"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                        onclick="editarDocumento({{ documento.pk }})" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="excluirDocumento({{ documento.pk }})" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if page_obj.has_other_pages %}
+                        <nav aria-label="Paginação dos documentos">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if processo %}&processo={{ processo }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if processo %}&processo={{ processo }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if processo %}&processo={{ processo }}{% endif %}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if processo %}&processo={{ processo }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if processo %}&processo={{ processo }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum documento encontrado</h5>
+                            <p class="text-muted">Não há documentos cadastrados ou que correspondam aos filtros aplicados.</p>
+                            <a href="{% url 'assejus:documento_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Anexar Primeiro Documento
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =============================================================================
+     MODAIS PARA UPLOAD E GERENCIAMENTO DE DOCUMENTOS
+     ============================================================================= -->
+
+<!-- Modal Upload Documento Único -->
+<div class="modal fade" id="modalUploadDocumento" tabindex="-1" aria-labelledby="modalUploadDocumentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUploadDocumentoLabel">
+                    <i class="fas fa-upload me-2"></i>
+                    Upload de Documento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formUploadDocumento" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label">Título do Documento *</label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
+                                <select class="form-select" id="tipo_documento" name="tipo_documento" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="peticao">Petição</option>
+                                    <option value="sentenca">Sentença</option>
+                                    <option value="despacho">Despacho</option>
+                                    <option value="certidao">Certidão</option>
+                                    <option value="contrato">Contrato</option>
+                                    <option value="comprovante">Comprovante</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="processo" class="form-label">Processo *</label>
+                        <select class="form-select" id="processo" name="processo_id" required>
+                            <option value="">Selecione o processo</option>
+                            <!-- Será preenchido via AJAX -->
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" 
+                                  placeholder="Descrição detalhada do documento (opcional)"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="arquivo" class="form-label">Arquivo *</label>
+                        <input type="file" class="form-control" id="arquivo" name="arquivo" required
+                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.rtf">
+                        <div class="form-text">
+                            Formatos aceitos: PDF, DOC, DOCX, JPG, PNG, TXT, RTF (máx. 10MB)
+                        </div>
+                    </div>
+                    
+                    <!-- Progress bar -->
+                    <div class="progress-upload mb-3">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted">Enviando arquivo...</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload Documento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Upload Múltiplo -->
+<div class="modal fade" id="modalUploadMultiplo" tabindex="-1" aria-labelledby="modalUploadMultiploLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalUploadMultiploLabel">
+                    <i class="fas fa-files me-2"></i>
+                    Upload Múltiplo de Documentos
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formUploadMultiplo" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tipo_documento_multiplo" class="form-label">Tipo de Documento *</label>
+                                <select class="form-select" id="tipo_documento_multiplo" name="tipo_documento" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="peticao">Petição</option>
+                                    <option value="sentenca">Sentença</option>
+                                    <option value="despacho">Despacho</option>
+                                    <option value="certidao">Certidão</option>
+                                    <option value="contrato">Contrato</option>
+                                    <option value="comprovante">Comprovante</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="processo_multiplo" class="form-label">Processo *</label>
+                                <select class="form-select" id="processo_multiplo" name="processo_id" required>
+                                    <option value="">Selecione o processo</option>
+                                    <!-- Será preenchido via AJAX -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descricao_multiplo" class="form-label">Descrição Geral</label>
+                        <textarea class="form-control" id="descricao_multiplo" name="descricao" rows="2" 
+                                  placeholder="Descrição geral para todos os documentos (opcional)"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="arquivo_multiplo" class="form-label">Arquivos *</label>
+                        <input type="file" class="form-control" id="arquivo_multiplo" name="arquivo_multiplo" 
+                               multiple required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.rtf">
+                        <div class="form-text">
+                            Selecione múltiplos arquivos. Formatos aceitos: PDF, DOC, DOCX, JPG, PNG, TXT, RTF (máx. 10MB cada)
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de arquivos selecionados -->
+                    <div id="listaArquivos" class="mb-3" style="display: none;">
+                        <h6>Arquivos Selecionados:</h6>
+                        <ul id="listaArquivosList" class="list-group list-group-flush"></ul>
+                    </div>
+                    
+                    <!-- Progress bar -->
+                    <div class="progress-upload mb-3">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted">Enviando arquivos...</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload Documentos
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editar Documento -->
+<div class="modal fade" id="modalEditarDocumento" tabindex="-1" aria-labelledby="modalEditarDocumentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarDocumentoLabel">
+                    <i class="fas fa-edit me-2"></i>
+                    Editar Documento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formEditarDocumento">
+                <div class="modal-body">
+                    <input type="hidden" id="documento_id" name="documento_id">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="titulo_edit" class="form-label">Título do Documento *</label>
+                                <input type="text" class="form-control" id="titulo_edit" name="titulo" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="tipo_documento_edit" class="form-label">Tipo de Documento *</label>
+                                <select class="form-select" id="tipo_documento_edit" name="tipo_documento" required>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="peticao">Petição</option>
+                                    <option value="sentenca">Sentença</option>
+                                    <option value="despacho">Despacho</option>
+                                    <option value="certidao">Certidão</option>
+                                    <option value="contrato">Contrato</option>
+                                    <option value="comprovante">Comprovante</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="descricao_edit" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao_edit" name="descricao" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Arquivo Atual</label>
+                        <div id="arquivo_atual" class="p-2 bg-light rounded"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Confirmar Exclusão -->
+<div class="modal fade" id="modalConfirmarExclusao" tabindex="-1" aria-labelledby="modalConfirmarExclusaoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalConfirmarExclusaoLabel">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este documento?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-warning me-2"></i>
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita. O arquivo será removido permanentemente.
+                </div>
+                <div id="infoDocumentoExclusao"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">
+                    <i class="fas fa-trash me-2"></i>
+                    Excluir Documento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // =============================================================================
+    // CONFIGURAÇÕES GERAIS
+    // =============================================================================
+    
+    // Alternar entre visualização em cards e tabela
+    $('#btnViewCards').click(function() {
+        $('#viewCards').show();
+        $('#viewTable').hide();
+        $(this).addClass('active');
+        $('#btnViewTable').removeClass('active');
+    });
+    
+    $('#btnViewTable').click(function() {
+        $('#viewCards').hide();
+        $('#viewTable').show();
+        $(this).addClass('active');
+        $('#btnViewCards').removeClass('active');
+    });
+    
+    // Carregar lista de processos nos selects
+    carregarProcessos();
+    
+    // =============================================================================
+    // UPLOAD DE DOCUMENTO ÚNICO
+    // =============================================================================
+    
+    $('#formUploadDocumento').on('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Mostrar progress bar
+        $('.progress-upload').show();
+        
+        $.ajax({
+            url: '{% url "assejus:documento_upload_ajax" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function() {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        const percentComplete = evt.loaded / evt.total * 100;
+                        $('.progress-bar').css('width', percentComplete + '%');
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(response) {
+                console.log('📋 Resposta do upload:', response);
+                if (response.success) {
+                    console.log('✅ Upload bem-sucedido, fechando modal...');
+                    mostrarMensagem('success', response.message);
+                    
+                    // Fechar modal - método mais direto
+                    console.log('🔧 Fechando modal...');
+                    const modal = document.getElementById('modalUploadDocumento');
+                    if (modal) {
+                        // Remover classes e estilos
+                        modal.classList.remove('show');
+                        modal.style.display = 'none';
+                        modal.setAttribute('aria-hidden', 'true');
+                        modal.removeAttribute('aria-modal');
+                        
+                        // Remover backdrop
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(backdrop => backdrop.remove());
+                        
+                        // Restaurar body
+                        document.body.classList.remove('modal-open');
+                        document.body.style.overflow = '';
+                        document.body.style.paddingRight = '';
+                        
+                        console.log('✅ Modal fechado com sucesso');
+                    }
+                    
+                    // Recarregar página após fechar modal
+                    console.log('🔄 Recarregando página em 1 segundo...');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    mostrarMensagem('error', response.message);
+                    if (response.errors) {
+                        mostrarErrosFormulario(response.errors);
+                    }
+                }
+            },
+            error: function() {
+                mostrarMensagem('error', 'Erro interno do servidor');
+            },
+            complete: function() {
+                $('.progress-upload').hide();
+                $('.progress-bar').css('width', '0%');
+            }
+        });
+    });
+    
+    // =============================================================================
+    // UPLOAD MÚLTIPLO
+    // =============================================================================
+    
+    $('#arquivo_multiplo').on('change', function() {
+        const files = this.files;
+        const lista = $('#listaArquivosList');
+        
+        lista.empty();
+        
+        if (files.length > 0) {
+            $('#listaArquivos').show();
+            
+            Array.from(files).forEach(function(file) {
+                const item = $(`
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fas fa-file me-2"></i>
+                            ${file.name}
+                        </div>
+                        <small class="text-muted">${formatarTamanhoArquivo(file.size)}</small>
+                    </li>
+                `);
+                lista.append(item);
+            });
+        } else {
+            $('#listaArquivos').hide();
+        }
+    });
+    
+    $('#formUploadMultiplo').on('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        // Mostrar progress bar
+        $('.progress-upload').show();
+        
+        $.ajax({
+            url: '{% url "assejus:documento_upload_multiplo_ajax" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            xhr: function() {
+                const xhr = new window.XMLHttpRequest();
+                xhr.upload.addEventListener("progress", function(evt) {
+                    if (evt.lengthComputable) {
+                        const percentComplete = evt.loaded / evt.total * 100;
+                        $('.progress-bar').css('width', percentComplete + '%');
+                    }
+                }, false);
+                return xhr;
+            },
+            success: function(response) {
+                if (response.success) {
+                    mostrarMensagem('success', response.message);
+                    $('#modalUploadMultiplo').modal('hide');
+                    location.reload();
+                } else {
+                    mostrarMensagem('error', response.message);
+                    if (response.errors) {
+                        mostrarErrosFormulario(response.errors);
+                    }
+                }
+            },
+            error: function() {
+                mostrarMensagem('error', 'Erro interno do servidor');
+            },
+            complete: function() {
+                $('.progress-upload').hide();
+                $('.progress-bar').css('width', '0%');
+            }
+        });
+    });
+    
+    // =============================================================================
+    // EDIÇÃO DE DOCUMENTO
+    // =============================================================================
+    
+    $('#formEditarDocumento').on('submit', function(e) {
+        e.preventDefault();
+        
+        const documentoId = $('#documento_id').val();
+        const formData = new FormData(this);
+        formData.append('acao', 'editar');
+        
+        $.ajax({
+            url: `/assejus/documentos/${documentoId}/update-ajax/`,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                if (response.success) {
+                    mostrarMensagem('success', response.message);
+                    $('#modalEditarDocumento').modal('hide');
+                    location.reload();
+                } else {
+                    mostrarMensagem('error', response.message);
+                    if (response.errors) {
+                        mostrarErrosFormulario(response.errors);
+                    }
+                }
+            },
+            error: function() {
+                mostrarMensagem('error', 'Erro interno do servidor');
+            }
+        });
+    });
+    
+    // =============================================================================
+    // EXCLUSÃO DE DOCUMENTO
+    // =============================================================================
+    
+    $('#btnConfirmarExclusao').click(function() {
+        const documentoId = $(this).data('documento-id');
+        
+        $.ajax({
+            url: `/assejus/documentos/${documentoId}/delete-ajax/`,
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': $('[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                if (response.success) {
+                    mostrarMensagem('success', response.message);
+                    $('#modalConfirmarExclusao').modal('hide');
+                    location.reload();
+                } else {
+                    mostrarMensagem('error', response.message);
+                }
+            },
+            error: function() {
+                mostrarMensagem('error', 'Erro interno do servidor');
+            }
+        });
+    });
+    
+    // =============================================================================
+    // FUNÇÕES AUXILIARES
+    // =============================================================================
+    
+    function carregarProcessos() {
+        $.ajax({
+            url: '/assejus/api/processos/',
+            type: 'GET',
+            success: function(response) {
+                const selectProcesso = $('#processo, #processo_multiplo');
+                selectProcesso.empty().append('<option value="">Selecione o processo</option>');
+                
+                response.forEach(function(processo) {
+                    selectProcesso.append(`
+                        <option value="${processo.id}">
+                            ${processo.numero_processo} - ${processo.parte_cliente}
+                        </option>
+                    `);
+                });
+            }
+        });
+    }
+    
+    function formatarTamanhoArquivo(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+    
+    function mostrarMensagem(tipo, mensagem) {
+        const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const alert = $(`
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                <i class="fas ${icon} me-2"></i>
+                ${mensagem}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+        
+        $('.container-fluid').prepend(alert);
+        
+        setTimeout(function() {
+            alert.alert('close');
+        }, 5000);
+    }
+    
+    function mostrarErrosFormulario(errors) {
+        Object.keys(errors).forEach(function(field) {
+            const fieldElement = $(`[name="${field}"]`);
+            if (fieldElement.length) {
+                fieldElement.addClass('is-invalid');
+                const errorDiv = $(`<div class="invalid-feedback">${errors[field].join(', ')}</div>`);
+                fieldElement.after(errorDiv);
+            }
+        });
+    }
+    
+    // Limpar erros de validação ao fechar modais
+    $('.modal').on('hidden.bs.modal', function() {
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+        $(this).find('form')[0].reset();
+    });
+});
+
+// =============================================================================
+// FUNÇÕES GLOBAIS
+// =============================================================================
+
+function editarDocumento(documentoId) {
+    // Carregar dados do documento via AJAX
+    $.ajax({
+        url: `/assejus/documentos/${documentoId}/`,
+        type: 'GET',
+        success: function(response) {
+            // Preencher formulário de edição
+            $('#documento_id').val(documentoId);
+            $('#titulo_edit').val(response.titulo);
+            $('#tipo_documento_edit').val(response.tipo_documento);
+            $('#descricao_edit').val(response.descricao);
+            
+            // Mostrar arquivo atual
+            $('#arquivo_atual').html(`
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-file me-2"></i>
+                    <span>${response.arquivo_nome}</span>
+                    <small class="text-muted ms-2">(${response.tamanho_arquivo})</small>
+                </div>
+            `);
+            
+            $('#modalEditarDocumento').modal('show');
+        }
+    });
+}
+
+function excluirDocumento(documentoId) {
+    // Carregar dados do documento para confirmação
+    $.ajax({
+        url: `/assejus/documentos/${documentoId}/`,
+        type: 'GET',
+        success: function(response) {
+            $('#infoDocumentoExclusao').html(`
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-title">${response.titulo}</h6>
+                        <p class="card-text small text-muted">
+                            <strong>Processo:</strong> ${response.processo_numero}<br>
+                            <strong>Tipo:</strong> ${response.tipo_documento_display}<br>
+                            <strong>Data Upload:</strong> ${response.data_upload}
+                        </p>
+                    </div>
+                </div>
+            `);
+            
+            $('#btnConfirmarExclusao').data('documento-id', documentoId);
+            $('#modalConfirmarExclusao').modal('show');
+        }
+    });
+}
+</script>
+{% endblock %}

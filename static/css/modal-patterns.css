@@ -1,0 +1,544 @@
+/* ========================================
+   PADRÕES VISUAIS PARA MODAIS DO SISTEMA
+   ======================================== */
+
+/* ===== OVERRIDE GLOBAL AGGRESSIVO ===== */
+/* Sobrescrever QUALQUER CSS que possa estar interferindo */
+body .modal-body select,
+body .modal-body input,
+body .modal-body textarea,
+body .modal-body .form-control,
+body .modal-body .form-select {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 9999 !important;
+    user-select: auto !important;
+    -webkit-user-select: auto !important;
+    -moz-user-select: auto !important;
+    -ms-user-select: auto !important;
+}
+
+/* Override para QUALQUER framework CSS */
+body .modal-body select[disabled],
+body .modal-body input[disabled],
+body .modal-body textarea[disabled],
+body .modal-body .form-control:disabled,
+body .modal-body .form-select:disabled {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+}
+
+/* Override para Bootstrap específico */
+body .modal-body .form-control:disabled,
+body .modal-body .form-select:disabled {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+}
+
+/* Override para qualquer CSS global */
+body .modal-body * {
+    pointer-events: auto !important;
+}
+
+/* Exceção apenas para loading */
+body .modal-body.loading {
+    pointer-events: none !important;
+}
+
+body .modal-body.loading * {
+    pointer-events: none !important;
+}
+
+/* ===== GARANTIR CAMPOS EDITÁVEIS ===== */
+/* Campos select específicos */
+.modal-body select.form-select,
+.modal-body select.form-control,
+.modal-body select[class*="form-"],
+.modal-body select {
+    cursor: pointer !important;
+    background-color: #fff !important;
+    /* Removido background-image para evitar duplicação de setas */
+    background-image: none !important;
+    /* Garantir que apenas a seta padrão do Bootstrap seja exibida */
+    appearance: auto !important;
+    -webkit-appearance: menulist !important;
+    -moz-appearance: menulist !important;
+}
+
+/* Campos de input específicos */
+.modal-body input[type="text"],
+.modal-body input[type="email"],
+.modal-body input[type="tel"],
+.modal-body input[type="number"],
+.modal-body input[type="date"],
+.modal-body textarea {
+    cursor: text !important;
+}
+
+/* Campos de checkbox e radio */
+.modal-body input[type="checkbox"],
+.modal-body input[type="radio"] {
+    cursor: pointer !important;
+}
+
+/* Remover qualquer estilo que possa estar causando problemas */
+.modal-body * {
+    pointer-events: auto !important;
+}
+
+/* Exceção para elementos que devem manter pointer-events: none */
+.modal-body.loading {
+    pointer-events: none !important;
+}
+
+.modal-body.loading * {
+    pointer-events: none !important;
+}
+
+/* ===== CONFIGURAÇÕES GERAIS DOS MODAIS ===== */
+.modal-xl {
+    max-width: 1400px;
+}
+
+.modal-lg {
+    max-width: 1000px;
+}
+
+.modal-content {
+    border: 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    overflow: hidden;
+}
+
+/* ===== HEADERS DOS MODAIS ===== */
+.modal-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    border: 0;
+    padding: 2rem;
+}
+
+.modal-header .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+}
+
+.modal-header .btn-close:hover {
+    opacity: 1;
+}
+
+.modal-title {
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.modal-title i {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+}
+
+/* ===== CORPO DOS MODAIS ===== */
+.modal-body {
+    padding: 2.5rem;
+    background: #f8f9fa;
+}
+
+/* ===== FOOTERS DOS MODAIS ===== */
+.modal-footer {
+    background: #f8f9fa;
+    border: 0;
+    padding: 2rem 2.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+/* ===== CARDS DE INFORMAÇÃO ===== */
+.info-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease-in-out;
+    margin-bottom: 1.5rem;
+}
+
+.info-card:hover {
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    transform: translateY(-5px);
+}
+
+.info-card-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    padding: 1.25rem;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+}
+
+.info-card-header h6 {
+    font-weight: 600;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.info-card-header i {
+    margin-right: 0.75rem;
+    font-size: 1.125rem;
+}
+
+.info-card-body {
+    padding: 1.75rem;
+}
+
+/* ===== ITENS DE INFORMAÇÃO ===== */
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.info-item:hover {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 160px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.info-label i {
+    margin-right: 0.75rem;
+    color: #0d6efd;
+}
+
+.info-value {
+    color: #212529;
+    font-weight: 500;
+    text-align: right;
+    flex: 1;
+}
+
+.info-value a {
+    color: #0d6efd;
+    transition: color 0.3s ease;
+    text-decoration: none;
+}
+
+.info-value a:hover {
+    color: #0a58ca;
+}
+
+/* ===== SEÇÕES DE FORMULÁRIO ===== */
+.form-section {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.form-section-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+    display: flex;
+    align-items: center;
+}
+
+.form-section-header h6 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.form-section-header i {
+    margin-right: 0.75rem;
+    font-size: 1.125rem;
+}
+
+/* ===== BOTÕES ===== */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 1rem;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    border: none;
+}
+
+.btn-outline-secondary {
+    border: 2px solid #6c757d;
+    color: #6c757d;
+    background: transparent;
+}
+
+.btn-outline-secondary:hover {
+    background: #6c757d;
+    color: white;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    border-radius: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    padding: 0.5rem 1rem;
+}
+
+.badge.fs-6 {
+    font-size: 0.875rem !important;
+}
+
+/* ===== AVATARES ===== */
+.avatar-circle {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== ALERTAS ===== */
+.alert {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+.alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+/* ===== OBSERVAÇÕES ===== */
+.observations-content {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border-left: 5px solid #ffc107;
+    position: relative;
+    text-align: center;
+    font-style: italic;
+}
+
+.observations-content i {
+    color: #ffc107;
+    font-size: 1.5rem;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .modal-xl {
+        max-width: 95vw;
+    }
+    
+    .modal-lg {
+        max-width: 95vw;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .modal-footer {
+        padding: 1.5rem 2rem;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .info-label {
+        min-width: auto;
+    }
+    
+    .info-value {
+        text-align: left;
+    }
+    
+    .form-section {
+        padding: 1.25rem;
+    }
+    
+    .form-section-header {
+        padding: 0.75rem 1.25rem;
+        margin: -1.25rem -1.25rem 1.25rem -1.25rem;
+    }
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal.fade .modal-dialog {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* ===== ESTILOS PARA FORMULÁRIOS CRISPY ===== */
+.form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    padding: 1rem 1.25rem;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+/* Espaçamento entre campos de formulário */
+.form-group, .mb-3 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Espaçamento entre linhas de formulário */
+.row {
+    margin-bottom: 1rem;
+}
+
+/* Campos de formulário em colunas */
+.col-md-6, .col-md-4, .col-md-3 {
+    padding: 0 0.75rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.help-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* ===== ESTILOS PARA TABELAS ===== */
+.table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.table thead th {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ===== ESTILOS PARA PAGINAÇÃO ===== */
+.pagination .page-link {
+    border-radius: 0.5rem;
+    margin: 0 0.25rem;
+    border: 2px solid #e9ecef;
+    color: #0d6efd;
+    transition: all 0.3s ease;
+}
+
+.pagination .page-link:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border-color: #0d6efd;
+}

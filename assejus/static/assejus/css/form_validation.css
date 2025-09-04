@@ -1,0 +1,105 @@
+/* Estilos para validação de formulários */
+.form-control.is-invalid,
+.form-select.is-invalid,
+.form-check-input.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
+    background-color: #f8fff9 !important;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus,
+.form-check-input.is-invalid:focus {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
+}
+
+.form-group.has-error .form-control,
+.form-group.has-error .form-select {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-success .form-control,
+.form-group.has-success .form-select {
+    border-color: #198754 !important;
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25) !important;
+    background-color: #f8fff9 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold;
+}
+
+.form-group.has-success .form-label {
+    color: #198754 !important;
+    font-weight: bold;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875em !important;
+    margin-top: 0.25rem !important;
+    font-weight: 500 !important;
+}
+
+.valid-feedback {
+    display: block !important;
+    color: #198754 !important;
+    font-size: 0.875em !important;
+    margin-top: 0.25rem !important;
+    font-weight: 500 !important;
+}
+
+.invalid-feedback i {
+    color: #dc3545 !important;
+    margin-right: 0.25rem !important;
+}
+
+.valid-feedback i {
+    color: #198754 !important;
+    margin-right: 0.25rem !important;
+}
+
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    animation: errorShake 0.5s ease-in-out;
+}
+
+.alert-danger.border-danger {
+    border: 2px solid #dc3545 !important;
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+}
+
+.error-summary {
+    border-left: 4px solid #dc3545;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.field-error {
+    animation: errorShake 0.5s ease-in-out;
+}

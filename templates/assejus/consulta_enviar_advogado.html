@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Enviar Consulta para Advogado - {{ consulta.associado.nome }} - ASEJUS
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-share me-2"></i>
+        Enviar Consulta para Advogado
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'assejus:consulta_detail' pk=consulta.pk %}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Detalhes da Consulta
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <p><strong>Associado:</strong> {{ consulta.associado.nome }}</p>
+                        <p><strong>Tipo de Consulta:</strong> {{ consulta.get_tipo_display }}</p>
+                        <p><strong>Status Atual:</strong> 
+                            <span class="badge {% if consulta.status == 'respondida' %}bg-success{% elif consulta.status == 'em_analise' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ consulta.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Data da Consulta:</strong> {{ consulta.data_consulta|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Prioridade:</strong> 
+                            <span class="badge {% if consulta.prioridade == 'alta' %}bg-danger{% elif consulta.prioridade == 'media' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ consulta.get_prioridade_display }}
+                            </span>
+                        </p>
+                        <p><strong>Advogado Atual:</strong> 
+                            {% if consulta.advogado_responsavel %}
+                                <span class="badge bg-primary">{{ consulta.advogado_responsavel.nome }}</span>
+                            {% else %}
+                                <span class="text-muted">Não atribuído</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6>Pergunta:</h6>
+                        <div class="border p-3 bg-light mb-3">
+                            {{ consulta.pergunta|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                {% if consulta.resposta %}
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h6>Resposta Atual:</h6>
+                        <div class="border p-3 bg-light mb-3">
+                            {{ consulta.resposta|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-8">
+                            <label for="advogado_responsavel" class="form-label">
+                                <strong>Selecione o Advogado Responsável:</strong>
+                            </label>
+                            <select name="advogado_responsavel" id="advogado_responsavel" class="form-control" required>
+                                <option value="">--------- Selecione um advogado ---------</option>
+                                {% for advogado in advogados %}
+                                    <option value="{{ advogado.pk }}" {% if consulta.advogado_responsavel == advogado %}selected{% endif %}>
+                                        {{ advogado.nome }} - OAB: {{ advogado.oab }}/{{ advogado.uf_oab }} - {{ advogado.especialidades }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                A consulta será enviada para o advogado selecionado e o status será alterado para "Em Análise"
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'assejus:consulta_detail' pk=consulta.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-1"></i>
+                            Enviar para Advogado
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

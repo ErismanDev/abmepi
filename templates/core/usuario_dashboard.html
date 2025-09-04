@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-tachometer-alt me-2"></i>
+        {{ title }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'core:perfil' %}" class="btn btn-outline-primary">
+                <i class="fas fa-user-edit me-1"></i>
+                Editar Perfil
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informações do Usuário -->
+    <div class="col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-user me-2"></i>
+                    Meu Perfil
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-user fa-2x text-white"></i>
+                    </div>
+                </div>
+                <h6 class="text-center mb-3">{{ user.get_full_name }}</h6>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Tipo de Usuário</small>
+                        <strong>{{ user.get_tipo_usuario_display }}</strong>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">Status</small>
+                        {% if user.ativo %}
+                            <span class="badge bg-success">Ativo</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inativo</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <hr>
+                <div class="small">
+                    <div class="mb-2">
+                        <i class="fas fa-envelope me-2 text-muted"></i>
+                        {{ user.email }}
+                    </div>
+                    <div class="mb-2">
+                        <i class="fas fa-calendar me-2 text-muted"></i>
+                        Membro desde {{ user.date_joined|date:"d/m/Y" }}
+                    </div>
+                    {% if user.ultimo_acesso %}
+                    <div class="mb-2">
+                        <i class="fas fa-clock me-2 text-muted"></i>
+                        Último acesso: {{ user.ultimo_acesso|date:"d/m/Y H:i" }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações Específicas do Tipo de Usuário -->
+    <div class="col-lg-8 mb-4">
+        {% if user.tipo_usuario == 'associado' and associado %}
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-id-card me-2"></i>
+                    Informações do Associado
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Dados Pessoais</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>CPF:</strong> 
+                                {% if associado.cpf %}
+                                    {{ associado.cpf }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Data de Nascimento:</strong> 
+                                {% if associado.data_nascimento %}
+                                    {{ associado.data_nascimento|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Telefone:</strong> 
+                                {% if associado.telefone %}
+                                    {{ associado.telefone }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Endereço:</strong> 
+                                {% if associado.cidade and associado.estado %}
+                                    {{ associado.cidade }}/{{ associado.estado }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Informações de Associação</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Matrícula:</strong> 
+                                {% if associado.matricula_militar %}
+                                    {{ associado.matricula_militar }}
+                                {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Data de Ingresso:</strong> 
+                                {% if associado.data_ingresso %}
+                                    {{ associado.data_ingresso|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Situação:</strong> 
+                                {% if associado.situacao %}
+                                    <span class="badge bg-{% if associado.situacao == 'ativo' %}success{% elif associado.situacao == 'inativo' %}danger{% else %}warning{% endif %}">
+                                        {{ associado.get_situacao_display }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">Não informada</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif user.tipo_usuario == 'associado' and not associado %}
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Associado Não Encontrado
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="fas fa-user-slash fa-3x text-warning mb-3"></i>
+                    <h6>Nenhum registro de associado encontrado</h6>
+                    <p class="text-muted">
+                        Você está logado como associado, mas não foi encontrado um registro correspondente 
+                        no sistema. Entre em contato com a administração para resolver esta situação.
+                    </p>
+                    <div class="mt-3">
+                        <a href="{% url 'core:perfil' %}" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-user-edit me-2"></i>
+                            Editar Perfil
+                        </a>
+                        <a href="{% url 'core:logout' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif user.tipo_usuario == 'advogado' and advogado %}
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-gavel me-2"></i>
+                    Informações do Advogado
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Dados Profissionais</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>OAB:</strong> {{ advogado.oab }}/{{ advogado.uf_oab }}</li>
+                            <li><strong>Especialidade:</strong> {{ advogado.especialidades|default:"Não informada" }}</li>
+                            <li><strong>Telefone:</strong> {{ advogado.telefone }}</li>
+                            <li><strong>Email:</strong> {{ advogado.email }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Estatísticas</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Casos Ativos:</strong> {{ casos_recentes|length }}</li>
+                            <li><strong>Status:</strong> 
+                                <span class="badge bg-{% if advogado.ativo %}success{% else %}danger{% endif %}">
+                                    {{ advogado.ativo|yesno:"Ativo,Inativo" }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% elif user.tipo_usuario == 'psicologo' and psicologo %}
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-brain me-2"></i>
+                    Informações do Psicólogo
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Dados Profissionais</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>CRP:</strong> {{ psicologo.crp }}/{{ psicologo.uf_crp }}</li>
+                            <li><strong>Especialidade:</strong> {{ psicologo.especialidades|default:"Não informada" }}</li>
+                            <li><strong>Telefone:</strong> {{ psicologo.telefone }}</li>
+                            <li><strong>Email:</strong> {{ psicologo.email }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Estatísticas</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Atendimentos:</strong> {{ atendimentos_recentes|length }}</li>
+                            <li><strong>Status:</strong> 
+                                <span class="badge bg-{% if psicologo.ativo %}success{% else %}danger{% endif %}">
+                                    {{ psicologo.ativo|yesno:"Ativo,Inativo" }}
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card h-100">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informações Gerais
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Bem-vindo ao seu dashboard pessoal!</p>
+                <p>Use o menu lateral para navegar pelas funcionalidades disponíveis para o seu tipo de usuário.</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Atividades Recentes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-history me-2"></i>
+                    Minhas Atividades Recentes
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if atividades_recentes %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Data/Hora</th>
+                                <th>Ação</th>
+                                <th>Módulo</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for atividade in atividades_recentes %}
+                            <tr>
+                                <td>{{ atividade.data_hora|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    <span class="badge bg-primary">{{ atividade.acao }}</span>
+                                </td>
+                                <td>{{ atividade.modulo }}</td>
+                                <td>{{ atividade.detalhes|truncatechars:50 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-4">
+                    <i class="fas fa-info-circle fa-3x mb-3"></i>
+                    <p>Nenhuma atividade registrada ainda.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações Rápidas -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Ações Rápidas
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'core:perfil' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-user-edit me-2"></i>
+                            Editar Perfil
+                        </a>
+                    </div>
+                    {% if user.tipo_usuario == 'associado' and associado %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'associados:minha_ficha' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-id-card me-2"></i>
+                            Minha Ficha
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if user.tipo_usuario == 'advogado' and advogado %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'assejus:advogado_detail' pk=advogado.pk %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-gavel me-2"></i>
+                            Ver Advogado
+                        </a>
+                    </div>
+                    {% endif %}
+                    {% if user.tipo_usuario == 'psicologo' and psicologo %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'psicologia:psicologo_detail' pk=psicologo.pk %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-brain me-2"></i>
+                            Ver Psicólogo
+                        </a>
+                    </div>
+                    {% endif %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'core:logout' %}" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,447 @@
+{% load static %}
+
+<style>
+/* Estilos para seções do formulário - Padrão Associados */
+.form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 0.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.form-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.form-section-header i {
+    color: #0d6efd;
+    font-size: 1.1rem;
+    margin-right: 0.5rem;
+}
+
+.form-section-header h6 {
+    color: #495057;
+    font-weight: 600;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-label i {
+    color: #6c757d;
+    margin-right: 0.25rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 0.375rem;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem;
+    font-size: 0.9rem;
+    transition: all 0.15s ease-in-out;
+    background-color: #fff;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    outline: 0;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+    margin-right: 0.25rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .form-section {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .col-md-6,
+    .col-md-3 {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<form method="post" enctype="multipart/form-data" id="advogadoForm" novalidate>
+    {% csrf_token %}
+    
+    <!-- Dados Pessoais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-user me-2"></i>
+            <h6 class="mb-0">Dados Pessoais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.nome.id_for_label }}" class="form-label">
+                        <i class="fas fa-user me-1"></i>Nome Completo *
+                    </label>
+                    {{ form.nome }}
+                    {% if form.nome.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.nome.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.cpf.id_for_label }}" class="form-label">
+                        <i class="fas fa-id-card me-1"></i>CPF *
+                    </label>
+                    {{ form.cpf }}
+                    {% if form.cpf.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.cpf.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.foto.id_for_label }}" class="form-label">
+                        <i class="fas fa-camera me-1"></i>Foto
+                    </label>
+                    {{ form.foto }}
+                    {% if form.foto.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.foto.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações Profissionais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-gavel me-2"></i>
+            <h6 class="mb-0">Informações Profissionais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.oab.id_for_label }}" class="form-label">
+                        <i class="fas fa-gavel me-1"></i>Número OAB *
+                    </label>
+                    {{ form.oab }}
+                    {% if form.oab.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.oab.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.uf_oab.id_for_label }}" class="form-label">
+                        <i class="fas fa-map-marker-alt me-1"></i>UF OAB *
+                    </label>
+                    {{ form.uf_oab }}
+                    {% if form.uf_oab.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.uf_oab.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.data_inscricao_oab.id_for_label }}" class="form-label">
+                        <i class="fas fa-calendar-alt me-1"></i>Data Inscrição OAB *
+                    </label>
+                    {{ form.data_inscricao_oab }}
+                    {% if form.data_inscricao_oab.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.data_inscricao_oab.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.especialidades.id_for_label }}" class="form-label">
+                        <i class="fas fa-certificate me-1"></i>Especialidades
+                    </label>
+                    {{ form.especialidades }}
+                    {% if form.especialidades.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.especialidades.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.experiencia_anos.id_for_label }}" class="form-label">
+                        <i class="fas fa-clock me-1"></i>Anos de Experiência *
+                    </label>
+                    {{ form.experiencia_anos }}
+                    {% if form.experiencia_anos.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.experiencia_anos.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.situacao.id_for_label }}" class="form-label">
+                        <i class="fas fa-info-circle me-1"></i>Situação *
+                    </label>
+                    {{ form.situacao }}
+                    {% if form.situacao.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.situacao.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contato -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-address-book me-2"></i>
+            <h6 class="mb-0">Contato</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                        <i class="fas fa-envelope me-1"></i>E-mail *
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.email.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.telefone.id_for_label }}" class="form-label">
+                        <i class="fas fa-phone me-1"></i>Telefone *
+                    </label>
+                    {{ form.telefone }}
+                    {% if form.telefone.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.telefone.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.celular.id_for_label }}" class="form-label">
+                        <i class="fas fa-mobile-alt me-1"></i>Celular
+                    </label>
+                    {{ form.celular }}
+                    {% if form.celular.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.celular.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Endereço -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            <h6 class="mb-0">Endereço</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.cep.id_for_label }}" class="form-label">
+                        <i class="fas fa-mail-bulk me-1"></i>CEP *
+                    </label>
+                    {{ form.cep }}
+                    {% if form.cep.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.cep.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.endereco.id_for_label }}" class="form-label">
+                        <i class="fas fa-road me-1"></i>Endereço *
+                    </label>
+                    {{ form.endereco }}
+                    {% if form.endereco.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.endereco.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.cidade.id_for_label }}" class="form-label">
+                        <i class="fas fa-city me-1"></i>Cidade *
+                    </label>
+                    {{ form.cidade }}
+                    {% if form.cidade.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.cidade.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.estado.id_for_label }}" class="form-label">
+                        <i class="fas fa-map me-1"></i>Estado *
+                    </label>
+                    {{ form.estado }}
+                    {% if form.estado.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.estado.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações Adicionais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-info-circle me-2"></i>
+            <h6 class="mb-0">Informações Adicionais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                        <i class="fas fa-sticky-note me-1"></i>Observações
+                    </label>
+                    {{ form.observacoes }}
+                    {% if form.observacoes.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.observacoes.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label for="{{ form.ativo.id_for_label }}" class="form-label">
+                        <i class="fas fa-check-circle me-1"></i>Ativo
+                    </label>
+                    {{ form.ativo }}
+                    {% if form.ativo.errors %}
+                        <div class="invalid-feedback d-block text-danger mt-1">
+                            {% for error in form.ativo.errors %}
+                                <div><i class="fas fa-times-circle me-1"></i>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+</form>

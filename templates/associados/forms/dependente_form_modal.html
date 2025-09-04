@@ -1,0 +1,84 @@
+{% load crispy_forms_tags %}
+
+<form method="post" enctype="multipart/form-data" id="dependenteForm" novalidate>
+    {% csrf_token %}
+    
+    {% if associado %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Associado:</strong> {{ associado.nome }}
+    </div>
+    {% endif %}
+    
+    <!-- Dados Básicos -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-user me-2"></i>
+            <h6 class="mb-0">Dados Básicos</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.nome|as_crispy_field }}
+            </div>
+
+            <div class="col-md-6">
+                {{ form.parentesco|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações Pessoais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-id-card me-2"></i>
+            <h6 class="mb-0">Informações Pessoais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.data_nascimento|as_crispy_field }}
+            </div>
+
+            <div class="col-md-6">
+                {{ form.cpf|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Contato e Mídia -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-address-book me-2"></i>
+            <h6 class="mb-0">Contato e Mídia</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.email|as_crispy_field }}
+            </div>
+
+            <div class="col-md-6">
+                {{ form.foto|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Observações -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-sticky-note me-2"></i>
+            <h6 class="mb-0">Observações</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-12">
+                {{ form.observacoes|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+

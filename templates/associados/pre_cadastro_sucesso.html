@@ -1,0 +1,320 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pré-Cadastro Enviado - ABMEPI</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --accent-light: #63b3ed;
+            --white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            --shadow-light: 0 4px 20px rgba(26, 54, 93, 0.08);
+            --shadow-medium: 0 8px 30px rgba(26, 54, 93, 0.12);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Navegação Moderna */
+        .modern-navbar {
+            background: rgba(26, 54, 93, 0.95) !important;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 8px 40px rgba(26, 54, 93, 0.25);
+            transition: all 0.4s ease;
+            padding: 1rem 0;
+            height: 85px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modern-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 179, 237, 0.5), transparent);
+        }
+        
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 100%;
+            padding-top: 8px;
+        }
+        
+        .brand-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            background: white;
+            padding: 4px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            min-width: 250px;
+        }
+        
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: unset;
+        }
+        
+        /* Links de navegação */
+        .modern-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modern-nav .nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .modern-nav .nav-link i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .main-container {
+            padding: 6rem 0 2rem 0; /* Compensar navbar fixo */
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 1rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 123, 255, 0.3);
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .alert {
+            border-radius: 0.75rem;
+            border: none;
+        }
+        
+        .footer {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 1rem 1rem 0 0;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-container h4 {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #28a745;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-badge {
+            font-size: 1.1rem;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top modern-navbar">
+        <div class="container">
+            <!-- Logo ABMEPI Destacada -->
+            <a class="navbar-brand" href="{% url 'institucional' %}">
+                <div class="logo-container">
+                    <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="brand-logo">
+                    <div class="brand-text">
+                        <span class="brand-title">ABMEPI</span>
+                        <span class="brand-subtitle">Associação de Bombeiros e Policiais Militares</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Menu de Navegação -->
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav modern-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/associados/pre-cadastro/consultar/">
+                            <i class="fas fa-search"></i>
+                            Consultar Andamento
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'institucional' %}">
+                            <i class="fas fa-home"></i>
+                            Voltar ao Portal
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <!-- Logo e título -->
+            <div class="logo-container">
+                <h4>Pré-Cadastro de Associado</h4>
+
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-body text-center p-5">
+                            <!-- Ícone de sucesso -->
+                            <div class="mb-4">
+                                <i class="fas fa-check-circle success-icon"></i>
+                            </div>
+                            
+                            <!-- Título -->
+                            <h2 class="card-title text-success mb-3">
+                                Pré-Cadastro Enviado com Sucesso!
+                            </h2>
+                            
+                            <!-- Mensagem principal -->
+                            <p class="lead text-muted mb-4">
+                                Sua solicitação de associação foi recebida e está sendo analisada pela diretoria da ABMEPI.
+                            </p>
+                            
+                            <!-- Informações importantes -->
+                            <div class="alert alert-info text-start mb-4">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Próximos Passos
+                                </h6>
+                                <ul class="mb-0">
+                                    <li><strong>Análise:</strong> Sua solicitação será analisada em até 5 dias úteis</li>
+                                    <li><strong>Notificação:</strong> Você receberá um email com o resultado da análise</li>
+                                    <li><strong>Aprovação:</strong> Se aprovado, receberá instruções para acessar o sistema</li>
+                                    <li><strong>Documentação:</strong> Mantenha seus dados atualizados</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Status atual -->
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">
+                                        <i class="fas fa-clock me-2"></i>
+                                        Status Atual
+                                    </h6>
+                                    <span class="badge bg-warning text-dark status-badge">Em Análise</span>
+                                    <p class="text-muted mt-2 mb-0">
+                                        Sua solicitação está na fila para análise da diretoria
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <!-- Botões de ação -->
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                <a href="{% url 'institucional' %}" class="btn btn-primary btn-lg me-md-2">
+                                    <i class="fas fa-home me-2"></i>
+                                    Voltar ao Portal
+                                </a>
+                                <a href="/associados/pre-cadastro/consultar/" class="btn btn-success btn-lg me-md-2">
+                                    <i class="fas fa-search me-2"></i>
+                                    Consultar Andamento
+                                </a>
+                                <a href="{% url 'associados:pre_cadastro_form' %}" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Nova Solicitação
+                                </a>
+                            </div>
+                            
+                            <!-- Informações de contato -->
+                            <hr class="my-4">
+                            <div class="text-muted">
+                                <p class="mb-1">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    <strong>Dúvidas?</strong> Entre em contato conosco
+                                </p>
+                                <p class="mb-0 small">
+                                    Email: contato@abmepi.org.br | Telefone: (11) 1234-5678
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer simples -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                © 2025 Erisman@TI. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

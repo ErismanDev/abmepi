@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Primeiro Acesso - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .first-access-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+    
+    .first-access-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        max-width: 500px;
+        width: 100%;
+    }
+    
+    .first-access-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+    
+    .first-access-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+    
+    .first-access-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1rem;
+    }
+    
+    .first-access-body {
+        padding: 2rem;
+    }
+    
+    .alert-warning {
+        border-left: 4px solid #ffc107;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+    }
+    
+    .password-info {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .password-info h6 {
+        color: #495057;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .current-password {
+        background: #e9ecef;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 0.5rem;
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        color: #495057;
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+    }
+    
+    .security-tips {
+        background: #e7f3ff;
+        border: 1px solid #b3d9ff;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1.5rem;
+    }
+    
+    .security-tips h6 {
+        color: #0056b3;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .security-tips ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        color: #0056b3;
+    }
+    
+    .security-tips li {
+        margin-bottom: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="first-access-container">
+    <div class="first-access-card">
+        <!-- Header -->
+        <div class="first-access-header">
+            <h1>
+                <i class="fas fa-shield-alt me-2"></i>
+                Primeiro Acesso
+            </h1>
+            <p>Bem-vindo ao sistema ABMEPI!</p>
+        </div>
+        
+        <!-- Body -->
+        <div class="first-access-body">
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Segurança:</strong> Por favor, altere sua senha padrão antes de continuar.
+            </div>
+            
+            <!-- Informações da Senha Atual -->
+            <div class="password-info">
+                <h6>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sua senha atual é:
+                </h6>
+                <div class="current-password">{{ senha_padrao }}</div>
+                <small class="text-muted">
+                    <i class="fas fa-user me-1"></i>
+                    Usuário: <strong>{{ username }}</strong>
+                </small>
+            </div>
+            
+            <!-- Formulário de Alteração de Senha -->
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    {{ form.nova_senha|as_crispy_field }}
+                </div>
+                
+                <div class="form-group">
+                    {{ form.confirmar_senha|as_crispy_field }}
+                </div>
+                
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-key me-2"></i>
+                        Alterar Senha e Continuar
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Dicas de Segurança -->
+            <div class="security-tips">
+                <h6>
+                    <i class="fas fa-lightbulb me-2"></i>
+                    Dicas para uma senha segura:
+                </h6>
+                <ul>
+                    <li>Use pelo menos 8 caracteres</li>
+                    <li>Combine letras maiúsculas e minúsculas</li>
+                    <li>Inclua números e símbolos especiais</li>
+                    <li>Evite informações pessoais óbvias</li>
+                    <li>Não use a mesma senha em outros sites</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Focar no primeiro campo de senha
+    $('#id_nova_senha').focus();
+    
+    // Validação em tempo real
+    $('#id_confirmar_senha').on('input', function() {
+        var novaSenha = $('#id_nova_senha').val();
+        var confirmarSenha = $(this).val();
+        
+        if (novaSenha && confirmarSenha) {
+            if (novaSenha === confirmarSenha) {
+                $(this).removeClass('is-invalid').addClass('is-valid');
+                $('.invalid-feedback').hide();
+            } else {
+                $(this).removeClass('is-valid').addClass('is-invalid');
+                $('.invalid-feedback').show();
+            }
+        } else {
+            $(this).removeClass('is-valid is-invalid');
+        }
+    });
+    
+    // Mostrar/ocultar senhas
+    $('.password-toggle').on('click', function() {
+        var field = $($(this).data('target'));
+        var icon = $(this).find('i');
+        
+        if (field.attr('type') === 'password') {
+            field.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            field.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+});
+</script>
+{% endblock %}

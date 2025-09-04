@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prontuário - {{ prontuario.paciente.associado.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-file-medical text-success"></i> 
+                    Prontuário Eletrônico - {{ prontuario.paciente.associado.nome }}
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:prontuario_update' prontuario.pk %}" class="btn btn-warning shadow-sm">
+                        <i class="fas fa-edit fa-sm text-white-50"></i> Editar
+                    </a>
+                    {% if prontuario.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' prontuario.paciente.pk %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar aos Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações do Prontuário -->
+        <div class="col-lg-8">
+            <!-- Informações do Paciente -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-user text-info"></i> Informações do Paciente
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Dados Básicos</h6>
+                            <div class="border rounded p-3 bg-light">
+                                <strong>Nome:</strong> {{ prontuario.paciente.associado.nome }}<br>
+                                <strong>CPF:</strong> {{ prontuario.paciente.associado.cpf }}<br>
+                                <strong>Data de Nascimento:</strong> 
+                                {% if prontuario.paciente.associado.data_nascimento %}
+                                    {{ prontuario.paciente.associado.data_nascimento|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Psicólogo Responsável</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {% if prontuario.paciente.psicologo_responsavel %}
+                                    <strong>Nome:</strong> {{ prontuario.paciente.psicologo_responsavel.nome_completo }}<br>
+                                    <strong>CRP:</strong> {{ prontuario.paciente.psicologo_responsavel.crp }}<br>
+                                    <strong>Especialidade:</strong> {{ prontuario.paciente.psicologo_responsavel.especialidades|default:"Não especificada" }}
+                                {% else %}
+                                    <span class="text-muted">Não atribuído</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção 1: Queixa e Motivo da Consulta -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-comment-medical text-warning"></i> Queixa e Motivo da Consulta
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if prontuario.queixa_principal %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Queixa Principal</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.queixa_principal|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.queixas_secundarias %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Queixas Secundárias</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.queixas_secundarias|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.expectativas_tratamento %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Expectativas do Tratamento</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.expectativas_tratamento|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Seção 2: Histórico Clínico -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-history text-info"></i> Histórico Clínico
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if prontuario.historico_familiar %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Histórico Familiar</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.historico_familiar|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.historico_pessoal %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Histórico Pessoal</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.historico_pessoal|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.historico_medico %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Histórico Médico</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.historico_medico|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.historico_psicologico %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Histórico Psicológico</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.historico_psicologico|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Seção 3: Avaliação Psicológica -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-brain text-success"></i> Avaliação Psicológica
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if prontuario.hipotese_diagnostica %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Hipótese Diagnóstica</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.hipotese_diagnostica|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.sintomas_principais %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Sintomas Principais</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.sintomas_principais|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.fatores_estressores %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Fatores Estressores</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.fatores_estressores|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.recursos_coping %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Recursos de Coping</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.recursos_coping|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Seção 4: Plano Terapêutico -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-clipboard-list text-warning"></i> Plano Terapêutico
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if prontuario.plano_terapeutico %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Plano Terapêutico</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.plano_terapeutico|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.objetivos_tratamento %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Objetivos do Tratamento</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.objetivos_tratamento|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.tecnicas_intervencao %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Técnicas de Intervenção</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.tecnicas_intervencao|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.prazo_estimado %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Prazo Estimado</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.prazo_estimado|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Seção 5: Observações e Considerações -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-sticky-note text-info"></i> Observações e Considerações
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if prontuario.observacoes_gerais %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Observações Gerais</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.observacoes_gerais|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.consideracoes_especiais %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Considerações Especiais</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.consideracoes_especiais|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if prontuario.recomendacoes %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Recomendações</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ prontuario.recomendacoes|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Informações do Sistema -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-cog text-secondary"></i> Informações do Sistema
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 bg-light">
+                                <strong>Criado em:</strong> {{ prontuario.data_criacao|date:"d/m/Y H:i" }}<br>
+                                <strong>Última atualização:</strong> {{ prontuario.data_atualizacao|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="border rounded p-3 bg-light">
+                                <strong>Status:</strong> 
+                                {% if prontuario.queixa_principal %}
+                                    <span class="badge badge-success">Completo</span>
+                                {% else %}
+                                    <span class="badge badge-warning">Em Preenchimento</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Ações e Informações -->
+        <div class="col-lg-4">
+            <!-- Ações Rápidas -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-bolt text-warning"></i> Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'psicologia:prontuario_update' prontuario.pk %}" class="btn btn-warning btn-block mb-2">
+                        <i class="fas fa-edit"></i> Editar Prontuário
+                    </a>
+                    <a href="{% url 'psicologia:paciente_detail' prontuario.paciente.pk %}" class="btn btn-primary btn-block mb-2">
+                        <i class="fas fa-user"></i> Ficha do Paciente
+                    </a>
+                    <a href="{% url 'psicologia:sessao_from_paciente_create' prontuario.paciente.pk %}" class="btn btn-info btn-block mb-2">
+                        <i class="fas fa-calendar-plus"></i> Nova Sessão
+                    </a>
+                    <a href="{% url 'psicologia:evolucao_from_paciente_create' prontuario.paciente.pk %}" class="btn btn-success btn-block mb-2">
+                        <i class="fas fa-chart-line"></i> Nova Evolução
+                    </a>
+                    <a href="{% url 'psicologia:documento_from_paciente_create' prontuario.paciente.pk %}" class="btn btn-secondary btn-block">
+                        <i class="fas fa-file-upload"></i> Novo Documento
+                    </a>
+                </div>
+            </div>
+
+            <!-- Estatísticas do Paciente -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-bar text-info"></i> Estatísticas do Paciente
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-primary mb-0">{{ prontuario.paciente.sessao_set.count }}</h4>
+                                <small class="text-muted">Sessões</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-info mb-0">{{ prontuario.paciente.evolucao_set.count }}</h4>
+                                <small class="text-muted">Evoluções</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-2">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-success mb-0">{{ prontuario.paciente.documento_set.count }}</h4>
+                                <small class="text-muted">Documentos</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-warning mb-0">1</h4>
+                                <small class="text-muted">Prontuário</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo do Prontuário -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-clipboard-check text-success"></i> Resumo do Prontuário
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Queixa Principal</span>
+                            {% if prontuario.queixa_principal %}
+                                <span class="badge badge-success badge-pill">✓</span>
+                            {% else %}
+                                <span class="badge badge-warning badge-pill">-</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Histórico Familiar</span>
+                            {% if prontuario.historico_familiar %}
+                                <span class="badge badge-success badge-pill">✓</span>
+                            {% else %}
+                                <span class="badge badge-warning badge-pill">-</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Hipótese Diagnóstica</span>
+                            {% if prontuario.hipotese_diagnostica %}
+                                <span class="badge badge-success badge-pill">✓</span>
+                            {% else %}
+                                <span class="badge badge-warning badge-pill">-</span>
+                            {% endif %}
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>Plano Terapêutico</span>
+                            {% if prontuario.plano_terapeutico %}
+                                <span class="badge badge-success badge-pill">✓</span>
+                            {% else %}
+                                <span class="badge badge-warning badge-pill">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

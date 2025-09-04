@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Benefícios{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Lista de Benefícios</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Benefícios</h1>
+            <p class="text-muted mb-0">Gerencie os benefícios solicitados pelos associados</p>
+        </div>
+        <a href="{% url 'beneficios:solicitar_beneficio' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Solicitar Benefício
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ search }}" placeholder="Buscar por associado ou convênio...">
+                </div>
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Status</label>
+                    <select class="form-select" id="status" name="status">
+                        <option value="">Todos os status</option>
+                        <option value="pendente" {% if status == 'pendente' %}selected{% endif %}>Pendente</option>
+                        <option value="aprovado" {% if status == 'aprovado' %}selected{% endif %}>Aprovado</option>
+                        <option value="rejeitado" {% if status == 'rejeitado' %}selected{% endif %}>Rejeitado</option>
+                        <option value="utilizado" {% if status == 'utilizado' %}selected{% endif %}>Utilizado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="categoria" class="form-label">Categoria</label>
+                    <select class="form-select" id="categoria" name="categoria">
+                        <option value="">Todas as categorias</option>
+                        {% for cat in categorias %}
+                            <option value="{{ cat.id }}" {% if categoria_id == cat.id|stringformat:"s" %}selected{% endif %}>
+                                {{ cat.nome }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <div class="btn-group w-100" role="group">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Filtrar
+                        </button>
+                        <a href="{% url 'beneficios:beneficio_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Limpar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de benefícios -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-gift me-2"></i>
+                Benefícios
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Associado</th>
+                                <th>Convênio</th>
+                                <th>Categoria</th>
+                                <th>Data Solicitação</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for beneficio in page_obj %}
+                            <tr>
+                                <td>
+                                    <strong>{{ beneficio.associado.nome }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{% url 'beneficios:convenio_detail' beneficio.convenio.pk %}" class="text-decoration-none">
+                                        {{ beneficio.convenio.titulo }}
+                                    </a>
+                                </td>
+                                <td>{{ beneficio.convenio.categoria }}</td>
+                                <td>{{ beneficio.data_solicitacao|date:"d/m/Y" }}</td>
+                                <td>
+                                    <span class="badge bg-{{ beneficio.status|yesno:'success,warning,danger,info' }}">
+                                        {{ beneficio.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'beneficios:beneficio_detail' beneficio.pk %}" 
+                                           class="btn btn-outline-primary" title="Visualizar">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        {% if beneficio.status == 'pendente' %}
+                                            <a href="{% url 'beneficios:aprovar_beneficio' beneficio.pk %}" 
+                                               class="btn btn-outline-success" title="Aprovar">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="{% url 'beneficios:rejeitar_beneficio' beneficio.pk %}" 
+                                               class="btn btn-outline-danger" title="Rejeitar">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                {% if page_obj.has_other_pages %}
+                    <nav aria-label="Navegação de páginas" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if categoria_id %}&categoria={{ categoria_id }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if categoria_id %}&categoria={{ categoria_id }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if categoria_id %}&categoria={{ categoria_id }}{% endif %}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if categoria_id %}&categoria={{ categoria_id }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if categoria_id %}&categoria={{ categoria_id }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-gift fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum benefício encontrado</h5>
+                    <p class="text-muted">
+                        {% if search or status or categoria_id %}
+                            Tente ajustar os filtros de busca ou
+                        {% endif %}
+                        Solicite o primeiro benefício para começar.
+                    </p>
+                    <a href="{% url 'beneficios:solicitar_beneficio' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Solicitar Primeiro Benefício
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalhes da Despesa - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-receipt me-2"></i>
+                        Detalhes da Despesa
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Visualizando despesa: <strong>{{ despesa.descricao }}</strong>
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'financeiro:despesa_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                    <a href="{% url 'financeiro:despesa_update' despesa.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informações da Despesa -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações da Despesa
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Descrição:</label>
+                                    <p class="mb-0">{{ despesa.descricao }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Categoria:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-{% if despesa.categoria == 'administrativa' %}primary{% elif despesa.categoria == 'operacional' %}info{% elif despesa.categoria == 'manutencao' %}warning{% elif despesa.categoria == 'eventos' %}success{% else %}secondary{% endif %}">
+                                            {{ despesa.get_categoria_display }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Valor:</label>
+                                    <p class="mb-0 text-danger fw-bold">R$ {{ despesa.valor|floatformat:2 }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Data da Despesa:</label>
+                                    <p class="mb-0">{{ despesa.data_despesa|date:"d/m/Y" }}</p>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-bold">Status:</label>
+                                    <p class="mb-0">
+                                        {% if despesa.pago %}
+                                            <span class="badge bg-success">Pago</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {% if despesa.data_vencimento %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Data de Vencimento:</label>
+                                        <p class="mb-0">{{ despesa.data_vencimento|date:"d/m/Y" }}</p>
+                                        {% if despesa.data_vencimento < today and not despesa.pago %}
+                                            <br>
+                                            <span class="badge bg-danger">Vencida</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if despesa.fornecedor %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Fornecedor:</label>
+                                    <p class="mb-0">{{ despesa.fornecedor }}</p>
+                                </div>
+                                {% if despesa.nota_fiscal %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Nota Fiscal:</label>
+                                    <p class="mb-0">{{ despesa.nota_fiscal }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {% if despesa.observacoes %}
+                            <div class="row">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Observações:</label>
+                                    <p class="mb-0">{{ despesa.observacoes }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Data de Criação:</label>
+                                    <p class="mb-0">{{ despesa.data_criacao|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Última Atualização:</label>
+                                    <p class="mb-0">{{ despesa.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Ações -->
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tools me-2"></i>
+                                Ações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                {% if not despesa.pago %}
+                                    <form method="post" action="{% url 'financeiro:dar_baixa_despesa' despesa.pk %}" style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success w-100" 
+                                                onclick="return confirm('Confirmar que esta despesa foi paga?')">
+                                            <i class="fas fa-check-circle me-2"></i>
+                                            Dar Baixa (Marcar como Paga)
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <div class="alert alert-success text-center mb-0">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        <strong>Despesa Paga</strong>
+                                    </div>
+                                {% endif %}
+                                
+                                <a href="{% url 'financeiro:despesa_update' despesa.pk %}" 
+                                   class="btn btn-warning">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editar Despesa
+                                </a>
+                                <a href="{% url 'financeiro:despesa_delete' despesa.pk %}" 
+                                   class="btn btn-danger">
+                                    <i class="fas fa-trash me-2"></i>
+                                    Excluir
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

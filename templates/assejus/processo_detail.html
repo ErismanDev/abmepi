@@ -1,0 +1,1344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ processo.numero_processo }} - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid" data-processo-id="{{ processo.pk }}">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-gavel me-2"></i>
+                        {{ processo.numero_processo }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Detalhes do processo jurídico
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:processos_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                    {% if user.tipo_usuario != 'advogado' %}
+                    <a href="{% url 'assejus:processo_edit' pk=processo.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Processo
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informações principais -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações do Processo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Número do Processo:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-primary">{{ processo.numero_processo }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Tipo de Ação:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-info">{{ processo.get_tipo_acao_display }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Situação Atual:</label>
+                                    <p class="mb-0">
+                                        {% if processo.situacao_atual == 'andamento' %}
+                                            <span class="badge bg-warning">Em Andamento</span>
+                                        {% elif processo.situacao_atual == 'concluido' %}
+                                            <span class="badge bg-success">Concluído</span>
+                                        {% elif processo.situacao_atual == 'suspenso' %}
+                                            <span class="badge bg-secondary">Suspenso</span>
+                                        {% elif processo.situacao_atual == 'arquivado' %}
+                                            <span class="badge bg-dark">Arquivado</span>
+                                        {% elif processo.situacao_atual == 'transitado_julgado' %}
+                                            <span class="badge bg-primary">Transitado em Julgado</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Vara/Tribunal:</label>
+                                    <p class="mb-0">{{ processo.vara_tribunal }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Parte Cliente:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-primary">{{ processo.parte_cliente.nome }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Parte Contrária:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-secondary">{{ processo.parte_contraria }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Advogado/Procurador da Parte Contrária:</label>
+                                    <p class="mb-0">
+                                        {% if processo.advogado_parte_contraria %}
+                                            <span class="badge bg-warning">
+                                                {{ processo.advogado_parte_contraria }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Não informado</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Advogado Responsável:</label>
+                                    <p class="mb-0">
+                                        {% if processo.advogado_responsavel %}
+                                            <span class="badge bg-success">
+                                                {{ processo.advogado_responsavel.get_full_name|default:processo.advogado_responsavel.username }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-warning">Não atribuído</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Data de Cadastro:</label>
+                                    <p class="mb-0">{{ processo.data_cadastro|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Última Atualização:</label>
+                                    <p class="mb-0">{{ processo.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                {% if processo.observacoes_gerais %}
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Observações Gerais:</label>
+                                    <p class="mb-0">{{ processo.observacoes_gerais|linebreaks }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Andamentos -->
+                    {% if andamentos %}
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tasks me-2"></i>
+                                Andamentos do Processo
+                                <span class="badge bg-secondary ms-2">{{ andamentos|length }}</span>
+                            </h5>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'assejus:processo_andamentos_pdf' pk=processo.pk %}" 
+                                   class="btn btn-sm btn-outline-info" 
+                                   target="_blank" 
+                                   title="Gerar PDF com todos os andamentos">
+                                    <i class="fas fa-file-pdf me-1"></i>
+                                    PDF
+                                </a>
+                                <a href="{% url 'assejus:andamento_create' %}?processo={{ processo.pk }}" 
+                                   class="btn btn-sm btn-primary">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Novo Andamento
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Menu de Ações dos Andamentos -->
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm active" 
+                                            onclick="toggleAndamentoView('timeline')" id="btn-timeline">
+                                        <i class="fas fa-list-ul me-1"></i>
+                                        Timeline
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" 
+                                            onclick="toggleAndamentoView('table')" id="btn-table">
+                                        <i class="fas fa-table me-1"></i>
+                                        Tabela
+                                    </button>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-info btn-sm" 
+                                            onclick="exportAndamentos()">
+                                        <i class="fas fa-download me-1"></i>
+                                        Exportar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-success btn-sm" 
+                                            onclick="printAndamentos()">
+                                        <i class="fas fa-print me-1"></i>
+                                        Imprimir
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Visualização Timeline -->
+                            <div id="timeline-view">
+                                <div class="timeline">
+                                    {% for andamento in andamentos %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="timeline-title mb-0">
+                                                    {{ andamento.get_tipo_andamento_display }}
+                                                </h6>
+                                                <small class="text-muted">
+                                                    {{ andamento.data_andamento|date:"d/m/Y H:i" }}
+                                                </small>
+                                            </div>
+                                            <p class="timeline-text mb-2">{{ andamento.descricao_detalhada }}</p>
+                                            {% if andamento.observacoes_cliente %}
+                                            <div class="alert alert-light p-2 mb-2">
+                                                <small class="text-muted">
+                                                    <strong>Para o cliente:</strong> {{ andamento.observacoes_cliente }}
+                                                </small>
+                                            </div>
+                                            {% endif %}
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <small class="text-muted">
+                                                    Registrado por: {{ andamento.usuario_registro.get_full_name|default:andamento.usuario_registro.username }}
+                                                </small>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'assejus:andamento_detail' pk=andamento.pk %}" 
+                                                       class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i>
+                                                        Ver
+                                                    </a>
+                                                    <a href="{% url 'assejus:andamento_update' pk=andamento.pk %}" 
+                                                       class="btn btn-sm btn-outline-warning">
+                                                        <i class="fas fa-edit me-1"></i>
+                                                        Editar
+                                                    </a>
+                                                    <a href="{% url 'assejus:andamento_pdf' pk=andamento.pk %}" 
+                                                       class="btn btn-sm btn-outline-info" 
+                                                       target="_blank" 
+                                                       title="Gerar PDF">
+                                                        <i class="fas fa-file-pdf"></i>
+                                                    </a>
+                                                    <button type="button" 
+                                                            class="btn btn-sm btn-outline-danger" 
+                                                            title="Excluir"
+                                                            data-andamento-id="{{ andamento.pk }}"
+                                                            data-andamento-tipo="{{ andamento.get_tipo_andamento_display }}"
+                                                            data-andamento-data="{{ andamento.data_andamento|date:'d/m/Y H:i' }}"
+                                                            data-andamento-descricao="{{ andamento.descricao_detalhada|truncatechars:50 }}"
+                                                            onclick="abrirModalExclusaoAndamento(this)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Visualização Tabela -->
+                            <div id="table-view" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Data</th>
+                                                <th>Tipo</th>
+                                                <th>Descrição</th>
+                                                <th>Usuário</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for andamento in andamentos %}
+                                            <tr>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        {{ andamento.data_andamento|date:"d/m/Y H:i" }}
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info">
+                                                        {{ andamento.get_tipo_andamento_display }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="text-truncate" style="max-width: 300px;" 
+                                                         title="{{ andamento.descricao_detalhada }}">
+                                                        {{ andamento.descricao_detalhada|truncatechars:100 }}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        {{ andamento.usuario_registro.get_full_name|default:andamento.usuario_registro.username }}
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="{% url 'assejus:andamento_detail' pk=andamento.pk %}" 
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                        <a href="{% url 'assejus:andamento_update' pk=andamento.pk %}" 
+                                                           class="btn btn-sm btn-outline-warning">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'assejus:andamento_pdf' pk=andamento.pk %}" 
+                                                           class="btn btn-sm btn-outline-info" 
+                                                           target="_blank" 
+                                                           title="Gerar PDF">
+                                                            <i class="fas fa-file-pdf"></i>
+                                                        </a>
+                                                        <button type="button" 
+                                                                class="btn btn-sm btn-outline-danger" 
+                                                                title="Excluir"
+                                                                data-andamento-id="{{ andamento.pk }}"
+                                                                data-andamento-tipo="{{ andamento.get_tipo_andamento_display }}"
+                                                                data-andamento-data="{{ andamento.data_andamento|date:'d/m/Y H:i' }}"
+                                                                data-andamento-descricao="{{ andamento.descricao_detalhada|truncatechars:50 }}"
+                                                                onclick="abrirModalExclusaoAndamento(this)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tasks me-2"></i>
+                                Andamentos do Processo
+                            </h5>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum andamento registrado</h5>
+                            <p class="text-muted mb-3">Este processo ainda não possui andamentos registrados.</p>
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{% url 'assejus:processo_andamentos_pdf' pk=processo.pk %}" 
+                                   class="btn btn-outline-info" 
+                                   target="_blank" 
+                                   title="Gerar PDF com todos os andamentos">
+                                    <i class="fas fa-file-pdf me-2"></i>
+                                    Gerar PDF
+                                </a>
+                                <a href="{% url 'assejus:andamento_create' %}?processo={{ processo.pk }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Registrar Primeiro Andamento
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Documentos -->
+                    {% if documentos %}
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Documentos do Processo
+                            </h5>
+                            <button type="button" class="btn btn-sm btn-primary" 
+                                    data-bs-toggle="modal" data-bs-target="#uploadDocumentoModal">
+                                <i class="fas fa-plus me-1"></i>
+                                Novo Documento
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for documento in documentos %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ documento.titulo }}</h6>
+                                            <small class="text-muted">{{ documento.get_tipo_documento_display }}</small>
+                                        </div>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ documento.arquivo.url }}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               target="_blank" title="Visualizar">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-danger" 
+                                                    title="Excluir"
+                                                    data-documento-id="{{ documento.pk }}"
+                                                    data-documento-titulo="{{ documento.titulo }}"
+                                                    data-documento-tipo="{{ documento.get_tipo_documento_display }}"
+                                                    data-documento-data="{{ documento.data_upload|date:'d/m/Y H:i' }}"
+                                                    onclick="abrirModalExclusaoComDados(this)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ documento.data_upload|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Documentos do Processo
+                            </h5>
+                        </div>
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum documento anexado</h5>
+                            <p class="text-muted mb-3">Este processo ainda não possui documentos anexados.</p>
+                            <button type="button" class="btn btn-primary" 
+                                    data-bs-toggle="modal" data-bs-target="#uploadDocumentoModal">
+                                <i class="fas fa-plus me-2"></i>
+                                Anexar Primeiro Documento
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar com informações adicionais -->
+                <div class="col-lg-4">
+                    <!-- Responsáveis -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                Responsáveis
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if processo.advogado_responsavel %}
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Advogado Responsável:</label>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-sm me-2">
+                                        <i class="fas fa-user-tie"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 fw-bold">{{ processo.advogado_responsavel.get_full_name|default:processo.advogado_responsavel.username }}</p>
+                                        <small class="text-muted">{{ processo.advogado_responsavel.email }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if not processo.advogado_responsavel %}
+                            <div class="text-center py-3">
+                                <i class="fas fa-user-slash fa-2x text-muted mb-2"></i>
+                                <p class="text-muted mb-0">Nenhum advogado atribuído</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Estatísticas -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Estatísticas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <h4 class="text-primary mb-0">{{ processo.total_andamentos }}</h4>
+                                    <small class="text-muted">Andamentos</small>
+                                </div>
+                                <div class="col-6">
+                                    <h4 class="text-info mb-0">{{ documentos|length }}</h4>
+                                    <small class="text-muted">Documentos</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações rápidas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                Ações Rápidas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'assejus:andamento_create' %}?processo={{ processo.pk }}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Registrar Andamento
+                                </a>
+                                <button type="button" class="btn btn-outline-info" 
+                                        data-bs-toggle="modal" data-bs-target="#uploadDocumentoModal">
+                                    <i class="fas fa-file-upload me-2"></i>
+                                    Anexar Documento
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" disabled>
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editar Processo (Em breve)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Upload de Documentos -->
+<div class="modal fade" id="uploadDocumentoModal" tabindex="-1" aria-labelledby="uploadDocumentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadDocumentoModalLabel">
+                    <i class="fas fa-file-upload me-2"></i>
+                    Anexar Documento ao Processo
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formUploadDocumentoProcesso" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="processo_id" value="{{ processo.pk }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="titulo_processo" class="form-label">Título do Documento *</label>
+                            <input type="text" class="form-control" id="titulo_processo" name="titulo" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo_processo" class="form-label">Tipo do Documento *</label>
+                            <select class="form-select" id="tipo_processo" name="tipo_documento" required>
+                                <option value="">Selecione o tipo</option>
+                                <option value="peticao">Petição</option>
+                                <option value="sentenca">Sentença</option>
+                                <option value="despacho">Despacho</option>
+                                <option value="certidao">Certidão</option>
+                                <option value="contrato">Contrato</option>
+                                <option value="comprovante">Comprovante</option>
+                                <option value="outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao_processo" class="form-label">Descrição</label>
+                        <textarea class="form-control" id="descricao_processo" name="descricao" rows="3" placeholder="Descrição opcional do documento"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="arquivo_processo" class="form-label">Arquivo *</label>
+                        <input type="file" class="form-control" id="arquivo_processo" name="arquivo" required accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.rtf">
+                        <div class="form-text">
+                            Formatos aceitos: PDF, DOC, DOCX, JPG, PNG, TXT, RTF (máximo 10MB)
+                        </div>
+                    </div>
+                    
+                    <!-- Progress bar -->
+                    <div class="progress-upload mb-3" style="display: none;">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted">Enviando arquivo...</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Processo:</strong> {{ processo.numero_processo }}<br>
+                        <strong>Cliente:</strong> {{ processo.parte_cliente.nome }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnUploadProcesso">
+                        <i class="fas fa-upload me-2"></i>
+                        Anexar Documento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Confirmar Exclusão de Documento -->
+<div class="modal fade" id="deleteDocumentoModal" tabindex="-1" aria-labelledby="deleteDocumentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteDocumentoModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este documento?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-warning me-2"></i>
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita. O arquivo será removido permanentemente.
+                </div>
+                <div id="infoDocumentoExclusao">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title" id="documentoExclusaoTitulo"></h6>
+                            <p class="card-text mb-1">
+                                <small class="text-muted">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    <span id="documentoExclusaoTipo"></span>
+                                </small>
+                            </p>
+                            <p class="card-text mb-0">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    <span id="documentoExclusaoData"></span>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">
+                    <i class="fas fa-trash me-2"></i>
+                    Excluir Documento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Confirmar Exclusão de Andamento -->
+<div class="modal fade" id="deleteAndamentoModal" tabindex="-1" aria-labelledby="deleteAndamentoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAndamentoModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este andamento?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-warning me-2"></i>
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita. O andamento será removido permanentemente.
+                </div>
+                <div id="infoAndamentoExclusao">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title" id="andamentoExclusaoTipo"></h6>
+                            <p class="card-text mb-1">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    <span id="andamentoExclusaoData"></span>
+                                </small>
+                            </p>
+                            <p class="card-text mb-0">
+                                <small class="text-muted">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    <span id="andamentoExclusaoDescricao"></span>
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusaoAndamento">
+                    <i class="fas fa-trash me-2"></i>
+                    Excluir Andamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #007bff;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 3px #007bff;
+}
+
+.timeline-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: -29px;
+    top: 12px;
+    width: 2px;
+    height: calc(100% + 8px);
+    background-color: #e9ecef;
+}
+
+.timeline-title {
+    margin-bottom: 8px;
+    color: #495057;
+}
+
+.timeline-text {
+    margin-bottom: 8px;
+    color: #6c757d;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+}
+
+.avatar-sm {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Controle de visualização dos andamentos
+    function toggleAndamentoView(view) {
+        const timelineView = document.getElementById('timeline-view');
+        const tableView = document.getElementById('table-view');
+        const btnTimeline = document.getElementById('btn-timeline');
+        const btnTable = document.getElementById('btn-table');
+        
+        if (view === 'timeline') {
+            timelineView.style.display = 'block';
+            tableView.style.display = 'none';
+            btnTimeline.classList.add('active');
+            btnTable.classList.remove('active');
+        } else if (view === 'table') {
+            timelineView.style.display = 'none';
+            tableView.style.display = 'block';
+            btnTimeline.classList.remove('active');
+            btnTable.classList.add('active');
+        }
+    }
+    
+    // Funções de exportação e impressão
+    function exportAndamentos() {
+        // Implementar exportação de andamentos
+        alert('Funcionalidade de exportação será implementada em breve.');
+    }
+    
+    function printAndamentos() {
+        // Implementar impressão de andamentos
+        window.print();
+    }
+    
+    // Upload de documento via AJAX
+    document.addEventListener('DOMContentLoaded', function() {
+        // Aguardar um pouco para garantir que todos os scripts estejam carregados
+        setTimeout(function() {
+            console.log('🚀 Inicializando upload de documentos...');
+            console.log('🔧 closeModal disponível:', typeof window.closeModal === 'function');
+            console.log('🔧 bootstrap disponível:', typeof bootstrap !== 'undefined');
+            
+            const uploadForm = document.querySelector('#formUploadDocumentoProcesso');
+            console.log('📋 Formulário encontrado:', uploadForm ? 'Sim' : 'Não');
+            if (uploadForm) {
+            uploadForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const progressBar = document.querySelector('.progress-upload');
+                const btnUpload = document.getElementById('btnUploadProcesso');
+                
+                // Validações básicas
+                const arquivo = document.getElementById('arquivo_processo');
+                const titulo = document.getElementById('titulo_processo');
+                const tipo = document.getElementById('tipo_processo');
+                
+                if (!arquivo.files[0]) {
+                    alert('Por favor, selecione um arquivo para upload.');
+                    return;
+                }
+                
+                if (!titulo.value.trim()) {
+                    alert('Por favor, informe o título do documento.');
+                    return;
+                }
+                
+                if (!tipo.value) {
+                    alert('Por favor, selecione o tipo do documento.');
+                    return;
+                }
+                
+                // Verificar tamanho do arquivo (10MB)
+                const maxSize = 10 * 1024 * 1024; // 10MB em bytes
+                if (arquivo.files[0].size > maxSize) {
+                    alert('O arquivo é muito grande. O tamanho máximo permitido é 10MB.');
+                    return;
+                }
+                
+                // Mostrar progress bar e desabilitar botão
+                progressBar.style.display = 'block';
+                btnUpload.disabled = true;
+                btnUpload.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Enviando...';
+                
+                // Fazer upload via AJAX
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                console.log('🔐 CSRF Token:', csrfToken ? 'Presente' : 'Ausente');
+                
+                fetch('{% url "assejus:documento_upload_ajax" %}', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': csrfToken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📋 Resposta do upload:', data);
+                    if (data.success) {
+                        console.log('✅ Upload bem-sucedido, fechando modal...');
+                        
+                        // Mostrar mensagem de sucesso
+                        mostrarMensagem('success', data.message);
+                        
+                        // Fechar modal usando Bootstrap
+                        console.log('🔧 Fechando modal...');
+                        const modalElement = document.getElementById('uploadDocumentoModal');
+                        if (modalElement) {
+                            const modal = bootstrap.Modal.getInstance(modalElement);
+                            if (modal) {
+                                modal.hide();
+                                console.log('✅ Modal fechado com sucesso usando Bootstrap');
+                            } else {
+                                // Fallback: criar nova instância e fechar
+                                const newModal = new bootstrap.Modal(modalElement);
+                                newModal.hide();
+                                console.log('✅ Modal fechado com sucesso usando nova instância Bootstrap');
+                            }
+                        }
+                        
+                        // Atualizar lista de documentos dinamicamente
+                        console.log('🔄 Atualizando lista de documentos...');
+                        console.log('📋 Dados recebidos:', data);
+                        console.log('📋 data.documento existe?', !!data.documento);
+                        console.log('📋 data.documento:', data.documento);
+                        
+                        if (data.documento) {
+                            console.log('✅ Chamando adicionarDocumentoNaLista...');
+                            adicionarDocumentoNaLista(data.documento);
+                        } else {
+                            // Fallback: recarregar página se não houver dados do documento
+                            console.log('⚠️ Dados do documento não disponíveis, recarregando página...');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1000);
+                        }
+                    } else {
+                        console.log('❌ Upload falhou:', data.message);
+                        // Mostrar mensagem de erro
+                        mostrarMensagem('error', data.message);
+                        
+                        // Mostrar erros de validação se existirem
+                        if (data.errors) {
+                            mostrarErrosFormulario(data.errors);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Erro no upload:', error);
+                    mostrarMensagem('error', 'Erro interno do servidor');
+                })
+                .finally(() => {
+                    // Restaurar botão e esconder progress bar
+                    progressBar.style.display = 'none';
+                    btnUpload.disabled = false;
+                    btnUpload.innerHTML = '<i class="fas fa-upload me-2"></i>Anexar Documento';
+                });
+            });
+            
+            // Limpar erros de validação ao fechar modal
+            const modalElement = document.getElementById('uploadDocumentoModal');
+            if (modalElement) {
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    const invalidFields = document.querySelectorAll('.is-invalid');
+                    invalidFields.forEach(field => {
+                        field.classList.remove('is-invalid');
+                    });
+                    
+                    const invalidFeedbacks = document.querySelectorAll('.invalid-feedback');
+                    invalidFeedbacks.forEach(feedback => {
+                        feedback.remove();
+                    });
+                    
+                    // Limpar formulário
+                    const form = document.getElementById('formUploadDocumentoProcesso');
+                    if (form) form.reset();
+                });
+            }
+            }
+        }, 500); // Fechar setTimeout
+    });
+    
+    // Função para mostrar mensagens
+    function mostrarMensagem(tipo, mensagem) {
+        const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+        const icon = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const alert = document.createElement('div');
+        alert.className = `alert ${alertClass} alert-dismissible fade show`;
+        alert.innerHTML = `
+            <i class="fas ${icon} me-2"></i>
+            ${mensagem}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Inserir no topo da página
+        const container = document.querySelector('.container-fluid');
+        container.insertBefore(alert, container.firstChild);
+        
+        // Remover automaticamente após 5 segundos
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+    
+    // Função para mostrar erros de validação
+    function mostrarErrosFormulario(errors) {
+        Object.keys(errors).forEach(function(field) {
+            const fieldElement = document.querySelector(`[name="${field}"]`);
+            if (fieldElement) {
+                fieldElement.classList.add('is-invalid');
+                
+                // Remover feedback anterior se existir
+                const existingFeedback = fieldElement.parentNode.querySelector('.invalid-feedback');
+                if (existingFeedback) {
+                    existingFeedback.remove();
+                }
+                
+                // Adicionar novo feedback
+                const feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                feedback.textContent = errors[field].join(', ');
+                fieldElement.parentNode.appendChild(feedback);
+            }
+        });
+    }
+
+    // Função para adicionar novo documento na lista
+    function adicionarDocumentoNaLista(documento) {
+        console.log('📄 Adicionando documento na lista:', documento);
+        
+        // Verificar se existe a seção de documentos
+        let documentosSection = null;
+        const cards = document.querySelectorAll('.card');
+        for (let card of cards) {
+            const title = card.querySelector('.card-title');
+            if (title && title.textContent.includes('Documentos do Processo')) {
+                documentosSection = card;
+                break;
+            }
+        }
+        
+        if (!documentosSection) {
+            // Se não existe, recarregar página
+            console.log('⚠️ Seção de documentos não encontrada, recarregando página...');
+            location.reload();
+            return;
+        }
+        
+        // Verificar se é a primeira seção (sem documentos) ou se já tem documentos
+        const listGroup = documentosSection.querySelector('.list-group');
+        const emptyState = documentosSection.querySelector('.text-center.py-5');
+        
+        console.log('🔍 listGroup encontrado:', !!listGroup);
+        console.log('🔍 emptyState encontrado:', !!emptyState);
+        
+        if (emptyState) {
+            // Se está no estado vazio, transformar em lista com documentos
+            console.log('🔄 Transformando estado vazio em lista com documentos...');
+            
+            // Remover estado vazio
+            emptyState.remove();
+            
+            // Adicionar header com botão
+            const cardHeader = documentosSection.querySelector('.card-header');
+            if (cardHeader) {
+                const button = cardHeader.querySelector('button');
+                if (!button) {
+                    const newButton = document.createElement('button');
+                    newButton.type = 'button';
+                    newButton.className = 'btn btn-sm btn-primary';
+                    newButton.setAttribute('data-bs-toggle', 'modal');
+                    newButton.setAttribute('data-bs-target', '#uploadDocumentoModal');
+                    newButton.innerHTML = '<i class="fas fa-plus me-1"></i>Novo Documento';
+                    cardHeader.appendChild(newButton);
+                }
+            }
+            
+            // Criar lista de documentos
+            const cardBody = documentosSection.querySelector('.card-body');
+            if (cardBody) {
+                const listGroup = document.createElement('div');
+                listGroup.className = 'list-group list-group-flush';
+                cardBody.appendChild(listGroup);
+            }
+        }
+        
+        // Adicionar novo documento à lista
+        const listGroupElement = documentosSection.querySelector('.list-group');
+        if (listGroupElement) {
+            const newItem = document.createElement('div');
+            newItem.className = 'list-group-item px-0';
+            newItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">${documento.titulo}</h6>
+                        <small class="text-muted">${documento.tipo}</small>
+                    </div>
+                    <div class="btn-group" role="group">
+                        <a href="${documento.url_view}" 
+                           class="btn btn-sm btn-outline-primary" 
+                           target="_blank" title="Visualizar">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-danger" 
+                                title="Excluir"
+                                data-documento-id="${documento.id}"
+                                data-documento-titulo="${documento.titulo}"
+                                data-documento-tipo="${documento.tipo}"
+                                data-documento-data="${documento.data_upload}"
+                                onclick="abrirModalExclusaoComDados(this)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                <small class="text-muted">
+                    <i class="fas fa-clock me-1"></i>
+                    ${documento.data_upload}
+                </small>
+            `;
+            
+            // Adicionar no início da lista (documentos mais recentes primeiro)
+            listGroupElement.insertBefore(newItem, listGroupElement.firstChild);
+            
+            console.log('✅ Documento adicionado à lista com sucesso');
+        }
+    }
+
+    // Variável global para armazenar ID do documento a ser excluído
+    let documentoParaExcluir = null;
+
+    // Função para abrir modal de exclusão com dados do botão
+    function abrirModalExclusaoComDados(button) {
+        const documentoId = button.getAttribute('data-documento-id');
+        const titulo = button.getAttribute('data-documento-titulo');
+        const tipo = button.getAttribute('data-documento-tipo');
+        const dataUpload = button.getAttribute('data-documento-data');
+        
+        console.log('🗑️ Abrindo modal de exclusão para documento:', documentoId);
+        
+        // Armazenar ID do documento
+        documentoParaExcluir = documentoId;
+        
+        // Preencher informações do documento no modal
+        document.getElementById('documentoExclusaoTitulo').textContent = titulo;
+        document.getElementById('documentoExclusaoTipo').textContent = tipo;
+        document.getElementById('documentoExclusaoData').textContent = dataUpload;
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('deleteDocumentoModal'));
+        modal.show();
+    }
+
+    // Função para abrir modal de exclusão (versão original para compatibilidade)
+    function abrirModalExclusao(documentoId, titulo, tipo, dataUpload) {
+        console.log('🗑️ Abrindo modal de exclusão para documento:', documentoId);
+        
+        // Armazenar ID do documento
+        documentoParaExcluir = documentoId;
+        
+        // Preencher informações do documento no modal
+        document.getElementById('documentoExclusaoTitulo').textContent = titulo;
+        document.getElementById('documentoExclusaoTipo').textContent = tipo;
+        document.getElementById('documentoExclusaoData').textContent = dataUpload;
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('deleteDocumentoModal'));
+        modal.show();
+    }
+
+    // Função para excluir documento via AJAX
+    function excluirDocumento() {
+        if (!documentoParaExcluir) {
+            console.error('❌ ID do documento não definido');
+            return;
+        }
+
+        console.log('🗑️ Excluindo documento:', documentoParaExcluir);
+        
+        // Desabilitar botão de exclusão
+        const btnExcluir = document.getElementById('btnConfirmarExclusao');
+        btnExcluir.disabled = true;
+        btnExcluir.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Excluindo...';
+        
+        // Fazer requisição AJAX
+        fetch(`{% url 'assejus:documento_delete_ajax' 0 %}`.replace('0', documentoParaExcluir), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('📋 Resposta da exclusão:', data);
+            
+            if (data.success) {
+                console.log('✅ Documento excluído com sucesso');
+                
+                // Mostrar mensagem de sucesso
+                mostrarMensagem('success', data.message);
+                
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteDocumentoModal'));
+                modal.hide();
+                
+                // Remover documento da lista
+                removerDocumentoDaLista(documentoParaExcluir);
+                
+                // Limpar variável
+                documentoParaExcluir = null;
+                
+            } else {
+                console.log('❌ Erro na exclusão:', data.message);
+                mostrarMensagem('error', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição de exclusão:', error);
+            mostrarMensagem('error', 'Erro interno do servidor');
+        })
+        .finally(() => {
+            // Restaurar botão
+            btnExcluir.disabled = false;
+            btnExcluir.innerHTML = '<i class="fas fa-trash me-2"></i>Excluir Documento';
+        });
+    }
+
+    // Função para remover documento da lista
+    function removerDocumentoDaLista(documentoId) {
+        console.log('🗑️ Removendo documento da lista:', documentoId);
+        
+        // Encontrar o item na lista
+        const documentoItems = document.querySelectorAll('.list-group-item');
+        let itemRemovido = false;
+        
+        documentoItems.forEach(item => {
+            const deleteButton = item.querySelector('button[data-documento-id]');
+            if (deleteButton && deleteButton.getAttribute('data-documento-id') == documentoId) {
+                item.remove();
+                itemRemovido = true;
+                console.log('✅ Documento removido da lista');
+            }
+        });
+        
+        // Se não encontrou o item, recarregar página
+        if (!itemRemovido) {
+            console.log('⚠️ Item não encontrado na lista, recarregando página...');
+            location.reload();
+        }
+    }
+
+    // Configurar evento do botão de confirmação
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnConfirmarExclusao = document.getElementById('btnConfirmarExclusao');
+        if (btnConfirmarExclusao) {
+            btnConfirmarExclusao.addEventListener('click', excluirDocumento);
+        }
+        
+        const btnConfirmarExclusaoAndamento = document.getElementById('btnConfirmarExclusaoAndamento');
+        if (btnConfirmarExclusaoAndamento) {
+            btnConfirmarExclusaoAndamento.addEventListener('click', excluirAndamento);
+        }
+    });
+
+    // =============================================================================
+    // FUNÇÕES PARA EXCLUSÃO DE ANDAMENTOS
+    // =============================================================================
+
+    // Variável global para armazenar ID do andamento a ser excluído
+    let andamentoParaExcluir = null;
+
+    // Função para abrir modal de exclusão de andamento
+    function abrirModalExclusaoAndamento(button) {
+        const andamentoId = button.getAttribute('data-andamento-id');
+        const tipo = button.getAttribute('data-andamento-tipo');
+        const data = button.getAttribute('data-andamento-data');
+        const descricao = button.getAttribute('data-andamento-descricao');
+        
+        console.log('🗑️ Abrindo modal de exclusão para andamento:', andamentoId);
+        
+        // Armazenar ID do andamento
+        andamentoParaExcluir = andamentoId;
+        
+        // Preencher informações do andamento no modal
+        document.getElementById('andamentoExclusaoTipo').textContent = tipo;
+        document.getElementById('andamentoExclusaoData').textContent = data;
+        document.getElementById('andamentoExclusaoDescricao').textContent = descricao;
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('deleteAndamentoModal'));
+        modal.show();
+    }
+
+    // Função para excluir andamento via AJAX
+    function excluirAndamento() {
+        if (!andamentoParaExcluir) {
+            console.error('❌ ID do andamento não definido');
+            return;
+        }
+
+        console.log('🗑️ Excluindo andamento:', andamentoParaExcluir);
+        
+        // Desabilitar botão de exclusão
+        const btnExcluir = document.getElementById('btnConfirmarExclusaoAndamento');
+        btnExcluir.disabled = true;
+        btnExcluir.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Excluindo...';
+        
+        // Fazer requisição AJAX
+        fetch(`{% url 'assejus:andamento_delete_ajax' 0 %}`.replace('0', andamentoParaExcluir), {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('📋 Resposta da exclusão:', data);
+            
+            if (data.success) {
+                console.log('✅ Andamento excluído com sucesso');
+                
+                // Mostrar mensagem de sucesso
+                mostrarMensagem('success', data.message);
+                
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAndamentoModal'));
+                modal.hide();
+                
+                // Remover andamento da lista
+                removerAndamentoDaLista(andamentoParaExcluir);
+                
+                // Limpar variável
+                andamentoParaExcluir = null;
+                
+            } else {
+                console.log('❌ Erro na exclusão:', data.message);
+                mostrarMensagem('error', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição de exclusão:', error);
+            mostrarMensagem('error', 'Erro interno do servidor');
+        })
+        .finally(() => {
+            // Restaurar botão
+            btnExcluir.disabled = false;
+            btnExcluir.innerHTML = '<i class="fas fa-trash me-2"></i>Excluir Andamento';
+        });
+    }
+
+    // Função para remover andamento da lista
+    function removerAndamentoDaLista(andamentoId) {
+        console.log('🗑️ Removendo andamento da lista:', andamentoId);
+        
+        // Encontrar o item na timeline
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        let itemRemovido = false;
+        
+        timelineItems.forEach(item => {
+            const deleteButton = item.querySelector('button[data-andamento-id]');
+            if (deleteButton && deleteButton.getAttribute('data-andamento-id') == andamentoId) {
+                item.remove();
+                itemRemovido = true;
+                console.log('✅ Andamento removido da timeline');
+            }
+        });
+        
+        // Encontrar o item na tabela
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach(row => {
+            const deleteButton = row.querySelector('button[data-andamento-id]');
+            if (deleteButton && deleteButton.getAttribute('data-andamento-id') == andamentoId) {
+                row.remove();
+                itemRemovido = true;
+                console.log('✅ Andamento removido da tabela');
+            }
+        });
+        
+        // Se não encontrou o item, recarregar página
+        if (!itemRemovido) {
+            console.log('⚠️ Item não encontrado na lista, recarregando página...');
+            location.reload();
+        }
+    }
+</script>
+{% endblock %}
+

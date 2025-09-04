@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Reservar Quarto{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+    }
+    
+    .quarto-info-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .reserva-form-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .quarto-header {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .quarto-body {
+        padding: 1.5rem;
+    }
+    
+    .quarto-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #495057;
+    }
+    
+    .quarto-type {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+    
+    .quarto-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+    
+    .feature-badge {
+        background: #f1f3f4;
+        color: #5f6368;
+        padding: 0.5rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .feature-badge.has {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .quarto-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-reservar {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-reservar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+    }
+    
+    .btn-cancelar {
+        background: #6c757d;
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .btn-cancelar:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .resumo-reserva {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    .resumo-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .resumo-item:last-child {
+        border-bottom: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #28a745;
+    }
+    
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Cabeçalho da Página -->
+    <div class="page-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-calendar-plus me-3"></i>
+                    Reservar Quarto
+                </h1>
+                <p class="mb-0">Preencha os dados para fazer sua reserva</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'hotel_transito:associado_quartos_disponiveis' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Voltar aos Quartos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações do Quarto -->
+        <div class="col-lg-4">
+            <div class="quarto-info-card">
+                <div class="quarto-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="quarto-number">Quarto {{ quarto.numero }}</span>
+                        <span class="quarto-type">{{ quarto.get_tipo_display }}</span>
+                    </div>
+                </div>
+                <div class="quarto-body">
+                    <div class="mb-3">
+                        <strong>Capacidade:</strong> {{ quarto.capacidade }} pessoa{{ quarto.capacidade|pluralize }}
+                    </div>
+                    
+                    <div class="quarto-features">
+                        <span class="feature-badge {% if quarto.ar_condicionado %}has{% endif %}">
+                            <i class="fas fa-snowflake me-1"></i>Ar Condicionado
+                        </span>
+                        <span class="feature-badge {% if quarto.tv %}has{% endif %}">
+                            <i class="fas fa-tv me-1"></i>TV
+                        </span>
+                        <span class="feature-badge {% if quarto.wifi %}has{% endif %}">
+                            <i class="fas fa-wifi me-1"></i>Wi-Fi
+                        </span>
+                        <span class="feature-badge {% if quarto.banheiro_privativo %}has{% endif %}">
+                            <i class="fas fa-bath me-1"></i>Banheiro Privativo
+                        </span>
+                        <span class="feature-badge {% if quarto.frigobar %}has{% endif %}">
+                            <i class="fas fa-ice-cream me-1"></i>Frigobar
+                        </span>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="quarto-price">R$ {{ quarto.valor_diaria|floatformat:2 }}</div>
+                        <small class="text-muted">por diária</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulário de Reserva -->
+        <div class="col-lg-8">
+            <div class="reserva-form-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Dados da Reserva
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Mensagem Informativa -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Importante:</strong> Sua reserva será enviada para aprovação da administração. Você receberá uma confirmação por e-mail quando aprovada.
+                    </div>
+
+                    <form method="post" id="reservaForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="data_entrada" class="form-label">
+                                        <i class="fas fa-calendar-day me-1"></i>
+                                        Data de Entrada
+                                    </label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           id="data_entrada" 
+                                           name="data_entrada" 
+                                           required
+                                           min="{{ today|date:'Y-m-d' }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="data_saida" class="form-label">
+                                        <i class="fas fa-calendar-day me-1"></i>
+                                        Data de Saída
+                                    </label>
+                                    <input type="date" 
+                                           class="form-control" 
+                                           id="data_saida" 
+                                           name="data_saida" 
+                                           required
+                                           min="{{ today|date:'Y-m-d' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="observacoes" class="form-label">
+                                <i class="fas fa-comment me-1"></i>
+                                Observações (opcional)
+                            </label>
+                            <textarea class="form-control" 
+                                      id="observacoes" 
+                                      name="observacoes" 
+                                      rows="3" 
+                                      placeholder="Informações adicionais sobre sua estadia..."></textarea>
+                        </div>
+
+                        <!-- Resumo da Reserva -->
+                        <div class="resumo-reserva" id="resumoReserva" style="display: none;">
+                            <h6 class="mb-3">
+                                <i class="fas fa-calculator me-2"></i>
+                                Resumo da Reserva
+                            </h6>
+                            <div class="resumo-item">
+                                <span>Valor da diária:</span>
+                                <span>R$ {{ quarto.valor_diaria|floatformat:2 }}</span>
+                            </div>
+                            <div class="resumo-item">
+                                <span>Quantidade de diárias:</span>
+                                <span id="quantidadeDiarias">-</span>
+                            </div>
+                            <div class="resumo-item">
+                                <span>Valor total:</span>
+                                <span id="valorTotal">-</span>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <a href="{% url 'hotel_transito:associado_quartos_disponiveis' %}" class="btn-cancelar">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <button type="submit" class="btn-reservar">
+                                    <i class="fas fa-calendar-check me-2"></i>
+                                    Confirmar Reserva
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dataEntrada = document.getElementById('data_entrada');
+    const dataSaida = document.getElementById('data_saida');
+    const resumoReserva = document.getElementById('resumoReserva');
+    const quantidadeDiarias = document.getElementById('quantidadeDiarias');
+    const valorTotal = document.getElementById('valorTotal');
+    const valorDiaria = {{ quarto.valor_diaria }};
+
+    function calcularResumo() {
+        if (dataEntrada.value && dataSaida.value) {
+            const entrada = new Date(dataEntrada.value);
+            const saida = new Date(dataSaida.value);
+            
+            if (saida > entrada) {
+                const diffTime = Math.abs(saida - entrada);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const total = diffDays * valorDiaria;
+                
+                quantidadeDiarias.textContent = diffDays + ' diária' + (diffDays > 1 ? 's' : '');
+                valorTotal.textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+                resumoReserva.style.display = 'block';
+            } else {
+                resumoReserva.style.display = 'none';
+            }
+        } else {
+            resumoReserva.style.display = 'none';
+        }
+    }
+
+    dataEntrada.addEventListener('change', function() {
+        if (dataSaida.value && dataSaida.value <= dataEntrada.value) {
+            dataSaida.value = '';
+        }
+        calcularResumo();
+    });
+
+    dataSaida.addEventListener('change', calcularResumo);
+
+    // Definir data mínima como hoje
+    const today = new Date().toISOString().split('T')[0];
+    dataEntrada.min = today;
+    dataSaida.min = today;
+});
+</script>
+{% endblock %}

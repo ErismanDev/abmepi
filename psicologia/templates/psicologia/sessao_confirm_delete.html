@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Sessão{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-trash text-danger"></i> 
+                    Excluir Sessão
+                </h1>
+                <div>
+                    {% if sessao.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' sessao.paciente.pk %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar aos Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-danger text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Confirmação de Exclusão
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Atenção!
+                        </h5>
+                        <p class="mb-0">
+                            Você está prestes a excluir permanentemente esta sessão. 
+                            Esta ação não pode ser desfeita e pode afetar o histórico do paciente.
+                        </p>
+                    </div>
+
+                    <div class="card border-warning mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">Detalhes da Sessão</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Data/Hora:</strong> {{ sessao.data_hora|date:"d/m/Y H:i" }}</p>
+                                    <p><strong>Duração:</strong> {{ sessao.duracao }} minutos</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Tipo:</strong> <span class="badge badge-info">{{ sessao.get_tipo_sessao_display }}</span></p>
+                                    <p><strong>Status:</strong> 
+                                        {% if sessao.status == 'agendada' %}
+                                            <span class="badge badge-warning">{{ sessao.get_status_display }}</span>
+                                        {% elif sessao.status == 'confirmada' %}
+                                            <span class="badge badge-info">{{ sessao.get_status_display }}</span>
+                                        {% elif sessao.status == 'realizada' %}
+                                            <span class="badge badge-success">{{ sessao.get_status_display }}</span>
+                                        {% elif sessao.status == 'cancelada' %}
+                                            <span class="badge badge-danger">{{ sessao.get_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">{{ sessao.get_status_display }}</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Paciente:</strong> {{ sessao.paciente.associado.nome }}</p>
+                                    <p><strong>CPF:</strong> {{ sessao.paciente.associado.cpf }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Psicólogo:</strong> {{ sessao.psicologo.nome_completo }}</p>
+                                    <p><strong>CRP:</strong> {{ sessao.psicologo.crp }}</p>
+                                </div>
+                            </div>
+                            {% if sessao.local %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <p><strong>Local:</strong> {{ sessao.local }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if sessao.observacoes %}
+                            <div class="row">
+                                <div class="col-12">
+                                    <p><strong>Observações:</strong></p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {{ sessao.observacoes|truncatewords:30 }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-trash"></i> 
+                                    Confirmar Exclusão
+                                </button>
+                                {% if sessao.paciente %}
+                                    <a href="{% url 'psicologia:paciente_detail' sessao.paciente.pk %}" class="btn btn-secondary btn-lg ml-2">
+                                        <i class="fas fa-times"></i> 
+                                        Cancelar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary btn-lg ml-2">
+                                        <i class="fas fa-times"></i> 
+                                        Cancelar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle"></i> 
+                                Alternativas à Exclusão
+                            </h6>
+                            <ul class="mb-0">
+                                <li><strong>Editar:</strong> Modifique a sessão em vez de excluí-la</li>
+                                <li><strong>Cancelar:</strong> Mude o status para "Cancelada"</li>
+                                <li><strong>Reagendar:</strong> Altere a data/hora</li>
+                                <li><strong>Transferir:</strong> Mova para outro paciente se necessário</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-shield-alt"></i> 
+                                Considerações Importantes
+                            </h6>
+                            <ul class="mb-0">
+                                <li>Evoluções relacionadas podem ser afetadas</li>
+                                <li>Verifique se não há dependências</li>
+                                <li>Considere o impacto no histórico do paciente</li>
+                                <li>Mantenha registros de auditoria</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

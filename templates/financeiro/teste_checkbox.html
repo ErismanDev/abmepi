@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Teste de Checkboxes - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1>Teste de Checkboxes</h1>
+    
+    <!-- Teste simples de checkbox -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Checkbox Simples</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="teste1">
+                <label class="form-check-label" for="teste1">
+                    Checkbox de teste 1
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="teste2">
+                <label class="form-check-label" for="teste2">
+                    Checkbox de teste 2
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Teste de checkbox com classe específica -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5>Checkbox com Classe Específica</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input mensalidade-checkbox" type="checkbox" value="1" id="mensalidade_1">
+                <label class="form-check-label" for="mensalidade_1">
+                    Mensalidade 1
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input mensalidade-checkbox" type="checkbox" value="2" id="mensalidade_2">
+                <label class="form-check-label" for="mensalidade_2">
+                    Mensalidade 2
+                </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input mensalidade-checkbox" type="checkbox" value="3" id="mensalidade_3">
+                <label class="form-check-label" for="mensalidade_3">
+                    Mensalidade 3
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Teste de checkbox "selecionar todas" -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5>Checkbox "Selecionar Todas"</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="selecionarTodas">
+                <label class="form-check-label" for="selecionarTodas">
+                    Selecionar Todas
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botões de teste -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h5>Botões de Teste</h5>
+        </div>
+        <div class="card-body">
+            <button type="button" class="btn btn-warning" id="btnGerarCarne" disabled>
+                <i class="fas fa-file-pdf me-1"></i>
+                Gerar Carnê
+            </button>
+            <button type="button" class="btn btn-danger" id="btnExcluirLote" disabled>
+                <i class="fas fa-trash me-1"></i>
+                Excluir Selecionadas
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        console.log('Script de teste carregado');
+        
+        // Verificar checkboxes
+        var checkboxes = $('.mensalidade-checkbox');
+        var checkboxTodas = $('#selecionarTodas');
+        
+        console.log('Checkboxes encontrados:', checkboxes.length);
+        console.log('Checkbox "Todas" encontrado:', checkboxTodas.length);
+        
+        // Funcionalidade para seleção em lote
+        var mensalidadesSelecionadas = [];
+        
+        // Função para atualizar botões baseado na seleção
+        function atualizarBotaoes() {
+            if (mensalidadesSelecionadas.length > 0) {
+                $('#btnGerarCarne').prop('disabled', false);
+                $('#btnExcluirLote').prop('disabled', false);
+            } else {
+                $('#btnGerarCarne').prop('disabled', true);
+                $('#btnExcluirLote').prop('disabled', true);
+            }
+        }
+        
+        // Event listener para checkboxes de seleção
+        $(document).on('change', '.mensalidade-checkbox', function() {
+            var mensalidadeId = $(this).val();
+            if ($(this).is(':checked')) {
+                if (mensalidadesSelecionadas.indexOf(mensalidadeId) === -1) {
+                    mensalidadesSelecionadas.push(mensalidadeId);
+                }
+            } else {
+                var index = mensalidadesSelecionadas.indexOf(mensalidadeId);
+                if (index > -1) {
+                    mensalidadesSelecionadas.splice(index, 1);
+                }
+            }
+            atualizarBotaoes();
+            console.log('Mensalidades selecionadas:', mensalidadesSelecionadas);
+        });
+        
+        // Botão para selecionar todas as mensalidades
+        $('#selecionarTodas').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('.mensalidade-checkbox').prop('checked', true).trigger('change');
+            } else {
+                $('.mensalidade-checkbox').prop('checked', false).trigger('change');
+            }
+        });
+        
+        // Inicializar botões
+        atualizarBotaoes();
+    });
+</script>
+{% endblock %}

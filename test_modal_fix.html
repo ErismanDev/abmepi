@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Correção de Modal</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .success { border-color: #28a745; background-color: #d4edda; }
+        .warning { border-color: #ffc107; background-color: #fff3cd; }
+        .danger { border-color: #dc3545; background-color: #f8d7da; }
+        
+        .log-area {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">🧪 Teste de Correção de Modal</h1>
+        
+        <div class="test-section success">
+            <h3>✅ Status da Correção</h3>
+            <p>Este teste verifica se a correção para o erro de backdrop está funcionando corretamente.</p>
+            <div id="statusArea"></div>
+        </div>
+        
+        <div class="test-section warning">
+            <h3>🔧 Testes de Modal</h3>
+            <button class="btn btn-primary me-2" onclick="testModalCreation()">Testar Criação de Modal</button>
+            <button class="btn btn-success me-2" onclick="testModalWithOptions()">Testar Modal com Opções</button>
+            <button class="btn btn-info me-2" onclick="testModalWithoutOptions()">Testar Modal sem Opções</button>
+            <button class="btn btn-warning" onclick="testModalFix()">Testar ModalFix API</button>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 Logs de Teste</h3>
+            <div id="logArea" class="log-area"></div>
+            <button class="btn btn-secondary btn-sm" onclick="clearLogs()">Limpar Logs</button>
+        </div>
+        
+        <!-- Modal de teste -->
+        <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="testModalLabel">Modal de Teste</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Este é um modal de teste para verificar se a correção está funcionando.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                        <button type="button" class="btn btn-primary">Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Arquivo de correção -->
+    <script src="/static/js/modal-fix.js"></script>
+    
+    <script>
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> <span class="text-${type === 'error' ? 'danger' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'primary'}">${message}</span>`;
+            logArea.appendChild(logEntry);
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        // Função para verificar status
+        function checkStatus() {
+            const statusArea = document.getElementById('statusArea');
+            
+            if (typeof ModalFix !== 'undefined') {
+                statusArea.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>✅ ModalFix disponível!</strong><br>
+                        <small>Versão: ${ModalFix.version || '1.0'}</small>
+                    </div>
+                `;
+                addLog('✅ ModalFix carregado com sucesso', 'success');
+            } else {
+                statusArea.innerHTML = `
+                    <div class="alert alert-warning">
+                        <strong>⚠️ ModalFix não disponível</strong><br>
+                        <small>Verifique se o arquivo foi carregado corretamente</small>
+                    </div>
+                `;
+                addLog('⚠️ ModalFix não encontrado', 'warning');
+            }
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                addLog('✅ Bootstrap Modal disponível', 'success');
+            } else {
+                addLog('❌ Bootstrap Modal não disponível', 'error');
+            }
+        }
+        
+        // Teste de criação de modal
+        function testModalCreation() {
+            addLog('🧪 Testando criação de modal...', 'info');
+            
+            try {
+                const modalElement = document.getElementById('testModal');
+                const modal = new bootstrap.Modal(modalElement);
+                addLog('✅ Modal criado com sucesso', 'success');
+                
+                // Testar abertura
+                modal.show();
+                addLog('✅ Modal aberto com sucesso', 'success');
+                
+                // Fechar após 2 segundos
+                setTimeout(() => {
+                    modal.hide();
+                    addLog('✅ Modal fechado com sucesso', 'success');
+                }, 2000);
+                
+            } catch (error) {
+                addLog(`❌ Erro ao criar modal: ${error.message}`, 'error');
+            }
+        }
+        
+        // Teste de modal com opções
+        function testModalWithOptions() {
+            addLog('🧪 Testando modal com opções...', 'info');
+            
+            try {
+                const modalElement = document.getElementById('testModal');
+                const modal = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                addLog('✅ Modal com opções criado com sucesso', 'success');
+                
+                modal.show();
+                setTimeout(() => modal.hide(), 2000);
+                
+            } catch (error) {
+                addLog(`❌ Erro ao criar modal com opções: ${error.message}`, 'error');
+            }
+        }
+        
+        // Teste de modal sem opções
+        function testModalWithoutOptions() {
+            addLog('🧪 Testando modal sem opções...', 'info');
+            
+            try {
+                const modalElement = document.getElementById('testModal');
+                const modal = new bootstrap.Modal(modalElement);
+                addLog('✅ Modal sem opções criado com sucesso', 'success');
+                
+                modal.show();
+                setTimeout(() => modal.hide(), 2000);
+                
+            } catch (error) {
+                addLog(`❌ Erro ao criar modal sem opções: ${error.message}`, 'error');
+            }
+        }
+        
+        // Teste da API ModalFix
+        function testModalFix() {
+            addLog('🧪 Testando API ModalFix...', 'info');
+            
+            if (typeof ModalFix !== 'undefined') {
+                try {
+                    const modalElement = document.getElementById('testModal');
+                    const modal = ModalFix.createSafe(modalElement);
+                    
+                    if (modal) {
+                        addLog('✅ ModalFix.createSafe funcionando', 'success');
+                        modal.show();
+                        setTimeout(() => modal.hide(), 2000);
+                    } else {
+                        addLog('❌ ModalFix.createSafe retornou null', 'error');
+                    }
+                } catch (error) {
+                    addLog(`❌ Erro na API ModalFix: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('❌ ModalFix não disponível', 'error');
+            }
+        }
+        
+        // Limpar logs
+        function clearLogs() {
+            document.getElementById('logArea').innerHTML = '';
+        }
+        
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página carregada, verificando status...', 'info');
+            
+            // Aguardar um pouco para o ModalFix carregar
+            setTimeout(() => {
+                checkStatus();
+                addLog('✅ Verificação de status concluída', 'success');
+            }, 500);
+        });
+        
+        // Interceptar erros globais
+        window.addEventListener('error', function(event) {
+            addLog(`❌ Erro global: ${event.message}`, 'error');
+        });
+        
+        // Interceptar erros não capturados
+        window.addEventListener('unhandledrejection', function(event) {
+            addLog(`❌ Promise rejeitada: ${event.reason}`, 'error');
+        });
+    </script>
+</body>
+</html>

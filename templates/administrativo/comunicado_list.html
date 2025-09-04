@@ -1,0 +1,238 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Comunicados - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-bullhorn me-2"></i>
+                        Comunicados
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie todos os comunicados da associação
+                    </p>
+                </div>
+                <div>
+                    {% if user.tipo_usuario == 'administrador_sistema' %}
+                    <a href="{% url 'administrativo:comunicado_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Comunicado
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Filtros de busca -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Título ou conteúdo...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select class="form-control" id="tipo" name="tipo">
+                                <option value="">Todos os tipos</option>
+                                <option value="informacao" {% if tipo == 'informacao' %}selected{% endif %}>Informação</option>
+                                <option value="aviso" {% if tipo == 'aviso' %}selected{% endif %}>Aviso</option>
+                                <option value="lembrete" {% if tipo == 'lembrete' %}selected{% endif %}>Lembrete</option>
+                                <option value="urgencia" {% if tipo == 'urgencia' %}selected{% endif %}>Urgência</option>
+                                <option value="evento" {% if tipo == 'evento' %}selected{% endif %}>Evento</option>
+                                <option value="outro" {% if tipo == 'outro' %}selected{% endif %}>Outro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="prioridade" class="form-label">Prioridade</label>
+                            <select class="form-control" id="prioridade" name="prioridade">
+                                <option value="">Todas as prioridades</option>
+                                <option value="baixa" {% if prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                                <option value="normal" {% if prioridade == 'normal' %}selected{% endif %}>Normal</option>
+                                <option value="alta" {% if prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                                <option value="urgente" {% if prioridade == 'urgente' %}selected{% endif %}>Urgente</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-2"></i>
+                                Filtrar
+                            </button>
+                            <a href="{% url 'administrativo:comunicado_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Limpar Filtros
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de comunicados -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Comunicados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Prioridade</th>
+                                        <th>Data de Publicação</th>
+                                        <th>Autor</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for comunicado in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ comunicado.titulo }}</strong>
+                                            {% if comunicado.conteudo %}
+                                                <br>
+                                                <small class="text-muted">{{ comunicado.conteudo|truncatechars:60 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ comunicado.get_tipo_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if comunicado.prioridade == 'urgente' %}danger{% elif comunicado.prioridade == 'alta' %}warning{% elif comunicado.prioridade == 'normal' %}primary{% else %}secondary{% endif %}">
+                                                {{ comunicado.get_prioridade_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ comunicado.data_publicacao|date:"d/m/Y" }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ comunicado.data_publicacao|time:"H:i" }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">
+                                                {{ comunicado.autor.username|default:"Sistema" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if comunicado.ativo %}success{% else %}danger{% endif %}">
+                                                {% if comunicado.ativo %}Ativo{% else %}Inativo{% endif %}
+                                            </span>
+                                            {% if comunicado.data_expiracao %}
+                                                <br>
+                                                <small class="text-muted">
+                                                    Expira: {{ comunicado.data_expiracao|date:"d/m/Y" }}
+                                                </small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="#" 
+                                                   class="btn btn-sm btn-outline-primary"
+                                                   onclick="openComunicadoModalFromLink(event, {{ comunicado.pk }})">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver
+                                                </a>
+                                                {% if user.tipo_usuario == 'administrador_sistema' %}
+                                                <a href="{% url 'administrativo:comunicado_update' pk=comunicado.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    Editar
+                                                </a>
+                                                <a href="{% url 'administrativo:comunicado_delete' pk=comunicado.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash me-1"></i>
+                                                    Excluir
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if page_obj.has_other_pages %}
+                        <nav aria-label="Navegação de páginas" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum comunicado encontrado</h5>
+                            <p class="text-muted">
+                                {% if search or tipo or prioridade %}
+                                    Tente ajustar os filtros de busca ou
+                                {% endif %}
+                                Crie o primeiro comunicado da associação.
+                            </p>
+                            <a href="{% url 'administrativo:comunicado_create' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>
+                                Criar Comunicado
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

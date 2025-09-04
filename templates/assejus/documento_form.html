@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if documento %}Editar{% else %}Novo{% endif %} Documento - ASSEJUS
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {% if documento %}Editar{% else %}Novo{% endif %} Documento
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if documento %}
+                            Editando: <strong>{{ documento.titulo }}</strong>
+                        {% else %}
+                            Anexe um novo documento ao caso jurídico
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:documento_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados do Documento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Campo hidden para manter processo_id se fornecido via URL -->
+                        {% if request.GET.processo %}
+                        <input type="hidden" name="processo_id" value="{{ request.GET.processo }}">
+                        {% endif %}
+                        
+                        <div class="row">
+                            <!-- Título -->
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                    {{ form.titulo.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.titulo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo de Documento -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.tipo_documento.id_for_label }}" class="form-label">
+                                    {{ form.tipo_documento.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_documento }}
+                                {% if form.tipo_documento.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo_documento.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Processo -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                {% if form.processo_info %}
+                                <!-- Processo pré-selecionado -->
+                                <label class="form-label">
+                                    {{ form.processo.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Processo Selecionado:</strong><br>
+                                    <strong>{{ form.processo_info.numero_processo }}</strong><br>
+                                    <small class="text-muted">
+                                        Cliente: {{ form.processo_info.parte_cliente.nome }}<br>
+                                        Vara/Tribunal: {{ form.processo_info.vara_tribunal }}
+                                    </small>
+                                </div>
+                                {{ form.processo }}
+                                {% else %}
+                                <!-- Seleção de processo -->
+                                <label for="{{ form.processo.id_for_label }}" class="form-label">
+                                    {{ form.processo.label }} <span class="text-danger">*</span>
+                                </label>
+                                
+                                <!-- Debug: mostrar informações do campo processo -->
+                                <div class="alert alert-info">
+                                    <strong>Debug:</strong><br>
+                                    - Campo ID: {{ form.processo.id_for_label }}<br>
+                                    - Total de opções: {{ form.processo.choices|length }}<br>
+                                    - Queryset count: {{ form.processo.queryset.count }}<br>
+                                    - Processo da URL: <span id="debug-processo-url"></span>
+                                </div>
+                                
+                                {{ form.processo }}
+                                {% endif %}
+                                
+                                {% if form.processo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.processo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    {% if form.processo_info %}
+                                        Este documento será anexado ao processo selecionado
+                                    {% else %}
+                                        Selecione o processo jurídico ao qual este documento pertence
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                    {{ form.descricao.label }}
+                                </label>
+                                {{ form.descricao }}
+                                {% if form.descricao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.descricao.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Descreva o conteúdo ou propósito deste documento
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Arquivo -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.arquivo.id_for_label }}" class="form-label">
+                                    {{ form.arquivo.label }} <span class="text-danger">*</span>
+                                </label>
+                                {% if documento and documento.arquivo %}
+                                    <div class="alert alert-info mb-3">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <strong>Arquivo atual:</strong> 
+                                        <a href="{{ documento.arquivo.url }}" target="_blank">
+                                            {{ documento.arquivo.name|slice:"24:" }}
+                                        </a>
+                                        <br>
+                                        <small class="text-muted">
+                                            Selecione um novo arquivo para substituir o atual
+                                        </small>
+                                    </div>
+                                {% endif %}
+                                {{ form.arquivo }}
+                                {% if form.arquivo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.arquivo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Formatos aceitos: PDF, DOC, DOCX, JPG, PNG, TXT. Tamanho máximo: 10MB
+                                </small>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Botões de ação -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'assejus:documento_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if documento %}Atualizar{% else %}Anexar{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Debug: mostrar informações da URL
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const processoId = urlParams.get('processo');
+    const atendimentoId = urlParams.get('atendimento');
+    
+    // Debug: mostrar informações
+    const debugProcessoSpan = document.getElementById('debug-processo-url');
+    if (debugProcessoSpan) {
+        debugProcessoSpan.textContent = processoId || 'Nenhum';
+    }
+    
+    if (processoId) {
+        console.log('🔍 Processo da URL:', processoId);
+        console.log('✅ Processo será pré-selecionado automaticamente');
+    } else if (atendimentoId) {
+        console.log('🔍 Atendimento da URL:', atendimentoId);
+        console.log('ℹ️ Os processos serão filtrados pelo associado do atendimento');
+    } else {
+        console.log('ℹ️ Nenhum processo ou atendimento na URL');
+    }
+});
+</script>
+{% endblock %}

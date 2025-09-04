@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Psicologia{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="h3 mb-4">Dashboard - Atendimento Psicológico</h1>
+        </div>
+    </div>
+
+    <!-- Cards de estatísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Pacientes</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_pacientes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Sessões Hoje</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sessoes_hoje }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Psicólogos Ativos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_psicologos }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-md fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Prontuários</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_prontuarios }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-medical fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações rápidas - Apenas para administradores e superusers -->
+    {% if user.tipo_usuario == 'administrador_sistema' or user.is_superuser %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ações Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-success btn-block" onclick="openPacienteModal()">
+                                <i class="fas fa-user-plus"></i> Novo Paciente
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-info btn-block" onclick="openPsicologoModal()">
+                                <i class="fas fa-user-md"></i> Novo Psicólogo
+                            </button>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="button" class="btn btn-warning btn-block" onclick="openAgendaModal()">
+                                <i class="fas fa-calendar-plus"></i> Nova Agenda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pacientes recentes -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Pacientes Recentes</h6>
+                    <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-sm btn-primary">
+                        Ver Todos
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if pacientes_recentes %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Psicólogo Responsável</th>
+                                        <th>Primeira Consulta</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for paciente in pacientes_recentes %}
+                                    <tr>
+                                        <td>{{ paciente.associado.nome }}</td>
+                                        <td>
+                                            {% if paciente.psicologos.all %}
+                                                {% for relacionamento in paciente.pacientepsicologo_set.all %}
+                                                    {% if relacionamento.ativo %}
+                                                        <span class="badge bg-primary text-white me-1">
+                                                            {{ relacionamento.psicologo.nome_completo }}
+                                                            {% if relacionamento.principal %}(Principal){% endif %}
+                                                        </span>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% elif paciente.psicologo_responsavel %}
+                                                <span class="badge bg-primary text-white fw-bold">
+                                                    {{ paciente.psicologo_responsavel.nome_completo }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">Não atribuído</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if paciente.data_primeira_consulta %}
+                                                {{ paciente.data_primeira_consulta|date:"d/m/Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Não registrada</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if paciente.ativo %}
+                                                <span class="badge bg-success text-white fw-bold">Ativo</span>
+                                            {% else %}
+                                                <span class="badge bg-danger text-white fw-bold">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i> Ver Ficha
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="openPacienteEditModal({{ paciente.pk }})">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhum paciente encontrado.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}
+
+{% endblock %}

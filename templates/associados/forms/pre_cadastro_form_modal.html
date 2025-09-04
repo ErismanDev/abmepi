@@ -1,0 +1,69 @@
+{% load crispy_forms_tags %}
+
+<form method="post" id="preCadastroForm" novalidate>
+    {% csrf_token %}
+    
+    <div class="alert alert-warning">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        <strong>Atenção:</strong> Este é um pré-cadastro que será analisado pela diretoria da associação.
+    </div>
+    
+    <div class="row mb-3">
+        <!-- Nome -->
+        <div class="col-md-6">
+            {{ form.nome|as_crispy_field }}
+        </div>
+
+        <!-- CPF -->
+        <div class="col-md-6">
+            {{ form.cpf|as_crispy_field }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <!-- Email -->
+        <div class="col-md-6">
+            {{ form.email|as_crispy_field }}
+        </div>
+
+        <!-- Telefone -->
+        <div class="col-md-6">
+            {{ form.telefone|as_crispy_field }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <!-- Naturalidade -->
+        <div class="col-md-6">
+            {{ form.naturalidade|as_crispy_field }}
+        </div>
+
+        <!-- Nacionalidade -->
+        <div class="col-md-6">
+            {{ form.nacionalidade|as_crispy_field }}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <!-- Tipo de Profissão -->
+        <div class="col-md-6">
+            {{ form.tipo_profissao|as_crispy_field }}
+        </div>
+
+        <!-- Profissão -->
+        <div class="col-md-6">
+            {{ form.profissao|as_crispy_field }}
+        </div>
+    </div>
+
+    <!-- Observações -->
+    <div class="row mb-3">
+        <div class="col-12">
+            {{ form.observacoes|as_crispy_field }}
+        </div>
+    </div>
+</form>
+
+
+
+

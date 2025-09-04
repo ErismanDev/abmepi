@@ -1,0 +1,542 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Processo Jurídico - ASSEJUS
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-gavel me-2"></i>
+                        {% if object %}Editar{% else %}Novo{% endif %} Processo Jurídico
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if object %}
+                            Editando: <strong>{{ object.numero_processo }}</strong>
+                        {% else %}
+                            Registre um novo processo jurídico
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    {% if object %}
+                        <a href="{% url 'assejus:processo_detail' pk=object.pk %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar ao Processo
+                        </a>
+                    {% else %}
+                        <a href="{% url 'assejus:processos_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à Lista
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados do Processo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Tipo de Processo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_processo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-gavel me-1"></i>
+                                    Tipo de Processo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_processo }}
+                                {% if form.tipo_processo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_processo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Número do Processo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.numero_processo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    Número do Processo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.numero_processo }}
+                                {% if form.numero_processo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.numero_processo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted" id="help-numero-processo">
+                                    Para processos judiciais: formato CNJ (0001234-56.2024.8.26.0001)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Processo Judicial -->
+                        <div id="campos-judicial" class="row">
+                            <!-- Vara/Tribunal -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.vara_tribunal.id_for_label }}" class="form-label">
+                                    <i class="fas fa-balance-scale me-1"></i>
+                                    Vara/Tribunal <span class="text-danger">*</span>
+                                </label>
+                                {{ form.vara_tribunal }}
+                                {% if form.vara_tribunal.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.vara_tribunal.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo de Ação -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_acao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-gavel me-1"></i>
+                                    Tipo de Ação <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_acao }}
+                                {% if form.tipo_acao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_acao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Campos para Processo Administrativo -->
+                        <div id="campos-administrativo" class="row" style="display: none;">
+                            <!-- Tipo de Processo Administrativo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_processo_administrativo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-clipboard-list me-1"></i>
+                                    Tipo de Processo Administrativo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_processo_administrativo }}
+                                {% if form.tipo_processo_administrativo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_processo_administrativo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Unidade Militar -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.unidade_militar_apuracao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Unidade Militar que está Apurando <span class="text-danger">*</span>
+                                </label>
+                                {{ form.unidade_militar_apuracao }}
+                                {% if form.unidade_militar_apuracao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.unidade_militar_apuracao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Situação Atual -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.situacao_atual.id_for_label }}" class="form-label">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                    Situação Atual <span class="text-danger">*</span>
+                                </label>
+                                {{ form.situacao_atual }}
+                                {% if form.situacao_atual.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.situacao_atual.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Parte Cliente -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.parte_cliente.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Parte Cliente <span class="text-danger">*</span>
+                                </label>
+                                {{ form.parte_cliente }}
+                                {% if form.parte_cliente.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.parte_cliente.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Parte Contrária -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.parte_contraria.id_for_label }}" class="form-label" id="label-parte-contraria">
+                                    <i class="fas fa-users me-1"></i>
+                                    Parte Contrária <span class="text-danger">*</span>
+                                </label>
+                                {{ form.parte_contraria }}
+                                {% if form.parte_contraria.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.parte_contraria.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted" id="help-parte-contraria">
+                                    Nome da parte contrária no processo
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Advogado da Parte Contrária -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.advogado_parte_contraria.id_for_label }}" class="form-label" id="label-advogado-parte-contraria">
+                                    <i class="fas fa-user-shield me-1"></i>
+                                    Advogado/Procurador da Parte Contrária
+                                </label>
+                                {{ form.advogado_parte_contraria }}
+                                {% if form.advogado_parte_contraria.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.advogado_parte_contraria.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted" id="help-advogado-parte-contraria">
+                                    Nome do advogado ou procurador que representa a parte contrária
+                                </small>
+                            </div>
+
+                            <!-- Advogado Responsável -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.advogado_responsavel.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Advogado Responsável <span class="text-danger">*</span>
+                                </label>
+                                {{ form.advogado_responsavel }}
+                                {% if form.advogado_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.advogado_responsavel.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Selecione o advogado responsável por este processo
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Observações Gerais -->
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.observacoes_gerais.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    Observações Gerais
+                                </label>
+                                {{ form.observacoes_gerais }}
+                                {% if form.observacoes_gerais.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes_gerais.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                {% if object %}
+                                    <a href="{% url 'assejus:processo_detail' pk=object.pk %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'assejus:processos_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if object %}Atualizar Processo{% else %}Criar Processo{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Validação do número do processo
+    const numeroProcesso = document.getElementById('{{ form.numero_processo.id_for_label }}');
+    if (numeroProcesso) {
+        numeroProcesso.addEventListener('input', function() {
+            const pattern = /^\d{7}-\d{2}\.\d{4}\.\d{1}\.\d{2}\.\d{4}$/;
+            if (this.value && !pattern.test(this.value)) {
+                this.setCustomValidity('Formato inválido. Use: 0001234-56.2024.8.26.0001');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Função para mostrar/ocultar campos baseado no tipo de processo
+    function toggleProcessoFields() {
+        const tipoProcesso = document.getElementById('{{ form.tipo_processo.id_for_label }}');
+        const camposJudicial = document.getElementById('campos-judicial');
+        const camposAdministrativo = document.getElementById('campos-administrativo');
+        const numeroProcesso = document.getElementById('id_numero_processo');
+        const helpNumeroProcesso = document.getElementById('help-numero-processo');
+        const parteContraria = document.getElementById('id_parte_contraria');
+        const labelParteContraria = document.getElementById('label-parte-contraria');
+        const helpParteContraria = document.getElementById('help-parte-contraria');
+        const advogadoParteContraria = document.getElementById('id_advogado_parte_contraria');
+        const labelAdvogadoParteContraria = document.getElementById('label-advogado-parte-contraria');
+        const helpAdvogadoParteContraria = document.getElementById('help-advogado-parte-contraria');
+        
+        if (tipoProcesso && camposJudicial && camposAdministrativo) {
+            if (tipoProcesso.value === 'judicial') {
+                camposJudicial.style.display = 'block';
+                camposAdministrativo.style.display = 'none';
+                
+                // Configurar para processo judicial
+                if (numeroProcesso) {
+                    numeroProcesso.placeholder = '0001234-56.2024.8.26.0001';
+                    numeroProcesso.pattern = '\\d{7}-\\d{2}\\.\\d{4}\\.\\d{1}\\.\\d{2}\\.\\d{4}';
+                    numeroProcesso.title = 'Formato CNJ: 0001234-56.2024.8.26.0001';
+                }
+                if (helpNumeroProcesso) {
+                    helpNumeroProcesso.textContent = 'Para processos judiciais: formato CNJ (0001234-56.2024.8.26.0001)';
+                }
+                
+                // Configurar labels para processo judicial
+                if (labelParteContraria) {
+                    labelParteContraria.innerHTML = '<i class="fas fa-users me-1"></i>Parte Contrária <span class="text-danger">*</span>';
+                }
+                if (helpParteContraria) {
+                    helpParteContraria.textContent = 'Nome da parte contrária no processo';
+                }
+                if (labelAdvogadoParteContraria) {
+                    labelAdvogadoParteContraria.innerHTML = '<i class="fas fa-user-shield me-1"></i>Advogado/Procurador da Parte Contrária';
+                }
+                if (helpAdvogadoParteContraria) {
+                    helpAdvogadoParteContraria.textContent = 'Nome do advogado ou procurador que representa a parte contrária';
+                }
+                if (parteContraria) {
+                    parteContraria.placeholder = 'Ex: João Silva, Empresa XYZ Ltda';
+                }
+                if (advogadoParteContraria) {
+                    advogadoParteContraria.placeholder = 'Nome do advogado/procurador da parte contrária';
+                }
+            } else if (tipoProcesso.value === 'administrativo') {
+                camposJudicial.style.display = 'none';
+                camposAdministrativo.style.display = 'block';
+                
+                // Configurar para processo administrativo
+                if (numeroProcesso) {
+                    numeroProcesso.placeholder = 'Ex: PA-2024-001, SIND-123/2024';
+                    numeroProcesso.removeAttribute('pattern');
+                    numeroProcesso.title = 'Qualquer formato de número de processo administrativo';
+                }
+                if (helpNumeroProcesso) {
+                    helpNumeroProcesso.textContent = 'Para processos administrativos: qualquer formato (letras e números)';
+                }
+                
+                // Configurar labels para processo administrativo
+                if (labelParteContraria) {
+                    labelParteContraria.innerHTML = '<i class="fas fa-building me-1"></i>Corporação <span class="text-danger">*</span>';
+                }
+                if (helpParteContraria) {
+                    helpParteContraria.textContent = 'Nome da corporação (Polícia Militar, Exército, etc.)';
+                }
+                if (labelAdvogadoParteContraria) {
+                    labelAdvogadoParteContraria.innerHTML = '<i class="fas fa-user-shield me-1"></i>Responsável pela Apuração';
+                }
+                if (helpAdvogadoParteContraria) {
+                    helpAdvogadoParteContraria.textContent = 'Nome do militar responsável pela apuração do processo';
+                }
+                if (parteContraria) {
+                    parteContraria.placeholder = 'Ex: Polícia Militar do Estado de São Paulo';
+                }
+                if (advogadoParteContraria) {
+                    advogadoParteContraria.placeholder = 'Ex: Maj. João Silva, Cap. Maria Santos';
+                }
+            } else {
+                camposJudicial.style.display = 'none';
+                camposAdministrativo.style.display = 'none';
+                
+                // Configuração padrão
+                if (numeroProcesso) {
+                    numeroProcesso.placeholder = '0001234-56.2024.8.26.0001';
+                    numeroProcesso.pattern = '\\d{7}-\\d{2}\\.\\d{4}\\.\\d{1}\\.\\d{2}\\.\\d{4}';
+                    numeroProcesso.title = 'Formato CNJ: 0001234-56.2024.8.26.0001';
+                }
+                if (helpNumeroProcesso) {
+                    helpNumeroProcesso.textContent = 'Para processos judiciais: formato CNJ (0001234-56.2024.8.26.0001)';
+                }
+                
+                // Configuração padrão para labels
+                if (labelParteContraria) {
+                    labelParteContraria.innerHTML = '<i class="fas fa-users me-1"></i>Parte Contrária <span class="text-danger">*</span>';
+                }
+                if (helpParteContraria) {
+                    helpParteContraria.textContent = 'Nome da parte contrária no processo';
+                }
+                if (labelAdvogadoParteContraria) {
+                    labelAdvogadoParteContraria.innerHTML = '<i class="fas fa-user-shield me-1"></i>Advogado/Procurador da Parte Contrária';
+                }
+                if (helpAdvogadoParteContraria) {
+                    helpAdvogadoParteContraria.textContent = 'Nome do advogado ou procurador que representa a parte contrária';
+                }
+                if (parteContraria) {
+                    parteContraria.placeholder = 'Ex: João Silva, Empresa XYZ Ltda';
+                }
+                if (advogadoParteContraria) {
+                    advogadoParteContraria.placeholder = 'Nome do advogado/procurador da parte contrária';
+                }
+            }
+        }
+    }
+    
+    // Executar na inicialização
+    toggleProcessoFields();
+    
+    // Adicionar listener para mudanças no tipo de processo
+    const tipoProcessoSelect = document.getElementById('{{ form.tipo_processo.id_for_label }}');
+    if (tipoProcessoSelect) {
+        tipoProcessoSelect.addEventListener('change', toggleProcessoFields);
+    }
+});
+
+// Função global para ser chamada pelo onchange do select
+function toggleProcessoFields() {
+    const tipoProcesso = document.getElementById('{{ form.tipo_processo.id_for_label }}');
+    const camposJudicial = document.getElementById('campos-judicial');
+    const camposAdministrativo = document.getElementById('campos-administrativo');
+    const numeroProcesso = document.getElementById('id_numero_processo');
+    const helpNumeroProcesso = document.getElementById('help-numero-processo');
+    const parteContraria = document.getElementById('id_parte_contraria');
+    const labelParteContraria = document.getElementById('label-parte-contraria');
+    const helpParteContraria = document.getElementById('help-parte-contraria');
+    const advogadoParteContraria = document.getElementById('id_advogado_parte_contraria');
+    const labelAdvogadoParteContraria = document.getElementById('label-advogado-parte-contraria');
+    const helpAdvogadoParteContraria = document.getElementById('help-advogado-parte-contraria');
+    
+    if (tipoProcesso && camposJudicial && camposAdministrativo) {
+        if (tipoProcesso.value === 'judicial') {
+            camposJudicial.style.display = 'block';
+            camposAdministrativo.style.display = 'none';
+            
+            // Configurar para processo judicial
+            if (numeroProcesso) {
+                numeroProcesso.placeholder = '0001234-56.2024.8.26.0001';
+                numeroProcesso.pattern = '\\d{7}-\\d{2}\\.\\d{4}\\.\\d{1}\\.\\d{2}\\.\\d{4}';
+                numeroProcesso.title = 'Formato CNJ: 0001234-56.2024.8.26.0001';
+            }
+            if (helpNumeroProcesso) {
+                helpNumeroProcesso.textContent = 'Para processos judiciais: formato CNJ (0001234-56.2024.8.26.0001)';
+            }
+            
+            // Configurar labels para processo judicial
+            if (labelParteContraria) {
+                labelParteContraria.innerHTML = '<i class="fas fa-users me-1"></i>Parte Contrária <span class="text-danger">*</span>';
+            }
+            if (helpParteContraria) {
+                helpParteContraria.textContent = 'Nome da parte contrária no processo';
+            }
+            if (labelAdvogadoParteContraria) {
+                labelAdvogadoParteContraria.innerHTML = '<i class="fas fa-user-shield me-1"></i>Advogado/Procurador da Parte Contrária';
+            }
+            if (helpAdvogadoParteContraria) {
+                helpAdvogadoParteContraria.textContent = 'Nome do advogado ou procurador que representa a parte contrária';
+            }
+            if (parteContraria) {
+                parteContraria.placeholder = 'Ex: João Silva, Empresa XYZ Ltda';
+            }
+            if (advogadoParteContraria) {
+                advogadoParteContraria.placeholder = 'Nome do advogado/procurador da parte contrária';
+            }
+        } else if (tipoProcesso.value === 'administrativo') {
+            camposJudicial.style.display = 'none';
+            camposAdministrativo.style.display = 'block';
+            
+            // Configurar para processo administrativo
+            if (numeroProcesso) {
+                numeroProcesso.placeholder = 'Ex: PA-2024-001, SIND-123/2024';
+                numeroProcesso.removeAttribute('pattern');
+                numeroProcesso.title = 'Qualquer formato de número de processo administrativo';
+            }
+            if (helpNumeroProcesso) {
+                helpNumeroProcesso.textContent = 'Para processos administrativos: qualquer formato (letras e números)';
+            }
+            
+            // Configurar labels para processo administrativo
+            if (labelParteContraria) {
+                labelParteContraria.innerHTML = '<i class="fas fa-building me-1"></i>Corporação <span class="text-danger">*</span>';
+            }
+            if (helpParteContraria) {
+                helpParteContraria.textContent = 'Nome da corporação (Polícia Militar, Exército, etc.)';
+            }
+            if (labelAdvogadoParteContraria) {
+                labelAdvogadoParteContraria.innerHTML = '<i class="fas fa-user-shield me-1"></i>Responsável pela Apuração';
+            }
+            if (helpAdvogadoParteContraria) {
+                helpAdvogadoParteContraria.textContent = 'Nome do militar responsável pela apuração do processo';
+            }
+            if (parteContraria) {
+                parteContraria.placeholder = 'Ex: Polícia Militar do Estado de São Paulo';
+            }
+            if (advogadoParteContraria) {
+                advogadoParteContraria.placeholder = 'Ex: Maj. João Silva, Cap. Maria Santos';
+            }
+        } else {
+            camposJudicial.style.display = 'none';
+            camposAdministrativo.style.display = 'none';
+            
+            // Configuração padrão
+            if (numeroProcesso) {
+                numeroProcesso.placeholder = '0001234-56.2024.8.26.0001';
+                numeroProcesso.pattern = '\\d{7}-\\d{2}\\.\\d{4}\\.\\d{1}\\.\\d{2}\\.\\d{4}';
+                numeroProcesso.title = 'Formato CNJ: 0001234-56.2024.8.26.0001';
+            }
+            if (helpNumeroProcesso) {
+                helpNumeroProcesso.textContent = 'Para processos judiciais: formato CNJ (0001234-56.2024.8.26.0001)';
+            }
+            
+            // Configuração padrão para labels
+            if (labelParteContraria) {
+                labelParteContraria.innerHTML = '<i class="fas fa-users me-1"></i>Parte Contrária <span class="text-danger">*</span>';
+            }
+            if (helpParteContraria) {
+                helpParteContraria.textContent = 'Nome da parte contrária no processo';
+            }
+            if (labelAdvogadoParteContraria) {
+                labelAdvogadoParteContraria.innerHTML = '<i class="fas fa-user-shield me-1"></i>Advogado/Procurador da Parte Contrária';
+            }
+            if (helpAdvogadoParteContraria) {
+                helpAdvogadoParteContraria.textContent = 'Nome do advogado ou procurador que representa a parte contrária';
+            }
+            if (parteContraria) {
+                parteContraria.placeholder = 'Ex: João Silva, Empresa XYZ Ltda';
+            }
+            if (advogadoParteContraria) {
+                advogadoParteContraria.placeholder = 'Nome do advogado/procurador da parte contrária';
+            }
+        }
+    }
+}
+</script>
+{% endblock %}

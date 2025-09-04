@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Processo - {{ processo.numero_processo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-gavel text-primary"></i>
+                        Processo: {{ processo.numero_processo }}
+                    </h4>
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'assejus:processo_edit' processo.pk %}" class="btn btn-warning">
+                            <i class="fas fa-edit me-2"></i>Editar
+                        </a>
+                        <a href="{% url 'assejus:documento_create' %}?processo={{ processo.pk }}" class="btn btn-success">
+                            <i class="fas fa-file-upload me-2"></i>Novo Documento
+                        </a>
+                        <a href="{% url 'assejus:andamento_modal_create' %}?processo={{ processo.pk }}" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalBase">
+                            <i class="fas fa-plus me-2"></i>Novo Andamento
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-info-circle me-2"></i>Informações do Processo
+                            </h5>
+                            
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td width="30%"><strong>Número do Processo:</strong></td>
+                                    <td>{{ processo.numero_processo }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Vara/Tribunal:</strong></td>
+                                    <td>{{ processo.vara_tribunal }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tipo de Ação:</strong></td>
+                                    <td>
+                                        <span class="badge bg-info">{{ processo.get_tipo_acao_display }}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Situação:</strong></td>
+                                    <td>
+                                        <span class="badge bg-{% if processo.situacao_atual == 'andamento' %}warning{% elif processo.situacao_atual == 'concluido' %}success{% elif processo.situacao_atual == 'arquivado' %}secondary{% else %}info{% endif %}">
+                                            {{ processo.get_situacao_atual_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cliente:</strong></td>
+                                    <td>
+                                        <strong>{{ processo.parte_cliente.nome }}</strong>
+                                        <br><small class="text-muted">CPF: {{ processo.parte_cliente.cpf }}</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Parte Contrária:</strong></td>
+                                    <td>{{ processo.parte_contraria }}</td>
+                                </tr>
+                                {% if processo.advogado_parte_contraria %}
+                                <tr>
+                                    <td><strong>Advogado da Parte Contrária:</strong></td>
+                                    <td>{{ processo.advogado_parte_contraria }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if processo.advogado_responsavel %}
+                                <tr>
+                                    <td><strong>Advogado Responsável:</strong></td>
+                                    <td>{{ processo.advogado_responsavel.get_full_name|default:processo.advogado_responsavel.username }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td><strong>Data de Cadastro:</strong></td>
+                                    <td>{{ processo.data_cadastro|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Última Atualização:</strong></td>
+                                    <td>{{ processo.data_atualizacao|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% if processo.observacoes_gerais %}
+                                <tr>
+                                    <td><strong>Observações:</strong></td>
+                                    <td>{{ processo.observacoes_gerais }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="fas fa-chart-bar me-2"></i>Estatísticas
+                            </h5>
+                            
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-primary">{{ processo.total_andamentos }}</h5>
+                                            <p class="card-text">Andamentos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-success">{{ processo.documentos.count }}</h5>
+                                            <p class="card-text">Documentos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-link me-2"></i>Links Rápidos
+                                </h6>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'assejus:processos_list' %}" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-list me-2"></i>Lista de Processos
+                                    </a>
+                                    <a href="{% url 'assejus:documento_list' %}" class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-file-alt me-2"></i>Documentos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Seção de Andamentos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tasks text-primary"></i>
+                        Andamentos ({{ processo.total_andamentos }})
+                    </h5>
+                    <a href="{% url 'assejus:andamento_modal_create' %}?processo={{ processo.pk }}" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalBase">
+                        <i class="fas fa-plus me-2"></i>Novo Andamento
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if processo.andamentos.all %}
+                        <div class="timeline">
+                            {% for andamento in processo.andamentos.all %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="timeline-title">
+                                        {{ andamento.get_tipo_andamento_display }}
+                                        <span class="badge bg-secondary ms-2">{{ andamento.data_andamento|date:"d/m/Y" }}</span>
+                                    </h6>
+                                    <p class="timeline-text">{{ andamento.descricao_detalhada }}</p>
+                                    {% if andamento.observacoes_cliente %}
+                                        <div class="alert alert-info mt-2">
+                                            <strong>Para o Cliente:</strong> {{ andamento.observacoes_cliente }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="text-muted">
+                                        Registrado por {{ andamento.usuario_registro.get_full_name|default:andamento.usuario_registro.username }} 
+                                        em {{ andamento.data_cadastro|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-tasks fa-2x text-muted mb-3"></i>
+                            <h6 class="text-muted">Nenhum andamento registrado</h6>
+                            <p class="text-muted">Clique em "Novo Andamento" para registrar o primeiro.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Seção de Documentos -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt text-primary"></i>
+                        Documentos ({{ processo.documentos.count }})
+                    </h5>
+                    <a href="{% url 'assejus:documento_create' %}?processo={{ processo.pk }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-upload me-2"></i>Novo Documento
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if processo.documentos.all %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Data Upload</th>
+                                        <th>Upload por</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for documento in processo.documentos.all %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ documento.titulo }}</strong>
+                                            {% if documento.descricao %}
+                                                <br><small class="text-muted">{{ documento.descricao|truncatechars:50 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ documento.get_tipo_documento_display }}</span>
+                                        </td>
+                                        <td>
+                                            {{ documento.data_upload|date:"d/m/Y H:i" }}
+                                        </td>
+                                        <td>
+                                            {{ documento.usuario_upload.get_full_name|default:documento.usuario_upload.username }}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'assejus:documento_detail' documento.pk %}" class="btn btn-sm btn-outline-primary" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {% if documento.arquivo %}
+                                                    <a href="{{ documento.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-success" title="Download">
+                                                        <i class="fas fa-download"></i>
+                                                    </a>
+                                                {% endif %}
+                                                <a href="{% url 'assejus:documento_update' documento.pk %}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'assejus:documento_delete' documento.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-alt fa-2x text-muted mb-3"></i>
+                            <h6 class="text-muted">Nenhum documento anexado</h6>
+                            <p class="text-muted">Clique em "Novo Documento" para fazer o primeiro upload.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Base para Andamentos -->
+<div class="modal fade" id="modalBase" tabindex="-1" aria-labelledby="modalBaseLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalBaseLabel">Carregando...</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 3px solid #fff;
+    box-shadow: 0 0 0 3px #007bff;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 3px solid #007bff;
+}
+
+.timeline-title {
+    margin-bottom: 10px;
+    color: #007bff;
+}
+
+.timeline-text {
+    margin-bottom: 10px;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal Simples</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        body { padding: 20px; background-color: #f8f9fa; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .log-container { 
+            background: #f8f9fa; 
+            border: 1px solid #dee2e6; 
+            border-radius: 8px; 
+            padding: 15px; 
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry { 
+            margin-bottom: 8px; 
+            padding: 5px; 
+            border-radius: 4px; 
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        .log-info { background-color: #d1ecf1; color: #0c5460; }
+        .log-success { background-color: #d4edda; color: #155724; }
+        .log-error { background-color: #f8d7da; color: #721c24; }
+        .log-warning { background-color: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="card">
+            <div class="card-header">
+                <h3>🧪 Teste Modal de Advogado</h3>
+                <p class="text-muted mb-0">⚠️ IMPORTANTE: Abra este arquivo através do servidor Django (http://127.0.0.1:8000/) para evitar erros de CORS</p>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Testes Disponíveis</h5>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary" onclick="testModalBase()">
+                                <i class="fas fa-download"></i> Carregar Modal Base
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="testOpenModal()">
+                                <i class="fas fa-plus"></i> Abrir Modal de Advogado
+                            </button>
+                            <button type="button" class="btn btn-info" onclick="testFormDirect()">
+                                <i class="fas fa-code"></i> Testar Formulário Direto
+                            </button>
+                            <button type="button" class="btn btn-warning" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i> Limpar Logs
+                            </button>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <h6>Como usar:</h6>
+                            <ol class="small">
+                                <li>Certifique-se de que o servidor Django está rodando</li>
+                                <li>Abra este arquivo através de: <code>http://127.0.0.1:8000/teste_modal_simples.html</code></li>
+                                <li>Clique em "Carregar Modal Base" primeiro</li>
+                                <li>Depois teste as outras funcionalidades</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Status</h5>
+                        <div id="status" class="alert alert-info">
+                            Aguardando teste...
+                        </div>
+                        <div class="mb-3">
+                            <strong>Funções Disponíveis:</strong>
+                            <ul id="functions" class="mt-2">
+                                <li>Verificando...</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="log-container">
+                    <h6>📋 Log de Eventos</h6>
+                    <div id="logs"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Base -->
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formModalLabel">Modal de Teste</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="formModalBody">
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-2">Carregando formulário...</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary" id="formModalSubmit">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        // Função para atualizar status
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.className = `alert alert-${type}`;
+            status.innerHTML = message;
+        }
+
+        // Função para verificar funções disponíveis
+        function checkFunctions() {
+            const functions = document.getElementById('functions');
+            const functionsList = [];
+            
+            if (typeof window.loadModalBase === 'function') {
+                functionsList.push('<span class="text-success">✅ loadModalBase</span>');
+            } else {
+                functionsList.push('<span class="text-danger">❌ loadModalBase</span>');
+            }
+            
+            if (typeof window.openAdvogadoModal === 'function') {
+                functionsList.push('<span class="text-success">✅ openAdvogadoModal</span>');
+            } else {
+                functionsList.push('<span class="text-danger">❌ openAdvogadoModal</span>');
+            }
+            
+            if (typeof window.openFormModal === 'function') {
+                functionsList.push('<span class="text-success">✅ openFormModal</span>');
+            } else {
+                functionsList.push('<span class="text-danger">❌ openFormModal</span>');
+            }
+            
+            if (typeof window.submitForm === 'function') {
+                functionsList.push('<span class="text-success">✅ submitForm</span>');
+            } else {
+                functionsList.push('<span class="text-danger">❌ submitForm</span>');
+            }
+            
+            functions.innerHTML = functionsList.map(f => `<li>${f}</li>`).join('');
+        }
+
+        // Função para carregar modal base
+        async function testModalBase() {
+            addLog('🔄 Carregando modal base...', 'info');
+            updateStatus('Carregando modal base...', 'info');
+            
+            try {
+                const response = await fetch('/assejus/modal/base/');
+                if (response.ok) {
+                    const html = await response.text();
+                    addLog('✅ Modal base carregado com sucesso', 'success');
+                    updateStatus('Modal base carregado com sucesso!', 'success');
+                    
+                    // Executar o script do modal base
+                    const scriptMatch = html.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+                    if (scriptMatch) {
+                        try {
+                            eval(scriptMatch[1]);
+                            addLog('✅ Script do modal base executado', 'success');
+                            checkFunctions();
+                        } catch (e) {
+                            addLog(`❌ Erro ao executar script: ${e.message}`, 'error');
+                        }
+                    } else {
+                        addLog('⚠️ Nenhum script encontrado no modal base', 'warning');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addLog(`❌ Erro ao carregar modal base: ${error.message}`, 'error');
+                updateStatus(`Erro ao carregar modal base: ${error.message}`, 'danger');
+            }
+        }
+
+        // Função para testar abertura do modal
+        function testOpenModal() {
+            addLog('🔄 Tentando abrir modal de advogado...', 'info');
+            
+            if (typeof window.openAdvogadoModal === 'function') {
+                try {
+                    window.openAdvogadoModal();
+                    addLog('✅ Modal aberto com sucesso', 'success');
+                    updateStatus('Modal aberto com sucesso!', 'success');
+                } catch (error) {
+                    addLog(`❌ Erro ao abrir modal: ${error.message}`, 'error');
+                    updateStatus(`Erro ao abrir modal: ${error.message}`, 'danger');
+                }
+            } else {
+                addLog('❌ Função openAdvogadoModal não está disponível', 'error');
+                updateStatus('Função openAdvogadoModal não está disponível!', 'danger');
+            }
+        }
+
+        // Função para testar formulário direto
+        async function testFormDirect() {
+            addLog('🔄 Testando formulário direto...', 'info');
+            updateStatus('Testando formulário direto...', 'info');
+            
+            try {
+                const response = await fetch('/assejus/advogados/modal/novo/');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.form_html) {
+                        addLog('✅ Formulário carregado com sucesso', 'success');
+                        updateStatus('Formulário carregado com sucesso!', 'success');
+                        
+                        // Mostrar o formulário no modal
+                        document.getElementById('formModalBody').innerHTML = data.form_html;
+                        
+                        // Abrir o modal
+                        const modal = new bootstrap.Modal(document.getElementById('formModal'));
+                        modal.show();
+                        
+                        addLog('✅ Modal aberto com formulário', 'success');
+                    } else {
+                        addLog('⚠️ Formulário carregado mas sem HTML', 'warning');
+                        updateStatus('Formulário carregado mas sem HTML', 'warning');
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                addLog(`❌ Erro ao carregar formulário: ${error.message}`, 'error');
+                updateStatus(`Erro ao carregar formulário: ${error.message}`, 'danger');
+            }
+        }
+
+        // Função para limpar logs
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            addLog('🧹 Logs limpos', 'info');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página de teste carregada', 'success');
+            checkFunctions();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,827 @@
+{% extends 'base.html' %}
+
+{% block title %}Recebíveis de {{ associado.nome }} - ABMEPI{% endblock %}
+
+{% csrf_token %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div>
+            <h1 class="h2">
+                <i class="fas fa-credit-card me-2"></i>
+                Recebíveis de {{ associado.nome }}
+            </h1>
+            <p class="text-muted mb-0">
+                Controle dos recebíveis do associado {{ associado.get_posto_graduacao_display }} {{ associado.nome }}
+            </p>
+            <small class="text-muted">
+                CPF: {{ associado.cpf }} | Matrícula: {{ associado.matricula_militar }}
+            </small>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#gerarMensalidadesModal">
+                    <i class="fas fa-plus me-1"></i>
+                    Gerar Recebíveis
+                </button>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#parcelaUnicaModal">
+                    <i class="fas fa-file-invoice me-1"></i>
+                    Parcela Única
+                </button>
+                <button type="button" class="btn btn-success" id="btnDarBaixaLote" disabled>
+                    <i class="fas fa-check-double me-1"></i>
+                    Dar Baixa em Lote
+                </button>
+                <button type="button" class="btn btn-warning" id="btnGerarCarne" disabled>
+                    <i class="fas fa-file-pdf me-1"></i>
+                    Gerar Carnê
+                </button>
+                <button type="button" class="btn btn-danger" id="btnExcluirLote" disabled>
+                    <i class="fas fa-trash me-1"></i>
+                    Excluir Selecionadas
+                </button>
+                <a href="{% url 'associados:associado_detail' associado.id %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-user me-1"></i>
+                    Voltar ao Associado
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de estatísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Recebíveis
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ total_recebiveis|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Recebíveis Pagos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ recebiveis_pagos|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Recebíveis Pendentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ recebiveis_pendentes|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Recebíveis Atrasados
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ recebiveis_atrasados|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de recebíveis -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list me-2"></i>
+                Recebíveis do Associado
+            </h6>
+            <div class="text-muted">
+                {% if is_paginated %}
+                    {{ page_obj.start_index }}-{{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+                {% else %}
+                    {{ mensalidades.count }} recebível(s)
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            {% if mensalidades %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="selecionarTodas">
+                                    <label class="form-check-label" for="selecionarTodas">
+                                        <small>Todas</small>
+                                    </label>
+                                </div>
+                            </th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th>Dias de Atraso</th>
+                            <th>Valor com Multa</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mensalidade in mensalidades %}
+                        <tr>
+                            <td style="width: 50px; text-align: center;">
+                                <div class="form-check">
+                                    <input class="form-check-input mensalidade-checkbox" type="checkbox" 
+                                           value="{{ mensalidade.pk }}" id="mensalidade_{{ mensalidade.pk }}">
+                                    <label class="form-check-label" for="mensalidade_{{ mensalidade.pk }}">
+                                        <small>{{ forloop.counter }}</small>
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">{{ mensalidade.tipo.nome }}</span>
+                            </td>
+                            <td>R$ {{ mensalidade.valor }}</td>
+                            <td>{{ mensalidade.data_vencimento|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if mensalidade.status == 'pago' %}
+                                    <span class="badge bg-success">Pago</span>
+                                {% elif mensalidade.status == 'pendente' %}
+                                    {% if mensalidade.data_vencimento < today %}
+                                        <span class="badge bg-danger">Atrasado</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ mensalidade.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if mensalidade.status == 'pendente' and mensalidade.data_vencimento < today %}
+                                    <span class="badge bg-danger">{{ mensalidade.get_dias_atraso }} dias</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if mensalidade.status == 'pendente' and mensalidade.data_vencimento < today %}
+                                    <strong class="text-danger">R$ {{ mensalidade.get_valor_com_multa|floatformat:2 }}</strong>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'financeiro:mensalidade_detail' mensalidade.pk %}" class="btn btn-sm btn-outline-primary" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'financeiro:mensalidade_update' mensalidade.pk %}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if mensalidade.status == 'pendente' %}
+                                        <a href="{% url 'financeiro:pagamento_create' %}?mensalidade={{ mensalidade.pk }}" class="btn btn-sm btn-outline-success" title="Registrar Pagamento">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </a>
+                                    {% endif %}
+                                    <a href="{% url 'financeiro:gerar_carne_associado' associado.id %}?mensalidades={{ mensalidade.pk }}" class="btn btn-sm btn-outline-info" title="Gerar PDF" target="_blank">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            {% if is_paginated %}
+            <nav aria-label="Paginação">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-credit-card fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Nenhuma mensalidade encontrada</h5>
+                <p class="text-muted">Este associado ainda não possui mensalidades cadastradas.</p>
+                <a href="{% url 'financeiro:mensalidade_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Cadastrar Primeira Mensalidade
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Gerar Recebíveis em Lote -->
+<div class="modal fade" id="gerarMensalidadesModal" tabindex="-1" aria-labelledby="gerarMensalidadesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="gerarMensalidadesModalLabel">
+                    <i class="fas fa-plus me-2"></i>
+                    Gerar Recebíveis em Lote
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formGerarMensalidades" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo_recebimento" class="form-label">Tipo de Recebimento *</label>
+                            <select class="form-select" id="tipo_recebimento" name="tipo_recebimento" required>
+                                <option value="">Selecione o tipo</option>
+                                {% if tipos_recebimento %}
+                                    {% for tipo in tipos_recebimento %}
+                                        <option value="{{ tipo.id }}">{{ tipo.nome }} - R$ {{ tipo.valor|floatformat:2 }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="" disabled>Nenhum tipo disponível</option>
+                                {% endif %}
+                            </select>
+                            {% if not tipos_recebimento %}
+                                <div class="form-text text-danger">Nenhum tipo de recebimento encontrado. Verifique se existem tipos cadastrados.</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="valor" class="form-label">Valor por Parcela *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" class="form-control" id="valor" name="valor" step="0.01" min="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="quantidade_parcelas" class="form-label">Quantidade de Parcelas *</label>
+                            <input type="number" class="form-control" id="quantidade_parcelas" name="quantidade_parcelas" min="1" max="60" value="12" required>
+                            <div class="form-text">Máximo: 60 parcelas</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="data_inicio" class="form-label">Data de Início *</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="dia_vencimento" class="form-label">Dia do Vencimento *</label>
+                            <select class="form-select" id="dia_vencimento" name="dia_vencimento" required>
+                                <option value="">Selecione o dia</option>
+                                {% for dia in dias_vencimento %}
+                                    <option value="{{ dia }}" {% if dia == 10 %}selected{% endif %}>{{ dia }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="intervalo_meses" class="form-label">Intervalo entre Parcelas</label>
+                            <select class="form-select" id="intervalo_meses" name="intervalo_meses">
+                                <option value="1" selected>Mensal (1 mês)</option>
+                                <option value="2">Bimestral (2 meses)</option>
+                                <option value="3">Trimestral (3 meses)</option>
+                                <option value="6">Semestral (6 meses)</option>
+                                <option value="12">Anual (12 meses)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Resumo:</strong> Serão geradas <span id="resumo_quantidade">12</span> parcelas de 
+                        <span id="resumo_valor">R$ 0,00</span> cada, com vencimento no dia 
+                        <span id="resumo_dia">10</span> de cada mês, totalizando 
+                        <span id="resumo_total">R$ 0,00</span>.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="btnConfirmarGeracao">
+                        <i class="fas fa-check me-1"></i>
+                        Gerar Recebíveis
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Gerar Parcela Única -->
+<div class="modal fade" id="parcelaUnicaModal" tabindex="-1" aria-labelledby="parcelaUnicaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="parcelaUnicaModalLabel">
+                    <i class="fas fa-file-invoice me-2"></i>
+                    Gerar Parcela Única
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="formParcelaUnica" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Associado:</strong> {{ associado.nome }} ({{ associado.cpf }})
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="tipo_parcela_unica" class="form-label">Tipo de Recebimento *</label>
+                            <select class="form-select" id="tipo_parcela_unica" name="tipo_recebimento" required>
+                                <option value="">Selecione o tipo</option>
+                                {% if tipos_recebimento %}
+                                    {% for tipo in tipos_recebimento %}
+                                        <option value="{{ tipo.id }}">{{ tipo.nome }} - R$ {{ tipo.valor|floatformat:2 }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="" disabled>Nenhum tipo disponível</option>
+                                {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="valor_parcela_unica" class="form-label">Valor *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R$</span>
+                                <input type="number" class="form-control" id="valor_parcela_unica" name="valor" step="0.01" min="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="data_vencimento_parcela_unica" class="form-label">Data de Vencimento *</label>
+                            <input type="date" class="form-control" id="data_vencimento_parcela_unica" name="data_vencimento" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="descricao_parcela_unica" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="descricao_parcela_unica" name="descricao" placeholder="Ex: Taxa de adesão, Multa, etc.">
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Atenção:</strong> Esta parcela será criada com status "Pendente" e deverá ser paga até a data de vencimento.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-info" id="btnConfirmarParcelaUnica">
+                        <i class="fas fa-check me-1"></i>
+                        Criar Parcela
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Garantir que os checkboxes sejam visíveis */
+.form-check-input {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+}
+
+/* Estilo para a coluna de checkboxes */
+.checkbox-column {
+    width: 50px;
+    text-align: center;
+}
+
+/* Estilo para os checkboxes */
+.mensalidade-checkbox {
+    transform: scale(1.2);
+    margin: 0;
+}
+
+/* Estilo para o checkbox "selecionar todas" */
+#selecionarTodas {
+    transform: scale(1.2);
+    margin: 0;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        console.log('Script carregado - verificando checkboxes...');
+        
+        // Array para armazenar recebíveis selecionados
+        var recebiveisSelecionados = [];
+        
+        // Verificar se os checkboxes estão presentes
+        var checkboxes = $('.mensalidade-checkbox');
+        var checkboxTodas = $('#selecionarTodas');
+        
+        console.log('Checkboxes encontrados:', checkboxes.length);
+        console.log('Checkbox "Todas" encontrado:', checkboxTodas.length);
+        
+        // Verificar se há recebíveis na página
+        var recebiveis = $('tr').length - 1; // -1 para excluir o cabeçalho
+        console.log('Linhas na tabela (excluindo cabeçalho):', recebiveis);
+        
+        // Verificar se o jQuery está funcionando
+        console.log('jQuery funcionando:', typeof $ !== 'undefined');
+        console.log('jQuery versão:', $.fn.jquery);
+        
+        // Função para atualizar botões baseado na seleção
+        function atualizarBotaoes() {
+            if (recebiveisSelecionados.length > 0) {
+                $('#btnDarBaixaLote').prop('disabled', false);
+                $('#btnGerarCarne').prop('disabled', false);
+                $('#btnExcluirLote').prop('disabled', false);
+            } else {
+                $('#btnDarBaixaLote').prop('disabled', true);
+                $('#btnGerarCarne').prop('disabled', true);
+                $('#btnExcluirLote').prop('disabled', true);
+            }
+        }
+        
+        // Event listener para checkboxes de seleção
+        $(document).on('change', '.mensalidade-checkbox', function() {
+            var recebivelId = $(this).val();
+            if ($(this).is(':checked')) {
+                if (recebiveisSelecionados.indexOf(recebivelId) === -1) {
+                    recebiveisSelecionados.push(recebivelId);
+                }
+            } else {
+                var index = recebiveisSelecionados.indexOf(recebivelId);
+                if (index > -1) {
+                    recebiveisSelecionados.splice(index, 1);
+                }
+            }
+            atualizarBotaoes();
+            console.log('Recebíveis selecionados:', recebiveisSelecionados);
+        });
+        
+        // Botão para selecionar todas as mensalidades
+        $('#selecionarTodas').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('.mensalidade-checkbox').prop('checked', true).trigger('change');
+            } else {
+                $('.mensalidade-checkbox').prop('checked', false).trigger('change');
+            }
+        });
+        
+        // Botão para dar baixa em lote
+        $('#btnDarBaixaLote').on('click', function() {
+            if (recebiveisSelecionados.length === 0) {
+                alert('Selecione pelo menos um recebível para dar baixa.');
+                return;
+            }
+            
+            if (confirm('Confirma dar baixa em ' + recebiveisSelecionados.length + ' recebível(s) selecionado(s)?')) {
+                // Desabilitar botão para evitar duplo clique
+                $('#btnDarBaixaLote').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Processando...');
+                
+                // Preparar dados para envio
+                var dados = {
+                    associado_id: {{ associado.id }},
+                    mensalidades: recebiveisSelecionados,
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
+                };
+                
+                // Enviar via AJAX
+                $.ajax({
+                    url: '{% url "financeiro:dar_baixa_recebiveis_lote" %}',
+                    method: 'POST',
+                    data: dados,
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Sucesso! ' + response.recebiveis_baixados + ' recebível(s) foram baixados.');
+                            // Recarregar página para atualizar a lista
+                            location.reload();
+                        } else {
+                            alert('Erro: ' + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Erro ao dar baixa nos recebíveis: ' + error);
+                    },
+                    complete: function() {
+                        // Reabilitar botão
+                        $('#btnDarBaixaLote').prop('disabled', false).html('<i class="fas fa-check-double me-1"></i>Dar Baixa em Lote');
+                    }
+                });
+            }
+        });
+        
+        // Botão para gerar carnê
+        $('#btnGerarCarne').on('click', function() {
+            if (recebiveisSelecionados.length === 0) {
+                alert('Selecione pelo menos um recebível para gerar o carnê.');
+                return;
+            }
+            
+            // Gerar carnê para as mensalidades selecionadas
+            var associadoId = {{ associado.id }};
+            var mensalidadesIds = recebiveisSelecionados.join(',');
+            var url = `/financeiro/associado/${associadoId}/carne/?mensalidades=${mensalidadesIds}`;
+            
+            // Abrir em nova aba
+            window.open(url, '_blank');
+        });
+        
+        // Botão para excluir em lote
+        $('#btnExcluirLote').on('click', function() {
+            console.log('Botão de exclusão clicado!');
+            console.log('Recebíveis selecionados:', recebiveisSelecionados);
+            
+            if (recebiveisSelecionados.length === 0) {
+                alert('Selecione pelo menos um recebível para excluir.');
+                return;
+            }
+            
+            if (confirm('Tem certeza que deseja excluir ' + recebiveisSelecionados.length + ' recebível(s) selecionado(s)?')) {
+                console.log('Confirmação aceita, preparando dados...');
+                
+                // Desabilitar botão para evitar duplo clique
+                $('#btnExcluirLote').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Excluindo...');
+                
+                // Preparar dados para envio
+                var dados = {
+                    associado_id: {{ associado.id }},
+                    mensalidades: recebiveisSelecionados,
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
+                };
+                
+                console.log('Dados preparados:', dados);
+                console.log('URL de destino:', '{% url "financeiro:excluir_mensalidades_associado_lote" %}');
+                
+                // Enviar via AJAX
+                $.ajax({
+                    url: '{% url "financeiro:excluir_mensalidades_associado_lote" %}',
+                    method: 'POST',
+                    data: dados,
+                    success: function(response) {
+                        console.log('Resposta de sucesso:', response);
+                        if (response.success) {
+                            alert('Sucesso! ' + response.mensalidades_excluidas + ' recebível(s) foram excluído(s).');
+                            // Recarregar página para atualizar a lista
+                            location.reload();
+                        } else {
+                            alert('Erro: ' + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Erro AJAX:', {xhr: xhr, status: status, error: error});
+                        console.log('Resposta do servidor:', xhr.responseText);
+                        alert('Erro ao excluir recebíveis: ' + error);
+                    },
+                    complete: function() {
+                        console.log('Requisição AJAX finalizada');
+                        // Reabilitar botão
+                        $('#btnExcluirLote').prop('disabled', false).html('<i class="fas fa-trash me-1"></i>Excluir Selecionadas');
+                    }
+                });
+            } else {
+                console.log('Confirmação cancelada pelo usuário');
+            }
+        });
+        
+        // Inicializar botões
+        atualizarBotaoes();
+        
+        // ===== FUNCIONALIDADES DO MODAL DE GERAÇÃO EM LOTE =====
+        
+        // Definir data atual como padrão
+        var hoje = new Date();
+        var dataAtual = hoje.toISOString().split('T')[0];
+        $('#data_inicio').val(dataAtual);
+        
+        // Função para atualizar o resumo
+        function atualizarResumo() {
+            var quantidade = parseInt($('#quantidade_parcelas').val()) || 0;
+            var valor = parseFloat($('#valor').val()) || 0;
+            var dia = $('#dia_vencimento').val() || '10';
+            var total = quantidade * valor;
+            
+            $('#resumo_quantidade').text(quantidade);
+            $('#resumo_valor').text('R$ ' + valor.toFixed(2).replace('.', ','));
+            $('#resumo_dia').text(dia);
+            $('#resumo_total').text('R$ ' + total.toFixed(2).replace('.', ','));
+        }
+        
+        // Event listeners para atualizar resumo em tempo real
+        $('#quantidade_parcelas, #valor, #dia_vencimento').on('input change', atualizarResumo);
+        
+        // Quando o tipo de recebimento é selecionado, preencher o valor automaticamente
+        $('#tipo_recebimento').on('change', function() {
+            var tipoSelecionado = $(this).find('option:selected');
+            if (tipoSelecionado.val()) {
+                var valorTexto = tipoSelecionado.text().split('R$ ')[1];
+                if (valorTexto) {
+                    var valor = parseFloat(valorTexto.replace(',', '.'));
+                    $('#valor').val(valor);
+                    atualizarResumo();
+                }
+            }
+        });
+        
+        // Validação da quantidade de parcelas
+        $('#quantidade_parcelas').on('input', function() {
+            var valor = parseInt($(this).val());
+            if (valor > 60) {
+                $(this).val(60);
+                alert('Máximo de 60 parcelas permitido.');
+            } else if (valor < 1) {
+                $(this).val(1);
+            }
+            atualizarResumo();
+        });
+        
+        // Envio do formulário
+        $('#formGerarMensalidades').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Validações
+            var tipo = $('#tipo_recebimento').val();
+            var valor = parseFloat($('#valor').val());
+            var quantidade = parseInt($('#quantidade_parcelas').val());
+            var dataInicio = $('#data_inicio').val();
+            var diaVencimento = $('#dia_vencimento').val();
+            
+            if (!tipo || !valor || !quantidade || !dataInicio || !diaVencimento) {
+                alert('Por favor, preencha todos os campos obrigatórios.');
+                return;
+            }
+            
+            if (valor <= 0) {
+                alert('O valor deve ser maior que zero.');
+                return;
+            }
+            
+            if (quantidade < 1 || quantidade > 60) {
+                alert('A quantidade de parcelas deve estar entre 1 e 60.');
+                return;
+            }
+            
+            // Confirmar geração
+            if (confirm('Confirma a geração de ' + quantidade + ' parcelas de R$ ' + valor.toFixed(2).replace('.', ',') + ' cada?')) {
+                // Desabilitar botão para evitar duplo clique
+                $('#btnConfirmarGeracao').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Gerando...');
+                
+                // Preparar dados para envio
+                var dados = {
+                    associado_id: {{ associado.id }},
+                    tipo_recebimento: tipo,
+                    valor: valor,
+                    quantidade_parcelas: quantidade,
+                    data_inicio: dataInicio,
+                    dia_vencimento: diaVencimento,
+                    intervalo_meses: $('#intervalo_meses').val(),
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
+                };
+                
+                // Enviar via AJAX
+                $.ajax({
+                    url: '{% url "financeiro:gerar_mensalidades_associado_lote" %}',
+                    method: 'POST',
+                    data: dados,
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Sucesso! ' + response.mensalidades_criadas + ' recebíveis foram gerados.');
+                            // Fechar modal e recarregar página
+                            $('#gerarMensalidadesModal').modal('hide');
+                            location.reload();
+                        } else {
+                            alert('Erro: ' + response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Erro ao gerar recebíveis: ' + error);
+                    },
+                    complete: function() {
+                        // Reabilitar botão
+                        $('#btnConfirmarGeracao').prop('disabled', false).html('<i class="fas fa-check me-1"></i>Gerar Recebíveis');
+                    }
+                });
+            }
+        });
+        
+        // Inicializar resumo
+        atualizarResumo();
+        
+        // Inicializar botões
+        atualizarBotaoes();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,486 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .stats-card h3 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    
+    .stats-card p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .email-form {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+    }
+    
+    .btn-warning {
+        background: #ffc107;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+        color: #212529;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .tab-content {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .nav-tabs {
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 20px;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        border-radius: 10px 10px 0 0;
+        margin-right: 5px;
+        padding: 12px 20px;
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .nav-tabs .nav-link.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .nav-tabs .nav-link:hover {
+        border-color: transparent;
+        background: #f8f9fa;
+    }
+    
+    .nav-tabs .nav-link.active:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+                    <p class="text-muted">{{ subtitle }}</p>
+                </div>
+                <div>
+                    <a href="{% url 'core:email_batch_history' %}" class="btn btn-secondary">
+                        <i class="fas fa-history"></i> Histórico
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="stats-card">
+                <h3>{{ total_associados }}</h3>
+                <p>Total de Associados</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <h3>{{ associados_ativos }}</h3>
+                <p>Associados Ativos</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <h3>{{ total_usuarios }}</h3>
+                <p>Total de Usuários</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="stats-card">
+                <h3>{{ usuarios_ativos }}</h3>
+                <p>Usuários Ativos</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário de Envio -->
+    <div class="row">
+        <div class="col-12">
+            <div class="email-form">
+                <form method="post" action="{% url 'core:email_batch_send' %}" id="emailForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Abas -->
+                    <ul class="nav nav-tabs" id="emailTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="compose-tab" data-bs-toggle="tab" data-bs-target="#compose" type="button" role="tab">
+                                <i class="fas fa-edit"></i> Compor Email
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="recipients-tab" data-bs-toggle="tab" data-bs-target="#recipients" type="button" role="tab">
+                                <i class="fas fa-users"></i> Destinatários
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="attachments-tab" data-bs-toggle="tab" data-bs-target="#attachments" type="button" role="tab">
+                                <i class="fas fa-paperclip"></i> Anexos
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="emailTabsContent">
+                        <!-- Aba Compor Email -->
+                        <div class="tab-pane fade show active" id="compose" role="tabpanel">
+                            <div class="form-group">
+                                <label for="subject" class="form-label">Assunto *</label>
+                                <input type="text" class="form-control" id="subject" name="subject" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="message" class="form-label">Mensagem (Texto Simples) *</label>
+                                <textarea class="form-control" id="message" name="message" rows="6" required></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="html_message" class="form-label">Mensagem (HTML) - Opcional</label>
+                                <textarea class="form-control" id="html_message" name="html_message" rows="8" placeholder="<p>Digite sua mensagem em HTML aqui...</p>"></textarea>
+                                <small class="form-text text-muted">Se preenchido, será usado no lugar da mensagem de texto simples.</small>
+                            </div>
+                        </div>
+
+                        <!-- Aba Destinatários -->
+                        <div class="tab-pane fade" id="recipients" role="tabpanel">
+                            <div class="form-group">
+                                <label for="recipient_type" class="form-label">Tipo de Destinatários *</label>
+                                <select class="form-select" id="recipient_type" name="recipient_type" required>
+                                    <option value="">Selecione o tipo de destinatários</option>
+                                    <option value="associados_ativos">Associados Ativos ({{ associados_ativos }} emails)</option>
+                                    <option value="associados_todos">Todos os Associados ({{ total_associados }} emails)</option>
+                                    <option value="usuarios_ativos">Usuários Ativos ({{ usuarios_ativos }} emails)</option>
+                                    <option value="usuarios_todos">Todos os Usuários ({{ total_usuarios }} emails)</option>
+                                    <option value="usuarios_especificos">Usuários Específicos</option>
+                                    <option value="custom">Lista Customizada</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="specific_users_group" style="display: none;">
+                                <label class="form-label">Selecionar Usuários Específicos</label>
+                                <div class="alert alert-info mb-3">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>{{ usuarios_disponiveis.count }} usuário(s)</strong> disponível(is) para seleção.
+                                </div>
+                                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                    {% for usuario in usuarios_disponiveis %}
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="selected_users" value="{{ usuario.id }}" id="user_{{ usuario.id }}">
+                                            <label class="form-check-label" for="user_{{ usuario.id }}">
+                                                <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>
+                                                <small class="text-muted">({{ usuario.email }})</small>
+                                            </label>
+                                        </div>
+                                    {% empty %}
+                                        <div class="text-center text-muted py-3">
+                                            <i class="fas fa-users fa-2x mb-2"></i>
+                                            <p>Nenhum usuário com email cadastrado encontrado.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <small class="form-text text-muted">Selecione os usuários que receberão o email.</small>
+                            </div>
+                            
+                            <div class="form-group" id="custom_emails_group" style="display: none;">
+                                <label for="email_list" class="form-label">Lista de Emails (um por linha)</label>
+                                <textarea class="form-control" id="email_list" name="email_list" rows="8" placeholder="email1@exemplo.com&#10;email2@exemplo.com&#10;email3@exemplo.com"></textarea>
+                                <small class="form-text text-muted">Digite um email por linha. Emails duplicados serão removidos automaticamente.</small>
+                            </div>
+                        </div>
+
+                        <!-- Aba Anexos -->
+                        <div class="tab-pane fade" id="attachments" role="tabpanel">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Anexos:</strong> Selecione os arquivos que serão anexados ao email. Tamanho máximo por arquivo: 10MB.
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="attachments" class="form-label">Arquivos para Anexar</label>
+                                <input type="file" class="form-control" id="attachments" name="attachments" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif">
+                                <small class="form-text text-muted">Você pode selecionar múltiplos arquivos. Formatos suportados: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, JPG, JPEG, PNG, GIF.</small>
+                            </div>
+                            
+                            <div id="file-list" class="mt-3"></div>
+                        </div>
+
+
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <div>
+                            <button type="button" class="btn btn-secondary" onclick="previewEmail()">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                        </div>
+                        <div>
+                            <button type="submit" class="btn btn-primary" name="action" value="send">
+                                <i class="fas fa-paper-plane"></i> Enviar Emails
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Preview -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Preview do Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Controle da aba de emails customizados e usuários específicos
+    const recipientType = document.getElementById('recipient_type');
+    const customEmailsGroup = document.getElementById('custom_emails_group');
+    const specificUsersGroup = document.getElementById('specific_users_group');
+    
+    recipientType.addEventListener('change', function() {
+        // Esconder todos os grupos primeiro
+        customEmailsGroup.style.display = 'none';
+        specificUsersGroup.style.display = 'none';
+        
+        // Mostrar o grupo apropriado
+        if (this.value === 'custom') {
+            customEmailsGroup.style.display = 'block';
+        } else if (this.value === 'usuarios_especificos') {
+            specificUsersGroup.style.display = 'block';
+        }
+    });
+    
+    // Controle de anexos
+    const attachmentsInput = document.getElementById('attachments');
+    const fileList = document.getElementById('file-list');
+    
+    attachmentsInput.addEventListener('change', function() {
+        const files = Array.from(this.files);
+        fileList.innerHTML = '';
+        
+        if (files.length > 0) {
+            const listGroup = document.createElement('div');
+            listGroup.className = 'list-group';
+            
+            files.forEach((file, index) => {
+                const listItem = document.createElement('div');
+                listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                
+                const fileInfo = document.createElement('div');
+                fileInfo.innerHTML = `
+                    <i class="fas fa-file me-2"></i>
+                    <strong>${file.name}</strong>
+                    <small class="text-muted ms-2">(${(file.size / 1024 / 1024).toFixed(2)} MB)</small>
+                `;
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-sm btn-outline-danger';
+                removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                removeBtn.onclick = function() {
+                    // Remover arquivo da lista (não é possível remover do input diretamente)
+                    listItem.remove();
+                };
+                
+                listItem.appendChild(fileInfo);
+                listItem.appendChild(removeBtn);
+                listGroup.appendChild(listItem);
+            });
+            
+            fileList.appendChild(listGroup);
+        }
+    });
+    
+    // Validação do formulário
+    const emailForm = document.getElementById('emailForm');
+    emailForm.addEventListener('submit', function(e) {
+        const recipientType = document.getElementById('recipient_type').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+        const htmlMessage = document.getElementById('html_message').value;
+        
+        if (!recipientType) {
+            e.preventDefault();
+            alert('Por favor, selecione o tipo de destinatários.');
+            return;
+        }
+        
+        if (!subject) {
+            e.preventDefault();
+            alert('Por favor, preencha o assunto.');
+            return;
+        }
+        
+        if (!message && !htmlMessage) {
+            e.preventDefault();
+            alert('Por favor, preencha a mensagem.');
+            return;
+        }
+        
+        if (recipientType === 'custom') {
+            const emailList = document.getElementById('email_list').value;
+            if (!emailList.trim()) {
+                e.preventDefault();
+                alert('Por favor, preencha a lista de emails.');
+                return;
+            }
+        } else if (recipientType === 'usuarios_especificos') {
+            const selectedUsers = document.querySelectorAll('input[name="selected_users"]:checked');
+            if (selectedUsers.length === 0) {
+                e.preventDefault();
+                alert('Por favor, selecione pelo menos um usuário.');
+                return;
+            }
+        }
+        
+        // Confirmação para envio em lote
+        const recipientCounts = {
+            'associados_ativos': {{ associados_ativos }},
+            'associados_todos': {{ total_associados }},
+            'usuarios_ativos': {{ usuarios_ativos }},
+            'usuarios_todos': {{ total_usuarios }}
+        };
+        
+        if (recipientType in recipientCounts) {
+            const count = recipientCounts[recipientType];
+            if (count > 0) {
+                if (!confirm(`Você está prestes a enviar emails para ${count} destinatários. Deseja continuar?`)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        } else if (recipientType === 'usuarios_especificos') {
+            const selectedUsers = document.querySelectorAll('input[name="selected_users"]:checked');
+            if (selectedUsers.length > 0) {
+                if (!confirm(`Você está prestes a enviar emails para ${selectedUsers.length} usuário(s) específico(s). Deseja continuar?`)) {
+                    e.preventDefault();
+                    return;
+                }
+            }
+        }
+    });
+});
+
+function previewEmail() {
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    const htmlMessage = document.getElementById('html_message').value;
+    
+    if (!subject && !message && !htmlMessage) {
+        alert('Por favor, preencha pelo menos o assunto e a mensagem para visualizar o preview.');
+        return;
+    }
+    
+    // Criar preview
+    let previewContent = '<div class="email-preview">';
+    
+    if (subject) {
+        previewContent += `<h4><strong>Assunto:</strong> ${subject}</h4><hr>`;
+    }
+    
+    if (htmlMessage) {
+        previewContent += `<div class="html-content">${htmlMessage}</div>`;
+    } else if (message) {
+        previewContent += `<div class="text-content"><pre>${message}</pre></div>`;
+    }
+    
+    previewContent += '</div>';
+    
+    document.getElementById('previewContent').innerHTML = previewContent;
+    
+    // Mostrar modal
+    const previewModal = new bootstrap.Modal(document.getElementById('previewModal'));
+    previewModal.show();
+}
+</script>
+{% endblock %}

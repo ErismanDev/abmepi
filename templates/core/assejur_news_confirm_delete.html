@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .logo-container {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-circular {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .associacao-text {
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+    }
+    
+    .warning-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+    
+    .news-details {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+    
+    .news-details h6 {
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header da Página -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="logo-container me-3">
+                            <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="logo-circular">
+                        </div>
+                        <div>
+                            <h1 class="associacao-text mb-0">ABMEPI</h1>
+                            <p class="text-muted mb-0">Associação de Bombeiros e Policiais Militares</p>
+                        </div>
+                    </div>
+                    <h2 class="mb-2">{{ title }}</h2>
+                    <p class="text-muted mb-0">{{ subtitle }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmação de Exclusão -->
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <div class="warning-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    
+                    <h3 class="text-danger mb-3">Atenção!</h3>
+                    <p class="lead mb-4">
+                        Você está prestes a excluir permanentemente uma notícia da assessoria jurídica.
+                        <strong>Esta ação não pode ser desfeita.</strong>
+                    </p>
+                    
+                    <!-- Detalhes da Notícia -->
+                    <div class="news-details">
+                        <h6>
+                            <i class="fas fa-newspaper me-2 text-primary"></i>Detalhes da Notícia
+                        </h6>
+                        <div class="row text-start">
+                            <div class="col-md-6">
+                                <p><strong>Título:</strong> {{ object.titulo }}</p>
+                                <p><strong>Categoria:</strong> {{ object.get_categoria_display }}</p>
+                                <p><strong>Prioridade:</strong> 
+                                    <span class="badge bg-{{ object.get_prioridade_color }}">
+                                        {{ object.get_prioridade_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Data de Publicação:</strong> {{ object.data_publicacao|date:"d/m/Y H:i" }}</p>
+                                <p><strong>Status:</strong> 
+                                    {% if object.ativo %}
+                                    <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Inativo</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Destaque:</strong> 
+                                    {% if object.destaque %}
+                                    <span class="badge bg-warning">Sim</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Não</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <p><strong>Resumo:</strong></p>
+                            <p class="text-muted">{{ object.resumo }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Importante:</strong> Esta notícia será removida permanentemente do sistema. 
+                        Se você precisar apenas desativá-la temporariamente, considere alterar o status para "Inativo" ao invés de excluí-la.
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-center gap-3 mt-4">
+                        <a href="{% url 'core:assejur_news_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Cancelar
+                        </a>
+                        <a href="{% url 'core:assejur_news_update' object.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-edit me-2"></i>Editar ao Invés de Excluir
+                        </a>
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <a href="{% url 'core:institucional_edit' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>Voltar ao Institucional
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Confirmar antes de enviar o formulário
+    const deleteForm = document.querySelector('form');
+    deleteForm.addEventListener('submit', function(e) {
+        const confirmMessage = 'ATENÇÃO! Você tem certeza absoluta de que deseja excluir permanentemente esta notícia?\n\n' +
+                              'Título: "{{ object.titulo }}"\n' +
+                              'Categoria: {{ object.get_categoria_display }}\n\n' +
+                              'Esta ação NÃO PODE SER DESFEITA!';
+        
+        if (!confirm(confirmMessage)) {
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}

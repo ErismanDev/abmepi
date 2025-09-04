@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Simples - Salvar Advogado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Teste Simples - Salvar Advogado</h1>
+        <p class="text-muted">Testando a funcionalidade de salvar passo a passo</p>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Testes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="testarSalvar()">
+                                <i class="fas fa-save me-2"></i>Testar Salvar
+                            </button>
+                            <button class="btn btn-info" onclick="testarURL()">
+                                <i class="fas fa-link me-2"></i>Testar URL
+                            </button>
+                            <button class="btn btn-warning" onclick="limparLog()">
+                                <i class="fas fa-broom me-2"></i>Limpar Log
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5>Console de Debug</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="console" class="bg-dark text-light p-3 rounded" style="height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            <div class="text-success">🚀 Página carregada - Pronta para testes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const console = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'text-danger' : type === 'success' ? 'text-success' : type === 'warning' ? 'text-warning' : 'text-info';
+            
+            const logDiv = document.createElement('div');
+            logDiv.className = color;
+            logDiv.innerHTML = `[${timestamp}] ${message}`;
+            
+            console.appendChild(logDiv);
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        // Função para limpar log
+        function limparLog() {
+            document.getElementById('console').innerHTML = '<div class="text-success">🚀 Log limpo - Pronto para novos testes</div>';
+        }
+        
+        // Função para testar URL
+        async function testarURL() {
+            addLog('🔧 Testando URL...', 'info');
+            
+            try {
+                const response = await fetch('/assejus/advogados/modal/novo/teste-post/', {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog(`✅ URL funcionando! Resposta recebida: ${data.form_html ? 'Formulário HTML' : 'Sem formulário'}`, 'success');
+                    addLog(`📊 Tamanho da resposta: ${JSON.stringify(data).length} caracteres`, 'info');
+                } else {
+                    addLog(`❌ Erro HTTP: ${response.status} ${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                addLog(`❌ Erro ao testar URL: ${error.message}`, 'error');
+                addLog(`🔍 Tipo de erro: ${error.name}`, 'warning');
+                
+                // Verificar se é problema de CORS
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    addLog('🚨 Possível problema de CORS ou servidor não acessível', 'warning');
+                    addLog('💡 Tentando com URL absoluta...', 'info');
+                    
+                    try {
+                        const response = await fetch('http://127.0.0.1:8000/assejus/advogados/modal/novo/teste-post/', {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            addLog(`✅ URL absoluta funcionando!`, 'success');
+                        } else {
+                            addLog(`❌ URL absoluta também falhou: ${response.status}`, 'error');
+                        }
+                    } catch (error2) {
+                        addLog(`❌ URL absoluta também falhou: ${error2.message}`, 'error');
+                    }
+                }
+            }
+        }
+        
+        // Função para testar salvar
+        async function testarSalvar() {
+            addLog('🔧 Testando salvar completo...', 'info');
+            
+            // Dados de teste
+            const dadosTeste = {
+                nome: 'João Silva',
+                cpf: '123.456.789-00',
+                oab: '123456',
+                uf_oab: 'SP',
+                email: 'joao@teste.com',
+                telefone: '(11) 9999-9999',
+                endereco: 'Rua Teste, 123',
+                cidade: 'São Paulo',
+                estado: 'SP',
+                cep: '01234-567',
+                data_inscricao_oab: '2023-01-01',
+                experiencia_anos: '5',
+                situacao: 'ativo',
+                ativo: 'on'
+            };
+            
+            addLog(`📝 Dados de teste: ${JSON.stringify(dadosTeste)}`, 'info');
+            
+            try {
+                // Primeiro testar se a URL está funcionando
+                addLog('🔍 Testando conectividade...', 'info');
+                const response = await fetch('/assejus/advogados/modal/novo/teste-post/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams(dadosTeste)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addLog(`✅ POST funcionando! Resposta: ${JSON.stringify(data)}`, 'success');
+                } else {
+                    addLog(`❌ Erro HTTP: ${response.status} ${response.statusText}`, 'error');
+                    
+                    // Tentar ler o corpo da resposta para mais detalhes
+                    try {
+                        const errorText = await response.text();
+                        addLog(`📄 Corpo da resposta: ${errorText.substring(0, 200)}...`, 'warning');
+                    } catch (e) {
+                        addLog(`❌ Não foi possível ler o corpo da resposta`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erro ao fazer POST: ${error.message}`, 'error');
+                addLog(`🔍 Tipo de erro: ${error.name}`, 'warning');
+                
+                // Tentar com URL absoluta
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    addLog('💡 Tentando com URL absoluta...', 'info');
+                    
+                    try {
+                        const response = await fetch('http://127.0.0.1:8000/assejus/advogados/modal/novo/teste-post/', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: new URLSearchParams(dadosTeste)
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            addLog(`✅ POST com URL absoluta funcionando!`, 'success');
+                        } else {
+                            addLog(`❌ POST com URL absoluta falhou: ${response.status}`, 'error');
+                        }
+                    } catch (error2) {
+                        addLog(`❌ POST com URL absoluta também falhou: ${error2.message}`, 'error');
+                    }
+                }
+            }
+        }
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página de teste carregada com sucesso!', 'success');
+            addLog('💡 Clique em "Testar URL" primeiro para verificar conectividade', 'info');
+        });
+    </script>
+</body>
+</html>

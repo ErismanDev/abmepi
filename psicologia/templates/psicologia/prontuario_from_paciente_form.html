@@ -1,0 +1,569 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Editar Prontuário{% else %}Novo Prontuário{% endif %} - {{ paciente.associado.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-clipboard-medical text-primary"></i>
+                    {% if form.instance.pk %}Editar Prontuário{% else %}Novo Prontuário{% endif %}
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar à Ficha
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-user-md"></i>
+                        {% if form.instance.pk %}Editar Prontuário{% else %}Novo Prontuário{% endif %} de {{ paciente.associado.nome }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <!-- Informações do Paciente -->
+                    <div class="row mb-4">
+                        <div class="col-md-2 text-center">
+                            {% if paciente.associado.foto %}
+                                <img src="{{ paciente.associado.foto.url }}" alt="Foto de {{ paciente.associado.nome }}" 
+                                     class="img-fluid rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                     style="width: 80px; height: 80px;">
+                                    <i class="fas fa-user fa-2x text-white"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <h6 class="text-primary border-bottom pb-2">
+                                <i class="fas fa-info-circle"></i> Informações do Paciente
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nome:</strong> {{ paciente.associado.nome }}</p>
+                                    <p><strong>CPF:</strong> {{ paciente.associado.cpf }}</p>
+                                    <p><strong>Data de Nascimento:</strong> {{ paciente.associado.data_nascimento|date:"d/m/Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Idade:</strong> {{ paciente.associado.data_nascimento|timesince|slice:":2" }} anos</p>
+                                    <p><strong>Psicólogo Responsável:</strong> 
+                                        {% if paciente.psicologo_responsavel %}
+                                            <span class="badge bg-success text-white fw-bold">{{ paciente.psicologo_responsavel.nome_completo }}</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark fw-bold">Não atribuído</span>
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Status:</strong> <span class="badge bg-success text-white fw-bold">Ativo</span></p>
+                                    <p><strong>Data de Cadastro:</strong> {{ paciente.data_cadastro|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Prontuário (quando editando) -->
+                    {% if form.instance.pk %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info border-left-primary">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle"></i> Informações do Prontuário
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Data de Criação:</strong> {{ form.instance.data_criacao|date:"d/m/Y H:i" }}</p>
+                                        <p><strong>Última Atualização:</strong> {{ form.instance.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Psicólogo:</strong> {{ paciente.psicologo_responsavel.nome_completo|default:"Não atribuído" }}</p>
+                                        <p><strong>Status:</strong> <span class="badge bg-success text-white fw-bold">Ativo</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulário do Prontuário -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Seção 1: Queixa e Motivo da Consulta -->
+                        <div class="card mb-4 border-left-primary">
+                            <div class="card-header bg-light">
+                                <h6 class="m-0 font-weight-bold text-primary">
+                                    <i class="fas fa-clipboard-list"></i> Queixa e Motivo da Consulta
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="{{ form.queixa_principal.id_for_label }}" class="font-weight-bold">
+                                        {{ form.queixa_principal.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.queixa_principal }}
+                                    {% if form.queixa_principal.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.queixa_principal.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> 
+                                        Descreva detalhadamente o motivo principal que levou o paciente a buscar atendimento psicológico
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.queixas_secundarias.id_for_label }}" class="font-weight-bold">
+                                        {{ form.queixas_secundarias.label }}
+                                    </label>
+                                    {{ form.queixas_secundarias }}
+                                    {% if form.queixas_secundarias.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.queixas_secundarias.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> 
+                                        Outros sintomas ou problemas relatados pelo paciente
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.expectativas_tratamento.id_for_label }}" class="font-weight-bold">
+                                        {{ form.expectativas_tratamento.label }}
+                                    </label>
+                                    {{ form.expectativas_tratamento }}
+                                    {% if form.expectativas_tratamento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.expectativas_tratamento.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle"></i> 
+                                        Objetivos e expectativas do paciente em relação ao tratamento
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção 2: Histórico Clínico -->
+                        <div class="card mb-4 border-left-success">
+                            <div class="card-header bg-light">
+                                <h6 class="m-0 font-weight-bold text-success">
+                                    <i class="fas fa-history"></i> Histórico Clínico
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ form.historico_familiar.id_for_label }}" class="font-weight-bold">
+                                                {{ form.historico_familiar.label }}
+                                            </label>
+                                            {{ form.historico_familiar }}
+                                            {% if form.historico_familiar.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.historico_familiar.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-users"></i> 
+                                                Histórico familiar relevante para o caso
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="{{ form.historico_pessoal.id_for_label }}" class="font-weight-bold">
+                                                {{ form.historico_pessoal.label }}
+                                            </label>
+                                            {{ form.historico_pessoal }}
+                                            {% if form.historico_pessoal.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.historico_pessoal.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            <small class="form-text text-muted">
+                                                <i class="fas fa-user"></i> 
+                                                Experiências e vivências do paciente
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.historico_medico.id_for_label }}" class="font-weight-bold">
+                                        {{ form.historico_medico.label }}
+                                    </label>
+                                    {{ form.historico_medico }}
+                                    {% if form.historico_medico.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.historico_medico.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-stethoscope"></i> 
+                                        Histórico médico relevante, medicações em uso, etc.
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.historico_psicologico.id_for_label }}" class="font-weight-bold">
+                                        {{ form.historico_psicologico.label }}
+                                    </label>
+                                    {{ form.historico_psicologico }}
+                                    {% if form.historico_psicologico.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.historico_psicologico.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-brain"></i> 
+                                        Tratamentos psicológicos anteriores, diagnósticos, etc.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção 3: Avaliação Psicológica -->
+                        <div class="card mb-4 border-left-warning">
+                            <div class="card-header bg-light">
+                                <h6 class="m-0 font-weight-bold text-warning">
+                                    <i class="fas fa-search"></i> Avaliação Psicológica
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="{{ form.hipotese_diagnostica.id_for_label }}" class="font-weight-bold">
+                                        {{ form.hipotese_diagnostica.label }}
+                                    </label>
+                                    {{ form.hipotese_diagnostica }}
+                                    {% if form.hipotese_diagnostica.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.hipotese_diagnostica.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-search"></i> 
+                                        Impressão clínica inicial e hipóteses diagnósticas
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.sintomas_principais.id_for_label }}" class="font-weight-bold">
+                                        {{ form.sintomas_principais.label }}
+                                    </label>
+                                    {{ form.sintomas_principais }}
+                                    {% if form.sintomas_principais.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.sintomas_principais.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-exclamation-triangle"></i> 
+                                        Sintomas mais relevantes para a avaliação
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.fatores_estressores.id_for_label }}" class="font-weight-bold">
+                                        {{ form.fatores_estressores.label }}
+                                    </label>
+                                    {{ form.fatores_estressores }}
+                                    {% if form.fatores_estressores.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.fatores_estressores.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-fire"></i> 
+                                        Situações ou fatores que causam estresse ao paciente
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.recursos_coping.id_for_label }}" class="font-weight-bold">
+                                        {{ form.recursos_coping.label }}
+                                    </label>
+                                    {{ form.recursos_coping }}
+                                    {% if form.recursos_coping.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.recursos_coping.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-shield-alt"></i> 
+                                        Estratégias que o paciente usa para lidar com situações difíceis
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção 4: Plano Terapêutico -->
+                        <div class="card mb-4 border-left-info">
+                            <div class="card-header bg-light">
+                                <h6 class="m-0 font-weight-bold text-info">
+                                    <i class="fas fa-route"></i> Plano Terapêutico
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="{{ form.plano_terapeutico.id_for_label }}" class="font-weight-bold">
+                                        {{ form.plano_terapeutico.label }}
+                                    </label>
+                                    {{ form.plano_terapeutico }}
+                                    {% if form.plano_terapeutico.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.plano_terapeutico.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-route"></i> 
+                                        Estratégias e técnicas de intervenção planejadas
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.objetivos_tratamento.id_for_label }}" class="font-weight-bold">
+                                        {{ form.objetivos_tratamento.label }}
+                                    </label>
+                                    {{ form.objetivos_tratamento }}
+                                    {% if form.objetivos_tratamento.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.objetivos_tratamento.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-bullseye"></i> 
+                                        Objetivos específicos e mensuráveis do tratamento
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.tecnicas_intervencao.id_for_label }}" class="font-weight-bold">
+                                        {{ form.tecnicas_intervencao.label }}
+                                    </label>
+                                    {{ form.tecnicas_intervencao }}
+                                    {% if form.tecnicas_intervencao.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.tecnicas_intervencao.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-tools"></i> 
+                                        Técnicas específicas que serão utilizadas no tratamento
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.prazo_estimado.id_for_label }}" class="font-weight-bold">
+                                        {{ form.prazo_estimado.label }}
+                                    </label>
+                                    {{ form.prazo_estimado }}
+                                    {% if form.prazo_estimado.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.prazo_estimado.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-calendar-alt"></i> 
+                                        Prazo estimado para alcançar os objetivos do tratamento
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção 5: Observações e Considerações -->
+                        <div class="card mb-4 border-left-secondary">
+                            <div class="card-header bg-light">
+                                <h6 class="m-0 font-weight-bold text-secondary">
+                                    <i class="fas fa-clipboard"></i> Observações e Considerações
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label for="{{ form.observacoes_gerais.id_for_label }}" class="font-weight-bold">
+                                        {{ form.observacoes_gerais.label }}
+                                    </label>
+                                    {{ form.observacoes_gerais }}
+                                    {% if form.observacoes_gerais.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.observacoes_gerais.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-clipboard"></i> 
+                                        Observações gerais sobre o caso
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.consideracoes_especiais.id_for_label }}" class="font-weight-bold">
+                                        {{ form.consideracoes_especiais.label }}
+                                    </label>
+                                    {{ form.consideracoes_especiais }}
+                                    {% if form.consideracoes_especiais.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.consideracoes_especiais.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-exclamation-circle"></i> 
+                                        Aspectos especiais que merecem atenção especial
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="{{ form.recomendacoes.id_for_label }}" class="font-weight-bold">
+                                        {{ form.recomendacoes.label }}
+                                    </label>
+                                    {{ form.recomendacoes }}
+                                    {% if form.recomendacoes.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.recomendacoes.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-lightbulb"></i> 
+                                        Recomendações para o paciente e familiares
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="form-group text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> 
+                                {% if form.instance.pk %}Atualizar{% else %}Criar{% endif %} Prontuário
+                            </button>
+                            {% if form.instance.pk %}
+                            <a href="{% url 'psicologia:prontuario_detail' form.instance.pk %}" class="btn btn-info btn-lg ml-2">
+                                <i class="fas fa-eye"></i> Visualizar Prontuário
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary btn-lg ml-2">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Dicas e Informações -->
+        <div class="col-lg-3">
+            <!-- Dicas para o Psicólogo -->
+            <div class="card shadow mb-4 border-left-primary">
+                <div class="card-header py-3 bg-primary text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-lightbulb"></i> Orientações para o Psicólogo
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-clipboard-list text-primary"></i>
+                            <strong>Queixa Principal:</strong>
+                            <small class="d-block text-muted">Motivo da busca pelo atendimento</small>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-users text-info"></i>
+                            <strong>Histórico Familiar:</strong>
+                            <small class="d-block text-muted">Informações relevantes sobre a família</small>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-user text-success"></i>
+                            <strong>Histórico Pessoal:</strong>
+                            <small class="d-block text-muted">Experiências e vivências do paciente</small>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-search text-warning"></i>
+                            <strong>Hipótese Diagnóstica:</strong>
+                            <small class="d-block text-muted">Impressão clínica inicial</small>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-route text-secondary"></i>
+                            <strong>Plano Terapêutico:</strong>
+                            <small class="d-block text-muted">Estratégias de intervenção</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Estatísticas do Paciente -->
+            <div class="card shadow mb-4 border-left-success">
+                <div class="card-header py-3 bg-success text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-chart-bar"></i> Estatísticas do Paciente
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-right">
+                                <h4 class="text-success">{{ paciente.sessao_set.count }}</h4>
+                                <small class="text-muted">Sessões</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info">{{ paciente.evolucao_set.count }}</h4>
+                            <small class="text-muted">Evoluções</small>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-right">
+                                <h4 class="text-warning">{{ paciente.documento_set.count }}</h4>
+                                <small class="text-muted">Documentos</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-primary">{{ paciente.data_cadastro|timesince|slice:":2" }}</h4>
+                            <small class="text-muted">Tempo</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas Atividades -->
+            <div class="card shadow border-left-info">
+                <div class="card-header py-3 bg-info text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-clock"></i> Últimas Atividades
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if paciente.sessao_set.all %}
+                        <div class="list-group list-group-flush">
+                            {% for sessao in paciente.sessao_set.all|slice:":3" %}
+                            <div class="list-group-item px-0">
+                                <small class="text-muted">{{ sessao.data_hora|date:"d/m/Y H:i" }}</small>
+                                <p class="mb-1">{{ sessao.get_tipo_sessao_display }}</p>
+                                <p class="mb-0 text-truncate" style="max-width: 200px;">
+                                    <span class="badge badge-{{ sessao.status|yesno:'success,warning' }}">
+                                        {{ sessao.get_status_display }}
+                                    </span>
+                                </p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhuma sessão registrada.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

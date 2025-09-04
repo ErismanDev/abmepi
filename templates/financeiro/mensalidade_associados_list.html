@@ -1,0 +1,332 @@
+{% extends 'base.html' %}
+
+{% block title %}Recebíveis de Associados - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div>
+            <h1 class="h2">
+                <i class="fas fa-users me-2"></i>
+                Recebíveis de Associados
+            </h1>
+            <p class="text-muted mb-0">
+                Controle dos recebíveis recorrentes dos associados
+            </p>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="{% url 'financeiro:mensalidade_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Novo Recebível
+                </a>
+                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#gerarMensalidadesModal">
+                    <i class="fas fa-magic me-1"></i>
+                    Gerar em Lote
+                </button>
+                <button type="button" class="btn btn-warning" id="btnGerarCarne" disabled>
+                    <i class="fas fa-file-pdf me-1"></i>
+                    Gerar Carnê
+                </button>
+                <button type="button" class="btn btn-danger" id="btnExcluirLote" disabled>
+                    <i class="fas fa-trash me-1"></i>
+                    Excluir Selecionadas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debug info -->
+    <div class="alert alert-info">
+        <strong>Debug:</strong> 
+        Mensalidades encontradas: {{ mensalidades|length }}
+        {% if mensalidades %}
+            <br>Primeira mensalidade ID: {{ mensalidades.0.pk }}
+            <br>Primeira mensalidade Nome: {{ mensalidades.0.associado.nome }}
+        {% endif %}
+    </div>
+
+    <!-- Tabela simplificada -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Recebíveis de Associados</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px; text-align: center;">
+                                <input type="checkbox" id="selecionarTodas" class="form-check-input">
+                                <label for="selecionarTodas">Todas</label>
+                            </th>
+                            <th>Associado</th>
+                            <th>Tipo</th>
+                            <th>Valor</th>
+                            <th>Vencimento</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for mensalidade in mensalidades %}
+                        <tr>
+                            <td style="width: 50px; text-align: center;">
+                                <input type="checkbox" 
+                                       class="mensalidade-checkbox form-check-input" 
+                                       value="{{ mensalidade.pk }}" 
+                                       id="mensalidade_{{ mensalidade.pk }}">
+                                <label for="mensalidade_{{ mensalidade.pk }}">{{ forloop.counter }}</label>
+                            </td>
+                            <td>
+                                <strong>{{ mensalidade.associado.nome }}</strong>
+                                <br>
+                                <small class="text-muted">{{ mensalidade.associado.cpf }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary">{{ mensalidade.tipo.nome }}</span>
+                            </td>
+                            <td class="text-end">R$ {{ mensalidade.valor|floatformat:2 }}</td>
+                            <td>{{ mensalidade.data_vencimento|date:"d/m/Y" }}</td>
+                            <td>
+                                {% if mensalidade.status == 'pago' %}
+                                    <span class="badge bg-success">Pago</span>
+                                {% elif mensalidade.status == 'pendente' %}
+                                    {% if mensalidade.data_vencimento < today %}
+                                        <span class="badge bg-danger">Atrasado</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ mensalidade.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'financeiro:mensalidade_detail' mensalidade.pk %}" 
+                                       class="btn btn-sm btn-outline-primary" title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'financeiro:mensalidade_update' mensalidade.pk %}" 
+                                       class="btn btn-sm btn-outline-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    {% if mensalidade.status != 'pago' %}
+                                        <a href="{% url 'financeiro:pagamento_create' %}?mensalidade={{ mensalidade.pk }}" 
+                                           class="btn btn-sm btn-outline-success" title="Registrar pagamento">
+                                            <i class="fas fa-dollar-sign"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para gerar mensalidades em lote -->
+    <div class="modal fade" id="gerarMensalidadesModal" tabindex="-1" aria-labelledby="gerarMensalidadesModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gerarMensalidadesModalLabel">Gerar Recebíveis em Lote</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formGerarMensalidades">
+                        <div class="mb-3">
+                            <label for="associado" class="form-label">Associado</label>
+                            <select class="form-select" id="associado" name="associado" required>
+                                <option value="">Selecione um associado</option>
+                                {% for associado in associados %}
+                                    <option value="{{ associado.pk }}">{{ associado.nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipo" class="form-label">Tipo de Recebimento</label>
+                            <select class="form-select" id="tipo" name="tipo" required>
+                                <option value="">Selecione um tipo</option>
+                                {% for tipo in tipos %}
+                                    <option value="{{ tipo.pk }}" data-valor="{{ tipo.valor }}">{{ tipo.nome }} - R$ {{ tipo.valor|floatformat:2 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="mes" class="form-label">Mês Inicial</label>
+                                    <select class="form-select" id="mes" name="mes" required>
+                                        <option value="1">Janeiro</option>
+                                        <option value="2">Fevereiro</option>
+                                        <option value="3">Março</option>
+                                        <option value="4">Abril</option>
+                                        <option value="5">Maio</option>
+                                        <option value="6">Junho</option>
+                                        <option value="7">Julho</option>
+                                        <option value="8">Agosto</option>
+                                        <option value="9">Setembro</option>
+                                        <option value="10">Outubro</option>
+                                        <option value="11">Novembro</option>
+                                        <option value="12">Dezembro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="ano" class="form-label">Ano</label>
+                                    <input type="number" class="form-control" id="ano" name="ano" min="2020" max="2030" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantidade_meses" class="form-label">Quantidade de Meses</label>
+                            <input type="number" class="form-control" id="quantidade_meses" name="quantidade_meses" min="1" max="24" value="12" required>
+                            <div class="form-text"></div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGerarMensalidades">Gerar Recebíveis</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    /* Estilos básicos para os checkboxes */
+    .form-check-input {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        cursor: pointer;
+    }
+    
+    .mensalidade-checkbox {
+        cursor: pointer;
+    }
+    
+    #selecionarTodas {
+        cursor: pointer;
+    }
+</style>
+
+<script>
+    $(document).ready(function() {
+        console.log('=== INICIANDO SCRIPT ===');
+        
+        // Verificar elementos básicos
+        var checkboxes = $('.mensalidade-checkbox');
+        var checkboxTodas = $('#selecionarTodas');
+        var tabela = $('table tbody tr');
+        
+        console.log('Checkboxes encontrados:', checkboxes.length);
+        console.log('Checkbox "Todas" encontrado:', checkboxTodas.length);
+        console.log('Linhas na tabela:', tabela.length);
+        
+        // Verificar se jQuery está funcionando
+        console.log('jQuery funcionando:', typeof $ !== 'undefined');
+        if (typeof $ !== 'undefined') {
+            console.log('jQuery versão:', $.fn.jquery);
+        }
+        
+        // Teste simples - adicionar evento de clique
+        checkboxes.on('change', function() {
+            console.log('Checkbox clicado:', $(this).val(), 'Status:', $(this).is(':checked'));
+        });
+        
+        checkboxTodas.on('change', function() {
+            console.log('Checkbox "Todas" clicado:', $(this).is(':checked'));
+        });
+        
+        // Funcionalidade para seleção em lote
+        var mensalidadesSelecionadas = [];
+        
+        // Função para atualizar botões baseado na seleção
+        function atualizarBotaoes() {
+            console.log('Atualizando botões. Selecionados:', mensalidadesSelecionadas.length);
+            if (mensalidadesSelecionadas.length > 0) {
+                $('#btnGerarCarne').prop('disabled', false);
+                $('#btnExcluirLote').prop('disabled', false);
+            } else {
+                $('#btnGerarCarne').prop('disabled', true);
+                $('#btnExcluirLote').prop('disabled', true);
+            }
+        }
+        
+        // Event listener para checkboxes de seleção
+        $(document).on('change', '.mensalidade-checkbox', function() {
+            var mensalidadeId = $(this).val();
+            console.log('Checkbox mudou:', mensalidadeId, 'Status:', $(this).is(':checked'));
+            
+            if ($(this).is(':checked')) {
+                if (mensalidadesSelecionadas.indexOf(mensalidadeId) === -1) {
+                    mensalidadesSelecionadas.push(mensalidadeId);
+                }
+            } else {
+                var index = mensalidadesSelecionadas.indexOf(mensalidadeId);
+                if (index > -1) {
+                    mensalidadesSelecionadas.splice(index, 1);
+                }
+            }
+            atualizarBotaoes();
+        });
+        
+        // Botão para selecionar todas as mensalidades
+        $('#selecionarTodas').on('change', function() {
+            console.log('Selecionar todas mudou:', $(this).is(':checked'));
+            if ($(this).is(':checked')) {
+                $('.mensalidade-checkbox').prop('checked', true).trigger('change');
+            } else {
+                $('.mensalidade-checkbox').prop('checked', false).trigger('change');
+            }
+        });
+        
+        // Botão para gerar carnê
+        $('#btnGerarCarne').on('click', function() {
+            if (mensalidadesSelecionadas.length === 0) {
+                alert('Selecione pelo menos uma mensalidade para gerar o carnê.');
+                return;
+            }
+            var ids = mensalidadesSelecionadas.join(',');
+            window.open(`{% url 'financeiro:gerar_carne' %}?mensalidades=${ids}`, '_blank');
+        });
+        
+        // Botão para excluir em lote
+        $('#btnExcluirLote').on('click', function() {
+            if (mensalidadesSelecionadas.length === 0) {
+                alert('Selecione pelo menos uma mensalidade para excluir.');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir ${mensalidadesSelecionadas.length} mensalidade(s)? Esta ação não pode ser desfeita.`)) {
+                $.post('{% url "financeiro:excluir_mensalidades_lote" %}', {
+                    mensalidades: mensalidadesSelecionadas,
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val()
+                }).done(function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Erro ao excluir mensalidades: ' + response.message);
+                    }
+                }).fail(function() {
+                    alert('Erro ao excluir mensalidades. Tente novamente.');
+                });
+            }
+        });
+        
+        // Inicializar botões
+        atualizarBotaoes();
+        
+        console.log('=== SCRIPT FINALIZADO ===');
+    });
+</script>
+{% endblock %}

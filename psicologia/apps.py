@@ -1,0 +1,7 @@
+from django.apps import AppConfig
+
+
+class PsicologiaConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'psicologia'
+    verbose_name = 'Atendimento Psicológico'

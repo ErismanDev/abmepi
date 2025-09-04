@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Convênio{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:convenio_list' %}">Convênios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">{{ title }}</h1>
+            <p class="text-muted mb-0">Preencha as informações do convênio</p>
+        </div>
+        <a href="{% url 'beneficios:convenio_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-handshake me-2"></i>
+                        Dados do Convênio
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                {{ form.titulo|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.empresa|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.categoria|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.status|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.data_inicio|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.data_fim|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.desconto|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.ativo|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.descricao|as_crispy_field }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.condicoes|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.documentos_necessarios|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.usuario_responsavel|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.arquivos_anexados|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.observacoes|as_crispy_field }}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'beneficios:convenio_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ action }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dicas -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Dicas para um bom convênio
+                    </h6>
+                </div>
+                <div class="card-body">
+                                         <ul class="mb-0">
+                         <li><strong>Título:</strong> Use um título claro e descritivo</li>
+                         <li><strong>Desconto:</strong> Informe a porcentagem exata oferecida</li>
+                         <li><strong>Validade:</strong> Defina datas realistas para início e fim</li>
+                         <li><strong>Condições:</strong> Descreva claramente as condições de uso</li>
+                         <li><strong>Documentos:</strong> Liste os documentos necessários para o associado</li>
+                         <li><strong>Observações:</strong> Adicione informações importantes para os associados</li>
+                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-popular data de início com hoje
+    document.addEventListener('DOMContentLoaded', function() {
+        const dataInicioField = document.getElementById('id_data_inicio');
+        if (dataInicioField && !dataInicioField.value) {
+            const today = new Date().toISOString().split('T')[0];
+            dataInicioField.value = today;
+        }
+    });
+</script>
+{% endblock %}

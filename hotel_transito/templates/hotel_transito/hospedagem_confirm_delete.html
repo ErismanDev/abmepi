@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Hospedagem - {{ hospedagem.hospede.nome_completo }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .confirmation-card {
+        background: white;
+        border-radius: 15px;
+        padding: 3rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .warning-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 1.5rem;
+    }
+    
+    .confirmation-title {
+        color: #dc3545;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+    
+    .confirmation-message {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    
+    .hospedagem-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+    
+    .hospedagem-info h4 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-value {
+        color: #6c757d;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-ativa {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-finalizada {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-cancelada {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .actions-container {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-cancel {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .warning-box {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+    
+    .warning-box h5 {
+        color: #856404;
+        margin: 0 0 0.5rem 0;
+        font-size: 1.1rem;
+    }
+    
+    .warning-box p {
+        color: #856404;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        .confirmation-card {
+            padding: 2rem;
+            margin: 0 1rem;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+        }
+        
+        .actions-container {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .btn-delete,
+        .btn-cancel {
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da página -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-exclamation-triangle"></i> Excluir Hospedagem
+        </h1>
+        <p>Confirme a exclusão da hospedagem selecionada</p>
+    </div>
+
+    <!-- Card de confirmação -->
+    <div class="confirmation-card">
+        <!-- Ícone de aviso -->
+        <div class="warning-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        
+        <!-- Título da confirmação -->
+        <h2 class="confirmation-title">Confirmar Exclusão</h2>
+        
+        <!-- Mensagem de confirmação -->
+        <p class="confirmation-message">
+            Você está prestes a excluir permanentemente esta hospedagem. 
+            Esta ação não pode ser desfeita e liberará o quarto associado.
+        </p>
+        
+        <!-- Informações da hospedagem -->
+        <div class="hospedagem-info">
+            <h4><i class="fas fa-info-circle"></i> Detalhes da Hospedagem</h4>
+            
+            <div class="info-item">
+                <span class="info-label">Hóspede:</span>
+                <span class="info-value">{{ hospedagem.hospede.nome_completo }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Quarto:</span>
+                <span class="info-value">{{ hospedagem.quarto.numero }} - {{ hospedagem.quarto.get_tipo_display }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Status:</span>
+                <span class="info-value">
+                    <span class="status-badge status-{{ hospedagem.status }}">
+                        {{ hospedagem.get_status_display }}
+                    </span>
+                </span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Data de Entrada:</span>
+                <span class="info-value">{{ hospedagem.data_entrada_real|date:"d/m/Y H:i" }}</span>
+            </div>
+            
+            {% if hospedagem.data_saida_real %}
+            <div class="info-item">
+                <span class="info-label">Data de Saída:</span>
+                <span class="info-value">{{ hospedagem.data_saida_real|date:"d/m/Y H:i" }}</span>
+            </div>
+            {% endif %}
+            
+            <div class="info-item">
+                <span class="info-label">Valor Total:</span>
+                <span class="info-value">R$ {{ hospedagem.valor_total_real|floatformat:2 }}</span>
+            </div>
+            
+            {% if hospedagem.reserva %}
+            <div class="info-item">
+                <span class="info-label">Reserva:</span>
+                <span class="info-value">Sim (ID: {{ hospedagem.reserva.id }})</span>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Aviso importante -->
+        <div class="warning-box">
+            <h5><i class="fas fa-exclamation-circle"></i> Aviso Importante</h5>
+            <p>
+                <strong>Atenção:</strong> Ao excluir esta hospedagem, o quarto será automaticamente 
+                liberado e marcado como disponível. Se houver uma reserva associada, ela também será 
+                afetada.
+            </p>
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="actions-container">
+            <form method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete">
+                    <i class="fas fa-trash"></i> Confirmar Exclusão
+                </button>
+            </form>
+            
+            <a href="{% url 'hotel_transito:hospedagem_detail' hospedagem.pk %}" class="btn-cancel">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

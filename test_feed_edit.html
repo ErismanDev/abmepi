@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Edição de Feed Post</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Teste de Edição de Feed Post</h1>
+        
+        <!-- Botão para abrir modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addPostModal">
+            <i class="fas fa-plus me-1"></i>Editar Post
+        </button>
+        
+        <!-- Modal para Editar Post -->
+        <div class="modal fade" id="addPostModal" tabindex="-1" aria-labelledby="addPostModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPostModalLabel">
+                            <i class="fas fa-edit me-2"></i>Editar Post do Feed
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="feedPostForm" method="post" enctype="multipart/form-data">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="post_titulo" class="form-label">Título do Post *</label>
+                                        <input type="text" class="form-control" id="post_titulo" name="titulo" required 
+                                               value="Post de Teste para Edição">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="post_conteudo" class="form-label">Conteúdo do Post *</label>
+                                        <textarea class="form-control" id="post_conteudo" name="conteudo" rows="4" required
+                                                  >Este é um post de teste para verificar se a edição está funcionando.</textarea>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="post_tipo" class="form-label">Tipo de Post</label>
+                                                <select class="form-select" id="post_tipo" name="tipo_post">
+                                                    <option value="noticia">Notícia</option>
+                                                    <option value="evento" selected>Evento</option>
+                                                    <option value="treinamento">Treinamento</option>
+                                                    <option value="premiacao">Premiação</option>
+                                                    <option value="convenio">Convênio</option>
+                                                    <option value="outro">Outro</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="post_autor" class="form-label">Autor</label>
+                                                <input type="text" class="form-control" id="post_autor" name="autor" 
+                                                       value="ABMEPI Oficial">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="post_imagem" class="form-label">Imagem do Post</label>
+                                        <input type="file" class="form-control" id="post_imagem" name="imagem" 
+                                               accept="image/*">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="post_ordem" class="form-label">Ordem de Exibição</label>
+                                        <input type="number" class="form-control" id="post_ordem" name="ordem_exibicao" 
+                                               value="1" min="0">
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="post_ativo" name="ativo" value="true" checked>
+                                            <label class="form-check-label" for="post_ativo">
+                                                Post Ativo
+                                            </label>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="post_destaque" name="destaque" value="true" checked>
+                                            <label class="form-check-label" for="post_destaque">
+                                                Post em Destaque
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Salvar Post
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resultado do teste -->
+        <div id="testResult" class="mt-4"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simular dados de um post existente
+        const editingPostId = 3; // ID do post que estamos editando
+        
+        // Função para simular o envio do formulário
+        document.getElementById('feedPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            console.log('DEBUG: Formulário submetido');
+            
+            const formData = new FormData(this);
+            
+            // Debug: verificar todos os campos
+            console.log('DEBUG: Título:', formData.get('titulo'));
+            console.log('DEBUG: Conteúdo:', formData.get('conteudo'));
+            console.log('DEBUG: Tipo:', formData.get('tipo_post'));
+            console.log('DEBUG: Autor:', formData.get('autor'));
+            console.log('DEBUG: Ordem:', formData.get('ordem_exibicao'));
+            console.log('DEBUG: Ativo:', formData.get('ativo'));
+            console.log('DEBUG: Destaque:', formData.get('destaque'));
+            
+            // Corrigir campos de checkbox que podem não estar sendo enviados
+            if (!formData.get('ativo')) {
+                formData.append('ativo', 'false');
+            }
+            if (!formData.get('destaque')) {
+                formData.append('destaque', 'false');
+            }
+            
+            // Teste: verificar se FormData está funcionando
+            console.log('DEBUG: FormData entries:');
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+            
+            // Simular envio para a URL de atualização
+            const url = `/core/feed/posts/${editingPostId}/atualizar/`;
+            console.log('DEBUG: URL da requisição:', url);
+            
+            // Simular resposta de sucesso
+            const testResult = document.getElementById('testResult');
+            testResult.innerHTML = `
+                <div class="alert alert-success">
+                    <h5>✓ Teste de Formulário Concluído</h5>
+                    <p><strong>Título:</strong> ${formData.get('titulo')}</p>
+                    <p><strong>Conteúdo:</strong> ${formData.get('conteudo')}</p>
+                    <p><strong>Tipo:</strong> ${formData.get('tipo_post')}</p>
+                    <p><strong>Autor:</strong> ${formData.get('autor')}</p>
+                    <p><strong>Ordem:</strong> ${formData.get('ordem_exibicao')}</p>
+                    <p><strong>Ativo:</strong> ${formData.get('ativo')}</p>
+                    <p><strong>Destaque:</strong> ${formData.get('destaque')}</p>
+                    <p><strong>URL de Atualização:</strong> ${url}</p>
+                </div>
+            `;
+            
+            console.log('DEBUG: Teste concluído com sucesso');
+        });
+        
+        // Mostrar informações de debug quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DEBUG: Página carregada');
+            console.log('DEBUG: editingPostId:', editingPostId);
+            console.log('DEBUG: Formulário encontrado:', document.getElementById('feedPostForm'));
+        });
+    </script>
+</body>
+</html>

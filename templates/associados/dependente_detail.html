@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ dependente.nome }} - Dependente{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        {{ dependente.nome }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Dependente de <strong>{{ associado.nome }}</strong>
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'associados:associado_detail' associado.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar ao Associado
+                    </a>
+                    <a href="{% url 'associados:dependente_update' dependente.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informações principais -->
+                <div class="col-lg-8">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações do Dependente
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nome Completo:</strong><br>{{ dependente.nome }}</p>
+                                    <p><strong>Parentesco:</strong><br>{{ dependente.get_parentesco_display }}</p>
+                                    <p><strong>Data de Nascimento:</strong><br>{{ dependente.data_nascimento|date:"d/m/Y" }}</p>
+                                    <p><strong>Idade:</strong><br>{{ dependente.get_idade }} anos</p>
+                                </div>
+                                <div class="col-md-6">
+                                    {% if dependente.cpf %}
+                                    <p><strong>CPF:</strong><br>{{ dependente.cpf }}</p>
+                                    {% endif %}
+                                    {% if dependente.email %}
+                                    <p><strong>E-mail:</strong><br>
+                                        <a href="mailto:{{ dependente.email }}" class="text-decoration-none">
+                                            <i class="fas fa-envelope me-2"></i>{{ dependente.email }}
+                                        </a>
+                                    </p>
+                                    {% endif %}
+                                    <p><strong>Status:</strong><br>
+                                        {% if dependente.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </p>
+                                    {% if dependente.observacoes %}
+                                    <p><strong>Observações:</strong><br>{{ dependente.observacoes }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-lg-4">
+                    <!-- Foto do Dependente -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-camera me-2"></i>
+                                Foto
+                            </h6>
+                        </div>
+                        <div class="card-body text-center">
+                            {% if dependente.foto %}
+                                <img src="{{ dependente.foto.url }}" alt="{{ dependente.nome }}" 
+                                     class="img-fluid rounded" style="max-width: 200px;">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                     style="width: 200px; height: 200px; margin: 0 auto;">
+                                    <i class="fas fa-user fa-3x text-muted"></i>
+                                </div>
+                                <p class="text-muted mt-2">Nenhuma foto cadastrada</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Informações do Associado -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-user-tie me-2"></i>
+                                Associado Responsável
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Nome:</strong><br>{{ associado.nome }}</p>
+                            <p><strong>CPF:</strong><br>{{ associado.cpf }}</p>
+                            <p><strong>Status:</strong><br>
+                                {% if associado.ativo %}
+                                    <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'associados:associado_detail' associado.id %}" 
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye me-1"></i>
+                                Ver Associado
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

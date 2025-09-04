@@ -1,0 +1,499 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if procuracao %}Editar{% else %}Nova{% endif %} Procuração Ad Judicia - ASSEJUS
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        {% if procuracao %}Editar{% else %}Nova{% endif %} Procuração Ad Judicia
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if procuracao %}
+                            Editando procuração de: <strong>{{ procuracao.outorgante.nome }}</strong>
+                        {% else %}
+                            Crie uma nova procuração ad judicia
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    {% if procuracao %}
+                        <a href="{% url 'assejus:procuracao_detail' pk=procuracao.pk %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à Procuração
+                        </a>
+                    {% else %}
+                        <a href="{% url 'assejus:procuracao_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à Lista
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados da Procuração
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Outorgante -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.outorgante.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Outorgante (Associado) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.outorgante }}
+                                {% if form.outorgante.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.outorgante.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo de Poderes -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_poderes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-gavel me-1"></i>
+                                    Tipo de Poderes <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_poderes }}
+                                {% if form.tipo_poderes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_poderes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Advogados -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Advogado(s) Outorgado(s) <span class="text-danger">*</span>
+                                </label>
+                                <div class="row">
+                                    {% for choice in form.outorgados %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                {{ choice.tag }}
+                                                <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                                    {{ choice.choice_label }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.outorgados.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.outorgados.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Os dados dos advogados selecionados serão preenchidos automaticamente
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Informações dos Advogados Outorgados -->
+                        <div id="advogados-info" class="row" style="display: none;">
+                            <div class="col-12 mb-3">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-gavel me-2"></i>
+                                            Dados dos Advogados Outorgados
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="advogados-details">
+                                            <!-- Dados dos advogados serão inseridos aqui via JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processo Específico -->
+                        <div id="processo-especifico" class="row" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.processo_especifico.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    Processo Cadastrado (Opcional)
+                                </label>
+                                {{ form.processo_especifico }}
+                                {% if form.processo_especifico.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.processo_especifico.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Selecione um processo já cadastrado no sistema (opcional)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Dados Militares -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.cargo_militar.id_for_label }}" class="form-label">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Cargo Militar <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cargo_militar }}
+                                {% if form.cargo_militar.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.cargo_militar.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.matricula_funcional.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    Matrícula Funcional <span class="text-danger">*</span>
+                                </label>
+                                {{ form.matricula_funcional }}
+                                {% if form.matricula_funcional.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.matricula_funcional.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.rgpmpi.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-badge me-1"></i>
+                                    RGPMPI <span class="text-danger">*</span>
+                                </label>
+                                {{ form.rgpmpi }}
+                                {% if form.rgpmpi.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.rgpmpi.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Contatos -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.telefone_contato.id_for_label }}" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>
+                                    Telefone de Contato <span class="text-danger">*</span>
+                                </label>
+                                {{ form.telefone_contato }}
+                                {% if form.telefone_contato.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.telefone_contato.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email_contato.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    E-mail de Contato <span class="text-danger">*</span>
+                                </label>
+                                {{ form.email_contato }}
+                                {% if form.email_contato.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email_contato.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Endereço -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.endereco_completo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Endereço Completo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.endereco_completo }}
+                                {% if form.endereco_completo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.endereco_completo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Texto Personalizado -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.texto_personalizado.id_for_label }}" class="form-label">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Texto Personalizado da Procuração
+                                </label>
+                                {{ form.texto_personalizado }}
+                                {% if form.texto_personalizado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.texto_personalizado.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Deixe em branco para usar o texto padrão. Use as variáveis: {outorgante_nome}, {outorgante_cpf}, {outorgante_cargo}, {outorgante_matricula}, {outorgante_rgpmpi}, {outorgante_endereco}, {outorgante_telefone}, {outorgante_email}, {outorgados_nomes}, {outorgados_oab}, {processo_numero}, {processo_vara}, {data_atual}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    Observações Adicionais
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                {% if procuracao %}
+                                    <a href="{% url 'assejus:procuracao_detail' pk=procuracao.pk %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'assejus:procuracao_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if procuracao %}Atualizar Procuração{% else %}Criar Procuração{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Função para mostrar/ocultar campo de processo específico
+    function toggleProcessoEspecifico() {
+        const tipoPoderes = document.getElementById('{{ form.tipo_poderes.id_for_label }}');
+        const processoEspecifico = document.getElementById('processo-especifico');
+        
+        if (tipoPoderes && processoEspecifico) {
+            if (tipoPoderes.value === 'especificos' || tipoPoderes.value === 'ambos') {
+                processoEspecifico.style.display = 'block';
+            } else {
+                processoEspecifico.style.display = 'none';
+            }
+        }
+    }
+    
+    // Executar na inicialização
+    toggleProcessoEspecifico();
+    
+    // Adicionar listener para mudanças no tipo de poderes
+    const tipoPoderesSelect = document.getElementById('{{ form.tipo_poderes.id_for_label }}');
+    if (tipoPoderesSelect) {
+        tipoPoderesSelect.addEventListener('change', toggleProcessoEspecifico);
+    }
+});
+
+// Função global para ser chamada pelo onchange do select
+function toggleProcessoEspecifico() {
+    const tipoPoderes = document.getElementById('{{ form.tipo_poderes.id_for_label }}');
+    const processoEspecifico = document.getElementById('processo-especifico');
+    
+    if (tipoPoderes && processoEspecifico) {
+        if (tipoPoderes.value === 'especificos' || tipoPoderes.value === 'ambos') {
+            processoEspecifico.style.display = 'block';
+        } else {
+            processoEspecifico.style.display = 'none';
+        }
+    }
+}
+
+
+// Função para preencher dados do outorgante automaticamente
+function preencherDadosOutorgante() {
+    const associadoSelect = document.getElementById('{{ form.outorgante.id_for_label }}');
+    const associadoId = associadoSelect.value;
+    
+    if (associadoId) {
+        // Fazer requisição AJAX para buscar dados do associado
+        fetch(`{% url 'assejus:get_associado_data' associado_id=0 %}`.replace('0', associadoId))
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erro ao buscar dados do associado:', data.error);
+                    return;
+                }
+                
+                // Preencher campos automaticamente (apenas se estiverem vazios)
+                const cargoMilitar = document.getElementById('id_cargo_militar');
+                const matriculaFuncional = document.getElementById('id_matricula_funcional');
+                const rgpmpi = document.getElementById('id_rgpmpi');
+                const enderecoCompleto = document.getElementById('id_endereco_completo');
+                const telefoneContato = document.getElementById('id_telefone_contato');
+                const emailContato = document.getElementById('id_email_contato');
+                
+                if (cargoMilitar && !cargoMilitar.value && data.cargo_militar) {
+                    cargoMilitar.value = data.cargo_militar;
+                }
+                
+                if (matriculaFuncional && !matriculaFuncional.value && data.matricula_funcional) {
+                    matriculaFuncional.value = data.matricula_funcional;
+                }
+                
+                if (rgpmpi && !rgpmpi.value && data.rgpmpi) {
+                    rgpmpi.value = data.rgpmpi;
+                }
+                
+                if (enderecoCompleto && !enderecoCompleto.value && data.endereco_completo) {
+                    enderecoCompleto.value = data.endereco_completo;
+                }
+                
+                if (telefoneContato && !telefoneContato.value && data.telefone) {
+                    telefoneContato.value = data.telefone;
+                }
+                
+                if (emailContato && !emailContato.value && data.email) {
+                    emailContato.value = data.email;
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição AJAX:', error);
+            });
+    }
+}
+
+// Função para preencher dados dos advogados outorgados automaticamente
+function preencherDadosAdvogados() {
+    const checkboxes = document.querySelectorAll('input[name="outorgados"]:checked');
+    const advogadosInfo = document.getElementById('advogados-info');
+    const advogadosDetails = document.getElementById('advogados-details');
+    
+    if (checkboxes.length === 0) {
+        advogadosInfo.style.display = 'none';
+        return;
+    }
+    
+    advogadosInfo.style.display = 'block';
+    advogadosDetails.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando dados dos advogados...</div>';
+    
+    // Buscar dados de todos os advogados selecionados
+    const promises = Array.from(checkboxes).map(checkbox => {
+        const advogadoId = checkbox.value;
+        return fetch(`{% url 'assejus:get_advogado_data' advogado_id=0 %}`.replace('0', advogadoId))
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erro ao buscar dados do advogado:', data.error);
+                    return null;
+                }
+                return data;
+            })
+            .catch(error => {
+                console.error('Erro na requisição AJAX:', error);
+                return null;
+            });
+    });
+    
+    Promise.all(promises).then(results => {
+        const validResults = results.filter(result => result !== null);
+        
+        if (validResults.length === 0) {
+            advogadosDetails.innerHTML = '<div class="alert alert-warning">Erro ao carregar dados dos advogados.</div>';
+            return;
+        }
+        
+        let html = '';
+        validResults.forEach((data, index) => {
+            // Formatar endereço para o padrão jurídico
+            const enderecoFormatado = data.endereco_completo.replace(/CEP: \d{5}-\d{3}/, '').trim();
+            
+            html += `
+                <div class="row mb-3 ${index > 0 ? 'border-top pt-3' : ''}">
+                    <div class="col-12">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user-tie me-2"></i>
+                                    OUTORGADO ${index + 1}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p class="mb-2 text-justify">
+                                            <strong>OUTORGADO:</strong> ${data.nome.toUpperCase()}, brasileiro, advogado, 
+                                            inscrito na OAB/${data.uf_oab}, sob o nº ${data.oab}, 
+                                            com escritório profissional na ${enderecoFormatado}.
+                                        </p>
+                                        <p class="mb-1"><strong>CPF:</strong> ${data.cpf}</p>
+                                        <p class="mb-1"><strong>E-mail:</strong> ${data.email}</p>
+                                        <p class="mb-1"><strong>Telefone:</strong> ${data.telefone}</p>
+                                        ${data.celular && data.celular !== data.telefone ? `<p class="mb-1"><strong>Celular:</strong> ${data.celular}</p>` : ''}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <span class="badge bg-success fs-6 mb-2">${data.situacao}</span>
+                                            ${data.especialidades ? `
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Especialidades:</strong></small>
+                                                    <p class="small mb-0">${data.especialidades}</p>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        advogadosDetails.innerHTML = html;
+    });
+}
+
+// Adicionar listeners para os checkboxes dos advogados
+document.addEventListener('DOMContentLoaded', function() {
+    const advogadoCheckboxes = document.querySelectorAll('input[name="outorgados"]');
+    advogadoCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', preencherDadosAdvogados);
+    });
+    
+});
+</script>
+{% endblock %}

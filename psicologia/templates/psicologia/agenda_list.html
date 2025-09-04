@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Agenda - Horários Disponíveis{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-calendar-check text-primary"></i> Agenda - Horários Disponíveis
+                </h1>
+                <div>
+                    <button type="button" class="btn btn-primary shadow-sm" onclick="openAgendaModal()">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> Novo Horário
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Horários da Agenda</h6>
+                </div>
+                <div class="card-body">
+                    {% if agendas %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Psicólogo</th>
+                                        <th>Data</th>
+                                        <th>Horário</th>
+                                        <th>Status</th>
+                                        <th>Observações</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for agenda in agendas %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ agenda.psicologo.nome_completo }}</strong>
+                                            {% if agenda.psicologo.crp %}
+                                                <br><small class="text-muted">CRP: {{ agenda.psicologo.crp }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info">{{ agenda.data|date:"d/m/Y" }}</span>
+                                            <br><small class="text-muted">{{ agenda.data|date:"l"|title }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ agenda.hora_inicio|time:"H:i" }}</strong> - 
+                                            <strong>{{ agenda.hora_fim|time:"H:i" }}</strong>
+                                        </td>
+                                        <td>
+                                            {% if agenda.disponivel %}
+                                                <span class="badge badge-success">Disponível</span>
+                                            {% else %}
+                                                <span class="badge badge-warning">Indisponível</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if agenda.observacoes %}
+                                                {{ agenda.observacoes|truncatewords:10 }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:agenda_detail' agenda.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="openAgendaEditModal({{ agenda.pk }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a href="{% url 'psicologia:agenda_delete' agenda.pk %}" class="btn btn-sm btn-danger" 
+                                               onclick="return confirm('Tem certeza que deseja excluir este horário?')">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-2x text-gray-300 mb-2"></i>
+                            <p class="text-muted">Nenhum horário encontrado.</p>
+                            <button type="button" class="btn btn-primary" onclick="openAgendaModal()">
+                                <i class="fas fa-plus"></i> Criar Primeiro Horário
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-3">
+                            <label for="psicologo" class="form-label">Psicólogo</label>
+                            <select name="psicologo" id="psicologo" class="form-select">
+                                <option value="">Todos</option>
+                                {% for psicologo in psicologos %}
+                                    <option value="{{ psicologo.pk }}" {% if request.GET.psicologo == psicologo.pk|stringformat:"s" %}selected{% endif %}>
+                                        {{ psicologo.nome_completo }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" name="data_inicio" id="data_inicio" class="form-control" 
+                                   value="{{ request.GET.data_inicio }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" name="data_fim" id="data_fim" class="form-control" 
+                                   value="{{ request.GET.data_fim }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="disponivel" class="form-label">Status</label>
+                            <select name="disponivel" id="disponivel" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="1" {% if request.GET.disponivel == "1" %}selected{% endif %}>Disponível</option>
+                                <option value="0" {% if request.GET.disponivel == "0" %}selected{% endif %}>Indisponível</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                            <a href="{% url 'psicologia:agenda_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Focar no primeiro campo
+    $('input:first, select:first').focus();
+    
+    // Auto-submit quando mudar os filtros
+    $('select, input[type="date"]').on('change', function() {
+        if ($(this).val()) {
+            $('form').submit();
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}

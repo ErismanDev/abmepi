@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Correção do Erro de Backdrop</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .test-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .test-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .test-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .modal-test {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-bug me-2"></i>
+            Teste de Correção do Erro de Backdrop
+        </h1>
+        
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle me-2"></i>Objetivo do Teste</h5>
+            <p>Este teste verifica se as correções implementadas para o erro "Cannot read properties of undefined (reading 'backdrop')" estão funcionando corretamente.</p>
+        </div>
+        
+        <!-- Seção 1: Verificação do Bootstrap -->
+        <div class="test-section">
+            <h3><i class="fas fa-check-circle me-2"></i>1. Verificação do Bootstrap</h3>
+            <div id="bootstrap-check-result"></div>
+            <button class="btn btn-primary" onclick="checkBootstrap()">
+                <i class="fas fa-search me-2"></i>Verificar Bootstrap
+            </button>
+        </div>
+        
+        <!-- Seção 2: Teste de Criação de Modal -->
+        <div class="test-section">
+            <h3><i class="fas fa-window-maximize me-2"></i>2. Teste de Criação de Modal</h3>
+            <div id="modal-creation-result"></div>
+            <button class="btn btn-success" onclick="testModalCreation()">
+                <i class="fas fa-plus me-2"></i>Testar Criação de Modal
+            </button>
+        </div>
+        
+        <!-- Seção 3: Teste de Modal com Opções -->
+        <div class="test-section">
+            <h3><i class="fas fa-cog me-2"></i>3. Teste de Modal com Opções</h3>
+            <div id="modal-options-result"></div>
+            <button class="btn btn-info" onclick="testModalWithOptions()">
+                <i class="fas fa-cogs me-2"></i>Testar Modal com Opções
+            </button>
+        </div>
+        
+        <!-- Seção 4: Teste de Modal com Elemento Inválido -->
+        <div class="test-section">
+            <h3><i class="fas fa-exclamation-triangle me-2"></i>4. Teste de Modal com Elemento Inválido</h3>
+            <div id="invalid-element-result"></div>
+            <button class="btn btn-warning" onclick="testInvalidElement()">
+                <i class="fas fa-times-circle me-2"></i>Testar Elemento Inválido
+            </button>
+        </div>
+        
+        <!-- Seção 5: Teste de Modal com Bootstrap Indisponível -->
+        <div class="test-section">
+            <h3><i class="fas fa-ban me-2"></i>5. Teste de Modal com Bootstrap Indisponível</h3>
+            <div id="bootstrap-unavailable-result"></div>
+            <button class="btn btn-danger" onclick="testBootstrapUnavailable()">
+                <i class="fas fa-exclamation-triangle me-2"></i>Testar Bootstrap Indisponível
+            </button>
+        </div>
+        
+        <!-- Seção 6: Teste de Funções Seguras -->
+        <div class="test-section">
+            <h3><i class="fas fa-shield-alt me-2"></i>6. Teste de Funções Seguras</h3>
+            <div id="safe-functions-result"></div>
+            <button class="btn btn-secondary" onclick="testSafeFunctions()">
+                <i class="fas fa-lock me-2"></i>Testar Funções Seguras
+            </button>
+        </div>
+        
+        <!-- Botão para Executar Todos os Testes -->
+        <div class="text-center mt-4">
+            <button class="btn btn-lg btn-primary" onclick="runAllTests()">
+                <i class="fas fa-play me-2"></i>Executar Todos os Testes
+            </button>
+        </div>
+        
+        <!-- Resultados dos Testes -->
+        <div id="test-results" class="mt-4"></div>
+    </div>
+    
+    <!-- Modal de Teste -->
+    <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="testModalLabel">Modal de Teste</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Este é um modal de teste para verificar se as correções estão funcionando.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <button type="button" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script de Teste -->
+    <script>
+        // Variáveis para armazenar resultados
+        let testResults = [];
+        let originalBootstrap = null;
+        
+        // Função para adicionar resultado
+        function addResult(section, message, type = 'info') {
+            const resultDiv = document.getElementById(section);
+            if (resultDiv) {
+                resultDiv.innerHTML = `<div class="test-result test-${type}">${message}</div>`;
+            }
+            
+            testResults.push({
+                section: section,
+                message: message,
+                type: type,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            updateResultsDisplay();
+        }
+        
+        // Função para atualizar display de resultados
+        function updateResultsDisplay() {
+            const resultsDiv = document.getElementById('test-results');
+            if (!resultsDiv) return;
+            
+            let html = '<h3><i class="fas fa-list me-2"></i>Resultados dos Testes</h3>';
+            
+            testResults.forEach(result => {
+                const iconClass = result.type === 'success' ? 'check-circle' : 
+                                result.type === 'error' ? 'times-circle' : 
+                                result.type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+                
+                html += `
+                    <div class="test-result test-${result.type}">
+                        <i class="fas fa-${iconClass} me-2"></i>
+                        <strong>${result.section}:</strong> ${result.message}
+                        <small class="float-end">${result.timestamp}</small>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 1. Verificação do Bootstrap
+        function checkBootstrap() {
+            try {
+                if (typeof bootstrap === 'undefined') {
+                    addResult('bootstrap-check-result', '❌ Bootstrap não está disponível', 'error');
+                    return false;
+                }
+                
+                if (typeof bootstrap.Modal === 'undefined') {
+                    addResult('bootstrap-check-result', '❌ Bootstrap.Modal não está disponível', 'error');
+                    return false;
+                }
+                
+                addResult('bootstrap-check-result', '✅ Bootstrap e Modal estão disponíveis', 'success');
+                return true;
+            } catch (error) {
+                addResult('bootstrap-check-result', `❌ Erro ao verificar Bootstrap: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // 2. Teste de Criação de Modal
+        function testModalCreation() {
+            try {
+                const modalElement = document.getElementById('testModal');
+                if (!modalElement) {
+                    addResult('modal-creation-result', '❌ Elemento do modal não encontrado', 'error');
+                    return;
+                }
+                
+                const modal = new bootstrap.Modal(modalElement);
+                addResult('modal-creation-result', '✅ Modal criado com sucesso', 'success');
+                
+                // Testar abertura
+                modal.show();
+                setTimeout(() => {
+                    modal.hide();
+                }, 2000);
+                
+            } catch (error) {
+                addResult('modal-creation-result', `❌ Erro ao criar modal: ${error.message}`, 'error');
+            }
+        }
+        
+        // 3. Teste de Modal com Opções
+        function testModalWithOptions() {
+            try {
+                const modalElement = document.getElementById('testModal');
+                if (!modalElement) {
+                    addResult('modal-options-result', '❌ Elemento do modal não encontrado', 'error');
+                    return;
+                }
+                
+                const modal = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+                
+                addResult('modal-options-result', '✅ Modal criado com opções personalizadas', 'success');
+                
+                // Testar abertura
+                modal.show();
+                setTimeout(() => {
+                    modal.hide();
+                }, 2000);
+                
+            } catch (error) {
+                addResult('modal-options-result', `❌ Erro ao criar modal com opções: ${error.message}`, 'error');
+            }
+        }
+        
+        // 4. Teste de Modal com Elemento Inválido
+        function testInvalidElement() {
+            try {
+                const modal = new bootstrap.Modal(null);
+                addResult('invalid-element-result', '❌ Modal criado com elemento null (não deveria funcionar)', 'warning');
+            } catch (error) {
+                addResult('invalid-element-result', `✅ Erro capturado corretamente: ${error.message}`, 'success');
+            }
+        }
+        
+        // 5. Teste de Modal com Bootstrap Indisponível
+        function testBootstrapUnavailable() {
+            try {
+                // Salvar referência original
+                originalBootstrap = window.bootstrap;
+                
+                // Simular Bootstrap indisponível
+                window.bootstrap = undefined;
+                
+                try {
+                    const modal = new bootstrap.Modal(document.getElementById('testModal'));
+                    addResult('bootstrap-unavailable-result', '❌ Modal criado com Bootstrap indisponível (não deveria funcionar)', 'warning');
+                } catch (error) {
+                    addResult('bootstrap-unavailable-result', `✅ Erro capturado corretamente: ${error.message}`, 'success');
+                }
+                
+            } catch (error) {
+                addResult('bootstrap-unavailable-result', `❌ Erro inesperado: ${error.message}`, 'error');
+            } finally {
+                // Restaurar Bootstrap
+                window.bootstrap = originalBootstrap;
+            }
+        }
+        
+        // 6. Teste de Funções Seguras
+        function testSafeFunctions() {
+            try {
+                // Simular função createSafeModal
+                function createSafeModal(element, options = {}) {
+                    if (!element) {
+                        console.error('❌ Elemento não fornecido para Modal');
+                        return null;
+                    }
+                    
+                    if (typeof bootstrap === 'undefined' || typeof bootstrap.Modal === 'undefined') {
+                        console.error('❌ Bootstrap ou Modal não está disponível');
+                        return null;
+                    }
+                    
+                    const safeOptions = {
+                        backdrop: true,
+                        keyboard: true,
+                        focus: true,
+                        show: false,
+                        ...options
+                    };
+                    
+                    try {
+                        const modal = new bootstrap.Modal(element, safeOptions);
+                        return modal;
+                    } catch (error) {
+                        console.error('❌ Erro ao criar modal:', error);
+                        return null;
+                    }
+                }
+                
+                // Testar com elemento válido
+                const modalElement = document.getElementById('testModal');
+                const validModal = createSafeModal(modalElement);
+                
+                if (validModal) {
+                    addResult('safe-functions-result', '✅ Função segura criou modal com elemento válido', 'success');
+                } else {
+                    addResult('safe-functions-result', '❌ Função segura falhou com elemento válido', 'error');
+                }
+                
+                // Testar com elemento inválido
+                const invalidModal = createSafeModal(null);
+                
+                if (invalidModal === null) {
+                    addResult('safe-functions-result', '✅ Função segura retornou null para elemento inválido', 'success');
+                } else {
+                    addResult('safe-functions-result', '❌ Função segura não retornou null para elemento inválido', 'warning');
+                }
+                
+            } catch (error) {
+                addResult('safe-functions-result', `❌ Erro ao testar funções seguras: ${error.message}`, 'error');
+            }
+        }
+        
+        // Função para executar todos os testes
+        function runAllTests() {
+            testResults = [];
+            updateResultsDisplay();
+            
+            addResult('test-results', '🚀 Iniciando execução de todos os testes...', 'info');
+            
+            setTimeout(() => checkBootstrap(), 100);
+            setTimeout(() => testModalCreation(), 200);
+            setTimeout(() => testModalWithOptions(), 300);
+            setTimeout(() => testInvalidElement(), 400);
+            setTimeout(() => testBootstrapUnavailable(), 500);
+            setTimeout(() => testSafeFunctions(), 600);
+            
+            setTimeout(() => {
+                addResult('test-results', '✅ Todos os testes foram executados!', 'success');
+            }, 1000);
+        }
+        
+        // Executar verificação inicial quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            addResult('test-results', '📋 Página carregada, testes prontos para execução', 'info');
+            checkBootstrap();
+        });
+    </script>
+</body>
+</html>

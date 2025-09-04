@@ -1,0 +1,440 @@
+/* ===== TABELAS MODERNAS E ROBUSTAS ===== */
+
+/* Container principal das tabelas */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+/* Cabeçalho da tabela - Cor neutra */
+.table-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-bottom: 2px solid #dee2e6;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.table-header h5 {
+    margin: 0;
+    color: #495057;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.table-header h5 i {
+    margin-right: 0.75rem;
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+
+.table-header .header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* Estilos das tabelas */
+.table {
+    margin: 0;
+    border: none;
+    background: white;
+}
+
+/* Cabeçalho da tabela - Cor neutra */
+.table thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: none;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    position: relative;
+}
+
+.table thead th:first-child {
+    border-top-left-radius: 0;
+}
+
+.table thead th:last-child {
+    border-top-right-radius: 0;
+}
+
+/* Linhas da tabela */
+.table tbody tr {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Células da tabela */
+.table tbody td {
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    border: none;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+/* Imagens nas tabelas - formato retangular */
+.table .avatar-rectangular {
+    width: 40px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.table .avatar-placeholder {
+    width: 40px;
+    height: 50px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Células com ações */
+.table tbody td.actions-cell {
+    padding: 0.75rem 1.25rem;
+    width: 1%;
+    white-space: nowrap;
+}
+
+/* Status e badges */
+.table .badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Botões de ação */
+.table .btn-group {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.table .btn-group .btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.table .btn-group .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Paginação moderna */
+.pagination-container {
+    background: white;
+    border-top: 1px solid #e9ecef;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pagination {
+    margin: 0;
+    gap: 0.25rem;
+}
+
+.pagination .page-item .page-link {
+    border: none;
+    color: #6c757d;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin: 0 0.125rem;
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #e9ecef;
+    color: #495057;
+    transform: translateY(-1px);
+}
+
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.3);
+}
+
+.pagination .page-item.disabled .page-link {
+    color: #adb5bd;
+    background: transparent;
+}
+
+/* Informações da tabela */
+.table-info {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.table-info .info-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.table-info .info-text i {
+    color: #adb5bd;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .table-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .table-header .header-actions {
+        justify-content: center;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .table .btn-group .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .pagination .page-item .page-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Animações */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table-container {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Estados especiais */
+.table tbody tr.selected {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.table tbody tr.warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+}
+
+.table tbody tr.danger {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+}
+
+/* Tabelas com zebrado */
+.table.table-striped tbody tr:nth-child(odd) {
+    background-color: #fafbfc;
+}
+
+.table.table-striped tbody tr:nth-child(odd):hover {
+    background-color: #f1f3f4;
+}
+
+/* Tabelas com bordas */
+.table.table-bordered {
+    border: 1px solid #dee2e6;
+}
+
+.table.table-bordered th,
+.table.table-bordered td {
+    border: 1px solid #dee2e6;
+}
+
+/* Tabelas compactas */
+.table.table-sm th,
+.table.table-sm td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+/* Tabelas responsivas */
+.table-responsive {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Estilos para tabelas específicas */
+.table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Cabeçalhos específicos */
+.table-dark thead th {
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+    color: white;
+}
+
+.table-light thead th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #495057;
+}
+
+/* Estilos para tabelas de dados */
+.dataTable {
+    width: 100% !important;
+}
+
+.dataTable th,
+.dataTable td {
+    padding: 1rem 1.25rem;
+}
+
+/* Estilos para tabelas de confirmação */
+.table-sm th,
+.table-sm td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+}
+
+/* Estilos para tabelas sem bordas */
+.table-borderless th,
+.table-borderless td {
+    border: none;
+}
+
+/* Estilos para tabelas de detalhes */
+.table-detail th {
+    background: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    width: 30%;
+}
+
+.table-detail td {
+    background: white;
+    color: #212529;
+}
+
+/* Estilos para tabelas de estatísticas */
+.table-stats th {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    color: #1565c0;
+    font-weight: 600;
+}
+
+.table-stats td {
+    background: #fafbfc;
+    color: #424242;
+}
+
+/* Estilos para tabelas de benefícios */
+.table-benefits th {
+    background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    color: #7b1fa2;
+    font-weight: 600;
+}
+
+.table-benefits td {
+    background: #fafbfc;
+    color: #424242;
+}
+
+/* Estilos para tabelas financeiras */
+.table-finance th {
+    background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.table-finance td {
+    background: #fafbfc;
+    color: #424242;
+}
+
+/* Estilos para tabelas de hotel */
+.table-hotel th {
+    background: linear-gradient(135deg, #fff3e0 0%, #ffcc02 100%);
+    color: #ef6c00;
+    font-weight: 600;
+}
+
+.table-hotel td {
+    background: #fafbfc;
+    color: #424242;
+}
+
+/* Estilos para tabelas de psicologia */
+.table-psychology th {
+    background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+    color: #c2185b;
+    font-weight: 600;
+}
+
+.table-psychology td {
+    background: #fafbfc;
+    color: #424242;
+}
+
+/* Estilos para tabelas de assejur */
+.table-assejur th {
+    background: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+    color: #00695c;
+    font-weight: 600;
+}
+
+.table-assejur td {
+    background: #fafbfc;
+    color: #424242;
+}

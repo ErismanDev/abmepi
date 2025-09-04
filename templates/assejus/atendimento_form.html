@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Editar{% else %}Novo{% endif %} Atendimento Jurídico - ASSEJUS
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-gavel me-2"></i>
+                        {% if object %}Editar{% else %}Novo{% endif %} Atendimento Jurídico
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if atendimento %}
+                            Editando: <strong>{{ atendimento.titulo }}</strong>
+                        {% else %}
+                            Registre um novo atendimento jurídico
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:atendimento_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados do Atendimento
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Associado -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.associado.id_for_label }}" class="form-label">
+                                    {{ form.associado.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.associado }}
+                                {% if form.associado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.associado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo de Demanda -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_demanda.id_for_label }}" class="form-label">
+                                    {{ form.tipo_demanda.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_demanda }}
+                                {% if form.tipo_demanda.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo_demanda.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Título -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                    {{ form.titulo.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.titulo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                    {{ form.descricao.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.descricao }}
+                                {% if form.descricao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.descricao.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.descricao.help_text %}
+                                    <small class="form-text text-muted">{{ form.descricao.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Status -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    {{ form.status.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.status.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Prioridade -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.prioridade.id_for_label }}" class="form-label">
+                                    {{ form.prioridade.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.prioridade }}
+                                {% if form.prioridade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.prioridade.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Data Limite -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.data_limite.id_for_label }}" class="form-label">
+                                    {{ form.data_limite.label }}
+                                </label>
+                                {{ form.data_limite }}
+                                {% if form.data_limite.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.data_limite.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Novos campos para processo judicial -->
+                        <div class="row">
+                            <!-- Número do Processo -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.numero_processo.id_for_label }}" class="form-label">
+                                    {{ form.numero_processo.label }}
+                                </label>
+                                {{ form.numero_processo }}
+                                {% if form.numero_processo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.numero_processo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Número do processo judicial (opcional)
+                                </small>
+                            </div>
+
+                            <!-- Comarca -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.comarca.id_for_label }}" class="form-label">
+                                    {{ form.comarca.label }}
+                                </label>
+                                {{ form.comarca }}
+                                {% if form.comarca.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.comarca.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Comarca onde tramita o processo
+                                </small>
+                            </div>
+
+                            <!-- Vara -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.vara.id_for_label }}" class="form-label">
+                                    {{ form.vara.label }}
+                                </label>
+                                {{ form.vara }}
+                                {% if form.vara.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.vara.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Vara judicial específica
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Advogado Responsável -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.advogado_responsavel.id_for_label }}" class="form-label">
+                                    {{ form.advogado_responsavel.label }}
+                                </label>
+                                {{ form.advogado_responsavel }}
+                                {% if form.advogado_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.advogado_responsavel.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Selecione o advogado responsável por este caso
+                                </small>
+                            </div>
+
+                            <!-- Usuário Responsável -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.usuario_responsavel.id_for_label }}" class="form-label">
+                                    {{ form.usuario_responsavel.label }}
+                                </label>
+                                {{ form.usuario_responsavel }}
+                                {% if form.usuario_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.usuario_responsavel.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Usuário do sistema responsável pelo acompanhamento
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Resultado -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.resultado.id_for_label }}" class="form-label">
+                                    {{ form.resultado.label }}
+                                </label>
+                                {{ form.resultado }}
+                                {% if form.resultado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.resultado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Descreva o resultado ou solução do caso
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    {{ form.observacoes.label }}
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.observacoes.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Observações adicionais sobre o caso
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'assejus:atendimento_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Atualizar{% else %}Criar{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

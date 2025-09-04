@@ -1,0 +1,434 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Tipos de Recebimentos - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'financeiro/css/error-styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-cog me-2"></i>
+                        Tipos de Recebimentos
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie os tipos de recebimentos da associação
+                    </p>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" id="btnNovoTipo">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Tipo
+                    </button>
+                </div>
+            </div>
+
+                <!-- Lista de tipos de recebimentos -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-list me-2"></i>
+                Tipos Cadastrados
+            </h5>
+        </div>
+        <div class="card-body">
+            {% if tipos_mensalidade %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Recorrente</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for tipo in tipos_mensalidade %}
+                            <tr>
+                                <td>
+                                    <strong>{{ tipo.nome }}</strong>
+                                </td>
+                                <td>
+                                    {% if tipo.descricao %}
+                                        {{ tipo.descricao|truncatewords:10 }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-success fs-6">
+                                        <i class="fas fa-dollar-sign me-1"></i>
+                                        R$ {{ tipo.valor|floatformat:2 }}
+                                    </span>
+                                    <br>
+                                    <small class="text-muted">BRL</small>
+                                </td>
+                                <td>
+                                    {% if tipo.recorrente %}
+                                        <span class="badge bg-primary">Sim</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Não</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if tipo.ativo %}
+                                        <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inativo</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'financeiro:tipo_mensalidade_update' tipo.pk %}" 
+                                           class="btn btn-sm btn-outline-warning"
+                                           data-bs-toggle="tooltip" 
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'financeiro:tipo_mensalidade_delete' tipo.pk %}" 
+                                           class="btn btn-sm btn-outline-danger"
+                                           data-bs-toggle="tooltip" 
+                                           title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                {% if is_paginated %}
+                <nav aria-label="Paginação">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">&laquo; Primeira</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-cog fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">Nenhum tipo de recebimento cadastrado</h5>
+                <p class="text-muted">Clique em "Novo Tipo" para criar o primeiro tipo de recebimento.</p>
+                    <button type="button" class="btn btn-primary" onclick="abrirModalNovoTipo()">
+                        <i class="fas fa-plus me-2"></i>
+                        Criar Primeiro Tipo
+                    </button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Novo Tipo de Recebimento -->
+<div class="modal fade" id="modalNovoTipo" tabindex="-1" aria-labelledby="modalNovoTipoLabel" aria-hidden="true">
+    {% csrf_token %}
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNovoTipoLabel">
+                    <i class="fas fa-plus"></i> Novo Tipo de Recebimento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoTipo">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="novo_nome" class="form-label"><strong>Nome *</strong></label>
+                                <input type="text" class="form-control" id="novo_nome" name="nome" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="novo_valor" class="form-label"><strong>Valor *</strong></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    <input type="text" class="form-control" id="novo_valor" name="valor" required>
+                                    <span class="input-group-text">BRL</span>
+                                </div>
+                                <small class="form-text text-muted">Digite o valor em reais (ex: 50,00)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="novo_descricao" class="form-label"><strong>Descrição</strong></label>
+                                <textarea class="form-control" id="novo_descricao" name="descricao" rows="3" placeholder="Descreva este tipo de recebimento..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="novo_recorrente" name="recorrente" value="true">
+                                    <label class="form-check-label" for="novo_recorrente">
+                                        Recorrente
+                                    </label>
+                                    <small class="form-text text-muted d-block">
+                                        Se marcado, este tipo será aplicado mensalmente aos associados
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="novo_ativo" name="ativo" value="true" checked>
+                                    <label class="form-check-label" for="novo_ativo">
+                                        Ativo
+                                    </label>
+                                    <small class="form-text text-muted d-block">
+                                        Tipos inativos não podem ser selecionados para novos recebíveis
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarTipo">
+                    <i class="fas fa-save"></i> Criar Tipo
+                </button>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Event listener para botão de novo tipo
+    document.getElementById('btnNovoTipo').addEventListener('click', function() {
+        abrirModalNovoTipo();
+    });
+    
+    // Configurar evento de submit
+    document.getElementById('btnSalvarTipo').addEventListener('click', function() {
+        criarNovoTipo();
+    });
+});
+
+function abrirModalNovoTipo() {
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalNovoTipo'));
+    modal.show();
+    
+    // Resetar formulário
+    document.getElementById('formNovoTipo').reset();
+    
+    // Marcar ativo como padrão
+    document.getElementById('novo_ativo').checked = true;
+    
+    // Configurar formatação do campo valor
+    const valorField = document.getElementById('novo_valor');
+    
+    // Formatação ao digitar
+    valorField.addEventListener('input', function() {
+        let value = this.value;
+        
+        // Permitir apenas números, ponto e vírgula
+        value = value.replace(/[^\d.,]/g, '');
+        
+        // Se tem vírgula, processar como decimal
+        if (value.indexOf(',') !== -1) {
+            const parts = value.split(',');
+            const integerPart = parts[0].replace(/\./g, ''); // Remove pontos da parte inteira
+            let decimalPart = parts[1] || '';
+            
+            // Limitar casas decimais a 2
+            if (decimalPart.length > 2) {
+                decimalPart = decimalPart.substring(0, 2);
+            }
+            
+            value = integerPart + ',' + decimalPart;
+        }
+        
+        this.value = value;
+    });
+    
+    // Formatação ao perder o foco
+    valorField.addEventListener('blur', function() {
+        let value = this.value;
+        
+        if (value) {
+            // Converter vírgula para ponto para cálculo
+            const valueForCalc = value.replace(/\./g, '').replace(',', '.');
+            const numValue = parseFloat(valueForCalc);
+            
+            if (!isNaN(numValue) && numValue > 0) {
+                // Formatar com separadores de milhares
+                const formattedValue = numValue.toFixed(2);
+                const parts = formattedValue.split('.');
+                let integerPart = parts[0];
+                const decimalPart = parts[1];
+                
+                // Adicionar separadores de milhares
+                integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                
+                this.value = integerPart + ',' + decimalPart;
+            }
+        }
+    });
+}
+
+function criarNovoTipo() {
+    // Coletar dados do formulário
+    const formData = new FormData();
+    formData.append('nome', document.getElementById('novo_nome').value);
+    formData.append('descricao', document.getElementById('novo_descricao').value);
+    formData.append('recorrente', document.getElementById('novo_recorrente').checked);
+    formData.append('ativo', document.getElementById('novo_ativo').checked);
+    
+    // Processar valor
+    let valorCampo = document.getElementById('novo_valor').value;
+    if (valorCampo) {
+        // Converter vírgula para ponto para envio
+        valorCampo = valorCampo.replace(/\./g, '').replace(',', '.');
+        
+        // Validar se é um número válido
+        if (isNaN(parseFloat(valorCampo)) || parseFloat(valorCampo) <= 0) {
+            alert('Por favor, insira um valor válido maior que zero.');
+            document.getElementById('novo_valor').focus();
+            return;
+        }
+        
+        formData.append('valor', valorCampo);
+    } else {
+        alert('Por favor, preencha o valor.');
+        document.getElementById('novo_valor').focus();
+        return;
+    }
+    
+    // Validações básicas
+    if (!formData.get('nome')) {
+        alert('Por favor, preencha o nome.');
+        document.getElementById('novo_nome').focus();
+        return;
+    }
+    
+    // Adicionar CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+    if (csrfToken) {
+        formData.append('csrfmiddlewaretoken', csrfToken);
+    }
+    
+    // Desabilitar botão durante o envio
+    const btnSalvar = document.getElementById('btnSalvarTipo');
+    const textoOriginal = btnSalvar.innerHTML;
+    btnSalvar.disabled = true;
+    btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Criando...';
+    
+    // Enviar dados via AJAX
+    fetch('{% url "financeiro:tipo_mensalidade_create" %}', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Sucesso
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalNovoTipo'));
+            modal.hide();
+            
+            // Mostrar mensagem de sucesso
+            alert('Tipo de recebimento criado com sucesso!');
+            
+            // Recarregar a página para mostrar o novo tipo
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            // Erro de validação - aplicar visualização de erros
+            if (data.errors && Object.keys(data.errors).length > 0) {
+                console.log('❌ Erros de validação detectados:', data.errors);
+                
+                // Exibir resumo dos erros no topo do modal
+                if (typeof showErrorSummaryInModal === 'function') {
+                    showErrorSummaryInModal(data.errors, Object.keys(data.errors).length, data.message);
+                }
+                
+                // Aplicar estilos de erro aos campos
+                if (typeof applyErrorStylesToFields === 'function') {
+                    setTimeout(() => {
+                        applyErrorStylesToFields(data.errors);
+                        if (typeof scrollToFirstError === 'function') {
+                            scrollToFirstError();
+                        }
+                    }, 100);
+                }
+            } else {
+                // Erro geral
+                alert('Erro ao criar tipo de recebimento: ' + (data.message || 'Erro desconhecido'));
+            }
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erro ao criar tipo:', error);
+        
+        // Tentar processar como HTML se não for JSON
+        if (error.message.includes('Unexpected token')) {
+            // Resposta não é JSON, tratar como HTML
+            alert('Erro ao criar tipo de recebimento. Verifique os dados e tente novamente.');
+        } else {
+            alert('Erro ao criar tipo de recebimento: ' + error.message);
+        }
+    })
+    .finally(() => {
+        // Reabilitar botão
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = textoOriginal;
+    });
+}
+</script>
+{% endblock %}

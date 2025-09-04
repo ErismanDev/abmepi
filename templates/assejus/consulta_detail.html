@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Consulta Jurídica - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Consulta Jurídica
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Detalhes da consulta jurídica
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:consulta_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                    <button type="button" class="btn btn-warning" onclick="openConsultaEditModal({{ consulta.pk }})">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informações principais -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações da Consulta
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Associado:</label>
+                                    <p class="mb-0">{{ consulta.associado.nome }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Tipo:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-info">{{ consulta.get_tipo_display }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Status:</label>
+                                    <p class="mb-0">
+                                        {% if consulta.status == 'pendente' %}
+                                            <span class="badge bg-secondary">Pendente</span>
+                                        {% elif consulta.status == 'em_analise' %}
+                                            <span class="badge bg-warning">Em Análise</span>
+                                        {% elif consulta.status == 'respondida' %}
+                                            <span class="badge bg-success">Respondida</span>
+                                        {% elif consulta.status == 'arquivada' %}
+                                            <span class="badge bg-dark">Arquivada</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Prioridade:</label>
+                                    <p class="mb-0">
+                                        {% if consulta.prioridade == 'alta' %}
+                                            <span class="badge bg-danger">Alta</span>
+                                        {% elif consulta.prioridade == 'media' %}
+                                            <span class="badge bg-warning">Média</span>
+                                        {% elif consulta.prioridade == 'baixa' %}
+                                            <span class="badge bg-success">Baixa</span>
+                                        {% elif consulta.prioridade == 'urgente' %}
+                                            <span class="badge bg-danger">Urgente</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Data da Consulta:</label>
+                                    <p class="mb-0">{{ consulta.data_consulta|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Advogado Responsável:</label>
+                                    <p class="mb-0">
+                                        {% if consulta.advogado_responsavel %}
+                                            <span class="badge bg-primary">{{ consulta.advogado_responsavel.nome }}</span>
+                                        {% else %}
+                                            <span class="text-muted">Não atribuído</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                {% if consulta.data_resposta %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Data da Resposta:</label>
+                                    <p class="mb-0">{{ consulta.data_resposta|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                {% endif %}
+                                {% if consulta.usuario_resposta %}
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Respondida por:</label>
+                                    <p class="mb-0">{{ consulta.usuario_resposta.get_full_name|default:consulta.usuario_resposta.username }}</p>
+                                </div>
+                                {% endif %}
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Pergunta:</label>
+                                    <div class="alert alert-primary">
+                                        {{ consulta.pergunta|linebreaks }}
+                                    </div>
+                                </div>
+                                {% if consulta.resposta %}
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Resposta:</label>
+                                    <div class="alert alert-success">
+                                        {{ consulta.resposta|linebreaks }}
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar com ações -->
+                <div class="col-lg-4">
+                    <!-- Ações rápidas -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                Ações Rápidas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                {% if not consulta.advogado_responsavel and consulta.status != 'respondida' %}
+                                <a href="{% url 'assejus:consulta_enviar_advogado' consulta.pk %}" 
+                                   class="btn btn-outline-info">
+                                    <i class="fas fa-share me-2"></i>
+                                    Enviar para Advogado
+                                </a>
+                                {% endif %}
+                                {% if consulta.status != 'respondida' %}
+                                <a href="{% url 'assejus:consulta_update' consulta.pk %}" 
+                                   class="btn btn-outline-success">
+                                    <i class="fas fa-check me-2"></i>
+                                    Responder Consulta
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'assejus:consulta_update' consulta.pk %}" 
+                                   class="btn btn-outline-warning">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editar Consulta
+                                </a>
+                                <a href="{% url 'assejus:atendimento_create' %}?consulta={{ consulta.pk }}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-gavel me-2"></i>
+                                    Criar Atendimento
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações adicionais -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-clock me-2"></i>
+                                Histórico
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline-mini">
+                                <div class="timeline-item-mini">
+                                    <div class="timeline-marker-mini bg-primary"></div>
+                                    <div class="timeline-content-mini">
+                                        <h6 class="timeline-title-mini">Consulta Registrada</h6>
+                                        <small class="text-muted">{{ consulta.data_consulta|date:"d/m/Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                
+                                {% if consulta.data_resposta %}
+                                <div class="timeline-item-mini">
+                                    <div class="timeline-marker-mini bg-success"></div>
+                                    <div class="timeline-content-mini">
+                                        <h6 class="timeline-title-mini">Consulta Respondida</h6>
+                                        <small class="text-muted">{{ consulta.data_resposta|date:"d/m/Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-mini {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item-mini {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.timeline-marker-mini {
+    position: absolute;
+    left: -25px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #007bff;
+}
+
+.timeline-item-mini:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: -20px;
+    top: 10px;
+    width: 2px;
+    height: calc(100% + 5px);
+    background-color: #e9ecef;
+}
+
+.timeline-title-mini {
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.bg-primary {
+    background-color: #007bff !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+}
+</style>
+{% endblock %}

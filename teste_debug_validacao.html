@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Validação - Formulário Advogado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+            background-color: #fff5f5 !important;
+        }
+        .form-group.has-error .form-label {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+        .invalid-feedback {
+            display: block !important;
+            color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Debug Validação - Formulário Advogado</h1>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Formulário de Teste (Simula Advogado)</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="advogadoForm" method="post" enctype="multipart/form-data" class="modal-form" action="/teste/">
+                            <!-- Informações sobre campos obrigatórios -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Campos obrigatórios:</strong> Nome, CPF, OAB, UF OAB, E-mail, Telefone, Endereço, Cidade, Estado, CEP, Data de Inscrição OAB, Anos de Experiência e Situação.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nome" class="form-label">
+                                            Nome <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="nome" name="nome">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="cpf" class="form-label">
+                                            CPF <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="cpf" name="cpf">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="oab" class="form-label">
+                                            OAB <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="oab" name="oab">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="uf_oab" class="form-label">
+                                            UF OAB <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="uf_oab" name="uf_oab">
+                                            <option value="">---------</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="email" class="form-label">
+                                            E-mail <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="telefone" class="form-label">
+                                            Telefone <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="telefone" name="telefone">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="endereco" class="form-label">
+                                            Endereço <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea class="form-control" id="endereco" name="endereco" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="cidade" class="form-label">
+                                            Cidade <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="cidade" name="cidade">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="estado" class="form-label">
+                                            Estado <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="estado" name="estado">
+                                            <option value="">---------</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="cep" class="form-label">
+                                            CEP <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="cep" name="cep">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="data_inscricao_oab" class="form-label">
+                                            Data de Inscrição OAB <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" class="form-control" id="data_inscricao_oab" name="data_inscricao_oab">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="experiencia_anos" class="form-label">
+                                            Anos de Experiência <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" class="form-control" id="experiencia_anos" name="experiencia_anos" min="0">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="situacao" class="form-label">
+                                            Situação <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="situacao" name="situacao">
+                                            <option value="">---------</option>
+                                            <option value="ativo">Ativo</option>
+                                            <option value="inativo">Inativo</option>
+                                            <option value="suspenso">Suspenso</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Salvar Advogado
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Console de Debug</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="console-output" class="bg-dark text-light p-3" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            <div>Console de debug...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addLog(message, type = 'info') {
+            const consoleOutput = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> <span class="text-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'}">${message}</span>`;
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Aguardar o DOM estar completamente carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 DOM carregado, inicializando validação do formulário...', 'success');
+            
+            // Verificar se o formulário existe
+            const form = document.getElementById('advogadoForm');
+            if (!form) {
+                addLog('❌ CRÍTICO: Formulário advogadoForm não encontrado!', 'error');
+                return;
+            }
+            
+            addLog('✅ Formulário encontrado: ' + form.id, 'success');
+            addLog('✅ Action do formulário: ' + form.action, 'info');
+            
+            // Lista de campos obrigatórios baseada no modelo Django
+            const requiredFieldNames = [
+                'nome', 'cpf', 'oab', 'uf_oab', 'email', 'telefone', 
+                'endereco', 'cidade', 'estado', 'cep', 'data_inscricao_oab', 
+                'experiencia_anos', 'situacao'
+            ];
+            
+            addLog(`🔍 Lista de campos obrigatórios: ${requiredFieldNames.join(', ')}`, 'info');
+            
+            // Função para validar formulário antes do envio
+            function validateForm(e) {
+                addLog('🔍 Validando formulário antes do envio...', 'info');
+                addLog('🔍 Evento: ' + e.type, 'info');
+                addLog('🔍 Target: ' + e.target.id, 'info');
+                
+                // Verificar se há campos obrigatórios vazios
+                let hasErrors = false;
+                let errorCount = 0;
+                
+                addLog(`🔍 Verificando ${requiredFieldNames.length} campos obrigatórios...`, 'info');
+                
+                requiredFieldNames.forEach(fieldName => {
+                    const field = document.querySelector(`[name="${fieldName}"]`);
+                    if (field) {
+                        addLog(`🔍 Campo ${fieldName} encontrado: ${field.value}`, 'info');
+                        const isEmpty = !field.value || field.value === '' || field.value === '---------';
+                        
+                        if (isEmpty) {
+                            addLog(`❌ Campo obrigatório vazio: ${fieldName}`, 'error');
+                            
+                            // Marcar campo como inválido
+                            field.classList.add('is-invalid');
+                            const formGroup = field.closest('.form-group');
+                            if (formGroup) {
+                                formGroup.classList.add('has-error');
+                            }
+                            
+                            // Criar mensagem de erro
+                            createErrorMessage(field, getFieldErrorMessage(field));
+                            
+                            hasErrors = true;
+                            errorCount++;
+                        } else {
+                            addLog(`✅ Campo ${fieldName} preenchido: ${field.value}`, 'success');
+                        }
+                    } else {
+                        addLog(`⚠️ Campo obrigatório não encontrado: ${fieldName}`, 'error');
+                    }
+                });
+                
+                if (hasErrors) {
+                    e.preventDefault();
+                    addLog(`❌ Formulário bloqueado devido a ${errorCount} erro(s) de validação`, 'error');
+                    
+                    // Mostrar resumo dos erros
+                    showErrorSummary(errorCount);
+                    
+                    // Mostrar alerta para o usuário
+                    alert(`Formulário com ${errorCount} erro(s)! Verifique os campos destacados em vermelho.`);
+                    
+                    return false;
+                }
+                
+                addLog('✅ Formulário válido, enviando...', 'success');
+                return true;
+            }
+            
+            // Função para criar mensagem de erro
+            function createErrorMessage(field, message) {
+                addLog(`📝 Criando mensagem de erro para ${field.name}: ${message}`, 'info');
+                
+                const formGroup = field.closest('.form-group');
+                if (formGroup) {
+                    // Verificar se já existe uma mensagem de erro
+                    const existingError = formGroup.querySelector('.invalid-feedback');
+                    if (existingError) {
+                        existingError.remove();
+                        addLog('🧹 Mensagem de erro anterior removida', 'info');
+                    }
+                    
+                    // Criar nova mensagem de erro
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'invalid-feedback d-block text-danger';
+                    errorDiv.innerHTML = `<i class="fas fa-times-circle me-1"></i>${message}`;
+                    
+                    // Inserir após o campo
+                    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                    
+                    addLog('✅ Mensagem de erro criada para: ' + field.name, 'success');
+                } else {
+                    addLog('⚠️ FormGroup não encontrado para o campo: ' + field.name, 'error');
+                }
+            }
+            
+            // Função para obter mensagem de erro
+            function getFieldErrorMessage(field) {
+                const fieldName = field.name;
+                const errorMessages = {
+                    'nome': 'Nome é obrigatório. Digite o nome completo do advogado.',
+                    'cpf': 'CPF é obrigatório. Digite um CPF válido.',
+                    'oab': 'OAB é obrigatória. Digite o número da OAB.',
+                    'uf_oab': 'UF OAB é obrigatória. Selecione o estado da OAB.',
+                    'email': 'E-mail é obrigatório. Digite um endereço de e-mail válido.',
+                    'telefone': 'Telefone é obrigatório. Digite um número de telefone válido.',
+                    'endereco': 'Endereço é obrigatório. Digite o endereço completo.',
+                    'cidade': 'Cidade é obrigatória. Digite o nome da cidade.',
+                    'estado': 'Estado é obrigatório. Selecione o estado.',
+                    'cep': 'CEP é obrigatório. Digite um CEP válido.',
+                    'data_inscricao_oab': 'Data de inscrição na OAB é obrigatória.',
+                    'experiencia_anos': 'Anos de experiência é obrigatório.',
+                    'situacao': 'Situação é obrigatória. Selecione uma situação.'
+                };
+                
+                return errorMessages[fieldName] || 'Este campo é obrigatório.';
+            }
+            
+            // Função para mostrar resumo dos erros
+            function showErrorSummary(errorCount) {
+                addLog(`📊 Mostrando resumo de ${errorCount} erros...`, 'info');
+                
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-danger mt-3 border-danger';
+                errorMessage.innerHTML = `
+                    <h6><i class="fas fa-exclamation-triangle me-2"></i>Formulário com Erros</h6>
+                    <p>Foram encontrados <strong>${errorCount}</strong> campo(s) obrigatório(s) não preenchido(s).</p>
+                    <p>Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+                `;
+                
+                // Inserir no topo do formulário
+                const form = document.getElementById('advogadoForm');
+                if (form) {
+                    form.insertBefore(errorMessage, form.firstChild);
+                    addLog('✅ Resumo de erros exibido', 'success');
+                }
+            }
+            
+            // Configurar event listeners
+            addLog('🔧 Configurando event listeners...', 'info');
+            
+            // Event listener para o formulário
+            if (form) {
+                addLog('✅ Formulário encontrado, adicionando event listener de submit', 'success');
+                form.addEventListener('submit', validateForm);
+                addLog('✅ Event listener de submit adicionado', 'success');
+            } else {
+                addLog('❌ Formulário não encontrado!', 'error');
+            }
+            
+            addLog('✅ Validação do formulário inicializada com sucesso!', 'success');
+            addLog('🔍 Para testar: deixe campos vazios e clique em salvar', 'info');
+        });
+    </script>
+</body>
+</html>

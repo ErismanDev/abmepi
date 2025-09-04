@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Finalizar Atendimento - {{ atendimento.titulo }} - ASEJUS
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-check-circle me-2"></i>
+        Finalizar Atendimento
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'assejus:atendimento_detail' pk=atendimento.pk %}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmação de Finalização
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Atenção!
+                    </h5>
+                    <p class="mb-0">
+                        Você está prestes a finalizar o atendimento jurídico. Esta ação irá:
+                    </p>
+                    <ul class="mb-0 mt-2">
+                        <li>Alterar o status para "Concluído"</li>
+                        <li>Definir a data de conclusão como agora</li>
+                        <li>Não poderá ser desfeita facilmente</li>
+                    </ul>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="border-bottom pb-2">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Detalhes do Atendimento
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Título:</strong> {{ atendimento.titulo }}</p>
+                        <p><strong>Associado:</strong> {{ atendimento.associado.nome }}</p>
+                        <p><strong>Tipo de Demanda:</strong> {{ atendimento.get_tipo_demanda_display }}</p>
+                        <p><strong>Status Atual:</strong> 
+                            <span class="badge {% if atendimento.status == 'concluido' %}bg-success{% elif atendimento.status == 'em_andamento' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                {{ atendimento.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Data de Abertura:</strong> {{ atendimento.data_abertura|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Prioridade:</strong> 
+                            <span class="badge {% if atendimento.prioridade == 'alta' %}bg-danger{% elif atendimento.prioridade == 'media' %}bg-warning{% else %}bg-success{% endif %}">
+                                {{ atendimento.get_prioridade_display }}
+                            </p>
+                        <p><strong>Advogado Responsável:</strong> 
+                            {% if atendimento.advogado_responsavel %}
+                                {{ atendimento.advogado_responsavel.nome }}
+                            {% else %}
+                                <span class="text-muted">Não definido</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Descrição:</h6>
+                        <div class="border p-3 bg-light mb-3">
+                            {{ atendimento.descricao|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'assejus:atendimento_detail' pk=atendimento.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i>
+                            Confirmar Finalização
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

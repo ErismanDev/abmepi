@@ -1,0 +1,3045 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ABMEPI - Associação de Bombeiros e Policiais Militares{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+    <link rel="stylesheet" href="{% static 'assejus/css/modais.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal-patterns.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modern-tables.css' %}">
+    <style>
+        /* Prevenir overflow horizontal */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Container */
+        .sidebar-container {
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            width: 250px;
+            overflow-y: auto;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        
+        /* Sidebar Header */
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo-container {
+            margin-bottom: 15px;
+        }
+        
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.3);
+            object-fit: cover;
+        }
+        
+        .logo-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+        
+        .logo-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.9rem;
+            margin: 0 0 10px 0;
+        }
+        
+        .logo-description {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.75rem;
+            line-height: 1.2;
+            margin: 0;
+        }
+        
+        /* Sidebar Menu */
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 5px;
+        }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: rgba(255,255,255,0.5);
+        }
+        
+        .menu-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .menu-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        .menu-link span {
+            flex: 1;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            margin-left: auto;
+        }
+        
+        .menu-toggle.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        /* Submenu */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background-color: rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+        }
+        
+        .submenu.show {
+            max-height: 500px;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        /* Garantir que os submenus sejam clicáveis */
+        .submenu * {
+            pointer-events: auto;
+        }
+        
+        .submenu:not(.show) * {
+            pointer-events: none;
+        }
+        
+        .submenu-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px 10px 50px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .submenu-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .submenu-link i {
+            width: 16px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-info {
+            text-align: center;
+        }
+        
+        .user-name, .user-type {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-name i, .user-type i {
+            margin-right: 8px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 767.98px) {
+            .sidebar-container {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                padding: 10px !important;
+                max-width: 100vw !important;
+            }
+            .navbar-toggler {
+                display: block !important;
+            }
+        }
+        
+        /* Telas muito pequenas de notebook */
+        @media (min-width: 768px) and (max-width: 900px) {
+            .sidebar-container {
+                width: 180px !important;
+            }
+            .main-content {
+                margin-left: 180px !important;
+                padding: 8px !important;
+                max-width: calc(100vw - 180px) !important;
+            }
+            .menu-link {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+            .submenu-link {
+                padding: 5px 10px 5px 30px;
+                font-size: 0.75rem;
+            }
+            .logo-title {
+                font-size: 1.1rem;
+            }
+            .logo-subtitle {
+                font-size: 0.7rem;
+            }
+        }
+        
+        /* Tablets pequenos */
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .sidebar-container {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                width: 200px;
+            }
+            .main-content {
+                margin-left: 200px !important;
+                padding: 10px !important;
+                max-width: calc(100vw - 200px) !important;
+            }
+            .navbar-toggler {
+                display: none !important;
+            }
+        }
+        
+        /* Notebooks pequenos (1024px-1199px) */
+        @media (min-width: 992px) and (max-width: 1199.98px) {
+            .sidebar-container {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 220px !important;
+                z-index: 1000 !important;
+            }
+            .main-content {
+                margin-left: 220px !important;
+                padding: 15px !important;
+                max-width: calc(100vw - 220px) !important;
+            }
+            .navbar-toggler {
+                display: none !important;
+            }
+            
+            /* Ajustar tamanhos para notebooks pequenos */
+            .menu-link {
+                padding: 8px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .submenu-link {
+                padding: 6px 12px 6px 35px;
+                font-size: 0.8rem;
+            }
+            
+            .logo-title {
+                font-size: 1.2rem;
+            }
+            
+            .logo-subtitle {
+                font-size: 0.75rem;
+            }
+        }
+        
+                /* Notebooks médios (1200px-1366px) */
+        @media (min-width: 1200px) and (max-width: 1366px) {
+            .sidebar-container {
+                width: 250px !important;
+            }
+            .main-content {
+                margin-left: 250px !important;
+                padding: 20px !important;
+                max-width: calc(100vw - 250px) !important;
+            }
+            
+            /* Ajustar tamanhos para notebooks médios */
+            .menu-link {
+                padding: 9px 14px;
+                font-size: 0.9rem;
+            }
+            
+            .submenu-link {
+                padding: 7px 14px 7px 40px;
+                font-size: 0.85rem;
+            }
+            
+            .logo-title {
+                font-size: 1.3rem;
+            }
+            
+            .logo-subtitle {
+                font-size: 0.8rem;
+            }
+        }
+        
+        /* Telas grandes (1367px+) */
+        @media (min-width: 1367px) {
+            .sidebar-container {
+                width: 250px !important;
+            }
+            .main-content {
+                margin-left: 250px !important;
+                padding: 25px !important;
+                max-width: calc(100vw - 250px) !important;
+            }
+        }
+        
+        /* Estilos para o menu mobile (offcanvas) */
+        .offcanvas-body .menu-item {
+            margin-bottom: 5px;
+        }
+        
+        .offcanvas-body .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .offcanvas-body .menu-link:hover {
+            background-color: #f8f9fa;
+            color: #1e3c72;
+        }
+        
+        .offcanvas-body .menu-link.active {
+            background-color: #1e3c72;
+            color: white;
+        }
+        
+        .offcanvas-body .menu-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        .offcanvas-body .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin: 5px 0;
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .offcanvas-body .submenu.show {
+            max-height: 500px;
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .offcanvas-body .submenu-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px 10px 50px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .offcanvas-body .submenu-link:hover {
+            background-color: #e9ecef;
+            color: #1e3c72;
+        }
+        
+        .offcanvas-body .submenu-link i {
+            width: 16px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        /* Garantir visibilidade do sidebar */
+        .sidebar-container {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem;
+            margin: 0.25rem 0;
+        }
+        .sidebar .nav-link:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            max-width: calc(100vw - 250px);
+            overflow-x: hidden;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #1e3c72 !important;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border-radius: 0.5rem;
+        }
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background-color: #1e3c72;
+            border-color: #1e3c72;
+        }
+        .btn-primary:hover {
+            background-color: #2a5298;
+            border-color: #2a5298;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+        }
+        .alert {
+            border-radius: 0.5rem;
+            border: none;
+        }
+        .form-control, .form-select {
+            border-radius: 0.375rem;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+        }
+        
+        /* Corrigir problema de setas duplas nos campos select */
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        .form-select:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%231e3c72' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+        }
+        
+        .sidebar .logo-circular {
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+        }
+        
+        .sidebar .logo-circular:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .sidebar .associacao-text {
+            font-size: 0.75rem;
+            line-height: 1.2;
+            margin-top: 0.5rem;
+        }
+        
+        .sidebar .logo-container {
+            margin-bottom: 1rem;
+        }
+        
+        .sidebar h4 {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Estilos específicos para o menu administrativo */
+        .sidebar .collapse {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar .collapse.show {
+            display: block !important;
+        }
+        
+        .sidebar .nav-link[data-bs-toggle="collapse"] {
+            cursor: pointer;
+        }
+        
+        .sidebar .nav-link[data-bs-toggle="collapse"]:hover {
+            background-color: rgba(255,255,255,0.15);
+        }
+        
+        /* Garantir que os submenus sejam visíveis */
+        .sidebar .collapse .nav-link {
+            padding-left: 2.5rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Indicador visual para menus expansíveis */
+        .sidebar .nav-link[data-bs-toggle="collapse"]::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar .nav-link[data-bs-toggle="collapse"][aria-expanded="true"]::after {
+            transform: rotate(180deg);
+        }
+        
+        /* Estilos para o navbar */
+        .navbar {
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        /* Estilos para links do navbar principal */
+        .navbar .nav-link {
+            color: #333 !important;
+        }
+        
+        .navbar .nav-link:hover {
+            color: #1e3c72 !important;
+        }
+        
+        .navbar .nav-link.dropdown-toggle {
+            color: #333 !important;
+        }
+        
+        .navbar .nav-link.dropdown-toggle:hover {
+            color: #1e3c72 !important;
+        }
+        
+        /* Estilos específicos para notificações */
+        .navbar #notificationsDropdown {
+            color: #333 !important;
+        }
+        
+        .navbar #notificationsDropdown:hover {
+            color: #1e3c72 !important;
+        }
+        
+        .navbar #notificationsDropdown i {
+            color: #333 !important;
+        }
+        
+        .navbar #notificationsDropdown:hover i {
+            color: #1e3c72 !important;
+        }
+        
+        .navbar #notificationsDropdown span {
+            color: #333 !important;
+        }
+        
+        .navbar #notificationsDropdown:hover span {
+            color: #1e3c72 !important;
+        }
+        
+        /* Estilos específicos para menu do usuário */
+        .navbar #userDropdown {
+            color: #333 !important;
+        }
+        
+        .navbar #userDropdown:hover {
+            color: #1e3c72 !important;
+        }
+        
+        .navbar #userDropdown .fw-bold {
+            color: #333 !important;
+        }
+        
+        .navbar #userDropdown:hover .fw-bold {
+            color: #1e3c72 !important;
+        }
+        
+        .navbar #userDropdown .text-muted {
+            color: #6c757d !important;
+        }
+        
+        /* Estilos específicos para cronômetro de sessão */
+        .navbar .nav-link .text-warning {
+            color: #ffc107 !important;
+        }
+        
+        .navbar .nav-link .badge {
+            color: #fff !important;
+            font-size: 0.5rem !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            width: 1rem !important;
+            height: 1rem !important;
+            min-width: 1rem !important;
+            min-height: 1rem !important;
+            max-width: 1rem !important;
+            max-height: 1rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            position: absolute !important;
+            top: -5px !important;
+            right: -5px !important;
+            background-color: #dc3545 !important;
+            border: 2px solid #fff !important;
+            z-index: 10 !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Estilos para badges do menu lateral */
+        .menu-link .badge {
+            font-size: 0.55rem !important;
+            padding: 0 !important;
+            margin-left: 0.5rem !important;
+            border-radius: 50% !important;
+            width: 1rem !important;
+            height: 1rem !important;
+            min-width: 1rem !important;
+            min-height: 1rem !important;
+            max-width: 1rem !important;
+            max-height: 1rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Estilos para badges do submenu */
+        .submenu-link .badge {
+            font-size: 0.5rem !important;
+            padding: 0 !important;
+            margin-left: 0.5rem !important;
+            border-radius: 50% !important;
+            width: 0.9rem !important;
+            height: 0.9rem !important;
+            min-width: 0.9rem !important;
+            min-height: 0.9rem !important;
+            max-width: 0.9rem !important;
+            max-height: 0.9rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            box-sizing: border-box !important;
+        }
+        
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: #6c757d;
+        }
+        
+        .breadcrumb-item a {
+            color: #1e3c72;
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item a:hover {
+            color: #2a5298;
+            text-decoration: underline;
+        }
+        
+        /* Avatar do usuário */
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            overflow: hidden;
+        }
+        
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Dropdown menus */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+        }
+        
+        .dropdown-header {
+            background-color: #f8f9fa;
+            border-radius: 0.375rem;
+            margin: -0.75rem -0.75rem 0.75rem -0.75rem;
+            padding: 0.75rem;
+        }
+        
+        /* Notificações */
+        .notification-item {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            border-left: 3px solid #1e3c72;
+            background-color: #f8f9fa;
+        }
+        
+        .notification-item.unread {
+            background-color: #e3f2fd;
+            border-left-color: #2196f3;
+        }
+        
+        /* Busca */
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .search-result-item {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            margin-bottom: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .search-result-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .navbar-nav .nav-link span {
+                display: none !important;
+            }
+            
+            .breadcrumb {
+                display: none;
+            }
+        }
+        
+        /* Tema Escuro */
+        .dark-theme {
+            background-color: #1a1a1a !important;
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar {
+            background-color: #2d2d2d !important;
+            border-bottom-color: #404040 !important;
+        }
+        
+        .dark-theme .card {
+            background-color: #2d2d2d !important;
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .card-header {
+            background-color: #404040 !important;
+            border-bottom-color: #505050 !important;
+        }
+        
+        .dark-theme .form-control,
+        .dark-theme .form-select {
+            background-color: #404040 !important;
+            border-color: #505050 !important;
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .dropdown-menu {
+            background-color: #2d2d2d !important;
+            border-color: #404040 !important;
+        }
+        
+        .dark-theme .dropdown-item {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .dropdown-item:hover {
+            background-color: #404040 !important;
+        }
+        
+        /* Estilos específicos para navbar no tema escuro */
+        .dark-theme .navbar .nav-link {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar .nav-link:hover {
+            color: #ffffff !important;
+        }
+        
+        .dark-theme .navbar #notificationsDropdown {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar #notificationsDropdown:hover {
+            color: #ffffff !important;
+        }
+        
+        .dark-theme .navbar #notificationsDropdown i {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar #notificationsDropdown:hover i {
+            color: #ffffff !important;
+        }
+        
+        .dark-theme .navbar #notificationsDropdown span {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar #notificationsDropdown:hover span {
+            color: #ffffff !important;
+        }
+        
+        .dark-theme .navbar #userDropdown {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar #userDropdown:hover {
+            color: #ffffff !important;
+        }
+        
+        .dark-theme .navbar #userDropdown .fw-bold {
+            color: #e0e0e0 !important;
+        }
+        
+        .dark-theme .navbar #userDropdown:hover .fw-bold {
+            color: #ffffff !important;
+        }
+        
+        /* Melhorias nos Modais */
+        .modal-content {
+            border: none;
+            box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        
+        /* Estilos para o cronômetro de sessão */
+        #sessionTimer {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        /* Animações para os modais */
+        .modal.fade .modal-dialog {
+            transform: scale(0.8);
+            transition: transform 0.3s ease-out;
+        }
+        
+        .modal.show .modal-dialog {
+            transform: scale(1);
+        }
+        
+        /* Estilos para os alertas flutuantes */
+        .alert.position-fixed {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    {% block extra_css %}
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/modal-patterns.css' %}">
+    
+    <!-- CSS de Override para campos editáveis -->
+    <link rel="stylesheet" href="{% static 'assejus/css/override.css' %}">
+    
+    <!-- CSS específico dos apps -->
+    {% endblock %}
+</head>
+<body>
+    <!-- Mensagens do sistema -->
+    {% include 'assejus/messages.html' %}
+    
+    <!-- Token CSRF global para modais -->
+    {% csrf_token %}
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="sidebar-container">
+                <nav class="sidebar">
+                    <div class="sidebar-header">
+                        <div class="logo-container">
+                            <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="logo-img">
+                        </div>
+                        <h4 class="logo-title">ABMEPI</h4>
+                        <p class="logo-subtitle">Sistema de Gestão</p>
+                        <p class="logo-description">
+                            ASSOCIAÇÃO DE BOMBEIROS E<br>
+                            POLICIAIS MILITARES DO<br>
+                            ESTADO DO PIAUÍ
+                        </p>
+                    </div>
+                    
+                    <div class="sidebar-menu">
+                        <!-- Dashboard Principal - Apenas para administradores do sistema -->
+                        {% if user_tipo == 'administrador_sistema' %}
+                        <div class="menu-item">
+                            <a href="{% url 'dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" data-menu-link="dashboard">
+                                <i class="fas fa-tachometer-alt"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Funcionalidades para Associados - Apenas para associados -->
+                        {% if user_tipo == 'associado' %}
+                        <div class="menu-item">
+                            <a href="{% url 'associados:minha_ficha' %}" class="menu-link {% if 'minha_ficha' in request.path %}active{% endif %}">
+                                <i class="fas fa-user"></i>
+                                <span>Minha Ficha</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'associados:meus_atendimentos_juridicos' %}" class="menu-link {% if 'meus_atendimentos_juridicos' in request.path %}active{% endif %}">
+                                <i class="fas fa-gavel"></i>
+                                <span>Meus Processos Jurídicos</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'associados:meus_atendimentos_psicologicos' %}" class="menu-link {% if 'meus_atendimentos_psicologicos' in request.path %}active{% endif %}">
+                                <i class="fas fa-brain"></i>
+                                <span>Meus Atendimentos Psicológicos</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'associados:associado_financeiro' %}" class="menu-link {% if 'meu-financeiro' in request.path %}active{% endif %}">
+                                <i class="fas fa-chart-line"></i>
+                                <span>Meu Financeiro</span>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="{% url 'hotel_transito:associado_quartos_disponiveis' %}" class="menu-link {% if 'associado_quartos_disponiveis' in request.path or 'associado_minhas_reservas' in request.path %}active{% endif %}">
+                                <i class="fas fa-bed"></i>
+                                <span>Hotel de Trânsito</span>
+                            </a>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Módulo Associados - Apenas para administradores e atendentes gerais -->
+                        {% if user_tipo == 'administrador_sistema' or user_tipo == 'atendente_geral' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'associados' in request.path %}active{% endif %}" data-target="associadosSubmenu">
+                                <i class="fas fa-users"></i>
+                                <span>Associados</span>
+                                {% if pre_cadastros_pendentes > 0 %}
+                                <span class="badge bg-warning text-dark ms-2">{{ pre_cadastros_pendentes }}</span>
+                                {% endif %}
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'associados' in request.path %}show{% endif %}" id="associadosSubmenu">
+                                <a href="{% url 'associados:associado_list' %}" class="submenu-link">
+                                    <i class="fas fa-list"></i>
+                                    <span>Listar</span>
+                                </a>
+                                <a href="#" onclick="openAssociadoModal(); return false;" class="submenu-link">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Novo</span>
+                                </a>
+                                <a href="{% url 'associados:pre_cadastro_list' %}" class="submenu-link">
+                                    <i class="fas fa-user-clock"></i>
+                                    <span>Pré-Cadastros</span>
+                                    {% if pre_cadastros_pendentes > 0 %}
+                                    <span class="badge bg-warning text-dark ms-2">{{ pre_cadastros_pendentes }}</span>
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Módulo Assejur - Apenas para advogados, atendentes de advogado e administradores -->
+                        {% if user_tipo == 'administrador_sistema' or user_tipo == 'advogado' or user_tipo == 'atendente_advogado' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'assejus' in request.path %}active{% endif %}" data-target="assejusSubmenu">
+                                <i class="fas fa-gavel"></i>
+                                <span>Assejur</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'assejus' in request.path %}show{% endif %}" id="assejusSubmenu">
+                                <a href="{% url 'assejus:dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                {% if user_tipo == 'administrador_sistema' or user_tipo == 'advogado' %}
+                                <a href="{% url 'assejus:advogado_list' %}" class="submenu-link">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>{% if user_tipo == 'advogado' %}Meu Perfil{% else %}Advogados{% endif %}</span>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'assejus:processos_list' %}" class="submenu-link">
+                                    <i class="fas fa-gavel"></i>
+                                    <span>Processos</span>
+                                </a>
+                                <a href="{% url 'assejus:procuracao_list' %}" class="submenu-link">
+                                    <i class="fas fa-file-contract"></i>
+                                    <span>Procurações</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Módulo Cuidar da Mente - Apenas para psicólogos, atendentes de psicologia e administradores -->
+                        {% if user_tipo == 'administrador_sistema' or user_tipo == 'psicologo' or user_tipo == 'atendente_psicologo' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'psicologia' in request.path %}active{% endif %}" data-target="psicologiaSubmenu">
+                                <i class="fas fa-brain"></i>
+                                <span>Cuidar da Mente</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'psicologia' in request.path %}show{% endif %}" id="psicologiaSubmenu">
+                                {% if user_tipo == 'psicologo' %}
+                                <a href="{% url 'psicologia:psicologo_dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>Meu Dashboard</span>
+                                </a>
+                                {% else %}
+                                <a href="{% url 'psicologia:dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                {% endif %}
+                                {% if user_tipo == 'administrador_sistema' or user_tipo == 'psicologo' %}
+                                <a href="{% url 'psicologia:psicologo_list' %}" class="submenu-link">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>{% if user_tipo == 'psicologo' %}Meu Perfil{% else %}Psicólogos{% endif %}</span>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'psicologia:paciente_list' %}" class="submenu-link">
+                                    <i class="fas fa-users"></i>
+                                    <span>Pacientes</span>
+                                </a>
+                                <a href="{% url 'psicologia:agenda_list' %}" class="submenu-link">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Agenda</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Módulo Gestão - Apenas para administradores e atendentes gerais -->
+                        {% if user_tipo == 'administrador_sistema' or user_tipo == 'atendente_geral' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'administrativo' in request.path or 'core' in request.path %}active{% endif %}" data-target="gestaoSubmenu">
+                                <i class="fas fa-cogs"></i>
+                                <span>Gestão</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'administrativo' in request.path or 'core' in request.path %}show{% endif %}" id="gestaoSubmenu">
+                                <a href="{% url 'administrativo:dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                <a href="{% url 'administrativo:evento_list' %}" class="submenu-link">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>Eventos</span>
+                                </a>
+                                <a href="{% url 'administrativo:comunicado_list' %}" class="submenu-link">
+                                    <i class="fas fa-bullhorn"></i>
+                                    <span>Comunicados</span>
+                                </a>
+                                <a href="{% url 'core:email_batch_dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>Emails em Lote</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Módulo Recursos - Apenas para administradores e atendentes gerais -->
+                        {% if user_tipo == 'administrador_sistema' or user_tipo == 'atendente_geral' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'financeiro' in request.path or 'beneficios' in request.path %}active{% endif %}" data-target="recursosSubmenu">
+                                <i class="fas fa-coins"></i>
+                                <span>Recursos</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'financeiro' in request.path or 'beneficios' in request.path %}show{% endif %}" id="recursosSubmenu">
+                                <a href="{% url 'financeiro:dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span>Financeiro</span>
+                                </a>
+                                <a href="{% url 'financeiro:mensalidade_list' %}" class="submenu-link">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Recebíveis</span>
+                                </a>
+                                <!-- Benefícios temporariamente oculto
+                                <a href="{% url 'beneficios:beneficio_list' %}" class="submenu-link">
+                                    <i class="fas fa-gift"></i>
+                                    <span>Benefícios</span>
+                                </a>
+                                -->
+                                <a href="{% url 'financeiro:tipo_mensalidade_list' %}" class="submenu-link">
+                                    <i class="fas fa-tags"></i>
+                                    <span>Tipos de Recebíveis</span>
+                                </a>
+                                <a href="{% url 'financeiro:despesa_list' %}" class="submenu-link">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Despesas</span>
+                                </a>
+                                <a href="#" onclick="openConfigModalFromMenu(); return false;" class="submenu-link">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Configuração de Cobrança</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+
+                        
+
+                        
+                        <!-- Hotel de Trânsito - Para administradores e atendentes gerais -->
+                        {% if user_tipo == 'administrador_sistema' or user_tipo == 'atendente_geral' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'hotel_transito' in request.path or 'quarto' in request.path or 'hospede' in request.path or 'reserva' in request.path or 'hospedagem' in request.path or 'servico' in request.path %}active{% endif %}" data-target="hotelTransitoSubmenu">
+                                <i class="fas fa-bed"></i>
+                                <span>Hotel de Trânsito</span>
+                                {% if reservas_pendentes > 0 %}
+                                <span class="badge bg-warning text-dark ms-2">{{ reservas_pendentes }}</span>
+                                {% endif %}
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'hotel_transito' in request.path or 'quarto' in request.path or 'hospede' in request.path or 'reserva' in request.path or 'hospedagem' in request.path or 'servico' in request.path %}show{% endif %}" id="hotelTransitoSubmenu">
+                                <a href="{% url 'hotel_transito:dashboard' %}" class="submenu-link">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                                <a href="{% url 'hotel_transito:quarto_list' %}" class="submenu-link">
+                                    <i class="fas fa-door-open"></i>
+                                    <span>Quartos</span>
+                                </a>
+                                <a href="{% url 'hotel_transito:hospede_list' %}" class="submenu-link">
+                                    <i class="fas fa-users"></i>
+                                    <span>Hóspedes</span>
+                                </a>
+                                <a href="{% url 'hotel_transito:reserva_list' %}" class="submenu-link">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <span>Reservas</span>
+                                    {% if reservas_pendentes > 0 %}
+                                    <span class="badge bg-warning text-dark ms-2">{{ reservas_pendentes }}</span>
+                                    {% endif %}
+                                </a>
+                                <a href="{% url 'hotel_transito:hospedagem_list' %}" class="submenu-link">
+                                    <i class="fas fa-bed"></i>
+                                    <span>Hospedagens</span>
+                                </a>
+                                <a href="{% url 'hotel_transito:servico_adicional_list' %}" class="submenu-link">
+                                    <i class="fas fa-concierge-bell"></i>
+                                    <span>Serviços</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Menu Administrativo - Apenas para administradores do sistema -->
+                        {% if user_tipo == 'administrador_sistema' %}
+                        <div class="menu-item">
+                            <a href="#" class="menu-link menu-toggle {% if 'core' in request.path and 'usuario' in request.path or 'institucional' in request.path %}active{% endif %}" data-target="adminSubmenu">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Administração</span>
+                                <i class="fas fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="submenu {% if 'core' in request.path and 'usuario' in request.path or 'institucional' in request.path %}show{% endif %}" id="adminSubmenu">
+                                <a href="{% url 'core:usuario_list' %}" class="submenu-link">
+                                    <i class="fas fa-users"></i>
+                                    <span>Usuários</span>
+                                </a>
+                                <a href="{% url 'core:institucional_edit' %}" class="submenu-link">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Editar Institucional</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        
+                        <!-- Admin Django - Apenas para staff -->
+                        {% if user.is_staff %}
+                        <div class="menu-item">
+                            <a href="{% url 'admin:index' %}" class="menu-link {% if 'admin' in request.path and 'administrativo' not in request.path %}active{% endif %}">
+                                <i class="fas fa-user-shield"></i>
+                                <span>Admin Django</span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="sidebar-footer">
+                        <div class="user-info">
+                            <div class="user-name">
+                                <i class="fas fa-user"></i>
+                                {{ user.get_full_name|default:user.username }}
+                            </div>
+                            <div class="user-type">
+                                <i class="fas fa-tag"></i>
+                                {{ user.get_tipo_usuario_display }}
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            
+            <!-- Offcanvas para mobile -->
+            <div class="offcanvas offcanvas-start d-md-none" tabindex="-1" id="sidebarOffcanvas">
+                <div class="offcanvas-header">
+                    <h5 class="offcanvas-title">
+                        <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="img-fluid rounded-circle" style="width: 40px; height: 40px;">
+                        ABMEPI
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                </div>
+                <div class="offcanvas-body">
+                    <!-- Menu mobile será copiado do sidebar via JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Main content -->
+            <main class="main-content" style="margin-left: 250px; padding: 20px;">
+                <!-- Top navbar -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+                    <div class="container-fluid">
+                        <!-- Botão para colapsar sidebar em dispositivos móveis -->
+                        <button class="navbar-toggler d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        
+                        <!-- Breadcrumb dinâmico -->
+                        <nav aria-label="breadcrumb" class="me-auto">
+                            <ol class="breadcrumb mb-0">
+                                {% if user_tipo == 'administrador_sistema' %}
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                                        <i class="fas fa-home me-1"></i>Início
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'institucional' %}" class="text-decoration-none">
+                                        <i class="fas fa-home me-1"></i>Início
+                                    </a>
+                                </li>
+                                {% endif %}
+                                {% if request.resolver_match.app_name %}
+                                <li class="breadcrumb-item">
+                                    <span class="text-capitalize">{{ request.resolver_match.app_name }}</span>
+                                </li>
+                                {% endif %}
+                                {% if request.resolver_match.url_name %}
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    {{ request.resolver_match.url_name|title }}
+                                </li>
+                                {% endif %}
+                            </ol>
+                        </nav>
+                        
+                        <!-- Menu de funcionalidades -->
+                        <div class="navbar-nav me-3">
+                            <!-- Cronômetro de Sessão -->
+                            <div class="nav-item">
+                                <div class="nav-link d-flex align-items-center">
+                                    <i class="fas fa-clock me-1 text-warning"></i>
+                                    <span class="badge bg-warning text-dark ms-2" id="sessionTimer">30:00</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Notificações -->
+                            <div class="nav-item dropdown">
+                                <a class="nav-link position-relative" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" style="position: relative !important;">
+                                    <i class="fas fa-bell me-1"></i>
+                                    <span class="d-none d-lg-inline">Notificações</span>
+                                    {% if total_notificacoes_pendentes > 0 %}
+                                    <span class="badge" id="notificationBadge">
+                                        {{ total_notificacoes_pendentes }}
+                                    </span>
+                                    {% endif %}
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-end p-3" style="width: 350px;">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">Notificações</h6>
+                                        <button class="btn btn-sm btn-outline-secondary" id="markAllRead">
+                                            Marcar todas como lidas
+                                        </button>
+                                    </div>
+                                    <div id="notificationsList" style="max-height: 300px; overflow-y: auto;">
+                                        {% if notificacoes_pendentes %}
+                                            {% for notificacao in notificacoes_pendentes %}
+                                            <div class="notification-item border-bottom py-2">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1 text-{% if notificacao.prioridade == 3 %}danger{% elif notificacao.prioridade == 2 %}warning{% else %}info{% endif %}">
+                                                            {{ notificacao.titulo }}
+                                                        </h6>
+                                                        <p class="mb-1 small text-muted">
+                                                            {{ notificacao.mensagem|truncatechars:80 }}
+                                                        </p>
+                                                        <small class="text-muted">
+                                                            {{ notificacao.data_criacao|timesince }} atrás
+                                                        </small>
+                                                    </div>
+                                                    {% if notificacao.url_acao %}
+                                                    <a href="{{ notificacao.url_acao }}" class="btn btn-sm btn-outline-primary ms-2">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="text-center text-muted py-3">
+                                                <i class="fas fa-bell-slash fa-2x mb-2"></i>
+                                                <p class="mb-0">Nenhuma notificação</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <a href="#" class="text-decoration-none small">Ver todas as notificações</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Menu do usuário -->
+                        <div class="navbar-nav">
+                            <div class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <div class="avatar-circle me-2">
+                                        {% if user.associado and user.associado.foto %}
+                                            <img src="{{ user.associado.foto.url }}" alt="Avatar" class="avatar-img">
+                                        {% else %}
+                                            <i class="fas fa-user"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-none d-lg-block text-start">
+                                        <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                        <small class="text-muted">{{ user.get_tipo_usuario_display }}</small>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 280px;">
+                                    <li class="dropdown-header">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-3">
+                                                {% if user.associado and user.associado.foto %}
+                                                    <img src="{{ user.associado.foto.url }}" alt="Avatar" class="avatar-img">
+                                                {% else %}
+                                                    <i class="fas fa-user fa-lg"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                                <small class="text-muted">{{ user.get_tipo_usuario_display }}</small>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" id="settingsLink">
+                                            <i class="fas fa-cog me-2 text-secondary"></i>
+                                            <div>
+                                                <strong>Configurações</strong>
+                                                <small class="d-block text-muted">Preferências do usuário</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center" href="#" id="changePasswordLink">
+                                            <i class="fas fa-shield-alt me-2 text-success"></i>
+                                            <div>
+                                                <strong>Alterar Senha</strong>
+                                                <small class="d-block text-muted">Segurança da conta</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item d-flex align-items-center text-danger" href="{% url 'logout' %}">
+                                            <i class="fas fa-sign-out-alt me-2"></i>
+                                            <div>
+                                                <strong>Sair</strong>
+                                                <small class="d-block text-muted">Encerrar sessão</small>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <!-- Page content -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- CORREÇÃO PRÉVIA PARA BOOTSTRAP MODAL -->
+    <script src="{% static 'js/bootstrap-preload-fix.js' %}"></script>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Ativar tooltips
+        try {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                try {
+                    return new bootstrap.Tooltip(tooltipTriggerEl)
+                } catch (error) {
+                    console.warn('⚠️ Erro ao criar tooltip:', error);
+                    return null;
+                }
+            });
+        } catch (error) {
+            console.warn('⚠️ Erro ao inicializar tooltips:', error);
+        }
+        
+        // Ativar popovers
+        try {
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                try {
+                    return new bootstrap.Popover(popoverTriggerEl)
+                } catch (error) {
+                    console.warn('⚠️ Erro ao criar popover:', error);
+                    return null;
+                }
+            });
+        } catch (error) {
+            console.warn('⚠️ Erro ao inicializar popovers:', error);
+        }
+        
+        // Funcionalidade específica para os menus colapsáveis
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Inicializando menus colapsáveis...');
+            
+            try {
+                // Inicializar todos os collapses
+                const collapseElements = document.querySelectorAll('.collapse');
+                collapseElements.forEach(function(element) {
+                    try {
+                        const bsCollapse = new bootstrap.Collapse(element, {
+                            toggle: false
+                        });
+                        
+                        // Adicionar evento para atualizar o estado visual
+                        element.addEventListener('show.bs.collapse', function() {
+                            const trigger = document.querySelector(`[data-bs-target="#${element.id}"]`);
+                            if (trigger) {
+                                trigger.setAttribute('aria-expanded', 'true');
+                                console.log('Menu aberto:', element.id);
+                            }
+                        });
+                        
+                        element.addEventListener('hide.bs.collapse', function() {
+                            const trigger = document.querySelector(`[data-bs-target="#${element.id}"]`);
+                            if (trigger) {
+                                trigger.setAttribute('aria-expanded', 'false');
+                                console.log('Menu fechado:', element.id);
+                            }
+                        });
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao inicializar collapse:', element.id, error);
+                    }
+                });
+            
+            // Garantir que o menu ativo esteja aberto
+            try {
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('administrativo')) {
+                    const adminSubmenu = document.getElementById('adminSubmenu');
+                    if (adminSubmenu) {
+                        try {
+                            const bsCollapse = new bootstrap.Collapse(adminSubmenu, {
+                                show: true
+                            });
+                            console.log('Menu administrativo aberto automaticamente');
+                        } catch (error) {
+                            console.warn('⚠️ Erro ao abrir menu administrativo:', error);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao verificar menu ativo:', error);
+            }
+            
+            // Debug: verificar se todos os elementos estão presentes
+            try {
+                console.log('Menus encontrados:', {
+                    'associadosSubmenu': document.getElementById('associadosSubmenu'),
+                    'financeiroSubmenu': document.getElementById('financeiroSubmenu'),
+                    'assejusSubmenu': document.getElementById('assejusSubmenu'),
+                    'adminSubmenu': document.getElementById('adminSubmenu'),
+                    'beneficiosSubmenu': document.getElementById('beneficiosSubmenu')
+                });
+            } catch (error) {
+                console.warn('⚠️ Erro ao verificar menus:', error);
+            }
+            
+            // Fallback: se o Bootstrap não funcionar, usar JavaScript puro
+            setTimeout(function() {
+                try {
+                    const adminSubmenu = document.getElementById('adminSubmenu');
+                    if (adminSubmenu && !adminSubmenu.classList.contains('show')) {
+                        console.log('Aplicando fallback JavaScript para o menu...');
+                        
+                        // Adicionar funcionalidade manual de toggle
+                        const adminLink = document.querySelector('a[href="#adminSubmenu"]');
+                        if (adminLink) {
+                            adminLink.addEventListener('click', function(e) {
+                                try {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    
+                                    const isOpen = adminSubmenu.classList.contains('show');
+                                    if (isOpen) {
+                                        adminSubmenu.classList.remove('show');
+                                        adminLink.setAttribute('aria-expanded', 'false');
+                                        console.log('Menu fechado manualmente');
+                                    } else {
+                                        adminSubmenu.classList.add('show');
+                                        adminLink.setAttribute('aria-expanded', 'true');
+                                        console.log('Menu aberto manualmente');
+                                    }
+                                } catch (error) {
+                                    console.warn('⚠️ Erro no fallback do menu:', error);
+                                }
+                            });
+                            
+                            console.log('Fallback JavaScript aplicado com sucesso');
+                        }
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Erro ao aplicar fallback do menu:', error);
+                }
+            }, 2000);
+            
+            // ===== FUNCIONALIDADES DO NAVBAR =====
+            
+            // Cronômetro de Sessão (30 minutos)
+            let sessionTimeLeft = 30 * 60; // 30 minutos em segundos
+            let sessionTimer;
+            let isSessionActive = true;
+            
+            function updateSessionTimer() {
+                try {
+                    if (sessionTimeLeft <= 0) {
+                        // Sessão expirada - fazer logout automático
+                        clearInterval(sessionTimer);
+                        showSessionExpiredModal();
+                        return;
+                    }
+                    
+                    const minutes = Math.floor(sessionTimeLeft / 60);
+                    const seconds = sessionTimeLeft % 60;
+                    const timerDisplay = document.getElementById('sessionTimer');
+                    
+                    if (timerDisplay) {
+                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        
+                        // Mudar cor do timer baseado no tempo restante
+                        if (sessionTimeLeft <= 300) { // 5 minutos ou menos
+                            timerDisplay.className = 'badge bg-danger text-white ms-2';
+                        } else if (sessionTimeLeft <= 600) { // 10 minutos ou menos
+                            timerDisplay.className = 'badge bg-warning text-dark ms-2';
+                        } else {
+                            timerDisplay.className = 'badge bg-success text-white ms-2';
+                        }
+                    }
+                    
+                    sessionTimeLeft--;
+                } catch (error) {
+                    console.warn('⚠️ Erro no timer de sessão:', error);
+                }
+            }
+            
+            function resetSessionTimer() {
+                try {
+                    sessionTimeLeft = 30 * 60; // Reset para 30 minutos
+                    isSessionActive = true;
+                    
+                    // Atualizar display
+                    const timerDisplay = document.getElementById('sessionTimer');
+                    if (timerDisplay) {
+                        timerDisplay.className = 'badge bg-success text-white ms-2';
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Erro ao resetar timer de sessão:', error);
+                }
+            }
+            
+            function showSessionExpiredModal() {
+                try {
+                    // Criar modal de sessão expirada
+                    const modal = document.createElement('div');
+                    modal.className = 'modal fade';
+                    modal.id = 'sessionExpiredModal';
+                    modal.setAttribute('data-bs-backdrop', 'static');
+                    modal.setAttribute('data-bs-keyboard', 'false');
+                    
+                    modal.innerHTML = `
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Sessão Expirada
+                                    </h5>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <i class="fas fa-clock fa-3x text-danger mb-3"></i>
+                                    <h6>Sua sessão expirou por inatividade</h6>
+                                    <p class="text-muted">Por segurança, você será redirecionado para a página de login.</p>
+                                </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-primary" onclick="redirectToLogin()">
+                                    <i class="fas fa-sign-in-alt me-2"></i>
+                                    Ir para Login
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                
+                // Mostrar modal
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+                
+                // Redirecionar automaticamente após 5 segundos
+                setTimeout(() => {
+                    redirectToLogin();
+                }, 5000);
+                } catch (error) {
+                    console.warn('⚠️ Erro ao mostrar modal de sessão expirada:', error);
+                    // Fallback: redirecionar diretamente
+                    redirectToLogin();
+                }
+            }
+            
+            function redirectToLogin() {
+                window.location.href = '{% url "login" %}';
+            }
+            
+            // Iniciar cronômetro
+            try {
+                sessionTimer = setInterval(updateSessionTimer, 1000);
+                
+                // Resetar timer em atividade do usuário
+                const userActivityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+                userActivityEvents.forEach(event => {
+                    try {
+                        document.addEventListener(event, resetSessionTimer, true);
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao adicionar evento de atividade:', event, error);
+                    }
+                });
+                
+                // Resetar timer ao focar na janela
+                try {
+                    window.addEventListener('focus', resetSessionTimer);
+                } catch (error) {
+                    console.warn('⚠️ Erro ao adicionar evento de foco:', error);
+                }
+                
+                // Resetar timer ao voltar para a aba
+                try {
+                    document.addEventListener('visibilitychange', function() {
+                        if (!document.hidden) {
+                            resetSessionTimer();
+                        }
+                    });
+                } catch (error) {
+                    console.warn('⚠️ Erro ao adicionar evento de visibilidade:', error);
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao inicializar timer de sessão:', error);
+            }
+            
+            // Sistema de notificações
+            try {
+                const notificationBadge = document.getElementById('notificationBadge');
+                const notificationsList = document.getElementById('notificationsList');
+                const markAllReadBtn = document.getElementById('markAllRead');
+                
+                if (notificationBadge && notificationsList) {
+                    // Usar dados reais do Django (já renderizados no template)
+                    // O template já exibe as notificações corretamente
+                    
+                    // Atualizar badge com dados reais
+                    updateNotificationBadge();
+                    
+                    // Marcar todas como lidas via AJAX
+                    if (markAllReadBtn) {
+                        markAllReadBtn.addEventListener('click', function() {
+                            try {
+                                markAllNotificationsAsRead();
+                            } catch (error) {
+                                console.warn('⚠️ Erro ao marcar notificações como lidas:', error);
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao inicializar sistema de notificações:', error);
+            }
+            
+            // As notificações são renderizadas pelo template Django
+            // Não precisamos de uma função JavaScript para isso
+            
+            function updateNotificationBadge() {
+                try {
+                    if (!notificationBadge) {
+                        console.warn('⚠️ Badge de notificações não encontrado');
+                        return;
+                    }
+                    
+                    // Usar o contador do Django (já renderizado no template)
+                    const totalNotificacoes = {{ total_notificacoes_pendentes|default:0 }};
+                    if (totalNotificacoes > 0) {
+                        notificationBadge.style.display = 'block';
+                        notificationBadge.textContent = totalNotificacoes;
+                    } else {
+                        notificationBadge.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Erro ao atualizar badge de notificações:', error);
+                }
+            }
+            
+            function markAllNotificationsAsRead() {
+                try {
+                    // Fazer requisição AJAX para marcar todas como lidas
+                    fetch('{% url "core:marcar_notificacoes_como_lidas" %}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Recarregar a página para atualizar as notificações
+                            location.reload();
+                        } else {
+                            console.warn('⚠️ Erro ao marcar notificações como lidas:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.warn('⚠️ Erro na requisição AJAX:', error);
+                    });
+                } catch (error) {
+                    console.warn('⚠️ Erro ao marcar notificações como lidas:', error);
+                }
+            }
+            
+            // ===== FUNCIONALIDADES DO MENU DO USUÁRIO =====
+            
+            // Elementos do menu do usuário
+            const settingsLink = document.getElementById('settingsLink');
+            const changePasswordLink = document.getElementById('changePasswordLink');
+            
+            // Modal de configurações
+            let userSettingsModal = null;
+            try {
+                const userSettingsElement = document.getElementById('userSettingsModal');
+                if (userSettingsElement && typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+                    userSettingsModal = new bootstrap.Modal(userSettingsElement);
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao criar modal de configurações:', error);
+            }
+            
+            const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+            
+            // Modal de alteração de senha
+            let changePasswordModal = null;
+            try {
+                const changePasswordElement = document.getElementById('changePasswordModal');
+                if (changePasswordElement && typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+                    changePasswordModal = new bootstrap.Modal(changePasswordElement);
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao criar modal de alteração de senha:', error);
+            }
+            
+            const savePasswordBtn = document.getElementById('savePasswordBtn');
+            const changePasswordForm = document.getElementById('changePasswordForm');
+            
+
+            
+            // Funcionalidade: Configurações
+            if (settingsLink && userSettingsModal) {
+                settingsLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    try {
+                        loadUserSettings();
+                        userSettingsModal.show();
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao abrir configurações:', error);
+                    }
+                });
+            }
+            
+            // Funcionalidade: Alterar Senha
+            if (changePasswordLink && changePasswordModal && changePasswordForm) {
+                changePasswordLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    try {
+                        changePasswordForm.reset();
+                        changePasswordModal.show();
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao abrir modal de alteração de senha:', error);
+                    }
+                });
+            }
+            
+            // Salvar configurações
+            if (saveSettingsBtn) {
+                saveSettingsBtn.addEventListener('click', function() {
+                    try {
+                        saveUserSettings();
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao salvar configurações:', error);
+                        if (typeof showAlert === 'function') {
+                            showAlert('Erro', 'Erro ao salvar configurações', 'danger');
+                        }
+                    }
+                });
+            }
+            
+            // Salvar nova senha
+            if (savePasswordBtn) {
+                savePasswordBtn.addEventListener('click', function() {
+                    try {
+                        changePassword();
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao alterar senha:', error);
+                        if (typeof showAlert === 'function') {
+                            showAlert('Erro', 'Erro ao alterar senha', 'danger');
+                        }
+                    }
+                });
+            }
+            
+            // Funções auxiliares
+            function getCurrentUserId() {
+                // Em um sistema real, isso viria do contexto do Django
+                // Por enquanto, vamos tentar extrair da URL ou usar um valor padrão
+                const pathParts = window.location.pathname.split('/');
+                for (let i = 0; i < pathParts.length; i++) {
+                    if (pathParts[i] === 'usuarios' && pathParts[i + 1] && !isNaN(pathParts[i + 1])) {
+                        return pathParts[i + 1];
+                    }
+                }
+                return '1'; // Fallback
+            }
+            
+            function loadUserSettings() {
+                // Carregar configurações salvas do localStorage
+                const settings = JSON.parse(localStorage.getItem('userSettings')) || {};
+                
+                // Aplicar configurações aos campos
+                if (settings.theme) document.getElementById('themeSelect').value = settings.theme;
+                if (settings.language) document.getElementById('languageSelect').value = settings.language;
+                if (settings.notificationsEnabled !== undefined) {
+                    document.getElementById('notificationsEnabled').checked = settings.notificationsEnabled;
+                }
+                if (settings.autoSaveEnabled !== undefined) {
+                    document.getElementById('autoSaveEnabled').checked = settings.autoSaveEnabled;
+                }
+                if (settings.soundEnabled !== undefined) {
+                    document.getElementById('soundEnabled').checked = settings.soundEnabled;
+                }
+                if (settings.fontSize) document.getElementById('fontSizeSelect').value = settings.fontSize;
+            }
+            
+            function saveUserSettings() {
+                try {
+                    // Coletar configurações dos campos
+                    const themeSelect = document.getElementById('themeSelect');
+                    const languageSelect = document.getElementById('languageSelect');
+                    const notificationsEnabled = document.getElementById('notificationsEnabled');
+                    const autoSaveEnabled = document.getElementById('autoSaveEnabled');
+                    const soundEnabled = document.getElementById('soundEnabled');
+                    const fontSizeSelect = document.getElementById('fontSizeSelect');
+                    
+                    if (!themeSelect || !languageSelect || !notificationsEnabled || !autoSaveEnabled || !soundEnabled || !fontSizeSelect) {
+                        throw new Error('Campos de configuração não encontrados');
+                    }
+                    
+                    const settings = {
+                        theme: themeSelect.value,
+                        language: languageSelect.value,
+                        notificationsEnabled: notificationsEnabled.checked,
+                        autoSaveEnabled: autoSaveEnabled.checked,
+                        soundEnabled: soundEnabled.checked,
+                        fontSize: fontSizeSelect.value
+                    };
+                    
+                    // Salvar no localStorage
+                    localStorage.setItem('userSettings', JSON.stringify(settings));
+                    
+                    // Aplicar configurações imediatamente
+                    applyUserSettings(settings);
+                    
+                    // Fechar modal e mostrar mensagem de sucesso
+                    if (userSettingsModal && typeof userSettingsModal.hide === 'function') {
+                        userSettingsModal.hide();
+                    }
+                    showAlert('Sucesso', 'Configurações salvas com sucesso!', 'success');
+                } catch (error) {
+                    console.error('❌ Erro ao salvar configurações:', error);
+                    throw error;
+                }
+            }
+            
+            function applyUserSettings(settings) {
+                // Aplicar tema
+                if (settings.theme === 'dark') {
+                    document.body.classList.add('dark-theme');
+                } else {
+                    document.body.classList.remove('dark-theme');
+                }
+                
+                // Aplicar tamanho da fonte
+                document.body.style.fontSize = settings.fontSize === 'small' ? '0.9rem' : 
+                                            settings.fontSize === 'large' ? '1.1rem' : '1rem';
+                
+                // Aplicar outras configurações conforme necessário
+                console.log('Configurações aplicadas:', settings);
+            }
+            
+            function changePassword() {
+                try {
+                    const currentPasswordElement = document.getElementById('currentPassword');
+                    const newPasswordElement = document.getElementById('newPassword');
+                    const confirmPasswordElement = document.getElementById('confirmPassword');
+                    const changePasswordFormElement = document.getElementById('changePasswordForm');
+                    
+                    if (!currentPasswordElement || !newPasswordElement || !confirmPasswordElement || !changePasswordFormElement) {
+                        throw new Error('Campos de senha não encontrados');
+                    }
+                    
+                    const currentPassword = currentPasswordElement.value;
+                    const newPassword = newPasswordElement.value;
+                    const confirmPassword = confirmPasswordElement.value;
+                    
+                    // Validações básicas
+                    if (!currentPassword || !newPassword || !confirmPassword) {
+                        showAlert('Erro', 'Todos os campos são obrigatórios.', 'danger');
+                        return;
+                    }
+                    
+                    if (newPassword.length < 8) {
+                        showAlert('Erro', 'A nova senha deve ter pelo menos 8 caracteres.', 'danger');
+                        return;
+                    }
+                    
+                    if (newPassword !== confirmPassword) {
+                        showAlert('Erro', 'As senhas não coincidem.', 'danger');
+                        return;
+                    }
+                    
+                    // Simular envio para o servidor (substitua por chamada AJAX real)
+                    showAlert('Processando', 'Alterando senha...', 'info');
+                    
+                    setTimeout(() => {
+                        try {
+                            // Simular sucesso
+                            showAlert('Sucesso', 'Senha alterada com sucesso!', 'success');
+                            if (changePasswordModal && typeof changePasswordModal.hide === 'function') {
+                                changePasswordModal.hide();
+                            }
+                            changePasswordFormElement.reset();
+                        } catch (error) {
+                            console.warn('⚠️ Erro ao finalizar alteração de senha:', error);
+                        }
+                    }, 2000);
+                } catch (error) {
+                    console.error('❌ Erro ao alterar senha:', error);
+                    showAlert('Erro', 'Erro interno ao alterar senha', 'danger');
+                }
+            }
+            
+            function showAlert(title, message, type) {
+                try {
+                    // Criar alerta Bootstrap
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                    
+                    alertDiv.innerHTML = `
+                        <strong>${title}:</strong> ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    `;
+                    
+                    if (document.body) {
+                        document.body.appendChild(alertDiv);
+                        
+                        // Remover automaticamente após 5 segundos
+                        setTimeout(() => {
+                            try {
+                                if (alertDiv.parentNode) {
+                                    alertDiv.remove();
+                                }
+                            } catch (error) {
+                                console.warn('⚠️ Erro ao remover alerta:', error);
+                            }
+                        }, 5000);
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao mostrar alerta:', error);
+                    // Fallback: usar alert nativo
+                    alert(`${title}: ${message}`);
+                }
+            }
+            
+            // Carregar configurações salvas ao inicializar
+            document.addEventListener('DOMContentLoaded', function() {
+                const savedSettings = JSON.parse(localStorage.getItem('userSettings')) || {};
+                if (Object.keys(savedSettings).length > 0) {
+                    applyUserSettings(savedSettings);
+                }
+            });
+            
+            // Atualizar breadcrumb dinamicamente
+            function updateBreadcrumb() {
+                try {
+                    const currentPath = window.location.pathname;
+                    const breadcrumbItems = document.querySelectorAll('.breadcrumb-item');
+                    
+                    // Implementar lógica para atualizar breadcrumb baseado na rota atual
+                    console.log('Breadcrumb atualizado para:', currentPath);
+                } catch (error) {
+                    console.warn('⚠️ Erro ao atualizar breadcrumb:', error);
+                }
+            }
+            
+            // Chamar função de atualização
+            try {
+                updateBreadcrumb();
+            } catch (error) {
+                console.warn('⚠️ Erro ao chamar updateBreadcrumb:', error);
+            }
+            
+            // Garantir que o sidebar seja sempre visível
+            try {
+                const sidebarContainer = document.querySelector('.sidebar-container');
+                const sidebar = document.querySelector('.sidebar');
+                
+                if (sidebarContainer) {
+                    sidebarContainer.style.display = 'block';
+                    sidebarContainer.style.visibility = 'visible';
+                    sidebarContainer.style.opacity = '1';
+                    sidebarContainer.style.position = 'fixed';
+                    sidebarContainer.style.left = '0';
+                    sidebarContainer.style.top = '0';
+                    sidebarContainer.style.width = '250px';
+                    sidebarContainer.style.zIndex = '1000';
+                    sidebarContainer.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+                    sidebarContainer.style.minHeight = '100vh';
+                    sidebarContainer.style.overflowY = 'auto';
+                    console.log('✅ Sidebar container forçado a ser visível');
+                }
+                
+                if (sidebar) {
+                    sidebar.style.display = 'flex';
+                    sidebar.style.flexDirection = 'column';
+                    sidebar.style.width = '100%';
+                    sidebar.style.height = '100vh';
+                    sidebar.style.color = 'white';
+                    console.log('✅ Sidebar forçado a ser visível');
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao forçar visibilidade do sidebar:', error);
+            }
+            
+            // Função para lidar com cliques nos toggles do menu
+            function handleToggleClick(e) {
+                        e.preventDefault();
+                e.stopPropagation();
+                
+                        const target = this.getAttribute('data-target');
+                        const submenu = document.getElementById(target);
+                
+                console.log('🖱️ Clique no toggle:', {
+                    target: target,
+                    submenu: submenu,
+                    currentActive: this.classList.contains('active')
+                });
+                        
+                        if (submenu) {
+                            const isActive = this.classList.contains('active');
+                            
+                            // Fechar todos os outros submenus
+                            document.querySelectorAll('.submenu').forEach(menu => {
+                                if (menu.id !== target) {
+                                    menu.classList.remove('show');
+                            console.log('🔒 Fechando submenu:', menu.id);
+                                }
+                            });
+                            
+                            // Fechar todos os outros toggles
+                            document.querySelectorAll('.menu-toggle').forEach(tog => {
+                                if (tog !== this) {
+                                    tog.classList.remove('active');
+                                }
+                            });
+                            
+                            // Toggle do submenu atual
+                            if (isActive) {
+                                submenu.classList.remove('show');
+                                this.classList.remove('active');
+                        console.log('🔒 Fechando submenu atual:', target);
+                            } else {
+                                submenu.classList.add('show');
+                                this.classList.add('active');
+                        console.log('🔓 Abrindo submenu:', target);
+                    }
+                } else {
+                    console.warn('⚠️ Submenu não encontrado:', target);
+                }
+            }
+            
+            // Controlar submenus usando event delegation
+            function initializeSubmenus() {
+            try {
+                    console.log('🔄 Inicializando controle de submenus...');
+                    
+                const menuToggles = document.querySelectorAll('.menu-toggle');
+                    console.log('📋 Menu toggles encontrados:', menuToggles.length);
+                    
+                    // Debug: verificar se os elementos existem
+                    if (menuToggles.length === 0) {
+                        console.warn('⚠️ Nenhum menu-toggle encontrado! Verificando se o DOM está carregado...');
+                        console.log('📄 Document ready state:', document.readyState);
+                        console.log('📄 Body exists:', !!document.body);
+                        return;
+                    }
+                    
+                                // Usar event delegation apenas no sidebar para evitar interferência com outros links
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) {
+                sidebar.removeEventListener('click', handleMenuClick);
+                sidebar.addEventListener('click', handleMenuClick);
+            }
+                    
+                    // Inicializar submenus que devem estar abertos por padrão
+                    document.querySelectorAll('.submenu.show').forEach(submenu => {
+                        const toggle = document.querySelector(`[data-target="${submenu.id}"]`);
+                        if (toggle) {
+                            toggle.classList.add('active');
+                            console.log('✅ Submenu inicializado como ativo:', submenu.id);
+                        }
+                    });
+                    
+                    console.log('✅ Controle de submenus inicializado com sucesso');
+                } catch (error) {
+                    console.error('❌ Erro ao inicializar controle de submenus:', error);
+                }
+            }
+            
+            // Função de event delegation para cliques no menu
+            function handleMenuClick(e) {
+                const toggle = e.target.closest('.menu-toggle');
+                if (toggle) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleToggleClick.call(toggle, e);
+                } else {
+                    // Verificar se é um link de menu normal
+                    const link = e.target.closest('a[data-menu-link]');
+                    if (link) {
+                        console.log('🔗 Link de menu clicado:', link.href, link.dataset.menuLink);
+                        // Permitir navegação normal - não fazer preventDefault
+                    }
+                }
+            }
+            
+            // Função global para reinicializar o menu
+            window.reinitializeMenu = function() {
+                console.log('🔄 Reinicializando menu via função global...');
+                try {
+                    if (typeof initializeSubmenus === 'function') {
+                        initializeSubmenus();
+                    } else {
+                        console.warn('⚠️ Função initializeSubmenus não encontrada');
+                        // Fallback: tentar inicializar elementos do menu manualmente
+                        initializeMenuFallback();
+                    }
+                } catch (error) {
+                    console.warn('⚠️ Erro ao reinicializar menu:', error);
+                }
+            };
+            
+            // Função de fallback para inicializar o menu
+            function initializeMenuFallback() {
+                try {
+                    console.log('🔄 Inicializando menu via fallback...');
+                    const menuToggles = document.querySelectorAll('.menu-toggle');
+                    menuToggles.forEach(toggle => {
+                        if (!toggle.hasAttribute('data-initialized')) {
+                            toggle.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const targetId = this.getAttribute('data-target');
+                                const target = document.getElementById(targetId);
+                                if (target) {
+                                    target.classList.toggle('show');
+                                }
+                            });
+                            toggle.setAttribute('data-initialized', 'true');
+                        }
+                    });
+                } catch (error) {
+                    console.warn('⚠️ Erro no fallback do menu:', error);
+                }
+            }
+            
+            // Inicializar imediatamente
+            if (typeof initializeSubmenus === 'function') {
+                initializeSubmenus();
+            }
+            
+            // Reinicializar após um pequeno delay para garantir que o DOM esteja pronto
+            setTimeout(() => {
+                if (typeof initializeSubmenus === 'function') {
+                    initializeSubmenus();
+                }
+            }, 100);
+            
+            // Reinicializar quando o DOM estiver completamente carregado
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof initializeSubmenus === 'function') {
+                    initializeSubmenus();
+                }
+            });
+            
+            // Event delegation elimina a necessidade de verificação periódica
+            
+            // Reinicializar menu quando a página for carregada via AJAX ou navegação
+            window.addEventListener('popstate', function() {
+                console.log('🔄 Navegação detectada - reinicializando menu...');
+                setTimeout(() => {
+                    if (typeof initializeSubmenus === 'function') {
+                        initializeSubmenus();
+                    }
+                }, 100);
+            });
+            
+            // Reinicializar menu quando houver mudanças no DOM
+            const observer = new MutationObserver(function(mutations) {
+                let shouldReinit = false;
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                        // Verificar se algum elemento do menu foi adicionado
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1 && (
+                                node.classList.contains('menu-toggle') ||
+                                node.querySelector && node.querySelector('.menu-toggle')
+                            )) {
+                                shouldReinit = true;
+                            }
+                        });
+                    }
+                });
+                
+                if (shouldReinit && typeof initializeSubmenus === 'function') {
+                    console.log('🔄 Mudanças no DOM detectadas - reinicializando menu...');
+                    setTimeout(() => {
+                        initializeSubmenus();
+                    }, 100);
+                }
+            });
+            
+            // Observar mudanças no body
+            if (document.body) {
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+            
+            // Copiar menu do sidebar para offcanvas em mobile
+            try {
+                const sidebar = document.querySelector('.sidebar');
+                const offcanvasBody = document.querySelector('.offcanvas-body');
+                
+                if (sidebar && offcanvasBody) {
+                    // Limpar conteúdo anterior
+                    offcanvasBody.innerHTML = '';
+                    
+                    // Clonar o conteúdo do sidebar menu
+                    const sidebarMenu = sidebar.querySelector('.sidebar-menu');
+                    if (sidebarMenu) {
+                        const clonedContent = sidebarMenu.cloneNode(true);
+                        
+                        // Reaplicar event listeners para os submenus no offcanvas
+                        const clonedToggles = clonedContent.querySelectorAll('.menu-toggle');
+                        clonedToggles.forEach(toggle => {
+                            toggle.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                
+                                const target = this.getAttribute('data-target');
+                                const submenu = clonedContent.querySelector(`#${target}`);
+                                
+                                if (submenu) {
+                                    const isActive = this.classList.contains('active');
+                                    
+                                    // Fechar todos os outros submenus no offcanvas
+                                    clonedContent.querySelectorAll('.submenu').forEach(menu => {
+                                        if (menu.id !== target) {
+                                            menu.classList.remove('show');
+                                        }
+                                    });
+                                    
+                                    // Fechar todos os outros toggles no offcanvas
+                                    clonedContent.querySelectorAll('.menu-toggle').forEach(tog => {
+                                        if (tog !== this) {
+                                            tog.classList.remove('active');
+                                        }
+                                    });
+                                    
+                                    // Toggle do submenu atual
+                                    if (isActive) {
+                                        submenu.classList.remove('show');
+                                        this.classList.remove('active');
+                                    } else {
+                                        submenu.classList.add('show');
+                                        this.classList.add('active');
+                                    }
+                                }
+                            });
+                        });
+                        
+                        offcanvasBody.appendChild(clonedContent);
+                        console.log('✅ Menu mobile copiado com sucesso');
+                    }
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao copiar menu para offcanvas:', error);
+            }
+            
+            console.log('Funcionalidades do navbar inicializadas com sucesso!');
+        } catch (error) {
+            console.error('❌ Erro ao inicializar funcionalidades do navbar:', error);
+        }
+        });
+    </script>
+    {% block extra_js %}
+    <!-- Modal de Configurações do Usuário -->
+    <div class="modal fade" id="userSettingsModal" tabindex="-1" aria-labelledby="userSettingsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userSettingsModalLabel">
+                        <i class="fas fa-cog me-2"></i>
+                        Configurações do Usuário
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userSettingsForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Preferências de Interface</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Tema</label>
+                                    <select class="form-select" id="themeSelect">
+                                        <option value="light">Claro</option>
+                                        <option value="dark">Escuro</option>
+                                        <option value="auto">Automático</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Idioma</label>
+                                    <select class="form-select" id="languageSelect">
+                                        <option value="pt-br">Português (Brasil)</option>
+                                        <option value="en">English</option>
+                                        <option value="es">Español</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="notificationsEnabled" checked>
+                                        <label class="form-check-label" for="notificationsEnabled">
+                                            Notificações por email
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="mb-3">Preferências de Sistema</h6>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="autoSaveEnabled" checked>
+                                        <label class="form-check-label" for="autoSaveEnabled">
+                                            Salvamento automático
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="soundEnabled">
+                                        <label class="form-check-label" for="soundEnabled">
+                                            Sons do sistema
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Tamanho da fonte</label>
+                                    <select class="form-select" id="fontSizeSelect">
+                                        <option value="small">Pequeno</option>
+                                        <option value="medium" selected>Médio</option>
+                                        <option value="large">Grande</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveSettingsBtn">
+                        <i class="fas fa-save me-2"></i>
+                        Salvar Configurações
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Alteração de Senha -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Alterar Senha
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm">
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Senha Atual</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                            <div class="form-text">Digite sua senha atual para confirmar a alteração</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPassword" class="form-label">Nova Senha</label>
+                            <input type="password" class="form-control" id="newPassword" required>
+                            <div class="form-text">A senha deve ter pelo menos 8 caracteres</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirmar Nova Senha</label>
+                            <input type="password" class="form-control" id="confirmPassword" required>
+                            <div class="form-text">Digite novamente a nova senha</div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>Dica:</strong> Use uma senha forte com letras, números e símbolos especiais.
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="savePasswordBtn">
+                        <i class="fas fa-key me-2"></i>
+                        Alterar Senha
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistema de Modais Base -->
+    <div id="modalContainer"></div>
+
+    <!-- Script para gerenciar modais -->
+    <script>
+        // Sistema de Modais
+        class ModalManager {
+            constructor() {
+                try {
+                    this.modalContainer = document.getElementById('modalContainer');
+                    if (!this.modalContainer) {
+                        console.warn('⚠️ ModalContainer não encontrado, criando um...');
+                        this.modalContainer = document.createElement('div');
+                        this.modalContainer.id = 'modalContainer';
+                        document.body.appendChild(this.modalContainer);
+                    }
+                    this.currentModal = null;
+                    console.log('✅ ModalManager inicializado com sucesso');
+                } catch (error) {
+                    console.error('❌ Erro ao inicializar ModalManager:', error);
+                    this.modalContainer = null;
+                    this.currentModal = null;
+                }
+            }
+
+            // Criar modal de formulário
+            createFormModal(title, formHtml, formId, submitUrl, method = 'POST', csrfToken = null) {
+                try {
+                    if (!this.modalContainer) {
+                        throw new Error('ModalContainer não está disponível');
+                    }
+                    
+                    const modalId = 'formModal_' + Date.now();
+                    const modalHtml = `
+                        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ${formHtml}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" form="${formId}" class="btn btn-primary">Salvar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    this.modalContainer.innerHTML = modalHtml;
+                    
+                    // Verificar se Bootstrap está disponível
+                    if (typeof bootstrap === 'undefined' || typeof bootstrap.Modal === 'undefined') {
+                        throw new Error('Bootstrap Modal não está disponível');
+                    }
+                    
+                    const modalElement = document.getElementById(modalId);
+                    if (!modalElement) {
+                        throw new Error('Elemento do modal não foi criado');
+                    }
+                    
+                    const modal = new bootstrap.Modal(modalElement);
+                    
+                    // Configurar envio do formulário
+                    const form = document.getElementById(formId);
+                    if (form) {
+                        form.addEventListener('submit', (e) => this.handleFormSubmit(e, submitUrl, method, csrfToken, modal));
+                    }
+
+                    this.currentModal = modal;
+                    console.log('✅ Modal de formulário criado com sucesso:', modalId);
+                    return modal;
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao criar modal de formulário:', error);
+                    throw error;
+                }
+            }
+
+            // Criar modal de confirmação
+            createConfirmModal(title, message, confirmCallback, cancelCallback = null) {
+                try {
+                    if (!this.modalContainer) {
+                        throw new Error('ModalContainer não está disponível');
+                    }
+                    
+                    const modalId = 'confirmModal_' + Date.now();
+                    const modalHtml = `
+                        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>${message}</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="button" class="btn btn-danger" id="confirmBtn">Confirmar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    this.modalContainer.innerHTML = modalHtml;
+                    
+                    // Verificar se Bootstrap está disponível
+                    if (typeof bootstrap === 'undefined' || typeof bootstrap.Modal === 'undefined') {
+                        throw new Error('Bootstrap Modal não está disponível');
+                    }
+                    
+                    const modalElement = document.getElementById(modalId);
+                    if (!modalElement) {
+                        throw new Error('Elemento do modal não foi criado');
+                    }
+                    
+                    const modal = new bootstrap.Modal(modalElement);
+                    
+                    // Configurar botão de confirmação
+                    const confirmBtn = document.getElementById('confirmBtn');
+                    if (confirmBtn) {
+                        confirmBtn.addEventListener('click', () => {
+                            modal.hide();
+                            if (confirmCallback) confirmCallback();
+                        });
+                    }
+
+                    // Configurar callback de cancelamento
+                    if (cancelCallback) {
+                        modal._element.addEventListener('hidden.bs.modal', cancelCallback);
+                    }
+
+                    this.currentModal = modal;
+                    console.log('✅ Modal de confirmação criado com sucesso:', modalId);
+                    return modal;
+                    
+                } catch (error) {
+                    console.error('❌ Erro ao criar modal de confirmação:', error);
+                    throw error;
+                }
+            }
+
+            // Abrir modal
+            show(modal) {
+                try {
+                    if (modal && typeof modal.show === 'function') {
+                        modal.show();
+                        console.log('✅ Modal aberto com sucesso');
+                    } else {
+                        console.warn('⚠️ Modal inválido ou método show não disponível');
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao abrir modal:', error);
+                }
+            }
+
+            // Fechar modal
+            hide(modal) {
+                try {
+                    if (modal && typeof modal.hide === 'function') {
+                        modal.hide();
+                        console.log('✅ Modal fechado com sucesso');
+                    } else {
+                        console.warn('⚠️ Modal inválido ou método hide não disponível');
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao fechar modal:', error);
+                }
+            }
+
+            // Fechar modal atual
+            hideCurrent() {
+                try {
+                    if (this.currentModal) {
+                        this.hide(this.currentModal);
+                        this.currentModal = null;
+                        console.log('✅ Modal atual fechado com sucesso');
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao fechar modal atual:', error);
+                    this.currentModal = null;
+                }
+            }
+
+            // Limpar container de modais
+            clear() {
+                try {
+                    if (this.modalContainer) {
+                        this.modalContainer.innerHTML = '';
+                    }
+                    this.currentModal = null;
+                    console.log('✅ Container de modais limpo com sucesso');
+                } catch (error) {
+                    console.error('❌ Erro ao limpar container de modais:', error);
+                    this.currentModal = null;
+                }
+            }
+
+            // Manipular envio de formulário
+            async handleFormSubmit(event, submitUrl, method, csrfToken, modal) {
+                try {
+                    event.preventDefault();
+                    
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    
+                    // Debug: verificar campos enviados
+                    console.log('DEBUG: Campos sendo enviados:');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(`${key}: ${value}`);
+                    }
+                    
+                    try {
+                        const response = await fetch(submitUrl, {
+                            method: method,
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': csrfToken || this.getCsrfToken()
+                            }
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                // Sucesso - mostrar mensagem e fechar modal
+                                this.showMessage('success', result.message || 'Operação realizada com sucesso!');
+                                if (modal && typeof modal.hide === 'function') {
+                                    modal.hide();
+                                }
+                                
+                                // Recarregar página se necessário
+                                if (result.reload) {
+                                    setTimeout(() => window.location.reload(), 1000);
+                                }
+                            } else {
+                                // Erro de validação
+                                this.showMessage('error', result.message || 'Erro na validação do formulário.');
+                                if (result.errors) {
+                                    this.displayFormErrors(result.errors);
+                                }
+                            }
+                        } else {
+                            // Erro HTTP
+                            this.showMessage('error', 'Erro ao processar a requisição.');
+                        }
+                    } catch (error) {
+                        console.error('Erro na requisição:', error);
+                        this.showMessage('error', 'Erro de conexão.');
+                    }
+                } catch (error) {
+                    console.error('Erro geral no handleFormSubmit:', error);
+                    this.showMessage('error', 'Erro interno do sistema.');
+                }
+            }
+
+            // Obter token CSRF
+            getCsrfToken() {
+                try {
+                    const token = document.querySelector('[name=csrfmiddlewaretoken]');
+                    return token ? token.value : '';
+                } catch (error) {
+                    console.error('❌ Erro ao obter token CSRF:', error);
+                    return '';
+                }
+            }
+
+            // Mostrar mensagem
+            showMessage(type, message) {
+                try {
+                    const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                    const alertHtml = `
+                        <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    `;
+                    
+                    // Inserir no topo da página
+                    const container = document.querySelector('.main-content') || document.body;
+                    if (container) {
+                        container.insertAdjacentHTML('afterbegin', alertHtml);
+                        
+                        // Auto-remover após 5 segundos
+                        setTimeout(() => {
+                            const alert = container.querySelector('.alert');
+                            if (alert) alert.remove();
+                        }, 5000);
+                    }
+                } catch (error) {
+                    console.error('❌ Erro ao mostrar mensagem:', error);
+                    // Fallback: usar alert nativo
+                    alert(message);
+                }
+            }
+
+            // Exibir erros de validação
+            displayFormErrors(errors) {
+                try {
+                    // Limpar erros anteriores
+                    document.querySelectorAll('.is-invalid').forEach(field => {
+                        field.classList.remove('is-invalid');
+                    });
+                    document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+                        feedback.remove();
+                    });
+
+                    // Exibir novos erros
+                    Object.keys(errors).forEach(fieldName => {
+                        const field = document.querySelector(`[name="${fieldName}"]`);
+                        if (field) {
+                            field.classList.add('is-invalid');
+                            
+                            const feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            feedback.textContent = errors[fieldName].join(', ');
+                            
+                            if (field.parentNode) {
+                                field.parentNode.appendChild(feedback);
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.error('❌ Erro ao exibir erros de validação:', error);
+                }
+            }
+        }
+
+        // Instanciar gerenciador de modais globalmente
+        try {
+            window.modalManager = new ModalManager();
+            console.log('✅ ModalManager instanciado com sucesso');
+        } catch (error) {
+            console.error('❌ Erro ao instanciar ModalManager:', error);
+            window.modalManager = null;
+        }
+
+        // Função global para abrir modais de formulário
+        window.openFormModal = function(title, formHtml, formId, submitUrl, method = 'POST') {
+            try {
+                if (window.modalManager && typeof window.modalManager.createFormModal === 'function') {
+                    const modal = window.modalManager.createFormModal(title, formHtml, formId, submitUrl, method);
+                    window.modalManager.show(modal);
+                    return modal;
+                } else {
+                    console.error('ModalManager não está disponível ou createFormModal não é uma função');
+                    // Fallback: criar modal básico
+                    const modalId = 'fallbackModal_' + Date.now();
+                    const modalHtml = `
+                        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        ${formHtml}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                        <button type="submit" form="${formId}" class="btn btn-primary">Salvar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Inserir no body
+                    document.body.insertAdjacentHTML('beforeend', modalHtml);
+                    
+                    // Criar e mostrar modal
+                    const modalElement = document.getElementById(modalId);
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                    
+                    // Configurar envio do formulário
+                    const form = document.getElementById(formId);
+                    if (form) {
+                        form.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            console.log('Formulário enviado via fallback');
+                            // Aqui você pode implementar a lógica de envio
+                        });
+                    }
+                    
+                    return modal;
+                }
+            } catch (error) {
+                console.error('Erro ao abrir modal:', error);
+                alert('Erro ao abrir modal. Verifique o console para mais detalhes.');
+            }
+        };
+
+        // Função global para abrir modais de confirmação
+        window.openConfirmModal = function(title, message, confirmCallback, cancelCallback) {
+            try {
+                if (window.modalManager && typeof window.modalManager.createConfirmModal === 'function') {
+                    const modal = window.modalManager.createConfirmModal(title, message, confirmCallback, cancelCallback);
+                    window.modalManager.show(modal);
+                    return modal;
+                } else {
+                    console.error('ModalManager não está disponível ou createConfirmModal não é uma função');
+                    // Fallback: usar confirm nativo
+                    if (confirm(message)) {
+                        if (confirmCallback) confirmCallback();
+                    } else if (cancelCallback) {
+                        cancelCallback();
+                    }
+                    return null;
+                }
+            } catch (error) {
+                console.error('Erro ao abrir modal de confirmação:', error);
+                // Fallback: usar confirm nativo
+                if (confirm(message)) {
+                    if (confirmCallback) confirmCallback();
+                } else if (cancelCallback) {
+                    cancelCallback();
+                }
+                return null;
+            }
+        };
+
+        // Função global para abrir modal de configuração de cobrança
+        window.openConfigModalFromMenu = function() {
+            try {
+                // Navegar para o dashboard financeiro com parâmetro para abrir o modal
+                if (!window.location.pathname.includes('/financeiro/')) {
+                    window.location.href = '/financeiro/?open_config=1';
+                } else {
+                    // Se já estivermos no módulo financeiro, adicionar parâmetro e recarregar
+                    const url = new URL(window.location);
+                    url.searchParams.set('open_config', '1');
+                    window.location.href = url.toString();
+                }
+            } catch (error) {
+                console.error('❌ Erro ao abrir modal de configuração:', error);
+                // Fallback: navegar diretamente
+                window.location.href = '/financeiro/?open_config=1';
+            }
+        };
+    </script>
+
+    <!-- Modal Loader - deve ser carregado primeiro -->
+    <script src="{% static 'js/modal-loader.js' %}"></script>
+    
+    <!-- Visualizador de Senhas Global -->
+    <script src="{% static 'js/password_viewer.js' %}"></script>
+    
+    <!-- CORREÇÃO PARA ERRO DE BACKDROP -->
+    <script src="{% static 'js/modal-fix.js' %}"></script>
+    
+    <!-- Scripts dos Modais da ASEJUS -->
+    <script src="{% static 'assejus/js/modais_assejus.js' %}"></script>
+    
+    <!-- PADRÕES DE MODAIS (após carregar as funções de mensagens) -->
+    <script src="{% static 'js/modal-patterns.js' %}"></script>
+    
+    <!-- Scripts dos Modais da Psicologia (após modal-patterns) -->
+    <script src="{% static 'psicologia/js/modais.js' %}"></script>
+    
+    <!-- Scripts dos Modais dos Associados -->
+    <script src="{% static 'associados/js/modais.js' %}"></script>
+    
+    <!-- Sistema de Visualização de Erros -->
+    <script src="{% static 'js/error-handling.js' %}"></script>
+    {% endblock %}
+</body>
+</html>

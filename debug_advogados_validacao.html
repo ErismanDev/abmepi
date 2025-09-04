@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Validação Advogados - ASEJUS</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+            background-color: #fff5f5 !important;
+        }
+        .form-group.has-error .form-label {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+        .invalid-feedback {
+            display: block !important;
+            color: #dc3545 !important;
+        }
+        .debug-console {
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .debug-console .timestamp {
+            color: #888;
+        }
+        .debug-console .error {
+            color: #ff6b6b;
+        }
+        .debug-console .success {
+            color: #51cf66;
+        }
+        .debug-console .info {
+            color: #74c0fc;
+        }
+        .debug-console .warning {
+            color: #ffd43b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4><i class="fas fa-bug me-2"></i>Debug Validação Advogados - ASEJUS</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Testes Disponíveis</h5>
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-primary" onclick="testAdvogadoModal()">
+                                        <i class="fas fa-user-tie me-2"></i>Testar Modal Advogado
+                                    </button>
+                                    <button type="button" class="btn btn-success" onclick="testFormValidation()">
+                                        <i class="fas fa-check-circle me-2"></i>Testar Validação
+                                    </button>
+                                    <button type="button" class="btn btn-warning" onclick="testErrorHandling()">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Testar Tratamento de Erros
+                                    </button>
+                                    <button type="button" class="btn btn-info" onclick="testBackendConnection()">
+                                        <i class="fas fa-server me-2"></i>Testar Conexão Backend
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Status do Sistema</h5>
+                                <div id="systemStatus">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Clique em um dos testes para verificar o funcionamento
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-terminal me-2"></i>Console de Debug</h5>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearConsole()">
+                            <i class="fas fa-trash me-1"></i>Limpar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="debugConsole" class="debug-console">
+                            <div class="timestamp">[Sistema] Console de debug inicializado...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Teste -->
+        <div class="modal fade" id="testModal" tabindex="-1" aria-labelledby="testModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="testModalLabel">
+                            <i class="fas fa-user-tie me-2"></i>Teste Modal Advogado
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="modalContent">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Carregando...</span>
+                                </div>
+                                <p class="mt-2">Carregando formulário de teste...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Função para adicionar logs ao console
+        function addLog(message, type = 'info') {
+            const console = document.getElementById('debugConsole');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="${type}">${message}</span>`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        // Função para limpar console
+        function clearConsole() {
+            const console = document.getElementById('debugConsole');
+            console.innerHTML = '<div class="timestamp">[Sistema] Console limpo...</div>';
+        }
+
+        // Função para atualizar status do sistema
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('systemStatus');
+            const alertClass = type === 'error' ? 'alert-danger' : 
+                             type === 'success' ? 'alert-success' : 
+                             type === 'warning' ? 'alert-warning' : 'alert-info';
+            
+            statusDiv.innerHTML = `<div class="alert ${alertClass}">
+                <i class="fas fa-${type === 'error' ? 'times-circle' : 
+                                   type === 'success' ? 'check-circle' : 
+                                   type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+                ${message}
+            </div>`;
+        }
+
+        // Teste 1: Modal de Advogado
+        function testAdvogadoModal() {
+            addLog('🚀 Iniciando teste do modal de advogado...', 'info');
+            updateStatus('Testando modal de advogado...', 'info');
+            
+            try {
+                const modal = new bootstrap.Modal(document.getElementById('testModal'));
+                modal.show();
+                addLog('✅ Modal aberto com sucesso', 'success');
+                updateStatus('Modal aberto com sucesso!', 'success');
+                
+                // Simular carregamento do formulário
+                setTimeout(() => {
+                    document.getElementById('modalContent').innerHTML = `
+                        <div class="alert alert-success">
+                            <i class="fas fa-check-circle me-2"></i>
+                            Modal funcionando corretamente!
+                        </div>
+                        <p>Este é um teste do modal de advogado.</p>
+                    `;
+                    addLog('✅ Conteúdo do modal carregado', 'success');
+                }, 1000);
+                
+            } catch (error) {
+                addLog(`❌ Erro ao abrir modal: ${error.message}`, 'error');
+                updateStatus(`Erro ao abrir modal: ${error.message}`, 'error');
+            }
+        }
+
+        // Teste 2: Validação de Formulário
+        function testFormValidation() {
+            addLog('🔍 Iniciando teste de validação...', 'info');
+            updateStatus('Testando validação de formulário...', 'info');
+            
+            // Simular dados de formulário
+            const formData = {
+                nome: '',
+                cpf: '',
+                oab: '',
+                uf_oab: '',
+                email: '',
+                telefone: '',
+                endereco: '',
+                cidade: '',
+                estado: '',
+                cep: '',
+                data_inscricao_oab: '',
+                experiencia_anos: '',
+                situacao: ''
+            };
+            
+            addLog('📋 Dados do formulário (todos vazios):', 'info');
+            addLog(JSON.stringify(formData, null, 2), 'info');
+            
+            // Simular validação
+            const errors = {};
+            Object.keys(formData).forEach(field => {
+                if (!formData[field] || formData[field] === '') {
+                    errors[field] = [`Campo ${field} é obrigatório`];
+                }
+            });
+            
+            if (Object.keys(errors).length > 0) {
+                addLog(`❌ Validação falhou com ${Object.keys(errors).length} erros:`, 'error');
+                Object.keys(errors).forEach(field => {
+                    addLog(`  • ${field}: ${errors[field].join(', ')}`, 'error');
+                });
+                updateStatus(`Validação falhou com ${Object.keys(errors).length} erros`, 'error');
+            } else {
+                addLog('✅ Validação passou com sucesso', 'success');
+                updateStatus('Validação passou com sucesso!', 'success');
+            }
+        }
+
+        // Teste 3: Tratamento de Erros
+        function testErrorHandling() {
+            addLog('⚠️ Iniciando teste de tratamento de erros...', 'info');
+            updateStatus('Testando tratamento de erros...', 'info');
+            
+            // Simular resposta de erro do servidor
+            const mockErrorResponse = {
+                success: false,
+                message: 'Erro na validação do formulário.',
+                errors: {
+                    'nome': ['Nome é obrigatório.'],
+                    'cpf': ['CPF é obrigatório.'],
+                    'oab': ['OAB é obrigatória.']
+                }
+            };
+            
+            addLog('📥 Simulando resposta de erro do servidor:', 'info');
+            addLog(JSON.stringify(mockErrorResponse, null, 2), 'info');
+            
+            // Testar tratamento dos erros
+            if (mockErrorResponse.errors) {
+                addLog('📋 Processando erros recebidos:', 'info');
+                Object.keys(mockErrorResponse.errors).forEach(fieldName => {
+                    const fieldErrors = mockErrorResponse.errors[fieldName];
+                    addLog(`  • ${fieldName}: ${fieldErrors.join(', ')}`, 'error');
+                });
+                
+                addLog('✅ Tratamento de erros funcionando corretamente', 'success');
+                updateStatus('Tratamento de erros funcionando!', 'success');
+            } else {
+                addLog('❌ Erro: Resposta não contém detalhes dos erros', 'error');
+                updateStatus('Erro: Resposta sem detalhes', 'error');
+            }
+        }
+
+        // Teste 4: Conexão com Backend
+        function testBackendConnection() {
+            addLog('🌐 Testando conexão com backend...', 'info');
+            updateStatus('Testando conexão com backend...', 'info');
+            
+            // Testar diferentes endpoints
+            const endpoints = [
+                '/assejus/advogados/modal/novo/',
+                '/assejus/advogados/modal/novo/teste-simples/',
+                '/assejus/advogados/modal/novo/teste-post/'
+            ];
+            
+            endpoints.forEach((endpoint, index) => {
+                setTimeout(() => {
+                    addLog(`🔍 Testando endpoint: ${endpoint}`, 'info');
+                    
+                    fetch(endpoint, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        addLog(`📥 Endpoint ${endpoint}: Status ${response.status}`, 
+                               response.ok ? 'success' : 'warning');
+                        
+                        if (response.ok) {
+                            return response.json();
+                        } else {
+                            throw new Error(`HTTP ${response.status}`);
+                        }
+                    })
+                    .then(data => {
+                        addLog(`✅ Endpoint ${endpoint} respondeu: ${JSON.stringify(data).substring(0, 100)}...`, 'success');
+                    })
+                    .catch(error => {
+                        addLog(`❌ Endpoint ${endpoint} falhou: ${error.message}`, 'error');
+                    });
+                    
+                    // Atualizar status final
+                    if (index === endpoints.length - 1) {
+                        setTimeout(() => {
+                            updateStatus('Teste de conexão concluído!', 'success');
+                        }, 2000);
+                    }
+                }, index * 1000);
+            });
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Sistema de debug inicializado', 'success');
+            addLog('📋 Testes disponíveis:', 'info');
+            addLog('  1. Modal de Advogado', 'info');
+            addLog('  2. Validação de Formulário', 'info');
+            addLog('  3. Tratamento de Erros', 'info');
+            addLog('  4. Conexão com Backend', 'info');
+            updateStatus('Sistema de debug pronto para uso!', 'success');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+/* ===== OVERRIDE CSS GLOBAL PARA CAMPOS EDITÁVEIS ===== */
+/* Este arquivo sobrescreve QUALQUER CSS que possa estar interferindo */
+
+/* Override para QUALQUER elemento dentro de modais */
+.modal-body *,
+.modal-body select,
+.modal-body input,
+.modal-body textarea,
+.modal-body .form-control,
+.modal-body .form-select {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 9999 !important;
+    user-select: auto !important;
+    -webkit-user-select: auto !important;
+    -moz-user-select: auto !important;
+    -ms-user-select: auto !important;
+}
+
+/* Override específico para campos select */
+.modal-body select,
+.modal-body select.form-select,
+.modal-body select.form-control {
+    cursor: pointer !important;
+    background-color: #fff !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 0.75rem center !important;
+    background-size: 16px 12px !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+    -moz-appearance: auto !important;
+    pointer-events: auto !important;
+}
+
+/* Override específico para campos de input */
+.modal-body input[type="text"],
+.modal-body input[type="email"],
+.modal-body input[type="tel"],
+.modal-body input[type="number"],
+.modal-body input[type="date"],
+.modal-body textarea {
+    cursor: text !important;
+    pointer-events: auto !important;
+}
+
+/* Override específico para campos de checkbox e radio */
+.modal-body input[type="checkbox"],
+.modal-body input[type="radio"] {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+/* Override para campos desabilitados */
+.modal-body select[disabled],
+.modal-body input[disabled],
+.modal-body textarea[disabled],
+.modal-body .form-control:disabled,
+.modal-body .form-select:disabled {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+}
+
+/* Override para Bootstrap */
+.modal-body .form-control:disabled,
+.modal-body .form-select:disabled {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+}
+
+/* Override para qualquer framework CSS */
+.modal-body .disabled,
+.modal-body .readonly,
+.modal-body .form-control-disabled {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+}
+
+/* Exceção apenas para loading */
+.modal-body.loading {
+    pointer-events: none !important;
+}
+
+.modal-body.loading * {
+    pointer-events: none !important;
+}
+
+/* Override para formulários específicos */
+#advogadoForm select,
+#advogadoForm input,
+#advogadoForm textarea {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    z-index: 9999 !important;
+}
+
+/* Override para qualquer CSS global que possa estar interferindo */
+html body .modal-body select,
+html body .modal-body input,
+html body .modal-body textarea {
+    pointer-events: auto !important;
+    cursor: auto !important;
+    background-color: #fff !important;
+    opacity: 1 !important;
+}

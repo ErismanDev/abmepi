@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal Sem Auth</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { padding: 20px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .log { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Teste do Modal de Advogado (Sem Auth)</h1>
+        
+        <div class="test-section">
+            <h3>Teste do Modal</h3>
+            <button type="button" class="btn btn-primary" onclick="testarModal()">
+                <i class="fas fa-plus me-2"></i>Testar Modal
+            </button>
+            
+            <div id="resultado" class="mt-3"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Logs</h3>
+            <div id="logs"></div>
+        </div>
+    </div>
+
+    <!-- Modal Base para Formulários -->
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formModalLabel">
+                        <i class="fas fa-edit me-2"></i>Título do Modal
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="formModalBody">
+                    <!-- Conteúdo do formulário será inserido aqui -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="formModalSubmit">
+                        <i class="fas fa-save me-2"></i>Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Função para adicionar logs
+        function addLog(message, type = 'info') {
+            const logsDiv = document.getElementById('logs');
+            const logDiv = document.createElement('div');
+            logDiv.className = `log ${type}`;
+            logDiv.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logsDiv.appendChild(logDiv);
+            console.log(message);
+        }
+
+        // Função para mostrar resultado
+        function showResult(message, type = 'info') {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        // Simular a função openFormModal que deveria estar disponível
+        window.openFormModal = function(titulo, conteudo, formId, actionUrl) {
+            addLog('🚀 openFormModal chamada: ' + titulo, 'info');
+            
+            // Atualizar título e conteúdo do modal
+            const titleEl = document.getElementById('formModalLabel');
+            const bodyEl = document.getElementById('formModalBody');
+            
+            if (titleEl) titleEl.innerHTML = titulo;
+            if (bodyEl) bodyEl.innerHTML = conteudo;
+            
+            // Configurar o formulário
+            const form = document.getElementById(formId);
+            if (form && actionUrl) {
+                form.action = actionUrl;
+                addLog('✅ Formulário configurado com action: ' + form.action, 'success');
+                
+                // Configurar o botão salvar
+                const submitBtn = document.getElementById('formModalSubmit');
+                if (submitBtn) {
+                    submitBtn.onclick = function(e) {
+                        e.preventDefault();
+                        addLog('🔘 Botão salvar clicado!', 'info');
+                        submitForm(form);
+                    };
+                }
+            }
+            
+            // Abrir modal
+            const modalElement = document.getElementById('formModal');
+            if (modalElement) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+                addLog('✅ Modal aberto', 'success');
+            }
+        };
+
+        // Simular a função submitForm
+        window.submitForm = function(form) {
+            addLog('🚀 submitForm chamada', 'info');
+            
+            if (!form || !form.action) {
+                addLog('❌ Formulário inválido ou sem action', 'error');
+                return;
+            }
+            
+            const formData = new FormData(form);
+            
+            // Log dos dados do formulário
+            addLog('🔍 Dados do formulário:', 'info');
+            for (let [key, value] of formData.entries()) {
+                addLog(`  ${key}: ${value}`, 'info');
+            }
+            
+            addLog('📤 Enviando requisição para: ' + form.action, 'info');
+            
+            // Simular envio (sem fazer requisição real)
+            showResult('Formulário enviado com sucesso! (Simulado)', 'success');
+            addLog('✅ Formulário enviado com sucesso (simulado)', 'success');
+        };
+
+        // Simular a função openAdvogadoModal
+        window.openAdvogadoModal = function() {
+            addLog('=== DEBUG: openAdvogadoModal chamada ===', 'info');
+            
+            // Verificar se a função openFormModal está disponível
+            if (typeof window.openFormModal === 'function') {
+                addLog('✅ window.openFormModal disponível', 'success');
+                
+                // Carregar modal de criação diretamente
+                const url = '/assejus/advogados/modal/novo/';
+                addLog('Carregando modal de criação: ' + url, 'info');
+                
+                // Mostrar indicador de carregamento
+                const loadingHtml = `
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Carregando formulário...</p>
+                    </div>
+                `;
+                
+                // Abrir modal com loading
+                window.openFormModal(
+                    'Novo Advogado',
+                    loadingHtml,
+                    'advogadoForm',
+                    url
+                );
+                
+                // Simular carregamento do formulário após 1 segundo
+                setTimeout(() => {
+                    const formHtml = `
+                        <form id="advogadoForm" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="nome" class="form-label">Nome *</label>
+                                <input type="text" class="form-control" id="nome" name="nome" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cpf" class="form-label">CPF *</label>
+                                <input type="text" class="form-control" id="cpf" name="cpf" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="oab" class="form-label">OAB *</label>
+                                <input type="text" class="form-control" id="oab" name="oab" required>
+                            </div>
+                        </form>
+                    `;
+                    
+                    // Atualizar conteúdo do modal
+                    const modalBody = document.getElementById('formModalBody');
+                    if (modalBody) {
+                        modalBody.innerHTML = formHtml;
+                        addLog('✅ Formulário carregado no modal', 'success');
+                    } else {
+                        addLog('❌ Modal body não encontrado', 'error');
+                    }
+                }, 1000);
+                
+            } else {
+                addLog('❌ Função openFormModal não disponível', 'error');
+                alert('Erro: Sistema de modais não disponível. Recarregue a página.');
+            }
+        };
+
+        // Função para testar o modal
+        function testarModal() {
+            addLog('🔧 Testando modal de advogado...', 'info');
+            
+            if (typeof window.openAdvogadoModal === 'function') {
+                addLog('✅ openAdvogadoModal disponível, chamando...', 'success');
+                window.openAdvogadoModal();
+            } else {
+                addLog('❌ openAdvogadoModal não disponível', 'error');
+                showResult('Erro: openAdvogadoModal não está disponível', 'danger');
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página de teste carregada', 'success');
+            addLog('✅ Funções disponíveis:', 'success');
+            addLog('  - openFormModal: ' + (typeof openFormModal === 'function'), 'info');
+            addLog('  - submitForm: ' + (typeof submitForm === 'function'), 'info');
+            addLog('  - openAdvogadoModal: ' + (typeof openAdvogadoModal === 'function'), 'info');
+        });
+    </script>
+</body>
+</html>

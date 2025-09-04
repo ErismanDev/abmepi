@@ -1,0 +1,607 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}
+        Editar Hóspede {{ object.nome_completo }} - Hotel de Trânsito
+    {% else %}
+        Novo Hóspede - Hotel de Trânsito
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .form-header {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-header h2 {
+        color: #1e3c72;
+        margin: 0;
+    }
+    
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .form-section h5 i {
+        color: #667eea;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-cancel {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    
+    .conditional-field {
+        display: none;
+    }
+    
+    .conditional-field.show {
+        display: block;
+    }
+    
+    .associado-info {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .associado-info h6 {
+        color: #1976d2;
+        margin-bottom: 0.5rem;
+    }
+    
+    .associado-info p {
+        margin: 0;
+        color: #424242;
+        font-size: 0.9rem;
+    }
+    
+    .form-control-plaintext {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        color: #495057;
+        font-weight: 500;
+    }
+    
+    .btn-enable-edit {
+        transition: all 0.2s ease;
+    }
+    
+    .btn-enable-edit:hover {
+        transform: scale(1.05);
+    }
+    
+    .field-group {
+        position: relative;
+    }
+    
+    .field-group .btn-enable-edit {
+        position: absolute;
+        right: -40px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>
+                        {% if object %}
+                            <i class="fas fa-user-edit me-2"></i>
+                            Editar Hóspede
+                        {% else %}
+                            <i class="fas fa-user-plus me-2"></i>
+                            Novo Hóspede
+                        {% endif %}
+                    </h2>
+                    <p class="text-muted mb-0">
+                        {% if object %}
+                            Atualize as informações do hóspede
+                        {% else %}
+                            Cadastre um novo hóspede no sistema
+                        {% endif %}
+                    </p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Tipo de Hóspede -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-user-tag me-2"></i>Tipo de Hóspede</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.tipo_hospede|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6" id="associado-field">
+                                {{ form.associado|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <!-- Informações do Associado (se selecionado) -->
+                        <div id="associado-info" class="associado-info" style="display: none;">
+                            <h6><i class="fas fa-info-circle me-2"></i>Informações do Associado</h6>
+                            <p>Os dados pessoais serão preenchidos automaticamente com base no associado selecionado.</p>
+                        </div>
+                    </div>
+
+                    <!-- Dados Pessoais -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-user me-2"></i>Dados Pessoais</h5>
+                        <div class="row">
+                            <div class="col-md-8">
+                                {{ form.nome_completo|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.data_nascimento|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.foto|as_crispy_field }}
+                                {% if hospede.associado and hospede.associado.foto %}
+                                <div class="alert alert-info mt-2">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Foto do Associado:</strong> Este hóspede é um associado e usará automaticamente a foto do cadastro do associado.
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documentos -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-id-card me-2"></i>Documentos</h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                {{ form.tipo_documento|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.numero_documento|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.orgao_emissor|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.uf_emissor|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contato -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-phone me-2"></i>Contato</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.telefone|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.telefone_secundario|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.email|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-map-marker-alt me-2"></i>Endereço</h5>
+                        <div class="row">
+                            <div class="col-md-2">
+                                {{ form.cep|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.endereco|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.numero|as_crispy_field }}
+                            </div>
+                            <div class="col-md-2">
+                                {{ form.complemento|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.bairro|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.cidade|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.estado|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações Profissionais -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-briefcase me-2"></i>Informações Profissionais</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.profissao|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.empresa|as_crispy_field }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Observações -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-sticky-note me-2"></i>Observações</h5>
+                        {{ form.observacoes|as_crispy_field }}
+                    </div>
+
+                    <!-- Status -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-toggle-on me-2"></i>Status</h5>
+                        {{ form.ativo|as_crispy_field }}
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="btn-group">
+                        <a href="{% url 'hotel_transito:hospede_list' %}" class="btn btn-cancel">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            {% if object %}
+                                Atualizar Hóspede
+                            {% else %}
+                                Criar Hóspede
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Controle do campo associado baseado no tipo de hóspede
+        function toggleAssociadoField() {
+            const tipoHospede = $('#id_tipo_hospede').val();
+            const associadoField = $('#associado-field');
+            const associadoInfo = $('#associado-info');
+            
+            if (tipoHospede === 'associado') {
+                associadoField.show();
+                associadoInfo.show();
+                $('#id_associado').prop('required', true);
+            } else {
+                associadoField.hide();
+                associadoInfo.hide();
+                $('#id_associado').prop('required', false);
+                $('#id_associado').val('');
+            }
+        }
+        
+        // Executar na inicialização
+        toggleAssociadoField();
+        
+        // Executar quando o tipo de hóspede mudar
+        $('#id_tipo_hospede').on('change', toggleAssociadoField);
+        
+        // Preenchimento automático de dados quando associado for selecionado
+        $('#id_associado').on('change', function() {
+            const associadoId = $(this).val();
+            console.log('Associado selecionado:', associadoId);
+            
+            if (associadoId && $('#id_tipo_hospede').val() === 'associado') {
+                console.log('Fazendo requisição AJAX para:', `/associados/api/associado/${associadoId}/`);
+                
+                // Buscar dados do associado via AJAX
+                $.ajax({
+                    url: `/associados/api/associado/${associadoId}/`,
+                    method: 'GET',
+                    beforeSend: function() {
+                        console.log('Enviando requisição AJAX...');
+                        showMessage('Buscando dados do associado...', 'info');
+                    },
+                    success: function(data) {
+                        console.log('Dados recebidos:', data);
+                        
+                        // Preencher campos automaticamente
+                        $('#id_nome_completo').val(data.nome_completo || '');
+                        $('#id_data_nascimento').val(data.data_nascimento || '');
+                        $('#id_telefone').val(data.telefone || '');
+                        $('#id_email').val(data.email || '');
+                        $('#id_cep').val(data.cep || '');
+                        $('#id_endereco').val(data.endereco || '');
+                        $('#id_numero').val(data.numero || '');
+                        $('#id_complemento').val(data.complemento || '');
+                        $('#id_bairro').val(data.bairro || '');
+                        $('#id_cidade').val(data.cidade || '');
+                        $('#id_estado').val(data.estado || '');
+                        
+                        console.log('Campos preenchidos com sucesso');
+                        
+                        // Aplicar máscaras após preenchimento
+                        if (data.telefone) {
+                            $('#id_telefone').trigger('input');
+                        }
+                        if (data.cep) {
+                            $('#id_cep').trigger('input');
+                        }
+                        
+                        // Desabilitar campos preenchidos automaticamente (opcional)
+                        disableAutoFilledFields();
+                        
+                        // Mostrar mensagem de sucesso
+                        showMessage('Dados do associado preenchidos automaticamente! Campos podem ser editados se necessário.', 'success');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Erro na requisição AJAX:', {xhr, status, error});
+                        console.error('Status:', xhr.status);
+                        console.error('Response:', xhr.responseText);
+                        
+                        let errorMessage = 'Erro ao buscar dados do associado. Preencha manualmente.';
+                        if (xhr.status === 404) {
+                            errorMessage = 'Associado não encontrado. Verifique a seleção.';
+                        } else if (xhr.status === 403) {
+                            errorMessage = 'Sem permissão para acessar dados do associado.';
+                        }
+                        
+                        showMessage(errorMessage, 'warning');
+                    }
+                });
+            } else if (!associadoId) {
+                console.log('Nenhum associado selecionado, limpando campos');
+                // Limpar campos quando nenhum associado estiver selecionado
+                clearAssociadoFields();
+            }
+        });
+        
+        // Função para limpar campos do associado
+        function clearAssociadoFields() {
+            $('#id_nome_completo').val('');
+            $('#id_data_nascimento').val('');
+            $('#id_telefone').val('');
+            $('#id_email').val('');
+            $('#id_cep').val('');
+            $('#id_endereco').val('');
+            $('#id_numero').val('');
+            $('#id_complemento').val('');
+            $('#id_bairro').val('');
+            $('#id_cidade').val('');
+            $('#id_estado').val('');
+            
+            // Habilitar todos os campos
+            enableAllFields();
+        }
+        
+        // Função para desabilitar campos preenchidos automaticamente
+        function disableAutoFilledFields() {
+            const fieldsToDisable = [
+                'nome_completo', 'data_nascimento', 'telefone', 'email',
+                'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado'
+            ];
+            
+            fieldsToDisable.forEach(field => {
+                const fieldElement = $(`#id_${field}`);
+                if (fieldElement.val()) {
+                    // Adicionar classe para posicionamento relativo
+                    fieldElement.closest('.col-md-2, .col-md-3, .col-md-4, .col-md-6, .col-md-8').addClass('field-group');
+                    
+                    fieldElement.prop('readonly', true);
+                    fieldElement.addClass('form-control-plaintext');
+                    fieldElement.removeClass('form-control');
+                    
+                    // Adicionar botão para habilitar edição
+                    if (!fieldElement.next('.btn-enable-edit').length) {
+                        const enableBtn = $(`<button type="button" class="btn btn-sm btn-outline-secondary btn-enable-edit" title="Habilitar edição">
+                            <i class="fas fa-edit"></i>
+                        </button>`);
+                        fieldElement.after(enableBtn);
+                        
+                        // Evento para habilitar edição
+                        enableBtn.on('click', function() {
+                            const field = $(this).prev();
+                            field.prop('readonly', false);
+                            field.removeClass('form-control-plaintext');
+                            field.addClass('form-control');
+                            $(this).remove();
+                            
+                            // Remover classe de posicionamento
+                            field.closest('.field-group').removeClass('field-group');
+                        });
+                    }
+                }
+            });
+        }
+        
+        // Função para habilitar todos os campos
+        function enableAllFields() {
+            const fields = [
+                'nome_completo', 'data_nascimento', 'telefone', 'email',
+                'cep', 'endereco', 'numero', 'complemento', 'bairro', 'cidade', 'estado'
+            ];
+            
+            fields.forEach(field => {
+                const fieldElement = $(`#id_${field}`);
+                fieldElement.prop('readonly', false);
+                fieldElement.removeClass('form-control-plaintext');
+                fieldElement.addClass('form-control');
+                
+                // Remover botões de habilitação
+                fieldElement.next('.btn-enable-edit').remove();
+                
+                // Remover classes de posicionamento
+                fieldElement.closest('.field-group').removeClass('field-group');
+            });
+        }
+        
+        // Função para mostrar mensagens
+        function showMessage(message, type) {
+            // Remover mensagens anteriores
+            $('.alert').remove();
+            
+            let alertClass, icon;
+            switch(type) {
+                case 'success':
+                    alertClass = 'alert-success';
+                    icon = 'check-circle';
+                    break;
+                case 'warning':
+                    alertClass = 'alert-warning';
+                    icon = 'exclamation-triangle';
+                    break;
+                case 'info':
+                    alertClass = 'alert-info';
+                    icon = 'info-circle';
+                    break;
+                default:
+                    alertClass = 'alert-info';
+                    icon = 'info-circle';
+            }
+            
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-${icon} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            // Inserir mensagem após o cabeçalho
+            $('.form-header').after(alertHtml);
+            
+            // Auto-remover após 5 segundos
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        }
+        
+        // Máscara para telefone
+        $('#id_telefone, #id_telefone_secundario').on('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                if (value.length <= 10) {
+                    value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                } else {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                }
+            }
+            this.value = value;
+        });
+        
+        // Máscara para CEP
+        $('#id_cep').on('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length <= 8) {
+                value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+            }
+            this.value = value;
+        });
+        
+        // Máscara para CPF
+        $('#id_numero_documento').on('input', function() {
+            const tipoDoc = $('#id_tipo_documento').val();
+            if (tipoDoc === 'cpf') {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                }
+                this.value = value;
+            }
+        });
+        
+        // Validação de email
+        $('#id_email').on('blur', function() {
+            const email = this.value;
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                $(this).addClass('is-invalid');
+                if (!$(this).next('.invalid-feedback').length) {
+                    $(this).after('<div class="invalid-feedback">Digite um email válido.</div>');
+                }
+            } else {
+                $(this).removeClass('is-invalid');
+                $(this).next('.invalid-feedback').remove();
+            }
+        });
+        
+        // Validação de data de nascimento
+        $('#id_data_nascimento').on('blur', function() {
+            const data = this.value;
+            if (data) {
+                const dataNasc = new Date(data);
+                const hoje = new Date();
+                const idade = hoje.getFullYear() - dataNasc.getFullYear();
+                
+                if (idade < 0 || idade > 120) {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).next('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">Data de nascimento inválida.</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.invalid-feedback').remove();
+                }
+            }
+        });
+        
+        // Limpar campos quando tipo de hóspede mudar
+        $('#id_tipo_hospede').on('change', function() {
+            if ($(this).val() === 'associado') {
+                // Limpar campos que serão preenchidos automaticamente quando associado for selecionado
+                clearAssociadoFields();
+                showMessage('Selecione um associado para preenchimento automático dos dados.', 'info');
+            } else {
+                // Limpar campo de associado quando não for associado
+                $('#id_associado').val('');
+                clearAssociadoFields();
+            }
+        });
+    });
+</script>
+{% endblock %}

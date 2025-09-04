@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Sessões{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Sessões</h1>
+                <button type="button" class="d-none d-sm-inline-block btn btn-primary shadow-sm" onclick="openSessaoModal()">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Nova Sessão
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Filtros</h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-3 mb-3">
+                            {{ filter_form.paciente|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ filter_form.psicologo|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            {{ filter_form.status|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            {{ filter_form.tipo_sessao|as_crispy_field }}
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-search"></i> Filtrar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="row mt-3">
+                        <div class="col-md-3 mb-3">
+                            {{ filter_form.data_inicio|as_crispy_field }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ filter_form.data_fim|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6 mb-3 d-flex align-items-end">
+                            <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Voltar aos Pacientes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de sessões -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if sessoes %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Paciente</th>
+                                        <th>Psicólogo</th>
+                                        <th>Data/Hora</th>
+                                        <th>Duração</th>
+                                        <th>Tipo</th>
+                                        <th>Status</th>
+                                        <th>Valor</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sessao in sessoes %}
+                                    <tr>
+                                        <td>{{ sessao.paciente.associado.nome }}</td>
+                                        <td>{{ sessao.psicologo.nome_completo }}</td>
+                                        <td>{{ sessao.data_hora|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ sessao.duracao }} min</td>
+                                        <td>
+                                            <span class="badge bg-info text-white">{{ sessao.get_tipo_sessao_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if sessao.status == 'agendada' %}
+                                                <span class="badge bg-warning text-dark fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% elif sessao.status == 'em_andamento' %}
+                                                <span class="badge bg-info text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% elif sessao.status == 'realizada' %}
+                                                <span class="badge bg-success text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% elif sessao.status == 'cancelada' %}
+                                                <span class="badge bg-danger text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if sessao.valor %}
+                                                R$ {{ sessao.valor }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:sessao_detail' sessao.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="openSessaoEditModal({{ sessao.pk }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a href="{% url 'psicologia:sessao_delete' sessao.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                        <nav aria-label="Paginação">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">&laquo; Primeira</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Anterior</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Próxima</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Última &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-calendar fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-500">Nenhuma sessão encontrada</h5>
+                            <p class="text-gray-400">Comece agendando a primeira sessão.</p>
+                            <button type="button" class="btn btn-primary" onclick="openSessaoModal()">
+                                <i class="fas fa-plus"></i> Agendar Sessão
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}

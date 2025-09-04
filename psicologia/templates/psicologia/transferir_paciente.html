@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transferir Paciente{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-exchange-alt text-warning"></i> 
+                    Transferir Paciente
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">
+                        Transferir {{ paciente.associado.nome }} para outro Psicólogo
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informações da Transferência</h6>
+                        <p class="mb-0">
+                            <strong>Paciente:</strong> {{ paciente.associado.nome }}<br>
+                            <strong>Psicólogo Atual:</strong> 
+                            {% if paciente.psicologo_responsavel %}
+                                {{ paciente.psicologo_responsavel.nome_completo }}
+                            {% else %}
+                                <span class="text-muted">Não atribuído</span>
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="novo_psicologo"><strong>Novo Psicólogo *</strong></label>
+                                    <select name="novo_psicologo" id="novo_psicologo" class="form-control" required>
+                                        <option value="">Selecione um psicólogo...</option>
+                                        {% for psicologo in psicologos_disponiveis %}
+                                            <option value="{{ psicologo.id }}">{{ psicologo.nome_completo }} (CRP: {{ psicologo.crp }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="motivo_transferencia"><strong>Motivo da Transferência *</strong></label>
+                                    <textarea name="motivo_transferencia" id="motivo_transferencia" class="form-control" rows="3" required 
+                                              placeholder="Descreva o motivo da transferência..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="observacoes"><strong>Observações</strong></label>
+                                    <textarea name="observacoes" id="observacoes" class="form-control" rows="3" 
+                                              placeholder="Observações adicionais sobre a transferência..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning">
+                                    <i class="fas fa-exchange-alt"></i> Confirmar Transferência
+                                </button>
+                                <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Informações -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Informações</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante</h6>
+                        <ul class="mb-0">
+                            <li>A transferência é irreversível</li>
+                            <li>O histórico será preservado</li>
+                            <li>Notifique o novo psicólogo</li>
+                            <li>Informe o paciente sobre a mudança</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Processo</h6>
+                        <ul class="mb-0">
+                            <li>Selecione o novo psicólogo</li>
+                            <li>Informe o motivo da transferência</li>
+                            <li>Adicione observações se necessário</li>
+                            <li>Confirme a operação</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Debug Menu - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bug me-2"></i>
+                        Debug do Menu Administrativo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h4>Teste de Funcionamento do Menu</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Teste Manual do Menu</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>Clique no menu "Administrativo" na barra lateral e verifique:</p>
+                                    <ul>
+                                        <li>Se o submenu abre</li>
+                                        <li>Se os links funcionam</li>
+                                        <li>Se há erros no console</li>
+                                    </ul>
+                                    
+                                    <div class="alert alert-warning">
+                                        <strong>Dica:</strong> Abra o console do navegador (F12) para ver mensagens de debug.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Links Diretos</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'administrativo:dashboard' %}" class="btn btn-primary">
+                                            Dashboard
+                                        </a>
+                                        <a href="{% url 'administrativo:evento_list' %}" class="btn btn-success">
+                                            Eventos
+                                        </a>
+                                        <a href="{% url 'administrativo:comunicado_list' %}" class="btn btn-info">
+                                            Comunicados
+                                        </a>
+                                        <a href="{% url 'administrativo:lista_presenca_list' %}" class="btn btn-warning">
+                                            Listas de Presença
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Console de Debug</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="debug-console" class="bg-dark text-light p-3 rounded" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                                        <div>Console de debug iniciado...</div>
+                                        <div>Clique no menu para ver mensagens</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const debugConsole = document.getElementById('debug-console');
+    
+    function log(message) {
+        const timestamp = new Date().toLocaleTimeString();
+        debugConsole.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+        debugConsole.scrollTop = debugConsole.scrollHeight;
+        console.log(message);
+    }
+    
+    log('Página de debug carregada');
+    
+    // Verificar se o Bootstrap está carregado
+    if (typeof bootstrap !== 'undefined') {
+        log('✓ Bootstrap carregado com sucesso');
+    } else {
+        log('✗ Bootstrap não está carregado');
+    }
+    
+    // Verificar se o menu administrativo existe
+    const adminSubmenu = document.getElementById('adminSubmenu');
+    if (adminSubmenu) {
+        log('✓ Menu administrativo encontrado no DOM');
+        
+        // Verificar se é um elemento collapse
+        if (adminSubmenu.classList.contains('collapse')) {
+            log('✓ Menu tem classe collapse');
+        } else {
+            log('✗ Menu não tem classe collapse');
+        }
+    } else {
+        log('✗ Menu administrativo não encontrado no DOM');
+    }
+    
+    // Verificar o link do menu
+    const adminLink = document.querySelector('a[href="#adminSubmenu"]');
+    if (adminLink) {
+        log('✓ Link do menu administrativo encontrado');
+        
+        // Verificar atributos
+        if (adminLink.hasAttribute('data-bs-toggle')) {
+            log('✓ Link tem atributo data-bs-toggle');
+        } else {
+            log('✗ Link não tem atributo data-bs-toggle');
+        }
+        
+        // Adicionar evento de clique para debug
+        adminLink.addEventListener('click', function(e) {
+            log('Clique no menu administrativo detectado');
+            
+            // Verificar se o collapse está funcionando
+            setTimeout(() => {
+                if (adminSubmenu.classList.contains('show')) {
+                    log('✓ Menu foi aberto com sucesso');
+                } else {
+                    log('✗ Menu não foi aberto');
+                }
+            }, 100);
+        });
+    } else {
+        log('✗ Link do menu administrativo não encontrado');
+    }
+    
+    // Teste de abertura forçada do menu
+    setTimeout(() => {
+        log('Tentando abrir menu forçadamente...');
+        try {
+            if (adminSubmenu && typeof bootstrap !== 'undefined') {
+                const bsCollapse = new bootstrap.Collapse(adminSubmenu, {
+                    show: true
+                });
+                log('✓ Menu aberto forçadamente');
+            }
+        } catch (error) {
+            log('✗ Erro ao abrir menu: ' + error.message);
+        }
+    }, 1000);
+});
+</script>
+{% endblock %}

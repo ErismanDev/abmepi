@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sessão - {{ sessao.paciente.associado.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-calendar-alt text-primary"></i> 
+                    Detalhes da Sessão
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:sessao_update' sessao.pk %}" class="btn btn-warning shadow-sm">
+                        <i class="fas fa-edit fa-sm text-white-50"></i> Editar
+                    </a>
+                    {% if sessao.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' sessao.paciente.pk %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar aos Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações da Sessão -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações da Sessão</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Data e Hora</h6>
+                            <p class="border rounded p-3 bg-light">{{ sessao.data_hora|date:"d/m/Y H:i" }}</p>
+                            
+                            <h6 class="text-primary">Status</h6>
+                            <p class="border rounded p-3 bg-light">
+                                {% if sessao.status == 'agendada' %}
+                                    <span class="badge badge-warning">{{ sessao.get_status_display }}</span>
+                                {% elif sessao.status == 'confirmada' %}
+                                    <span class="badge badge-info">{{ sessao.get_status_display }}</span>
+                                {% elif sessao.status == 'realizada' %}
+                                    <span class="badge badge-success">{{ sessao.get_status_display }}</span>
+                                {% elif sessao.status == 'cancelada' %}
+                                    <span class="badge badge-danger">{{ sessao.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">{{ sessao.get_status_display }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Tipo de Sessão</h6>
+                            <p class="border rounded p-3 bg-light">
+                                <span class="badge badge-info">{{ sessao.get_tipo_sessao_display }}</span>
+                            </p>
+                            
+                            <h6 class="text-primary">Duração</h6>
+                            <p class="border rounded p-3 bg-light">{{ sessao.duracao }} minutos</p>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Paciente</h6>
+                            <p class="border rounded p-3 bg-light">
+                                <strong>Nome:</strong> {{ sessao.paciente.associado.nome }}<br>
+                                <strong>CPF:</strong> {{ sessao.paciente.associado.cpf }}<br>
+                                <strong>Psicólogo Responsável:</strong> 
+                                {% if sessao.paciente.psicologo_responsavel %}
+                                    {{ sessao.paciente.psicologo_responsavel.nome_completo }}
+                                {% else %}
+                                    <span class="text-muted">Não atribuído</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Psicólogo</h6>
+                            <p class="border rounded p-3 bg-light">
+                                <strong>Nome:</strong> {{ sessao.psicologo.nome_completo }}<br>
+                                <strong>CRP:</strong> {{ sessao.psicologo.crp }}<br>
+                                <strong>Especialidade:</strong> {{ sessao.psicologo.especialidade|default:"Não especificada" }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if sessao.local %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Local</h6>
+                            <p class="border rounded p-3 bg-light">{{ sessao.local }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if sessao.observacoes %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Observações</h6>
+                            <div class="border rounded p-3 bg-light">
+                                {{ sessao.observacoes|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="text-primary">Informações do Sistema</h6>
+                            <div class="border rounded p-3 bg-light">
+                                <strong>Criado em:</strong> {{ sessao.data_criacao|date:"d/m/Y H:i" }}<br>
+                                <strong>Última atualização:</strong> {{ sessao.data_atualizacao|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Evoluções da Sessão -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-line"></i> Evoluções desta Sessão
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if evolucoes %}
+                        <div class="list-group">
+                            {% for evolucao in evolucoes %}
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ evolucao.data_evolucao|date:"d/m/Y" }}</h6>
+                                    <small class="text-muted">{{ evolucao.data_evolucao|date:"H:i" }}</small>
+                                </div>
+                                <p class="mb-1">{{ evolucao.conteudo|truncatewords:30 }}</p>
+                                {% if evolucao.observacoes_terapeuta %}
+                                    <small class="text-muted"><strong>Observações:</strong> {{ evolucao.observacoes_terapeuta|truncatewords:20 }}</small>
+                                {% endif %}
+                                <div class="mt-2">
+                                    <a href="{% url 'psicologia:evolucao_detail' evolucao.pk %}" class="btn btn-sm btn-info">
+                                        <i class="fas fa-eye"></i> Ver Completo
+                                    </a>
+                                    <a href="{% url 'psicologia:evolucao_update' evolucao.pk %}" class="btn btn-sm btn-warning">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-line fa-2x text-gray-300 mb-2"></i>
+                            <p class="text-muted">Nenhuma evolução registrada para esta sessão.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Ações e Informações -->
+        <div class="col-lg-4">
+            <!-- Ações Rápidas -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ações Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <a href="{% url 'psicologia:sessao_update' sessao.pk %}" class="btn btn-warning btn-block mb-2">
+                        <i class="fas fa-edit"></i> Editar Sessão
+                    </a>
+                    <a href="{% url 'psicologia:evolucao_create' %}" class="btn btn-info btn-block mb-2">
+                        <i class="fas fa-plus"></i> Nova Evolução
+                    </a>
+                    <a href="{% url 'psicologia:paciente_detail' sessao.paciente.pk %}" class="btn btn-primary btn-block mb-2">
+                        <i class="fas fa-user"></i> Ficha do Paciente
+                    </a>
+                    {% if sessao.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' sessao.paciente.pk %}" class="btn btn-secondary btn-block">
+                            <i class="fas fa-list"></i> Ficha do Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary btn-block">
+                            <i class="fas fa-list"></i> Lista de Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Estatísticas da Sessão -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Estatísticas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-info mb-0">{{ evolucoes.count }}</h4>
+                                <small class="text-muted">Evoluções</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-primary mb-0">{{ sessao.duracao }}</h4>
+                                <small class="text-muted">Minutos</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

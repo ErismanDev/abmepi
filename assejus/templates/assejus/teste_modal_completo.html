@@ -1,0 +1,776 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teste Modal Completo{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        padding: 20px;
+        background-color: #f8f9fa;
+    }
+    
+    .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+    
+    .btn-test {
+        margin: 10px;
+        padding: 15px 30px;
+        font-size: 16px;
+    }
+    
+    /* Estilos para campos válidos */
+    .form-control.is-valid,
+    .form-select.is-valid {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+
+    .form-group.has-success .form-control,
+    .form-group.has-success .form-select {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+
+    .form-group.has-success .form-label {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    .valid-feedback {
+        display: block;
+        color: #28a745;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Estilos para campos inválidos */
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-group.has-error .form-control,
+    .form-group.has-error .form-select {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .form-group.has-error .form-label {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    .invalid-feedback {
+        display: block;
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Resumo de erros */
+    .error-summary {
+        border-left: 4px solid #dc3545;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    /* Animação de erro */
+    .field-error {
+        animation: errorShake 0.5s ease-in-out;
+    }
+
+    @keyframes errorShake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="test-container">
+    <h1 class="text-center mb-4">
+        <i class="fas fa-test-tube text-primary me-2"></i>
+        Teste do Modal Completo
+    </h1>
+    
+    <div class="text-center mb-4">
+        <p class="lead">Clique no botão abaixo para abrir o modal de advogado completo:</p>
+        <button type="button" class="btn btn-primary btn-lg btn-test" data-bs-toggle="modal" data-bs-target="#advogadoModal">
+            <i class="fas fa-plus me-2"></i>Abrir Modal de Advogado
+        </button>
+    </div>
+    
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle me-2"></i>Instruções:</h5>
+        <ul class="mb-0">
+            <li>Clique no botão acima para abrir o modal</li>
+            <li>O modal deve mostrar todos os campos organizados em seções</li>
+            <li>Clique em "Testar Validação" para ver as mensagens de erro</li>
+            <li>Deixe campos vazios e clique em salvar para testar validação</li>
+            <li>Verifique se todos os 13 campos obrigatórios estão presentes</li>
+        </ul>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-check-circle me-2"></i>O que deve funcionar:</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Modal abre corretamente</li>
+                        <li>Todos os campos estão visíveis</li>
+                        <li>Validação em tempo real</li>
+                        <li>Mensagens de erro inline</li>
+                        <li>Resumo de erros no topo</li>
+                        <li>Botão "Testar Validação"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Problemas comuns:</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Modal não abre</li>
+                        <li>Campos não aparecem</li>
+                        <li>Validação não funciona</li>
+                        <li>JavaScript com erro</li>
+                        <li>CSS não carrega</li>
+                        <li>Formulário incompleto</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Criar/Editar Advogado -->
+<div class="modal fade" id="advogadoModal" tabindex="-1" aria-labelledby="advogadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <!-- Cabeçalho do Modal -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="advogadoModalLabel">
+                    <i class="fas fa-plus me-2"></i>Novo Advogado
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Corpo do Modal -->
+            <div class="modal-body">
+                <!-- Resumo de Erros -->
+                <div id="errorSummary" class="alert alert-danger error-summary" style="display: none;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <div>
+                            <strong>Erros de Validação:</strong>
+                            <div id="errorSummaryText"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formulário -->
+                <form id="advogadoForm" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- Informações Pessoais -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-user me-2"></i>Informações Pessoais
+                            </h6>
+                        </div>
+                        
+                        <!-- Nome -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="nome" class="form-label">
+                                    <i class="fas fa-user me-1"></i>Nome Completo *
+                                </label>
+                                <input type="text" class="form-control" id="nome" name="nome" placeholder="Digite o nome completo">
+                                <div class="invalid-feedback" id="nome-error"></div>
+                                <div class="valid-feedback" id="nome-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- CPF -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="cpf" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>CPF *
+                                </label>
+                                <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00">
+                                <div class="invalid-feedback" id="cpf-error"></div>
+                                <div class="valid-feedback" id="cpf-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- OAB -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="oab" class="form-label">
+                                    <i class="fas fa-gavel me-1"></i>Número OAB *
+                                </label>
+                                <input type="text" class="form-control" id="oab" name="oab" placeholder="Digite o número da OAB">
+                                <div class="invalid-feedback" id="oab-error"></div>
+                                <div class="valid-feedback" id="oab-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- UF OAB -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="uf_oab" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>UF OAB *
+                                </label>
+                                <select class="form-select" id="uf_oab" name="uf_oab">
+                                    <option value="">---------</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                                <div class="invalid-feedback" id="uf_oab-error"></div>
+                                <div class="valid-feedback" id="uf_oab-success"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações de Contato -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-address-book me-2"></i>Informações de Contato
+                            </h6>
+                        </div>
+                        
+                        <!-- E-mail -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="email" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>E-mail *
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="exemplo@email.com">
+                                <div class="invalid-feedback" id="email-error"></div>
+                                <div class="valid-feedback" id="email-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- Telefone -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="telefone" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>Telefone *
+                                </label>
+                                <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(00) 00000-0000">
+                                <div class="invalid-feedback" id="telefone-error"></div>
+                                <div class="valid-feedback" id="telefone-success"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-map me-2"></i>Endereço
+                            </h6>
+                        </div>
+                        
+                        <!-- Endereço -->
+                        <div class="col-12 mb-3">
+                            <div class="form-group">
+                                <label for="endereco" class="form-label">
+                                    <i class="fas fa-road me-1"></i>Endereço Completo *
+                                </label>
+                                <input type="text" class="form-control" id="endereco" name="endereco" placeholder="Rua, número, bairro">
+                                <div class="invalid-feedback" id="endereco-error"></div>
+                                <div class="valid-feedback" id="endereco-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- Cidade -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="cidade" class="form-label">
+                                    <i class="fas fa-city me-1"></i>Cidade *
+                                </label>
+                                <input type="text" class="form-control" id="cidade" name="cidade" placeholder="Nome da cidade">
+                                <div class="invalid-feedback" id="cidade-error"></div>
+                                <div class="valid-feedback" id="cidade-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- Estado -->
+                        <div class="col-md-3 mb-3">
+                            <div class="form-group">
+                                <label for="estado" class="form-label">
+                                    <i class="fas fa-map-marker me-1"></i>Estado *
+                                </label>
+                                <select class="form-select" id="estado" name="estado">
+                                    <option value="">---------</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                                <div class="invalid-feedback" id="estado-error"></div>
+                                <div class="valid-feedback" id="estado-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- CEP -->
+                        <div class="col-md-3 mb-3">
+                            <div class="form-group">
+                                <label for="cep" class="form-label">
+                                    <i class="fas fa-mail-bulk me-1"></i>CEP *
+                                </label>
+                                <input type="text" class="form-control" id="cep" name="cep" placeholder="00000-000">
+                                <div class="invalid-feedback" id="cep-error"></div>
+                                <div class="valid-feedback" id="cep-success"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações Profissionais -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="text-primary border-bottom pb-2 mb-3">
+                                <i class="fas fa-briefcase me-2"></i>Informações Profissionais
+                            </h6>
+                        </div>
+                        
+                        <!-- Data de Inscrição OAB -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="data_inscricao_oab" class="form-label">
+                                    <i class="fas fa-calendar-alt me-1"></i>Data de Inscrição OAB *
+                                </label>
+                                <input type="date" class="form-control" id="data_inscricao_oab" name="data_inscricao_oab">
+                                <div class="invalid-feedback" id="data_inscricao_oab-error"></div>
+                                <div class="valid-feedback" id="data_inscricao_oab-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- Anos de Experiência -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="experiencia_anos" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>Anos de Experiência *
+                                </label>
+                                <input type="number" class="form-control" id="experiencia_anos" name="experiencia_anos" placeholder="0" min="0" max="100">
+                                <div class="invalid-feedback" id="experiencia_anos-error"></div>
+                                <div class="valid-feedback" id="experiencia_anos-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- Situação -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="situacao" class="form-label">
+                                    <i class="fas fa-info-circle me-1"></i>Situação *
+                                </label>
+                                <select class="form-select" id="situacao" name="situacao">
+                                    <option value="">---------</option>
+                                    <option value="ativo">Ativo</option>
+                                    <option value="inativo">Inativo</option>
+                                    <option value="suspenso">Suspenso</option>
+                                    <option value="aposentado">Aposentado</option>
+                                </select>
+                                <div class="invalid-feedback" id="situacao-error"></div>
+                                <div class="valid-feedback" id="situacao-success"></div>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="col-md-6 mb-3">
+                            <div class="form-group">
+                                <label for="observacoes" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>Observações
+                                </label>
+                                <textarea class="form-control" id="observacoes" name="observacoes" rows="3" placeholder="Observações adicionais"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alertas e Botões de Teste -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info d-flex align-items-center">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <div>
+                                    <strong>Campos obrigatórios</strong> são marcados com asterisco (*)
+                                    <button type="button" class="btn btn-warning btn-sm ms-3" onclick="testarValidacao()">
+                                        <i class="fas fa-vial me-1"></i>Testar Validação
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Rodapé do Modal -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="submit" form="advogadoForm" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Lista de campos obrigatórios (escopo global)
+const requiredFieldNames = [
+    'nome', 'cpf', 'oab', 'uf_oab', 'email', 'telefone', 
+    'endereco', 'cidade', 'estado', 'cep', 'data_inscricao_oab', 
+    'experiencia_anos', 'situacao'
+];
+
+// Função para obter mensagem de erro (escopo global)
+function getFieldErrorMessage(fieldName) {
+    const errorMessages = {
+        'nome': 'Nome é obrigatório. Digite o nome completo do advogado.',
+        'cpf': 'CPF é obrigatório. Digite um CPF válido.',
+        'oab': 'OAB é obrigatória. Digite o número da OAB.',
+        'uf_oab': 'UF OAB é obrigatória. Selecione o estado da OAB.',
+        'email': 'E-mail é obrigatório. Digite um endereço de e-mail válido.',
+        'telefone': 'Telefone é obrigatório. Digite um número de telefone válido.',
+        'endereco': 'Endereço é obrigatório. Digite o endereço completo.',
+        'cidade': 'Cidade é obrigatória. Digite o nome da cidade.',
+        'estado': 'Estado é obrigatório. Selecione o estado.',
+        'cep': 'CEP é obrigatório. Digite um CEP válido.',
+        'data_inscricao_oab': 'Data de inscrição na OAB é obrigatória.',
+        'experiencia_anos': 'Anos de experiência é obrigatório.',
+        'situacao': 'Situação é obrigatória. Selecione uma situação.'
+    };
+    
+    return errorMessages[fieldName] || 'Este campo é obrigatório.';
+}
+
+// Função para validar campo individual (escopo global)
+function validateField(field) {
+    const fieldName = field.name;
+    const value = field.value.trim();
+    const isEmpty = !value || value === '' || value === '---------';
+    
+    // Remover classes anteriores
+    field.classList.remove('is-valid', 'is-invalid');
+    field.closest('.form-group')?.classList.remove('has-success', 'has-error');
+    
+    // Limpar mensagens anteriores
+    const errorDiv = document.getElementById(`${fieldName}-error`);
+    const successDiv = document.getElementById(`${fieldName}-success`);
+    
+    if (errorDiv) errorDiv.textContent = '';
+    if (successDiv) successDiv.textContent = '';
+    
+    if (isEmpty) {
+        // Campo inválido
+        field.classList.add('is-invalid');
+        field.closest('.form-group')?.classList.add('has-error');
+        
+        if (errorDiv) {
+            errorDiv.textContent = getFieldErrorMessage(fieldName);
+        }
+        
+        // Adicionar animação de erro
+        field.classList.add('field-error');
+        setTimeout(() => field.classList.remove('field-error'), 500);
+        
+        return false;
+    } else {
+        // Campo válido
+        field.classList.add('is-valid');
+        field.closest('.form-group')?.classList.add('has-success');
+        
+        if (successDiv) {
+            successDiv.textContent = '✓ Campo preenchido corretamente';
+        }
+        
+        return true;
+    }
+}
+
+// Função para mostrar resumo dos erros (escopo global)
+function showErrorSummary(errorCount, errorFields) {
+    console.log(`📊 Mostrando resumo de ${errorCount} erros...`);
+    
+    const errorSummary = document.getElementById('errorSummary');
+    const errorSummaryText = document.getElementById('errorSummaryText');
+    
+    if (errorSummary && errorSummaryText) {
+        errorSummaryText.innerHTML = `
+            Foram encontrados <strong>${errorCount}</strong> campo(s) obrigatório(s) não preenchido(s):<br>
+            <strong>${errorFields.join(', ')}</strong><br>
+            Por favor, corrija os campos destacados em vermelho e tente novamente.
+        `;
+        errorSummary.style.display = 'block';
+        
+        // Scroll para o topo do formulário
+        errorSummary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        console.log('✅ Resumo de erros exibido');
+    }
+}
+
+// Função para limpar resumo de erros (escopo global)
+function clearErrorSummary() {
+    const errorSummary = document.getElementById('errorSummary');
+    if (errorSummary) {
+        errorSummary.style.display = 'none';
+    }
+}
+
+// Função para testar validação diretamente no modal
+function testarValidacao() {
+    console.log('🧪 Testando validação diretamente no modal...');
+    
+    // Forçar validação de todos os campos
+    let errorCount = 0;
+    let errorFields = [];
+    
+    requiredFieldNames.forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+            // Forçar validação do campo
+            const isValid = validateField(field);
+            if (!isValid) {
+                errorCount++;
+                errorFields.push(fieldName);
+            }
+        }
+    });
+    
+    if (errorCount > 0) {
+        console.log(`❌ Foram encontrados ${errorCount} erros de validação`);
+        showErrorSummary(errorCount, errorFields);
+        
+        // Fazer scroll para o primeiro erro
+        const firstErrorField = document.querySelector(`[name="${errorFields[0]}"]`);
+        if (firstErrorField) {
+            firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            firstErrorField.focus();
+        }
+    } else {
+        console.log('✅ Todos os campos estão válidos!');
+        clearErrorSummary();
+    }
+}
+
+// Função principal de inicialização da validação
+function initializeValidation() {
+    console.log('🚀 Inicializando validação do formulário...');
+    
+    // Verificar se o formulário existe
+    const form = document.getElementById('advogadoForm');
+    if (!form) {
+        console.error('❌ CRÍTICO: Formulário advogadoForm não encontrado!');
+        return false;
+    }
+    
+    console.log('✅ Formulário encontrado:', form);
+    console.log('✅ ID do formulário:', form.id);
+    
+    console.log(`🔍 Lista de campos obrigatórios: ${requiredFieldNames.join(', ')}`);
+    
+    // Função para validar formulário antes do envio
+    function validateForm(e) {
+        console.log('🔍 Validando formulário antes do envio...');
+        
+        // Verificar se há campos obrigatórios vazios
+        let hasErrors = false;
+        let errorCount = 0;
+        let errorFields = [];
+        
+        console.log(`🔍 Verificando ${requiredFieldNames.length} campos obrigatórios...`);
+        
+        requiredFieldNames.forEach(fieldName => {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (field) {
+                const isValid = validateField(field);
+                if (!isValid) {
+                    hasErrors = true;
+                    errorCount++;
+                    errorFields.push(fieldName);
+                }
+            }
+        });
+        
+        if (hasErrors) {
+            e.preventDefault();
+            console.log(`❌ Formulário bloqueado devido a ${errorCount} erro(s) de validação`);
+            console.log(`❌ Campos com erro: ${errorFields.join(', ')}`);
+            
+            // Mostrar resumo dos erros
+            showErrorSummary(errorCount, errorFields);
+            
+            // Fazer scroll para o primeiro erro
+            const firstErrorField = document.querySelector(`[name="${errorFields[0]}"]`);
+            if (firstErrorField) {
+                firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstErrorField.focus();
+            }
+            
+            return false;
+        }
+        
+        console.log('✅ Formulário válido, enviando...');
+        return true;
+    }
+    
+    // Configurar event listeners
+    console.log('🔧 Configurando event listeners...');
+    
+    // Event listener para o formulário
+    if (form) {
+        console.log('✅ Formulário encontrado, adicionando event listener de submit');
+        form.addEventListener('submit', validateForm);
+        console.log('✅ Event listener de submit adicionado');
+    } else {
+        console.error('❌ Formulário não encontrado!');
+    }
+    
+    // Event listeners para validação em tempo real
+    requiredFieldNames.forEach(fieldName => {
+        const field = document.querySelector(`[name="${fieldName}"]`);
+        if (field) {
+            // Validação ao perder foco
+            field.addEventListener('blur', () => {
+                validateField(field);
+                updateErrorSummary();
+            });
+            
+            // Validação ao digitar (para campos de texto)
+            if (field.type === 'text' || field.type === 'email' || field.type === 'number') {
+                field.addEventListener('input', () => {
+                    if (field.value.trim()) {
+                        validateField(field);
+                        updateErrorSummary();
+                    }
+                });
+            }
+            
+            // Validação ao mudar seleção (para selects)
+            if (field.tagName === 'SELECT') {
+                field.addEventListener('change', () => {
+                    validateField(field);
+                    updateErrorSummary();
+                });
+            }
+        }
+    });
+    
+    // Função para atualizar resumo de erros
+    function updateErrorSummary() {
+        const errorFields = [];
+        requiredFieldNames.forEach(fieldName => {
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (field && field.classList.contains('is-invalid')) {
+                errorFields.push(fieldName);
+            }
+        });
+        
+        if (errorFields.length === 0) {
+            clearErrorSummary();
+        } else {
+            showErrorSummary(errorFields.length, errorFields);
+        }
+    }
+    
+    console.log('✅ Validação do formulário inicializada com sucesso!');
+    console.log('🔍 Para testar: deixe campos vazios e clique em salvar');
+    
+    return true;
+}
+
+// Inicializar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOM carregado, tentando inicializar validação...');
+    
+    // Tentar inicializar imediatamente
+    if (!initializeValidation()) {
+        // Se não conseguir, tentar novamente após um delay
+        setTimeout(function() {
+            console.log('⏳ Tentando novamente após delay...');
+            initializeValidation();
+        }, 500);
+        
+        // Tentar mais algumas vezes
+        setTimeout(function() {
+            console.log('⏳ Tentativa final...');
+            initializeValidation();
+        }, 1000);
+    }
+});
+
+console.log('🚀 Script de validação carregado, aguardando inicialização...');
+</script>
+{% endblock %}

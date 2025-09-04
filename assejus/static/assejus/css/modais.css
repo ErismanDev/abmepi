@@ -1,0 +1,1083 @@
+/* Sistema de Modais - ASEJUS */
+
+/* Variáveis CSS para personalização */
+:root {
+    --modal-bg: rgba(0, 0, 0, 0.5);
+    --modal-content-bg: #ffffff;
+    --modal-border-radius: 12px;
+    --modal-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --modal-header-bg: #f8f9fa;
+    --modal-border-color: #dee2e6;
+    --primary-color: #0d6efd;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #0dcaf0;
+}
+
+/* Modal Base */
+.modal-backdrop {
+    background-color: var(--modal-bg);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    border: none;
+    border-radius: var(--modal-border-radius);
+    box-shadow: var(--modal-shadow);
+    background: var(--modal-content-bg);
+    overflow: hidden;
+}
+
+/* Header do Modal */
+.modal-header {
+    background: var(--modal-header-bg);
+    border-bottom: 1px solid var(--modal-border-color);
+    padding: 1.5rem;
+    position: relative;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+    margin: 0;
+}
+
+.modal-header .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6c757d;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+}
+
+.modal-header .btn-close:hover {
+    color: #dc3545;
+    transform: scale(1.1);
+}
+
+/* Corpo do Modal */
+.modal-body {
+    padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Formulários */
+.modal-form {
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.form-control,
+.form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    background-color: #fff;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: var(--success-color);
+    box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+}
+
+.invalid-feedback {
+    color: var(--danger-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.valid-feedback {
+    color: var(--success-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Checkbox e Radio */
+.form-check {
+    margin-bottom: 1rem;
+}
+
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-right: 0.75rem;
+    border: 2px solid #dee2e6;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-label {
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+}
+
+/* Footer do Modal */
+.modal-footer {
+    background: #f8f9fa;
+    border-top: 1px solid var(--modal-border-color);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+/* Botões */
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5c636a;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #157347;
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #bb2d3b;
+    transform: translateY(-1px);
+}
+
+.btn-warning {
+    background-color: var(--warning-color);
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #ffca2c;
+    transform: translateY(-1px);
+}
+
+.btn-info {
+    background-color: var(--info-color);
+    color: #000;
+}
+
+.btn-info:hover {
+    background-color: #31d2f2;
+    transform: translateY(-1px);
+}
+
+/* Botões de tamanhos diferentes */
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+/* Botões com ícones */
+.btn i {
+    font-size: 1rem;
+}
+
+/* Estados de loading */
+.btn:disabled,
+.btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.btn.loading::after {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Alertas */
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    margin-bottom: 1rem;
+}
+
+.alert-success {
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    color: #0f5132;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    color: #842029;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    color: #664d03;
+}
+
+.alert-info {
+    background-color: #cff4fc;
+    border-color: #b6effb;
+    color: #055160;
+}
+
+/* Upload de arquivos */
+.file-upload {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-upload input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.file-upload-label:hover {
+    border-color: var(--primary-color);
+    background-color: #e7f1ff;
+    color: var(--primary-color);
+}
+
+.file-upload-label i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Preview de imagem */
+.image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    margin-top: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 1rem;
+        max-width: calc(100% - 2rem);
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+        max-height: 60vh;
+    }
+    
+    .modal-header {
+        padding: 1rem;
+    }
+    
+    .modal-footer {
+        padding: 1rem;
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .modal-body {
+        padding: 1rem;
+    }
+    
+    .form-control,
+    .form-select {
+        padding: 0.625rem 0.875rem;
+        font-size: 16px; /* Evita zoom no iOS */
+    }
+}
+
+/* Animações */
+.modal.fade .modal-dialog {
+    transform: translate(0, -50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: none;
+}
+
+/* Scrollbar personalizada */
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.modal-body::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Estados especiais */
+.modal-loading {
+    position: relative;
+}
+
+.modal-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.modal-loading::before {
+    content: 'Carregando...';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1051;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+/* Acessibilidade */
+.modal:focus {
+    outline: none;
+}
+
+.modal-content:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .modal-content {
+        border: 2px solid #000;
+    }
+    
+    .form-control,
+    .form-select {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .modal.fade .modal-dialog,
+    .btn,
+    .form-control,
+    .form-select {
+        transition: none;
+    }
+}
+
+/* Estilos para campos select do formulário de advogado */
+.form-select {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    pointer-events: auto !important;
+}
+
+.form-select:focus {
+    border-color: #1e3c72;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+}
+
+.form-select:disabled,
+.form-select[readonly] {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Garantir que os campos select sejam sempre clicáveis */
+select[name*="uf_oab"],
+select[name*="estado"] {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    background-color: #fff !important;
+}
+
+/* Estilos específicos para campos de UF */
+select[name*="uf_oab"] option,
+select[name*="estado"] option {
+    padding: 8px;
+    background-color: #fff;
+    color: #212529;
+}
+
+select[name*="uf_oab"] option:hover,
+select[name*="estado"] option:hover {
+    background-color: #f8f9fa;
+}
+
+/* Estilos para campos de formulário em geral */
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    color: #212529;
+    background-color: #fff;
+    border-color: #1e3c72;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+}
+
+/* Estilos para campos de data */
+input[type="date"] {
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+/* Estilos para campos de arquivo */
+input[type="file"] {
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+}
+
+/* Estilos para checkboxes */
+.form-check-input {
+    width: 1em;
+    height: 1em;
+    margin-top: 0.25em;
+    margin-right: 0.5em;
+    vertical-align: top;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+}
+
+.form-check-input:checked {
+    background-color: #1e3c72;
+    border-color: #1e3c72;
+}
+
+/* Estilos para labels */
+.form-label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Estilos para mensagens de erro */
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+/* Estilos para campos com erro */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='m5.8 4.6 2.4 2.4m0-2.4L5.8 7'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Estilos para campos válidos */
+.form-control.is-valid,
+.form-select.is-valid {
+    border-color: #198754;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='m2.3 6.73.94-.94 2.02 2.02L8.02 4.56l.94.94L5.26 8.5z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Estilos para grupos de formulário */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* Estilos para linhas do formulário */
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+.col-md-4,
+.col-md-6,
+.col-md-8,
+.col-12 {
+    position: relative;
+    width: 100%;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.col-md-4 {
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+}
+
+.col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.col-md-8 {
+    flex: 0 0 66.666667%;
+    max-width: 66.666667%;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+/* Estilos para espaçamento */
+.mt-4 {
+    margin-top: 1.5rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem !important;
+}
+
+/* Estilos para texto */
+.text-primary {
+    color: #1e3c72 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Estilos para cabeçalhos de seção */
+h6.text-primary {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #1e3c72;
+}
+
+/* Estilos para campos de arquivo */
+.file-upload {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.file-upload input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.file-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 120px;
+    padding: 1rem;
+    border: 2px dashed #ced4da;
+    border-radius: 0.375rem;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.file-upload-label:hover {
+    border-color: #1e3c72;
+    background-color: #e9ecef;
+}
+
+.file-upload-label i {
+    font-size: 2rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.file-upload-label strong {
+    color: #495057;
+    margin-bottom: 0.25rem;
+}
+
+.file-upload-label small {
+    color: #6c757d;
+    text-align: center;
+}
+
+/* Estilos para preview de imagem */
+.image-preview {
+    max-width: 200px;
+    max-height: 200px;
+    margin-top: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para botões */
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    border-radius: 0.375rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1e3c72;
+    border-color: #1e3c72;
+}
+
+.btn-primary:hover {
+    color: #fff;
+    background-color: #2a5298;
+    border-color: #2a5298;
+}
+
+.btn-secondary {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+    color: #fff;
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* Estilos para alertas */
+.alert {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+/* Estilos para tooltips */
+[data-bs-toggle="tooltip"] {
+    cursor: help;
+}
+
+/* Estilos para campos desabilitados */
+.form-control:disabled,
+.form-select:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* Garantir que os campos select sejam sempre visíveis e funcionais */
+select {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+}
+
+/* Estilos para campos de formulário em modais */
+.modal-form .form-control,
+.modal-form .form-select {
+    margin-bottom: 1rem;
+}
+
+.modal-form .form-group:last-child {
+    margin-bottom: 0;
+}
+
+/* Estilos para campos obrigatórios */
+.form-label .text-danger {
+    font-weight: bold;
+}
+
+/* Estilos para campos de texto */
+textarea.form-control {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Estilos para campos numéricos */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Estilos para campos de data */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+/* Estilos para campos de arquivo */
+input[type="file"]::-webkit-file-upload-button {
+    cursor: pointer;
+}
+
+/* Estilos para campos de checkbox */
+.form-check {
+    display: flex;
+    align-items: center;
+    min-height: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.form-check-input {
+    margin-left: -1.5rem;
+}
+
+.form-check-label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+/* Estilos para campos de select com opções */
+.form-select option {
+    padding: 8px 12px;
+}
+
+.form-select optgroup {
+    font-weight: bold;
+    color: #495057;
+}
+
+/* Estilos para campos de select múltiplo */
+.form-select[multiple] {
+    height: auto;
+    min-height: 120px;
+}
+
+/* Estilos para campos de select com tamanho personalizado */
+.form-select[size] {
+    height: auto;
+}
+
+/* Estilos para campos de select com placeholder */
+.form-select:invalid {
+    color: #6c757d;
+}
+
+/* Estilos para campos de select com foco */
+.form-select:focus {
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 0.2rem rgba(30, 60, 114, 0.25);
+}
+
+/* Estilos para campos de select com hover */
+.form-select:hover {
+    border-color: #adb5bd;
+}
+
+/* Estilos para campos de select com estado ativo */
+.form-select:active {
+    border-color: #1e3c72;
+}
+
+/* Estilos para campos de select com estado disabled */
+.form-select:disabled {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* Estilos para campos de select com estado readonly */
+.form-select[readonly] {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+}
+
+/* Estilos para campos de select com estado required */
+.form-select:required {
+    border-left: 3px solid #1e3c72;
+}
+
+/* Estilos para campos de select com estado valid */
+.form-select.is-valid {
+    border-color: #198754;
+}
+
+/* Estilos para campos de select com estado invalid */
+.form-select.is-invalid {
+    border-color: #dc3545;
+}
+
+/* Estilos para campos de select com estado warning */
+.form-select.is-warning {
+    border-color: #ffc107;
+}
+
+/* Estilos para campos de select com estado info */
+.form-select.is-info {
+    border-color: #0dcaf0;
+}
+
+/* Estilos para campos de select com estado success */
+.form-select.is-success {
+    border-color: #198754;
+}
+
+/* Estilos para campos de select com estado danger */
+.form-select.is-danger {
+    border-color: #dc3545;
+}
+
+/* Estilos para campos de select com estado light */
+.form-select.is-light {
+    border-color: #f8f9fa;
+}
+
+/* Estilos para campos de select com estado dark */
+.form-select.is-dark {
+    border-color: #212529;
+}
+
+/* Estilos para campos de select com estado primary */
+.form-select.is-primary {
+    border-color: #1e3c72;
+}
+
+/* Estilos para campos de select com estado secondary */
+.form-select.is-secondary {
+    border-color: #6c757d;
+}
+
+/* Estilos para campos de select com estado tertiary */
+.form-select.is-tertiary {
+    border-color: #6f42c1;
+}
+
+/* Estilos para campos de select com estado quaternary */
+.form-select.is-quaternary {
+    border-color: #fd7e14;
+}
+
+/* Estilos para campos de select com estado quinary */
+.form-select.is-quinary {
+    border-color: #20c997;
+}
+
+/* Estilos para campos de select com estado senary */
+.form-select.is-senary {
+    border-color: #e83e8c;
+}
+
+/* Estilos para campos de select com estado septenary */
+.form-select.is-septenary {
+    border-color: #6f42c1;
+}
+
+/* Estilos para campos de select com estado octonary */
+.form-select.is-octonary {
+    border-color: #fd7e14;
+}
+
+/* Estilos para campos de select com estado nonary */
+.form-select.is-nonary {
+    border-color: #20c997;
+}
+
+/* Estilos para campos de select com estado denary */
+.form-select.is-denary {
+    border-color: #e83e8c;
+}

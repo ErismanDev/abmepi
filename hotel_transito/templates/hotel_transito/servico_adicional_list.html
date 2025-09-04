@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Serviços Adicionais - Hotel de Trânsito{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+    }
+    
+    .stat-card h3 {
+        color: #667eea;
+        font-size: 2rem;
+        margin: 0;
+        font-weight: bold;
+    }
+    
+    .stat-card p {
+        color: #6c757d;
+        margin: 0.5rem 0 0 0;
+        font-size: 0.9rem;
+    }
+    
+    .actions-bar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-filters {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-filters select,
+    .search-filters input {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-new {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-new:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .servico-table {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        overflow-x: auto;
+    }
+    
+    .servico-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .servico-nome {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .servico-tipo {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .servico-valor {
+        font-weight: 600;
+        color: #28a745;
+    }
+    
+    .servico-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-ativo {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inativo {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .actions-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    
+    .actions-dropdown .dropdown-toggle {
+        background: none;
+        border: none;
+        color: #6c757d;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .actions-dropdown .dropdown-toggle:hover {
+        background-color: #f8f9fa;
+        color: #495057;
+    }
+    
+    .actions-dropdown .dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        min-width: 150px;
+        z-index: 1000;
+        display: none;
+    }
+    
+    .actions-dropdown:hover .dropdown-menu {
+        display: block;
+    }
+    
+    .actions-dropdown .dropdown-item {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: #495057;
+        text-decoration: none;
+        border-bottom: 1px solid #f8f9fa;
+        transition: all 0.3s ease;
+    }
+    
+    .actions-dropdown .dropdown-item:last-child {
+        border-bottom: none;
+    }
+    
+    .actions-dropdown .dropdown-item:hover {
+        background-color: #f8f9fa;
+        color: #667eea;
+        text-decoration: none;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .pagination .page-link {
+        padding: 0.5rem 1rem;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        color: #667eea;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .pagination .page-link:hover {
+        background-color: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+    
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+        margin-bottom: 1rem;
+        color: #495057;
+    }
+    
+    .empty-state p {
+        margin-bottom: 2rem;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="page-header">
+        <h1><i class="fas fa-concierge-bell me-3"></i>Serviços Adicionais</h1>
+        <p>Gerencie os serviços adicionais oferecidos pelo hotel de trânsito</p>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ servicos|length }}</h3>
+            <p>Exibidos</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ page_obj.paginator.count|default:servicos.count }}</h3>
+            <p>Total Geral</p>
+        </div>
+        <div class="stat-card">
+            <h3>
+                {% if is_paginated %}
+                    {{ page_obj.paginator.num_pages }}
+                {% else %}
+                    1
+                {% endif %}
+            </h3>
+            <p>Páginas</p>
+        </div>
+    </div>
+
+    <!-- Barra de Ações e Filtros -->
+    <div class="actions-bar">
+        <div class="search-filters">
+            <form method="get" class="d-flex gap-2">
+                <select name="tipo" class="form-select form-select-sm">
+                    <option value="">Todos os Tipos</option>
+                    <option value="alimentacao" {% if request.GET.tipo == 'alimentacao' %}selected{% endif %}>Alimentação</option>
+                    <option value="transporte" {% if request.GET.tipo == 'transporte' %}selected{% endif %}>Transporte</option>
+                    <option value="lavanderia" {% if request.GET.tipo == 'lavanderia' %}selected{% endif %}>Lavanderia</option>
+                    <option value="limpeza" {% if request.GET.tipo == 'limpeza' %}selected{% endif %}>Limpeza</option>
+                    <option value="outro" {% if request.GET.tipo == 'outro' %}selected{% endif %}>Outro</option>
+                </select>
+                <select name="ativo" class="form-select form-select-sm">
+                    <option value="">Todos os Status</option>
+                    <option value="true" {% if request.GET.ativo == 'true' %}selected{% endif %}>Ativo</option>
+                    <option value="false" {% if request.GET.ativo == 'false' %}selected{% endif %}>Inativo</option>
+                </select>
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-search me-1"></i>Filtrar
+                </button>
+                {% if request.GET %}
+                <a href="{% url 'hotel_transito:servico_adicional_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times me-1"></i>Limpar
+                </a>
+                {% endif %}
+            </form>
+        </div>
+        <a href="{% url 'hotel_transito:servico_adicional_create' %}" class="btn-new">
+            <i class="fas fa-plus me-2"></i>Novo Serviço
+        </a>
+    </div>
+
+    <!-- Tabela de Serviços -->
+    <div class="servico-table">
+        {% if servicos %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Serviço</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servico in servicos %}
+                <tr>
+                    <td>
+                        <div class="servico-info">
+                            <div class="servico-codigo">#{{ servico.id }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="servico-info">
+                            <div class="servico-nome">{{ servico.nome }}</div>
+                            {% if servico.descricao %}
+                            <div class="servico-descricao">{{ servico.descricao|truncatechars:50 }}</div>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ servico.get_tipo_display }}</span>
+                    </td>
+                    <td>
+                        <div class="servico-valor">R$ {{ servico.valor }}</div>
+                    </td>
+                    <td>
+                        <span class="servico-status status-{% if servico.ativo %}ativo{% else %}inativo{% endif %}">
+                            {% if servico.ativo %}Ativo{% else %}Inativo{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions-dropdown">
+                            <button class="dropdown-toggle">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="{% url 'hotel_transito:servico_adicional_detail' servico.pk %}" class="dropdown-item">
+                                    <i class="fas fa-eye me-2"></i>Visualizar
+                                </a>
+                                <a href="{% url 'hotel_transito:servico_adicional_update' servico.pk %}" class="dropdown-item">
+                                    <i class="fas fa-edit me-2"></i>Editar
+                                </a>
+                                <a href="{% url 'hotel_transito:servico_adicional_delete' servico.pk %}" class="dropdown-item text-danger">
+                                    <i class="fas fa-trash me-2"></i>Excluir
+                                </a>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Paginação -->
+        {% if is_paginated %}
+        <nav aria-label="Paginação de serviços">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <!-- Estado vazio -->
+        <div class="empty-state">
+            <i class="fas fa-concierge-bell"></i>
+            <h3>Nenhum serviço encontrado</h3>
+            <p>Não há serviços adicionais cadastrados no sistema.</p>
+            <a href="{% url 'hotel_transito:servico_adicional_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Cadastrar Primeiro Serviço
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Filtros automáticos
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipoSelect = document.querySelector('select[name="tipo"]');
+        const ativoSelect = document.querySelector('select[name="ativo"]');
+        
+        function applyFilters() {
+            const form = document.querySelector('form');
+            form.submit();
+        }
+        
+        if (tipoSelect) tipoSelect.addEventListener('change', applyFilters);
+        if (ativoSelect) ativoSelect.addEventListener('change', applyFilters);
+    });
+</script>
+{% endblock %}

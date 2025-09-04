@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Acesso Negado{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Acesso Negado
+                    </h4>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <i class="fas fa-lock fa-3x text-danger"></i>
+                    </div>
+                    
+                    <h5 class="text-danger mb-3">Você não tem permissão para acessar esta página</h5>
+                    
+                    <p class="text-muted mb-4">
+                        O dashboard principal é restrito apenas para administradores do sistema.
+                        {% if user.is_authenticated %}
+                            <br>Seu tipo de usuário: <strong>{{ user.get_tipo_usuario_display }}</strong>
+                        {% endif %}
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">
+                                        <i class="fas fa-home me-2"></i>
+                                        Página Inicial
+                                    </h6>
+                                    <p class="card-text small">Acesse a página institucional do sistema</p>
+                                    <a href="{% url 'institucional' %}" class="btn btn-outline-primary btn-sm">
+                                        Ir para Página Inicial
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                            <div class="col-md-6">
+                                <div class="card border-success">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-success">
+                                            <i class="fas fa-user me-2"></i>
+                                            Seu Perfil
+                                        </h6>
+                                        <p class="card-text small">Acesse suas informações pessoais</p>
+                                        <a href="{% url 'core:perfil' %}" class="btn btn-outline-success btn-sm">
+                                            Ver Perfil
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-start">
+                        <h6 class="text-muted mb-3">O que você pode fazer:</h6>
+                        <ul class="text-muted">
+                            {% if user.is_authenticated %}
+                                {% if user.tipo_usuario == 'advogado' or user.tipo_usuario == 'atendente_advogado' %}
+                                    <li><strong>Advogados e Atendentes:</strong> Acesse o <a href="{% url 'assejus:dashboard' %}">Dashboard ASEJUS</a></li>
+                                {% endif %}
+                                {% if user.tipo_usuario == 'psicologo' or user.tipo_usuario == 'atendente_psicologo' %}
+                                    <li><strong>Psicólogos e Atendentes:</strong> Acesse o <a href="{% url 'psicologia:dashboard' %}">Dashboard Psicologia</a></li>
+                                {% endif %}
+                                {% if user.tipo_usuario == 'atendente_geral' %}
+                                    <li><strong>Atendentes Gerais:</strong> Acesse a <a href="{% url 'associados:associado_list' %}">Lista de Associados</a></li>
+                                {% endif %}
+                                {% if user.tipo_usuario == 'associado' %}
+                                    {% if user.associado %}
+                                        <li><strong>Associados:</strong> Veja suas <a href="{% url 'associados:minha_ficha' %}">informações pessoais</a></li>
+                                    {% else %}
+                                        <li><strong>Associados:</strong> <a href="{% url 'core:usuario_dashboard' %}">Acesse seu dashboard</a></li>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <li><a href="{% url 'login' %}">Faça login</a> para acessar suas funcionalidades</li>
+                            {% endif %}
+                            <li>Entre em contato com o administrador do sistema se precisar de acesso adicional</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

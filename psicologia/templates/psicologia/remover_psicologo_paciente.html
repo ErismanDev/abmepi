@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Remover Psicólogo{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-user-minus text-danger"></i> 
+                    Remover Psicólogo
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">
+                        Remover Psicólogo de {{ paciente.associado.nome }}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Atenção!</h6>
+                        <p class="mb-0">
+                            <strong>Paciente:</strong> {{ paciente.associado.nome }}<br>
+                            <strong>Psicólogo Atual:</strong> {{ paciente.psicologo_responsavel.nome_completo }}<br>
+                            <strong>Ação:</strong> Remover psicólogo responsável
+                        </p>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Consequências</h6>
+                        <ul class="mb-0">
+                            <li>O paciente ficará sem psicólogo responsável</li>
+                            <li>Não poderá agendar novas sessões</li>
+                            <li>O histórico será preservado</li>
+                            <li>Será necessário atribuir um novo psicólogo</li>
+                        </ul>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="motivo_encerramento"><strong>Motivo da Remoção *</strong></label>
+                                    <textarea name="motivo_encerramento" id="motivo_encerramento" class="form-control" rows="3" required 
+                                              placeholder="Descreva o motivo da remoção..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-user-minus"></i> Confirmar Remoção
+                                </button>
+                                <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Informações -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">Alternativas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-lightbulb"></i> Recomendação</h6>
+                        <p class="mb-0">
+                            Em vez de remover o psicólogo, considere 
+                            <strong>transferir o paciente</strong> para outro psicólogo.
+                        </p>
+                        <div class="mt-2">
+                            <a href="{% url 'psicologia:transferir_paciente' paciente.pk %}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-exchange-alt"></i> Transferir Paciente
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading"><i class="fas fa-check-circle"></i> Vantagens da Transferência</h6>
+                        <ul class="mb-0">
+                            <li>Continuidade do atendimento</li>
+                            <li>Preservação do histórico</li>
+                            <li>Melhor para o paciente</li>
+                            <li>Processo mais profissional</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

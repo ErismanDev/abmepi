@@ -1,0 +1,1128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pré-Cadastro de Associado - ABMEPI</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Crispy Forms -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --accent-light: #63b3ed;
+            --white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            --shadow-light: 0 4px 20px rgba(26, 54, 93, 0.08);
+            --shadow-medium: 0 8px 30px rgba(26, 54, 93, 0.12);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Navegação Moderna */
+        .modern-navbar {
+            background: rgba(26, 54, 93, 0.95) !important;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 8px 40px rgba(26, 54, 93, 0.25);
+            transition: all 0.4s ease;
+            padding: 1rem 0;
+            height: 85px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modern-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 179, 237, 0.5), transparent);
+        }
+        
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 100%;
+            padding-top: 8px;
+        }
+        
+        .brand-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            background: white;
+            padding: 4px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            min-width: 250px;
+        }
+        
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: unset;
+        }
+        
+        /* Links de navegação */
+        .modern-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modern-nav .nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .modern-nav .nav-link i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .main-container {
+            padding: 6rem 0 2rem 0; /* Compensar navbar fixo */
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 1rem;
+        }
+        
+        .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+            border-bottom: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 123, 255, 0.3);
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .alert {
+            border-radius: 0.75rem;
+            border: none;
+        }
+        
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 0.5rem;
+        }
+        
+        .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        
+        .footer {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 1rem 1rem 0 0;
+        }
+        
+        /* Estilos responsivos */
+        @media (max-width: 768px) {
+            .navbar-logo {
+                height: 35px;
+            }
+            
+            .brand-text {
+                font-size: 1.2rem;
+            }
+            
+            .main-logo {
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .navbar-logo {
+                height: 30px;
+            }
+            
+            .brand-text {
+                font-size: 1rem;
+            }
+            
+            .main-logo {
+                height: 50px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .main-logo {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        
+        .main-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-container img {
+            max-height: 80px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-container h4 {
+            color: #495057;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top modern-navbar">
+        <div class="container">
+            <!-- Logo ABMEPI Destacada -->
+            <a class="navbar-brand" href="{% url 'institucional' %}">
+                <div class="logo-container">
+                    <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="brand-logo">
+                    <div class="brand-text">
+                        <span class="brand-title">ABMEPI</span>
+                        <span class="brand-subtitle">Associação de Bombeiros e Policiais Militares</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Menu de Navegação -->
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav modern-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/associados/pre-cadastro/consultar/">
+                            <i class="fas fa-search"></i>
+                            Consultar Andamento
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'institucional' %}">
+                            <i class="fas fa-home"></i>
+                            Voltar ao Portal
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <!-- Logo e título -->
+            <div class="logo-container">
+                <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="main-logo mb-3">
+                <h4>Pré-Cadastro de Associado</h4>
+
+            </div>
+            
+            <!-- Alertas informativos -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="card">
+                        <div class="card-header py-3 bg-primary text-white">
+                            <h5 class="m-0 font-weight-bold">
+                                <i class="fas fa-edit me-2"></i>
+                                Solicitação de Associação
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <!-- Informações importantes -->
+                            <div class="alert alert-info mb-4">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Informações Importantes
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Este é um <strong>pré-cadastro</strong> que será analisado pela diretoria da ABMEPI</li>
+                                    <li>Após a aprovação, você receberá um email com instruções para acessar o sistema</li>
+                                    <li>Mantenha seus dados atualizados e verifique seu email regularmente</li>
+                                    <li>O processo de aprovação pode levar até 5 dias úteis</li>
+                                </ul>
+                            </div>
+
+                            <form method="post" enctype="multipart/form-data" novalidate>
+                                {% csrf_token %}
+                                
+                                <!-- Dados Pessoais -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-user me-2"></i>
+                                            Dados Pessoais
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.nome.id_for_label }}" class="form-label">Nome Completo *</label>
+                                        {{ form.nome }}
+                                        {% if form.nome.errors %}
+                                            <div class="text-danger small">{{ form.nome.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.cpf.id_for_label }}" class="form-label">CPF *</label>
+                                        {{ form.cpf }}
+                                        {% if form.cpf.errors %}
+                                            <div class="text-danger small">{{ form.cpf.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.rg.id_for_label }}" class="form-label">RG *</label>
+                                        {{ form.rg }}
+                                        {% if form.rg.errors %}
+                                            <div class="text-danger small">{{ form.rg.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">Data de Nascimento *</label>
+                                        {{ form.data_nascimento }}
+                                        {% if form.data_nascimento.errors %}
+                                            <div class="text-danger small">{{ form.data_nascimento.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.sexo.id_for_label }}" class="form-label">Sexo *</label>
+                                        {{ form.sexo }}
+                                        {% if form.sexo.errors %}
+                                            <div class="text-danger small">{{ form.sexo.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.estado_civil.id_for_label }}" class="form-label">Estado Civil *</label>
+                                        {{ form.estado_civil }}
+                                        {% if form.estado_civil.errors %}
+                                            <div class="text-danger small">{{ form.estado_civil.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.foto.id_for_label }}" class="form-label">Foto</label>
+                                        {{ form.foto }}
+                                        {% if form.foto.errors %}
+                                            <div class="text-danger small">{{ form.foto.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.naturalidade.id_for_label }}" class="form-label">Naturalidade</label>
+                                        {{ form.naturalidade }}
+                                        {% if form.naturalidade.errors %}
+                                            <div class="text-danger small">{{ form.naturalidade.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.nacionalidade.id_for_label }}" class="form-label">Nacionalidade *</label>
+                                        {{ form.nacionalidade }}
+                                        {% if form.nacionalidade.errors %}
+                                            <div class="text-danger small">{{ form.nacionalidade.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label">E-mail *</label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                            <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.telefone.id_for_label }}" class="form-label">Telefone</label>
+                                        {{ form.telefone }}
+                                        {% if form.telefone.errors %}
+                                            <div class="text-danger small">{{ form.telefone.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.celular.id_for_label }}" class="form-label">Celular *</label>
+                                        {{ form.celular }}
+                                        {% if form.celular.errors %}
+                                            <div class="text-danger small">{{ form.celular.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Dados dos Pais -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-users me-2"></i>
+                                            Dados dos Pais
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.nome_pai.id_for_label }}" class="form-label">Nome do Pai</label>
+                                        {{ form.nome_pai }}
+                                        {% if form.nome_pai.errors %}
+                                            <div class="text-danger small">{{ form.nome_pai.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.nome_mae.id_for_label }}" class="form-label">Nome da Mãe</label>
+                                        {{ form.nome_mae }}
+                                        {% if form.nome_mae.errors %}
+                                            <div class="text-danger small">{{ form.nome_mae.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Endereço -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-map-marker-alt me-2"></i>
+                                            Endereço
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.cep.id_for_label }}" class="form-label">CEP *</label>
+                                        {{ form.cep }}
+                                        {% if form.cep.errors %}
+                                            <div class="text-danger small">{{ form.cep.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.rua.id_for_label }}" class="form-label">Rua *</label>
+                                        {{ form.rua }}
+                                        {% if form.rua.errors %}
+                                            <div class="text-danger small">{{ form.rua.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-3 mb-3">
+                                        <label for="{{ form.numero.id_for_label }}" class="form-label">Número *</label>
+                                        {{ form.numero }}
+                                        {% if form.numero.errors %}
+                                            <div class="text-danger small">{{ form.numero.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.complemento.id_for_label }}" class="form-label">Complemento</label>
+                                        {{ form.complemento }}
+                                        {% if form.complemento.errors %}
+                                            <div class="text-danger small">{{ form.complemento.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.bairro.id_for_label }}" class="form-label">Bairro *</label>
+                                        {{ form.bairro }}
+                                        {% if form.bairro.errors %}
+                                            <div class="text-danger small">{{ form.bairro.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.cidade.id_for_label }}" class="form-label">Cidade *</label>
+                                        {{ form.cidade }}
+                                        {% if form.cidade.errors %}
+                                            <div class="text-danger small">{{ form.cidade.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.estado.id_for_label }}" class="form-label">Estado *</label>
+                                        {{ form.estado }}
+                                        {% if form.estado.errors %}
+                                            <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Dados Profissionais -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-shield-alt me-2"></i>
+                                            Dados Profissionais
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.tipo_profissao.id_for_label }}" class="form-label">Tipo de Profissão *</label>
+                                        {{ form.tipo_profissao }}
+                                        {% if form.tipo_profissao.errors %}
+                                            <div class="text-danger small">{{ form.tipo_profissao.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.posto_graduacao.id_for_label }}" class="form-label">Posto/Graduação</label>
+                                        {{ form.posto_graduacao }}
+                                        {% if form.posto_graduacao.errors %}
+                                            <div class="text-danger small">{{ form.posto_graduacao.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.orgao.id_for_label }}" class="form-label">Órgão/Instituição</label>
+                                        {{ form.orgao }}
+                                        {% if form.orgao.errors %}
+                                            <div class="text-danger small">{{ form.orgao.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.matricula.id_for_label }}" class="form-label">Matrícula</label>
+                                        {{ form.matricula }}
+                                        {% if form.matricula.errors %}
+                                            <div class="text-danger small">{{ form.matricula.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.situacao.id_for_label }}" class="form-label">Situação</label>
+                                        {{ form.situacao }}
+                                        {% if form.situacao.errors %}
+                                            <div class="text-danger small">{{ form.situacao.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.tipo_documento.id_for_label }}" class="form-label">Tipo de Documento</label>
+                                        {{ form.tipo_documento }}
+                                        {% if form.tipo_documento.errors %}
+                                            <div class="text-danger small">{{ form.tipo_documento.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <label for="{{ form.observacoes.id_for_label }}" class="form-label">Observações</label>
+                                        {{ form.observacoes }}
+                                        {% if form.observacoes.errors %}
+                                            <div class="text-danger small">{{ form.observacoes.errors.0 }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Dependentes -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-users me-2"></i>
+                                            Dependentes
+                                        </h5>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <p class="text-muted mb-0">Adicione os dependentes do pré-cadastro</p>
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="adicionarDependente()">
+                                                <i class="fas fa-plus me-1"></i>
+                                                Adicionar Dependente
+                                            </button>
+                                        </div>
+                                        
+                                        <div id="dependentesContainer">
+                                            <!-- Dependentes serão adicionados aqui dinamicamente -->
+                                        </div>
+                                        
+                                        <div class="table-responsive" id="dependentesTable" style="display: none;">
+                                            <table class="table table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Nome</th>
+                                                        <th>Parentesco</th>
+                                                        <th>Data Nascimento</th>
+                                                        <th>CPF</th>
+                                                        <th>Idade</th>
+                                                        <th>Ações</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="dependentesTableBody">
+                                                    <!-- Linhas serão adicionadas dinamicamente -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Documentos -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-file-upload me-2"></i>
+                                            Documentos Necessários
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <div class="alert alert-warning">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Documentos Obrigatórios
+                                            </h6>
+                                            <p class="mb-0">
+                                                Para análise da sua solicitação, é necessário anexar os seguintes documentos:
+                                            </p>
+                                            <ul class="mb-0 mt-2">
+                                                <li><strong>Cópia do RG:</strong> Documento de identidade atualizado</li>
+                                                <li><strong>Cópia do CPF:</strong> Cadastro de Pessoa Física</li>
+                                                <li><strong>Comprovante de Residência:</strong> Conta de luz, água, telefone ou similar (máximo 3 meses)</li>
+                                            </ul>
+                                            <p class="mb-0 mt-2">
+                                                <small><strong>Formatos aceitos:</strong> PDF, JPG, JPEG, PNG, DOC, DOCX (máximo 5MB por arquivo)</small>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.copia_rg.id_for_label }}" class="form-label">
+                                            <i class="fas fa-id-card me-1"></i>
+                                            Cópia do RG *
+                                        </label>
+                                        {{ form.copia_rg }}
+                                        {% if form.copia_rg.errors %}
+                                            <div class="text-danger small">{{ form.copia_rg.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Documento de identidade atualizado
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.copia_cpf.id_for_label }}" class="form-label">
+                                            <i class="fas fa-file-alt me-1"></i>
+                                            Cópia do CPF *
+                                        </label>
+                                        {{ form.copia_cpf }}
+                                        {% if form.copia_cpf.errors %}
+                                            <div class="text-danger small">{{ form.copia_cpf.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Cadastro de Pessoa Física
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-md-4 mb-3">
+                                        <label for="{{ form.comprovante_residencia.id_for_label }}" class="form-label">
+                                            <i class="fas fa-home me-1"></i>
+                                            Comprovante de Residência *
+                                        </label>
+                                        {{ form.comprovante_residencia }}
+                                        {% if form.comprovante_residencia.errors %}
+                                            <div class="text-danger small">{{ form.comprovante_residencia.errors.0 }}</div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Conta de luz, água, telefone (máx. 3 meses)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Termos e Condições -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="section-title">
+                                            <i class="fas fa-file-contract me-2"></i>
+                                            Termos e Condições
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="aceite_termos" required>
+                                            <label class="form-check-label" for="aceite_termos">
+                                                <strong>Li e aceito os termos e condições da associação</strong>
+                                            </label>
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Ao marcar esta opção, você confirma que leu e concorda com os estatutos da ABMEPI
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-12 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="autorizacao_dados" required>
+                                            <label class="form-check-label" for="autorizacao_dados">
+                                                <strong>Autorizo o uso dos meus dados para fins associativos</strong>
+                                            </label>
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Suas informações serão utilizadas exclusivamente para fins da associação
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Botões de ação -->
+                                <div class="row">
+                                    <div class="col-12">
+                                        <hr class="my-4">
+                                        <div class="d-flex justify-content-between">
+                                            <a href="{% url 'institucional' %}" class="btn btn-outline-secondary">
+                                                <i class="fas fa-times me-1"></i>
+                                                Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn-primary btn-lg" id="btn_submit" disabled>
+                                                <i class="fas fa-paper-plane me-1"></i>
+                                                Enviar Solicitação
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer simples -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                © 2025 Erisman@TI. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Máscaras e validações
+    document.addEventListener('DOMContentLoaded', function() {
+        // Máscara para CPF
+        const cpfField = document.getElementById('id_cpf');
+        if (cpfField) {
+            cpfField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    e.target.value = value;
+                }
+            });
+        }
+
+        // Máscara para CEP
+        const cepField = document.getElementById('id_cep');
+        if (cepField) {
+            cepField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 8) {
+                    value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                    e.target.value = value;
+                }
+            });
+        }
+
+        // Máscara para telefone
+        const telefoneField = document.getElementById('id_telefone');
+        if (telefoneField) {
+            telefoneField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    if (value.length <= 10) {
+                        value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                    } else {
+                        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                    }
+                    e.target.value = value;
+                }
+            });
+        }
+
+        // Máscara para celular
+        const celularField = document.getElementById('id_celular');
+        if (celularField) {
+            celularField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    if (value.length <= 10) {
+                        value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                    } else {
+                        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                    }
+                    e.target.value = value;
+                }
+            });
+        }
+
+        // Validação dos checkboxes e campos obrigatórios
+        const aceiteTermos = document.getElementById('aceite_termos');
+        const autorizacaoDados = document.getElementById('autorizacao_dados');
+        const btnSubmit = document.getElementById('btn_submit');
+
+        // Campos obrigatórios
+        const camposObrigatorios = [
+            'id_nome', 'id_cpf', 'id_rg', 'id_data_nascimento', 'id_sexo', 'id_estado_civil',
+            'id_nacionalidade', 'id_celular', 'id_cep', 'id_rua', 'id_numero', 'id_bairro', 'id_cidade', 'id_estado',
+            'id_tipo_profissao', 'id_copia_rg', 'id_copia_cpf', 'id_comprovante_residencia'
+        ];
+
+        function verificarFormulario() {
+            // Verificar checkboxes
+            const checkboxesOk = aceiteTermos.checked && autorizacaoDados.checked;
+            
+            // Verificar campos obrigatórios
+            let camposOk = true;
+            camposObrigatorios.forEach(function(campoId) {
+                const campo = document.getElementById(campoId);
+                if (campo && (!campo.value || campo.value.trim() === '')) {
+                    camposOk = false;
+                }
+            });
+
+            if (checkboxesOk && camposOk) {
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove('btn-secondary');
+                btnSubmit.classList.add('btn-primary');
+            } else {
+                btnSubmit.disabled = true;
+                btnSubmit.classList.remove('btn-primary');
+                btnSubmit.classList.add('btn-secondary');
+            }
+        }
+
+        // Adicionar listeners para todos os campos obrigatórios
+        camposObrigatorios.forEach(function(campoId) {
+            const campo = document.getElementById(campoId);
+            if (campo) {
+                campo.addEventListener('input', verificarFormulario);
+                campo.addEventListener('change', verificarFormulario);
+            }
+        });
+
+        aceiteTermos.addEventListener('change', verificarFormulario);
+        autorizacaoDados.addEventListener('change', verificarFormulario);
+
+        // Validação inicial
+        verificarFormulario();
+
+        // Validação do formulário antes do envio
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            console.log('DEBUG: Formulário sendo enviado...');
+            
+            // Verificar checkboxes
+            if (!aceiteTermos.checked || !autorizacaoDados.checked) {
+                e.preventDefault();
+                alert('Por favor, aceite os termos e condições para continuar.');
+                return false;
+            }
+            
+            // Verificar campos obrigatórios
+            let camposVazios = [];
+            camposObrigatorios.forEach(function(campoId) {
+                const campo = document.getElementById(campoId);
+                if (campo && (!campo.value || campo.value.trim() === '')) {
+                    const label = document.querySelector('label[for="' + campoId + '"]');
+                    const nomeCampo = label ? label.textContent.replace('*', '').trim() : campoId;
+                    camposVazios.push(nomeCampo);
+                }
+            });
+            
+            if (camposVazios.length > 0) {
+                e.preventDefault();
+                alert('Por favor, preencha todos os campos obrigatórios:\n\n' + camposVazios.join('\n'));
+                return false;
+            }
+            
+            // Verificar dependentes (apenas se houver dependentes adicionados)
+            let dependentesIncompletos = [];
+            for (let i = 1; i <= dependenteCount; i++) {
+                const nome = document.querySelector(`input[name="dependente_nome_${i}"]`);
+                const parentesco = document.querySelector(`select[name="dependente_parentesco_${i}"]`);
+                const nascimento = document.querySelector(`input[name="dependente_data_nascimento_${i}"]`);
+                
+                if (nome && parentesco && nascimento) {
+                    if (!nome.value.trim() || !parentesco.value || !nascimento.value) {
+                        dependentesIncompletos.push(`Dependente ${i}`);
+                    }
+                }
+            }
+            
+            if (dependentesIncompletos.length > 0) {
+                e.preventDefault();
+                alert('Por favor, complete os dados dos dependentes:\n\n' + dependentesIncompletos.join('\n'));
+                return false;
+            }
+            
+            console.log('DEBUG: Validação passou, enviando formulário...');
+        });
+
+        // Funções para gerenciar dependentes
+        let dependenteCount = 0;
+    });
+    </script>
+    
+    <script>
+    // Funções globais para gerenciar dependentes
+    let dependenteCount = 0;
+
+    function adicionarDependente() {
+        console.log('Função adicionarDependente chamada');
+        dependenteCount++;
+        const container = document.getElementById('dependentesContainer');
+        console.log('Container encontrado:', container);
+            const dependenteHtml = `
+                <div class="card mb-3" id="dependente-${dependenteCount}">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="fas fa-user me-2"></i>
+                            Dependente ${dependenteCount}
+                        </h6>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerDependente(${dependenteCount})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nome Completo *</label>
+                                <input type="text" class="form-control" name="dependente_nome_${dependenteCount}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Parentesco *</label>
+                                <select class="form-select" name="dependente_parentesco_${dependenteCount}" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="conjuge">Cônjuge</option>
+                                    <option value="filho">Filho(a)</option>
+                                    <option value="pai">Pai</option>
+                                    <option value="mae">Mãe</option>
+                                    <option value="irmao">Irmão(ã)</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Data de Nascimento *</label>
+                                <input type="date" class="form-control" name="dependente_data_nascimento_${dependenteCount}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">CPF</label>
+                                <input type="text" class="form-control" name="dependente_cpf_${dependenteCount}" placeholder="000.000.000-00">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">E-mail</label>
+                                <input type="email" class="form-control" name="dependente_email_${dependenteCount}">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Observações</label>
+                                <textarea class="form-control" name="dependente_observacoes_${dependenteCount}" rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', dependenteHtml);
+            
+            // Mostrar tabela de dependentes se houver pelo menos um
+            if (dependenteCount > 0) {
+                document.getElementById('dependentesTable').style.display = 'block';
+            }
+            
+            // Aplicar máscara no CPF
+            const cpfField = document.querySelector(`input[name="dependente_cpf_${dependenteCount}"]`);
+            if (cpfField) {
+                cpfField.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length <= 11) {
+                        value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                        e.target.value = value;
+                    }
+                });
+            }
+            
+            // Adicionar linha na tabela de prévia
+            adicionarLinhaTabela(dependenteCount);
+        }
+
+        function removerDependente(id) {
+            const dependente = document.getElementById(`dependente-${id}`);
+            if (dependente) {
+                dependente.remove();
+                // Remover linha da tabela
+                const linha = document.getElementById(`linha-dependente-${id}`);
+                if (linha) {
+                    linha.remove();
+                }
+                // Esconder tabela se não houver dependentes
+                if (dependenteCount <= 1) {
+                    document.getElementById('dependentesTable').style.display = 'none';
+                }
+            }
+        }
+
+        function adicionarLinhaTabela(id) {
+            const tbody = document.getElementById('dependentesTableBody');
+            const linhaHtml = `
+                <tr id="linha-dependente-${id}">
+                    <td>
+                        <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                            <i class="fas fa-user text-white" style="font-size: 12px;"></i>
+                        </div>
+                        <span id="nome-dependente-${id}">-</span>
+                    </td>
+                    <td id="parentesco-dependente-${id}">-</td>
+                    <td id="nascimento-dependente-${id}">-</td>
+                    <td id="cpf-dependente-${id}">-</td>
+                    <td id="idade-dependente-${id}">-</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removerDependente(${id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', linhaHtml);
+            
+            // Adicionar listeners para atualizar a tabela em tempo real
+            const nomeField = document.querySelector(`input[name="dependente_nome_${id}"]`);
+            const parentescoField = document.querySelector(`select[name="dependente_parentesco_${id}"]`);
+            const nascimentoField = document.querySelector(`input[name="dependente_data_nascimento_${id}"]`);
+            const cpfField = document.querySelector(`input[name="dependente_cpf_${id}"]`);
+            
+            if (nomeField) {
+                nomeField.addEventListener('input', function() {
+                    document.getElementById(`nome-dependente-${id}`).textContent = this.value || '-';
+                });
+            }
+            
+            if (parentescoField) {
+                parentescoField.addEventListener('change', function() {
+                    const opcoes = {
+                        'conjuge': 'Cônjuge',
+                        'filho': 'Filho(a)',
+                        'pai': 'Pai',
+                        'mae': 'Mãe',
+                        'irmao': 'Irmão(ã)',
+                        'outro': 'Outro'
+                    };
+                    document.getElementById(`parentesco-dependente-${id}`).textContent = opcoes[this.value] || '-';
+                });
+            }
+            
+            if (nascimentoField) {
+                nascimentoField.addEventListener('change', function() {
+                    if (this.value) {
+                        const data = new Date(this.value);
+                        const dataFormatada = data.toLocaleDateString('pt-BR');
+                        document.getElementById(`nascimento-dependente-${id}`).textContent = dataFormatada;
+                        
+                        // Calcular idade
+                        const hoje = new Date();
+                        let idade = hoje.getFullYear() - data.getFullYear();
+                        const mesAtual = hoje.getMonth();
+                        const mesNascimento = data.getMonth();
+                        if (mesAtual < mesNascimento || (mesAtual === mesNascimento && hoje.getDate() < data.getDate())) {
+                            idade--;
+                        }
+                        document.getElementById(`idade-dependente-${id}`).textContent = idade + ' anos';
+                    } else {
+                        document.getElementById(`nascimento-dependente-${id}`).textContent = '-';
+                        document.getElementById(`idade-dependente-${id}`).textContent = '-';
+                    }
+                });
+            }
+            
+            if (cpfField) {
+                cpfField.addEventListener('input', function() {
+                    document.getElementById(`cpf-dependente-${id}`).textContent = this.value || '-';
+                });
+            }
+        }
+    </script>
+</body>
+</html>
