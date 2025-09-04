@@ -1,7 +1,6 @@
 # Git
 .git
 .gitignore
-README.md
 
 # Python
 __pycache__
@@ -24,6 +23,13 @@ coverage.xml
 .mypy_cache
 .pytest_cache
 .hypothesis
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media
 
 # Virtual environments
 venv/
@@ -48,57 +54,35 @@ venv.bak/
 ehthumbs.db
 Thumbs.db
 
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Media files (will be mounted as volume)
-media/
-
-# Static files (will be collected during build)
-staticfiles/
-
-# Environment variables
-.env
-.env.local
-.env.development
-.env.test
-.env.production
-
-# Backup files
-*.bak
-*.backup
-*.tmp
-
-# Test files
-test_*.py
-test_*.html
-debug_*.py
-debug_*.html
-teste_*.py
-teste_*.html
-
-# Documentation
-*.md
-docs/
-
-# Logs
-logs/
-
-# Node modules (if using any frontend build tools)
+# Node
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Coverage reports
-htmlcov/
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
 
-# Documentation builds
-docs/_build/
+# Documentation
+*.md
+README*
+docs/
+
+# Test files
+test_*
+*_test.py
+tests/
+
+# Backup files
+*.backup
+backup_*
+
+# Logs
+logs/
+*.log
 
 # Temporary files
-*.tmp
-*.temp
+tmp/
+temp/
