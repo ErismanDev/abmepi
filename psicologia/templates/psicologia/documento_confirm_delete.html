@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Documento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-trash text-danger"></i> 
+                    Excluir Documento
+                </h1>
+                <div>
+                    {% if documento.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' documento.paciente.pk %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar aos Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-danger text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Confirmação de Exclusão
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Atenção!
+                        </h5>
+                        <p class="mb-0">
+                            Você está prestes a excluir permanentemente este documento. 
+                            Esta ação não pode ser desfeita e o arquivo será removido do servidor.
+                        </p>
+                    </div>
+
+                    <div class="card border-warning mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">Detalhes do Documento</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Título:</strong> {{ documento.titulo }}</p>
+                                    <p><strong>Tipo:</strong> <span class="badge bg-secondary">{{ documento.get_tipo_display }}</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Paciente:</strong> {{ documento.paciente.associado.nome }}</p>
+                                    <p><strong>Criado em:</strong> {{ documento.data_criacao|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p><strong>Descrição:</strong></p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {% if documento.descricao %}
+                                            {{ documento.descricao|truncatewords:30 }}
+                                        {% else %}
+                                            <span class="text-muted">Sem descrição</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% if documento.arquivo %}
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <p><strong>Arquivo:</strong></p>
+                                    <div class="border rounded p-2 bg-light">
+                                        <i class="fas fa-file text-primary"></i>
+                                        {{ documento.arquivo.name }}
+                                        {% if documento.arquivo.size %}
+                                            <small class="text-muted">({{ documento.arquivo.size|filesizeformat }})</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-trash"></i> 
+                                    Confirmar Exclusão
+                                </button>
+                                <a href="{% url 'psicologia:paciente_detail' documento.paciente.pk %}" class="btn btn-secondary btn-lg ml-2">
+                                    <i class="fas fa-times"></i> 
+                                    Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle"></i> 
+                                Alternativas à Exclusão
+                            </h6>
+                            <ul class="mb-0">
+                                <li><strong>Editar:</strong> Modifique o documento em vez de excluí-lo</li>
+                                <li><strong>Arquivar:</strong> Marque como inativo para manter o histórico</li>
+                                <li><strong>Renomear:</strong> Altere o título ou descrição</li>
+                                <li><strong>Transferir:</strong> Mova para outro paciente se necessário</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-shield-alt"></i> 
+                                Considerações Importantes
+                            </h6>
+                            <ul class="mb-0">
+                                <li>O arquivo será permanentemente removido do servidor</li>
+                                <li>Considere fazer backup antes de excluir</li>
+                                <li>Verifique se não há referências em outros registros</li>
+                                <li>Mantenha o sigilo profissional</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

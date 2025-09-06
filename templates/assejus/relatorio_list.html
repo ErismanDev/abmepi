@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatórios Jurídicos - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Relatórios Jurídicos
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie todos os relatórios jurídicos da associação
+                    </p>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" onclick="openRelatorioModal()">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Relatório
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filtros de busca -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Tipo ou advogado...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select class="form-control" id="tipo" name="tipo">
+                                <option value="">Todos os tipos</option>
+                                <option value="mensal" {% if tipo == 'mensal' %}selected{% endif %}>Mensal</option>
+                                <option value="trimestral" {% if tipo == 'trimestral' %}selected{% endif %}>Trimestral</option>
+                                <option value="semestral" {% if tipo == 'semestral' %}selected{% endif %}>Semestral</option>
+                                <option value="anual" {% if tipo == 'anual' %}selected{% endif %}>Anual</option>
+                                <option value="especial" {% if tipo == 'especial' %}selected{% endif %}>Especial</option>
+                                <option value="outros" {% if tipo == 'outros' %}selected{% endif %}>Outros</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="escopo" class="form-label">Escopo</label>
+                            <select class="form-control" id="escopo" name="escopo">
+                                <option value="">Todos os escopos</option>
+                                <option value="total" {% if escopo == 'total' %}selected{% endif %}>Total Geral</option>
+                                <option value="por_advogado" {% if escopo == 'por_advogado' %}selected{% endif %}>Por Advogado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>
+                                    Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de relatórios -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Relatórios
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Tipo</th>
+                                        <th>Data de Geração</th>
+                                        <th>Usuário</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for relatorio in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <strong>
+                                                {% if relatorio.escopo == 'por_advogado' and relatorio.advogado %}
+                                                    {{ relatorio.advogado.nome }}
+                                                {% else %}
+                                                    Relatório {{ relatorio.tipo|title }}
+                                                {% endif %}
+                                            </strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                {% if relatorio.escopo == 'por_advogado' and relatorio.advogado %}
+                                                    {{ relatorio.periodo_inicio|date:"d/m/Y" }} a {{ relatorio.periodo_fim|date:"d/m/Y" }}
+                                                {% else %}
+                                                    {{ relatorio.periodo_inicio|date:"d/m/Y" }} a {{ relatorio.periodo_fim|date:"d/m/Y" }}
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ relatorio.tipo|title }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                {{ relatorio.data_geracao|date:"d/m/Y H:i" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if relatorio.usuario_geracao %}
+                                                <span class="badge bg-primary">
+                                                    {{ relatorio.usuario_geracao.username }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'assejus:relatorio_detail' pk=relatorio.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver
+                                                </a>
+                                                <a href="{% url 'assejus:relatorio_update' pk=relatorio.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    Editar
+                                                </a>
+                                                <div class="btn-group" role="group">
+                                                    <a href="{% url 'assejus:relatorio_pdf' pk=relatorio.pk %}" 
+                                                       class="btn btn-sm btn-outline-success">
+                                                        <i class="fas fa-file-pdf me-1"></i>
+                                                        Visualizar
+                                                    </a>
+                                                    <a href="{% url 'assejus:relatorio_pdf' pk=relatorio.pk %}?download=1" 
+                                                       class="btn btn-sm btn-outline-success dropdown-toggle dropdown-toggle-split" 
+                                                       data-bs-toggle="dropdown" 
+                                                       aria-expanded="false">
+                                                        <span class="visually-hidden">Toggle Dropdown</span>
+                                                    </a>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="{% url 'assejus:relatorio_pdf' pk=relatorio.pk %}?download=1">
+                                                            <i class="fas fa-download me-2"></i>Download PDF
+                                                        </a></li>
+                                                    </ul>
+                                                </div>
+                                                <a href="{% url 'assejus:relatorio_delete' pk=relatorio.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash me-1"></i>
+                                                    Excluir
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if page_obj.has_other_pages %}
+                        <nav aria-label="Navegação de páginas" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if escopo %}&escopo={{ escopo }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if escopo %}&escopo={{ escopo }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if escopo %}&escopo={{ escopo }}{% endif %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if escopo %}&escopo={{ escopo }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if escopo %}&escopo={{ escopo }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum relatório encontrado</h5>
+                            <p class="text-muted">
+                                {% if search or tipo %}
+                                    Tente ajustar os filtros de busca ou
+                                {% endif %}
+                                <a href="{% url 'assejus:relatorio_create' %}" class="text-decoration-none">
+                                    crie o primeiro relatório
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit do formulário quando os filtros mudarem
+    document.getElementById('tipo').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
+{% endblock %}

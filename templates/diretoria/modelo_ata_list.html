@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Modelos de Ata - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-save me-2"></i>
+                        Modelos de Ata Personalizados
+                    </h1>
+                    <p class="text-muted mb-0">Gerencie seus modelos de ata salvos</p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:modelo_ata_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Modelo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ request.GET.search }}" placeholder="Nome ou descrição...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="categoria" name="categoria">
+                                <option value="">Todas as categorias</option>
+                                <option value="geral" {% if request.GET.categoria == 'geral' %}selected{% endif %}>Geral</option>
+                                <option value="ordinaria" {% if request.GET.categoria == 'ordinaria' %}selected{% endif %}>Reunião Ordinária</option>
+                                <option value="extraordinaria" {% if request.GET.categoria == 'extraordinaria' %}selected{% endif %}>Reunião Extraordinária</option>
+                                <option value="emergencia" {% if request.GET.categoria == 'emergencia' %}selected{% endif %}>Emergência</option>
+                                <option value="assembleia" {% if request.GET.categoria == 'assembleia' %}selected{% endif %}>Assembleia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo de Reunião</label>
+                            <select class="form-select" id="tipo" name="tipo">
+                                <option value="">Todos os tipos</option>
+                                <option value="ordinaria" {% if request.GET.tipo == 'ordinaria' %}selected{% endif %}>Ordinária</option>
+                                <option value="extraordinaria" {% if request.GET.tipo == 'extraordinaria' %}selected{% endif %}>Extraordinária</option>
+                                <option value="emergencia" {% if request.GET.tipo == 'emergencia' %}selected{% endif %}>Emergência</option>
+                                <option value="assembleia" {% if request.GET.tipo == 'assembleia' %}selected{% endif %}>Assembleia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i>
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de modelos -->
+            {% if modelos %}
+                <div class="row">
+                    {% for modelo in modelos %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ modelo.nome }}</h6>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                                    data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'diretoria:modelo_ata_update' modelo.pk %}">
+                                                        <i class="fas fa-edit me-2"></i>Editar
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item text-danger" href="{% url 'diretoria:modelo_ata_delete' modelo.pk %}">
+                                                        <i class="fas fa-trash me-2"></i>Excluir
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text small text-muted mb-3">
+                                        {{ modelo.descricao|truncatechars:100|default:"Sem descrição" }}
+                                    </p>
+                                    
+                                    <div class="row text-center mb-3">
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Categoria</small>
+                                            <span class="badge bg-secondary">{{ modelo.categoria|title }}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Tipo</small>
+                                            <span class="badge bg-info">{{ modelo.get_tipo_reuniao_display }}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Usado</small>
+                                            <span class="badge bg-success">{{ modelo.vezes_usado }}x</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>{{ modelo.criado_por.get_full_name|default:modelo.criado_por.username }}
+                                            <br>
+                                            <i class="fas fa-calendar me-1"></i>{{ modelo.data_criacao|date:"d/m/Y" }}
+                                            {% if modelo.publico %}
+                                                <br><i class="fas fa-globe me-1"></i>Público
+                                            {% endif %}
+                                        </small>
+                                        <div>
+                                            <a href="{% url 'diretoria:ata_create' %}?modelo={{ modelo.pk }}" 
+                                               class="btn btn-sm btn-primary">
+                                                <i class="fas fa-download me-1"></i>
+                                                Usar
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginação -->
+                {% if is_paginated %}
+                    <nav aria-label="Paginação de modelos">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-save fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhum modelo encontrado</h4>
+                    <p class="text-muted">
+                        {% if request.GET.search or request.GET.categoria or request.GET.tipo %}
+                            Tente ajustar os filtros de busca.
+                        {% else %}
+                            Crie seu primeiro modelo de ata personalizado.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'diretoria:modelo_ata_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Criar Primeiro Modelo
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

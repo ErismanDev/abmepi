@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Editar Modelo{% else %}Novo Modelo{% endif %} - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-{% if object %}edit{% else %}plus{% endif %} me-2"></i>
+                        {% if object %}Editar Modelo{% else %}Novo Modelo{% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if object %}Edite as informações do modelo de ata{% else %}Crie um novo modelo de ata personalizado{% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:modelo_unificado_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" id="modeloForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Informações Básicas -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Informações Básicas
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.nome.id_for_label }}" class="form-label">
+                                        {{ form.nome.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.nome }}
+                                    {% if form.nome.errors %}
+                                        <div class="text-danger small">{{ form.nome.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                        {{ form.descricao.label }}
+                                    </label>
+                                    {{ form.descricao }}
+                                    {% if form.descricao.errors %}
+                                        <div class="text-danger small">{{ form.descricao.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.categoria.id_for_label }}" class="form-label">
+                                                {{ form.categoria.label }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.categoria }}
+                                            {% if form.categoria.errors %}
+                                                <div class="text-danger small">{{ form.categoria.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.tipo_conteudo.id_for_label }}" class="form-label">
+                                                {{ form.tipo_conteudo.label }}
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.tipo_conteudo }}
+                                            {% if form.tipo_conteudo.errors %}
+                                                <div class="text-danger small">{{ form.tipo_conteudo.errors.0 }}</div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.titulo_original.id_for_label }}" class="form-label">
+                                        {{ form.titulo_original.label }}
+                                    </label>
+                                    {{ form.titulo_original }}
+                                    {% if form.titulo_original.errors %}
+                                        <div class="text-danger small">{{ form.titulo_original.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                        {{ form.tags.label }}
+                                    </label>
+                                    {{ form.tags }}
+                                    <div class="form-text">Separe as tags por vírgula. Ex: reunião, diretoria, assembleia</div>
+                                    {% if form.tags.errors %}
+                                        <div class="text-danger small">{{ form.tags.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        {{ form.publico }}
+                                        <label class="form-check-label" for="{{ form.publico.id_for_label }}">
+                                            {{ form.publico.label }}
+                                        </label>
+                                    </div>
+                                    <div class="form-text">{{ form.publico.help_text }}</div>
+                                    {% if form.publico.errors %}
+                                        <div class="text-danger small">{{ form.publico.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Conteúdo -->
+                            <div class="col-md-6">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    Conteúdo do Modelo
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.conteudo.id_for_label }}" class="form-label">
+                                        {{ form.conteudo.label }}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.conteudo }}
+                                    {% if form.conteudo.errors %}
+                                        <div class="text-danger small">{{ form.conteudo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3" id="conteudo-html-group" style="display: none;">
+                                    <label for="{{ form.conteudo_html.id_for_label }}" class="form-label">
+                                        {{ form.conteudo_html.label }}
+                                    </label>
+                                    {{ form.conteudo_html }}
+                                    {% if form.conteudo_html.errors %}
+                                        <div class="text-danger small">{{ form.conteudo_html.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'diretoria:modelo_unificado_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Atualizar{% else %}Criar{% endif %} Modelo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoConteudoSelect = document.getElementById('{{ form.tipo_conteudo.id_for_label }}');
+    const conteudoHtmlGroup = document.getElementById('conteudo-html-group');
+    const conteudoHtmlField = document.getElementById('{{ form.conteudo_html.id_for_label }}');
+    
+    function toggleHtmlField() {
+        if (tipoConteudoSelect.value === 'html') {
+            conteudoHtmlGroup.style.display = 'block';
+            conteudoHtmlField.required = true;
+        } else {
+            conteudoHtmlGroup.style.display = 'none';
+            conteudoHtmlField.required = false;
+        }
+    }
+    
+    tipoConteudoSelect.addEventListener('change', toggleHtmlField);
+    toggleHtmlField(); // Executar na carga inicial
+});
+</script>
+{% endblock %}

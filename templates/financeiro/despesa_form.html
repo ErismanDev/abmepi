@@ -1,0 +1,203 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}Editar Despesa{% else %}Nova Despesa{% endif %} - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-receipt me-2"></i>
+                        {% if object %}
+                            Editar Despesa
+                        {% else %}
+                            Nova Despesa
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                {{ form.descricao|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.categoria|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="{{ form.valor.id_for_label }}" class="form-label">
+                                    {{ form.valor.label }} <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    {{ form.valor }}
+                                    <span class="input-group-text">BRL</span>
+                                </div>
+                                {% if form.valor.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.valor.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">Digite o valor em reais</small>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.data_despesa|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.data_vencimento|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.fornecedor|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.nota_fiscal|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    {{ form.pago }}
+                                    <label class="form-check-label" for="{{ form.pago.id_for_label }}">
+                                        {{ form.pago.label }}
+                                    </label>
+                                    {% if form.pago.help_text %}
+                                        <div class="form-text">{{ form.pago.help_text }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.comprovante|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.observacoes|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'financeiro:despesa_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Voltar à Lista
+                            </a>
+                            <div>
+                                {% if object %}
+                                    <a href="{% url 'financeiro:despesa_detail' object.pk %}" class="btn btn-outline-info me-2">
+                                        <i class="fas fa-eye me-2"></i>
+                                        Visualizar
+                                    </a>
+                                {% endif %}
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if object %}Salvar Alterações{% else %}Criar Despesa{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicializar datepickers se necessário
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr("input[type='date']", {
+                dateFormat: "Y-m-d",
+                locale: "pt"
+            });
+        }
+        
+        // Formatação de moeda brasileira para o campo valor
+        const valorInput = document.getElementById('{{ form.valor.id_for_label }}');
+        if (valorInput) {
+            // Formatação ao digitar
+            valorInput.addEventListener('input', function() {
+                var value = this.value;
+                
+                // Permitir números, ponto (separador de milhares), vírgula (separador decimal)
+                value = value.replace(/[^\d.,]/g, '');
+                
+                // Processar o valor para permitir formato brasileiro (1.000,00)
+                if (value.indexOf(',') !== -1) {
+                    // Tem vírgula decimal
+                    var parts = value.split(',');
+                    var integerPart = parts[0];
+                    var decimalPart = parts[1] || '';
+                    
+                    // Remover pontos da parte inteira (são separadores de milhares)
+                    integerPart = integerPart.replace(/\./g, '');
+                    
+                    // Limitar casas decimais a 2
+                    if (decimalPart.length > 2) {
+                        decimalPart = decimalPart.substring(0, 2);
+                    }
+                    
+                    // Reconstruir o valor
+                    value = integerPart + ',' + decimalPart;
+                } else if (value.indexOf('.') !== -1) {
+                    // Tem ponto, verificar se é separador decimal ou de milhares
+                    var lastDotIndex = value.lastIndexOf('.');
+                    var beforeLastDot = value.substring(0, lastDotIndex);
+                    var afterLastDot = value.substring(lastDotIndex + 1);
+                    
+                    // Se após o último ponto tem 1 ou 2 dígitos, é separador decimal
+                    if (afterLastDot.length <= 2 && /^\d{1,2}$/.test(afterLastDot)) {
+                        // É separador decimal, converter para vírgula
+                        value = beforeLastDot.replace(/\./g, '') + ',' + afterLastDot;
+                    } else {
+                        // É separador de milhares, manter
+                        value = value;
+                    }
+                }
+                
+                this.value = value;
+            });
+            
+            // Formatação ao perder o foco
+            valorInput.addEventListener('blur', function() {
+                var value = this.value;
+                var valueForCalc = value.replace(',', '.');
+                var numValue = parseFloat(valueForCalc);
+                
+                if (!isNaN(numValue) && numValue > 0) {
+                    // Formatar como moeda brasileira com separadores de milhares
+                    var formattedValue = numValue.toFixed(2);
+                    var parts = formattedValue.split('.');
+                    var integerPart = parts[0];
+                    var decimalPart = parts[1];
+                    
+                    // Adicionar separadores de milhares
+                    integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    
+                    // Formato final: 1.000,00
+                    this.value = integerPart + ',' + decimalPart;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

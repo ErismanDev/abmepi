@@ -1,0 +1,100 @@
+/* Estilos para campos com erro nos modais do ASEJUS */
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+}
+
+/* Estilos para alertas de erro */
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.alert-danger .alert-heading {
+    color: #721c24;
+}
+
+/* Animação para campos com erro */
+.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Estilo para botões de ação */
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para o resumo de erros */
+.error-summary {
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    border: 1px solid #feb2b2;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Estilos específicos para modais ASEJUS */
+#formModal .alert-danger.border-danger {
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+#formModal .alert-danger .btn-close {
+    opacity: 0.7;
+}
+
+#formModal .alert-danger .btn-close:hover {
+    opacity: 1;
+}
+
+/* Estilos para campos específicos do ASEJUS */
+.advogado-form .is-invalid {
+    border-width: 2px;
+}
+
+.advogado-form .has-error .form-label {
+    font-weight: 600;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .invalid-feedback {
+        font-size: 0.8rem;
+    }
+    
+    .alert-danger .d-flex {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .alert-danger .btn-close {
+        position: static !important;
+        margin-top: 1rem;
+    }
+}

@@ -1,0 +1,499 @@
+{% load static %}
+
+<!-- Conteúdo do Modal de Detalhes do Psicólogo -->
+<div class="psicologo-detail-content">
+    <!-- Header do Modal -->
+    <div class="modal-header bg-primary text-white border-0 py-4">
+        <div class="d-flex align-items-center flex-grow-1">
+            <div class="avatar-circle me-4" style="width: 70px; height: 70px;">
+                {% if psicologo.foto %}
+                    <img src="{{ psicologo.foto.url }}" alt="Foto do Psicólogo" class="avatar-img">
+                {% else %}
+                    <i class="fas fa-user-circle fa-2x text-white"></i>
+                {% endif %}
+            </div>
+            <div class="flex-grow-1">
+                <h5 class="modal-title mb-2" id="psicologoDetailModalLabel">
+                    <i class="fas fa-user-md me-2"></i>{{ psicologo.nome_completo }}
+                </h5>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-{% if psicologo.ativo %}success{% else %}danger{% endif %} fs-6 px-3 py-2 shadow-sm">
+                        <i class="fas fa-{% if psicologo.ativo %}check-circle{% else %}times-circle{% endif %} me-2"></i>
+                        {% if psicologo.ativo %}Ativo{% else %}Inativo{% endif %}
+                    </span>
+                    <span class="badge bg-info fs-6 px-3 py-2 shadow-sm">
+                        <i class="fas fa-certificate me-2"></i>{{ psicologo.crp }}
+                    </span>
+                    {% if psicologo.especialidades %}
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2 shadow-sm">
+                        <i class="fas fa-graduation-cap me-2"></i>Especialista
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+
+    <!-- Corpo do Modal -->
+    <div class="modal-body p-4">
+                <!-- Dados Pessoais -->
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-primary">
+                                <i class="fas fa-id-badge text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Identificação</h6>
+                            </div>
+                            <div class="info-card-body">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-user text-primary me-2"></i>Nome Completo
+                                    </label>
+                                    <span class="info-value">{{ psicologo.nome_completo }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-certificate text-primary me-2"></i>CRP
+                                    </label>
+                                    <span class="info-value">{{ psicologo.crp }}</span>
+                                </div>
+                                {% if psicologo.cpf %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-fingerprint text-primary me-2"></i>CPF
+                                    </label>
+                                    <span class="info-value">{{ psicologo.cpf }}</span>
+                                </div>
+                                {% endif %}
+                                {% if psicologo.data_nascimento %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-calendar-heart text-primary me-2"></i>Data de Nascimento
+                                    </label>
+                                    <span class="info-value">{{ psicologo.data_nascimento|date:"d/m/Y" }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-success">
+                                <i class="fas fa-address-book text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Contato</h6>
+                            </div>
+                            <div class="info-card-body">
+                                {% if psicologo.telefone %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-phone text-success me-2"></i>Telefone
+                                    </label>
+                                    <span class="info-value">
+                                        <a href="tel:{{ psicologo.telefone }}" class="text-decoration-none">
+                                            <i class="fas fa-phone me-2"></i>{{ psicologo.telefone }}
+                                        </a>
+                                    </span>
+                                </div>
+                                {% endif %}
+                                {% if psicologo.telefone_secundario %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-phone-square text-success me-2"></i>Telefone Secundário
+                                    </label>
+                                    <span class="info-value">
+                                        <a href="tel:{{ psicologo.telefone_secundario }}" class="text-decoration-none">
+                                            <i class="fas fa-phone me-2"></i>{{ psicologo.telefone_secundario }}
+                                        </a>
+                                    </span>
+                                </div>
+                                {% endif %}
+                                {% if psicologo.email %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-envelope text-success me-2"></i>E-mail
+                                    </label>
+                                    <span class="info-value">
+                                        <a href="mailto:{{ psicologo.email }}" class="text-decoration-none">
+                                            <i class="fas fa-envelope me-2"></i>{{ psicologo.email }}
+                                        </a>
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Especialidades -->
+                {% if psicologo.especialidades %}
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-info">
+                                <i class="fas fa-graduation-cap text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Especialidades</h6>
+                            </div>
+                            <div class="info-card-body">
+                                <div class="observations-content">
+                                    <i class="fas fa-quote-left text-info me-3 fs-4"></i>
+                                    {{ psicologo.especialidades|linebreaks }}
+                                    <i class="fas fa-quote-right text-info ms-3 fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Endereço -->
+                {% if psicologo.endereco %}
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-warning">
+                                <i class="fas fa-map-location-dot text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Endereço</h6>
+                            </div>
+                            <div class="info-card-body">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-road text-warning me-2"></i>Endereço
+                                    </label>
+                                    <span class="info-value">{{ psicologo.endereco }}, {{ psicologo.numero }}
+                                    {% if psicologo.complemento %}- {{ psicologo.complemento }}{% endif %}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-map-pin text-warning me-2"></i>Bairro
+                                    </label>
+                                    <span class="info-value">{{ psicologo.bairro }}</span>
+                                </div>
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-city text-warning me-2"></i>Cidade/Estado
+                                    </label>
+                                    <span class="info-value">{{ psicologo.cidade }}/{{ psicologo.estado }}</span>
+                                </div>
+                                {% if psicologo.cep %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-mailbox text-warning me-2"></i>CEP
+                                    </label>
+                                    <span class="info-value">{{ psicologo.cep }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Informações Profissionais -->
+                {% if psicologo.formacao or psicologo.instituicao %}
+                <div class="row g-4 mb-4">
+                    <div class="col-lg-6">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-secondary">
+                                <i class="fas fa-briefcase text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Formação</h6>
+                            </div>
+                            <div class="info-card-body">
+                                {% if psicologo.formacao %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-graduation-cap text-secondary me-2"></i>Formação
+                                    </label>
+                                    <span class="info-value">{{ psicologo.formacao }}</span>
+                                </div>
+                                {% endif %}
+                                {% if psicologo.instituicao %}
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-university text-secondary me-2"></i>Instituição
+                                    </label>
+                                    <span class="info-value">{{ psicologo.instituicao }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Observações -->
+                {% if psicologo.observacoes %}
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-danger">
+                                <i class="fas fa-sticky-note text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Observações</h6>
+                            </div>
+                            <div class="info-card-body">
+                                <div class="observations-content">
+                                    <i class="fas fa-quote-left text-danger me-3 fs-4"></i>
+                                    {{ psicologo.observacoes|linebreaks }}
+                                    <i class="fas fa-quote-right text-danger ms-3 fs-4"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Datas -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="info-card">
+                            <div class="info-card-header bg-gradient-primary">
+                                <i class="fas fa-calendar text-white me-2"></i>
+                                <h6 class="mb-0 text-white">Informações do Sistema</h6>
+                            </div>
+                            <div class="info-card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <label class="info-label">
+                                                <i class="fas fa-calendar-plus text-primary me-2"></i>Data de Cadastro
+                                            </label>
+                                            <span class="info-value">{{ psicologo.data_cadastro|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="info-item">
+                                            <label class="info-label">
+                                                <i class="fas fa-calendar-check text-primary me-2"></i>Última Atualização
+                                            </label>
+                                            <span class="info-value">{{ psicologo.data_atualizacao|date:"d/m/Y H:i" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    <!-- Footer do Modal -->
+    <div class="modal-footer bg-light border-0 py-3">
+        <div class="d-flex justify-content-between align-items-center w-100">
+            <div class="text-muted small">
+                <span class="me-3">
+                    <i class="fas fa-hashtag me-1"></i><strong>ID:</strong> {{ psicologo.pk }}
+                </span>
+                <span>
+                    <i class="fas fa-calendar me-1"></i><strong>Cadastrado em:</strong> {{ psicologo.data_cadastro|date:"d/m/Y" }}
+                </span>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal-xl {
+    max-width: 1200px;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+}
+
+.bg-gradient-success {
+    background: linear-gradient(135deg, #198754 0%, #146c43 100%);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%);
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+}
+
+.avatar-circle {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.fs-6 {
+    font-size: 0.875rem !important;
+}
+
+.fs-4 {
+    font-size: 1.125rem !important;
+}
+
+.info-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transition: all 0.3s ease-in-out;
+    border: none;
+}
+
+.info-card:hover {
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    transform: translateY(-5px);
+}
+
+.info-card-header {
+    padding: 1.25rem;
+    border-bottom: none;
+    display: flex;
+    align-items: center;
+}
+
+.info-card-header h6 {
+    font-weight: 600;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.info-card-body {
+    padding: 1.75rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.info-item:hover {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #495057;
+    min-width: 160px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.info-value {
+    color: #212529;
+    font-weight: 500;
+    text-align: right;
+    flex: 1;
+}
+
+.info-value a {
+    color: #0d6efd;
+    transition: color 0.3s ease;
+}
+
+.info-value a:hover {
+    color: #0a58ca;
+}
+
+.observations-content {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    border-left: 5px solid #ffc107;
+    position: relative;
+    text-align: center;
+    font-style: italic;
+}
+
+.btn-group .btn {
+    border-radius: 0.5rem !important;
+    margin-left: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.btn-group .btn:first-child {
+    margin-left: 0;
+}
+
+.badge {
+    border-radius: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .modal-xl {
+        max-width: 95vw;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .info-label {
+        min-width: auto;
+    }
+    
+    .info-value {
+        text-align: left;
+    }
+    
+    .d-flex.gap-3 {
+        flex-wrap: wrap;
+        gap: 0.5rem !important;
+    }
+    
+    .badge.fs-6 {
+        font-size: 0.75rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+    
+    .info-card-header {
+        padding: 1rem;
+    }
+    
+    .info-card-body {
+        padding: 1.25rem;
+    }
+}
+</style>

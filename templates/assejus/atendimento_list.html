@@ -1,0 +1,584 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Atendimentos Jurídicos - ASEJUS{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos para pesquisa moderna */
+.search-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.search-toggle {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 20px rgba(13, 110, 253, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(13, 110, 253, 0.4);
+    color: white;
+}
+
+.search-toggle i {
+    font-size: 1.25rem;
+}
+
+.search-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1001;
+    overflow-y: auto;
+}
+
+.search-panel.active {
+    right: 0;
+}
+
+.search-panel-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-panel-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.search-panel-header h5 i {
+    margin-right: 0.75rem;
+}
+
+.search-panel-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.search-panel-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-panel-body {
+    padding: 2rem;
+}
+
+.search-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.search-form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.search-form-control,
+.search-form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-form-control:focus,
+.search-form-select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.search-form-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.search-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .search-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .search-toggle {
+        top: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* Estilos para avatar retangular */
+.avatar-rectangular {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 1.2rem;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Token CSRF para formulários AJAX -->
+{% csrf_token %}
+
+<!-- Incluir template base de modais ANTES do conteúdo principal -->
+{% include 'assejus/modal_base.html' %}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="h2">
+            <i class="fas fa-gavel me-2"></i>
+            Atendimentos Jurídicos
+        </h1>
+        {% if is_advogado_restricted %}
+            <p class="text-muted mb-0">
+                <i class="fas fa-user-lock me-2 text-warning"></i>
+                <strong>Acesso Restrito:</strong> Você está visualizando apenas os atendimentos onde é o advogado responsável.
+            </p>
+        {% else %}
+            <p class="text-muted mb-0">
+                Gerencie todos os atendimentos jurídicos da associação
+            </p>
+        {% endif %}
+    </div>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-primary" id="novoAtendimentoBtn">
+                <i class="fas fa-plus me-1"></i>
+                Novo Atendimento
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Botão de pesquisa flutuante -->
+<button class="search-toggle" onclick="toggleSearchPanel()" title="Abrir pesquisa avançada">
+    <i class="fas fa-search"></i>
+</button>
+
+<!-- Painel de pesquisa lateral -->
+<div class="search-panel" id="searchPanel">
+    <div class="search-panel-header">
+        <h5>
+            <i class="fas fa-filter me-2"></i>
+            Pesquisa Avançada
+        </h5>
+        <button class="search-panel-close" onclick="toggleSearchPanel()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="search-panel-body">
+        <form method="get" id="searchForm">
+            <div class="search-form-group">
+                <label for="search">
+                    <i class="fas fa-search me-2 text-primary"></i>Buscar
+                </label>
+                <input type="text" 
+                       name="search" 
+                       id="search"
+                       class="search-form-control"
+                       placeholder="Associado, título ou descrição"
+                       value="{{ search|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="status">
+                    <i class="fas fa-clipboard-check me-2 text-primary"></i>Status
+                </label>
+                <select name="status" id="status" class="search-form-select">
+                    <option value="">Todos os Status</option>
+                    <option value="em_andamento" {% if status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                    <option value="concluido" {% if status == 'concluido' %}selected{% endif %}>Concluído</option>
+                    <option value="cancelado" {% if status == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                    <option value="aguardando" {% if status == 'aguardando' %}selected{% endif %}>Aguardando</option>
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="tipo_demanda">
+                    <i class="fas fa-balance-scale me-2 text-primary"></i>Tipo de Demanda
+                </label>
+                <select name="tipo_demanda" id="tipo_demanda" class="search-form-select">
+                    <option value="">Todos os Tipos</option>
+                    <option value="trabalhista" {% if tipo_demanda == 'trabalhista' %}selected{% endif %}>Trabalhista</option>
+                    <option value="previdenciario" {% if tipo_demanda == 'previdenciario' %}selected{% endif %}>Previdenciário</option>
+                    <option value="civil" {% if tipo_demanda == 'civil' %}selected{% endif %}>Civil</option>
+                    <option value="administrativo" {% if tipo_demanda == 'administrativo' %}selected{% endif %}>Administrativo</option>
+                    <option value="outros" {% if tipo_demanda == 'outros' %}selected{% endif %}>Outros</option>
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="prioridade">
+                    <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Prioridade
+                </label>
+                <select name="prioridade" id="prioridade" class="search-form-select">
+                    <option value="">Todas as Prioridades</option>
+                    <option value="alta" {% if prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                    <option value="media" {% if prioridade == 'media' %}selected{% endif %}>Média</option>
+                    <option value="baixa" {% if prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="advogado">
+                    <i class="fas fa-user-tie me-2 text-primary"></i>Advogado Responsável
+                </label>
+                <select name="advogado" id="advogado" class="search-form-select">
+                    <option value="">Todos os Advogados</option>
+                    {% for adv in advogados_disponiveis %}
+                        <option value="{{ adv.id }}" {% if advogado == adv.id|stringformat:"s" %}selected{% endif %}>
+                            {{ adv.nome }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-actions">
+                <button type="submit" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-search me-2"></i>Pesquisar
+                </button>
+                <a href="{% url 'assejus:atendimento_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-times me-2"></i>Limpar Filtros
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Overlay para fechar o painel -->
+<div class="search-overlay" id="searchOverlay" onclick="toggleSearchPanel()"></div>
+
+<!-- Lista de Atendimentos -->
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list me-2"></i>
+            Lista de Atendimentos
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if page_obj and page_obj|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Associado</th>
+                        <th>Título</th>
+                        <th>Tipo</th>
+                        <th>Status</th>
+                        <th>Prioridade</th>
+                        <th>Processo</th>
+                        <th>Data Abertura</th>
+                        <th>Advogado</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for atendimento in page_obj %}
+                    {% if forloop.first and tem_transicao and atendimento.status == 'concluido' %}
+                    <tr class="table-dark">
+                        <td colspan="9" class="text-center py-2">
+                            <strong><i class="fas fa-separator me-2"></i>ATENDIMENTOS CONCLUÍDOS<i class="fas fa-separator ms-2"></i></strong>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr class="{% if atendimento.status == 'concluido' %}table-secondary{% endif %}">
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if atendimento.associado.foto %}
+                                    <img src="{{ atendimento.associado.foto.url }}" alt="{{ atendimento.associado.nome }}" 
+                                         class="avatar-rectangular me-2">
+                                {% else %}
+                                    <div class="avatar-placeholder me-2">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ atendimento.associado.nome }}</strong>
+                                    <br><small class="text-muted">{{ atendimento.associado.cpf }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{% url 'assejus:atendimento_detail' atendimento.pk %}" 
+                               class="text-decoration-none {% if atendimento.status == 'concluido' %}text-muted{% endif %}">
+                                {{ atendimento.titulo|truncatechars:40 }}
+                            </a>
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ atendimento.get_tipo_demanda_display }}</span>
+                        </td>
+                        <td>
+                            {% if atendimento.status == 'em_andamento' %}
+                                <span class="badge bg-warning">Em Andamento</span>
+                            {% elif atendimento.status == 'concluido' %}
+                                <span class="badge bg-success">Concluído</span>
+                            {% elif atendimento.status == 'cancelado' %}
+                                <span class="badge bg-danger">Cancelado</span>
+                            {% elif atendimento.status == 'aguardando' %}
+                                <span class="badge bg-secondary">Aguardando</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if atendimento.prioridade == 'alta' %}
+                                <span class="badge bg-danger">Alta</span>
+                            {% elif atendimento.prioridade == 'media' %}
+                                <span class="badge bg-warning">Média</span>
+                            {% elif atendimento.prioridade == 'baixa' %}
+                                <span class="badge bg-success">Baixa</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if atendimento.numero_processo %}
+                                <span class="badge bg-primary" title="Comarca: {{ atendimento.comarca|default:'Não informada' }}, Vara: {{ atendimento.vara|default:'Não informada' }}">
+                                    {{ atendimento.numero_processo }}
+                                </span>
+                            {% else %}
+                                <span class="text-muted small">Não informado</span>
+                            {% endif %}
+                        </td>
+                        <td class="{% if atendimento.status == 'concluido' %}text-muted{% endif %}">
+                            {{ atendimento.data_abertura|date:"d/m/Y H:i" }}
+                        </td>
+                        <td>
+                            {% if atendimento.advogado_responsavel %}
+                                <span class="badge bg-primary">{{ atendimento.advogado_responsavel.nome }}</span>
+                            {% else %}
+                                <span class="text-muted">Não atribuído</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'assejus:atendimento_detail' atendimento.pk %}" class="btn btn-sm btn-outline-primary" title="Ver Detalhes Completos">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Editar" onclick="openAtendimentoEditModal({{ atendimento.pk }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                {% if atendimento.status != 'concluido' %}
+                                    <a href="{% url 'assejus:atendimento_finalizar' atendimento.pk %}" class="btn btn-sm btn-outline-success" title="Finalizar Atendimento">
+                                        <i class="fas fa-check-circle"></i>
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'assejus:atendimento_delete' atendimento.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if is_paginated %}
+        <nav aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if tipo_demanda %}&tipo_demanda={{ tipo_demanda }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}{% if advogado %}&advogado={{ advogado }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if tipo_demanda %}&tipo_demanda={{ tipo_demanda }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}{% if advogado %}&advogado={{ advogado }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if tipo_demanda %}&tipo_demanda={{ tipo_demanda }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}{% if advogado %}&advogado={{ advogado }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status %}&status={{ status }}{% endif %}{% if tipo_demanda %}&tipo_demanda={{ tipo_demanda }}{% endif %}{% if prioridade %}&prioridade={{ prioridade }}{% endif %}{% if advogado %}&advogado={{ advogado }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-gavel fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum atendimento encontrado</h5>
+            <p class="text-muted">
+                {% if search or status or tipo_demanda or prioridade or advogado %}
+                    Os filtros aplicados não retornaram resultados.
+                {% else %}
+                    Não há atendimentos jurídicos cadastrados no sistema.
+                {% endif %}
+            </p>
+            <button type="button" class="btn btn-primary" id="cadastrarAtendimentoBtn">
+                <i class="fas fa-plus me-1"></i>
+                Cadastrar Primeiro Atendimento
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Scripts específicos da página -->
+<!-- Novo sistema de modais ASEJUS -->
+<script src="{% static 'assejus/js/modais_assejus.js' %}"></script>
+<script>
+// Função para alternar a visibilidade do painel de pesquisa
+function toggleSearchPanel() {
+    const searchPanel = document.getElementById('searchPanel');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchToggle = document.querySelector('.search-toggle');
+
+    if (searchPanel.classList.contains('active')) {
+        searchPanel.classList.remove('active');
+        searchOverlay.classList.remove('active');
+        searchToggle.classList.remove('active');
+    } else {
+        searchPanel.classList.add('active');
+        searchOverlay.classList.add('active');
+        searchToggle.classList.add('active');
+    }
+}
+
+// Configuração simplificada dos botões
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== CONFIGURAÇÃO DOS BOTÕES ===');
+    
+    // Botão Novo Atendimento
+    const novoAtendimentoBtn = document.getElementById('novoAtendimentoBtn');
+    if (novoAtendimentoBtn) {
+        novoAtendimentoBtn.onclick = function() {
+            console.log('🔘 Botão Novo Atendimento clicado');
+            if (typeof openAtendimentoModal === 'function') {
+                openAtendimentoModal();
+            } else {
+                console.error('❌ openAtendimentoModal não disponível');
+                alert('Erro: Função não disponível. Recarregue a página.');
+            }
+        };
+        console.log('✅ Botão Novo Atendimento configurado');
+    }
+    
+    // Botão cadastrar primeiro atendimento
+    const cadastrarAtendimentoBtn = document.getElementById('cadastrarAtendimentoBtn');
+    if (cadastrarAtendimentoBtn) {
+        cadastrarAtendimentoBtn.onclick = function() {
+            console.log('🔘 Botão Cadastrar Primeiro Atendimento clicado');
+            if (typeof openAtendimentoModal === 'function') {
+                openAtendimentoModal();
+            } else {
+                console.error('❌ openAtendimentoModal não disponível');
+                alert('Erro: Função não disponível. Recarregue a página.');
+            }
+        };
+        console.log('✅ Botão Cadastrar Primeiro Atendimento configurado');
+    }
+    
+    // Configurar botões de edição
+    document.querySelectorAll('[onclick*="openAtendimentoEditModal"]').forEach(btn => {
+        const atendimentoId = btn.getAttribute('data-atendimento-id') || btn.getAttribute('onclick').match(/\d+/)?.[0];
+        if (atendimentoId) {
+            btn.onclick = function() {
+                if (typeof openAtendimentoEditModal === 'function') {
+                    openAtendimentoEditModal(atendimentoId);
+                } else {
+                    alert('Função não disponível. Recarregue a página.');
+                }
+            };
+        }
+    });
+    
+    console.log('✅ Todos os botões configurados');
+});
+</script>
+{% endblock %}

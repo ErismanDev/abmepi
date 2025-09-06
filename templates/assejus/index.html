@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessoria Jurídica - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <h1 class="h2">
+            <i class="fas fa-gavel me-2"></i>
+            ASSESSORIA JURÍDICA - ASSEJUS
+        </h1>
+        <p class="text-muted mb-0">Informações, notícias e orientações legais</p>
+    </div>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'assejus:dashboard' %}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-chart-line me-1"></i>
+                Dashboard
+            </a>
+            <a href="{% url 'core:institucional_edit' %}" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-cog me-1"></i>
+                Configurar Redes Sociais
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Redes Sociais ASSEJUR -->
+{% if institucional_config %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow-sm">
+            <div class="card-body text-center py-3">
+                <h6 class="text-muted mb-3">
+                    <i class="fas fa-share-alt me-2"></i>
+                    Siga-nos nas Redes Sociais
+                </h6>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    {% if institucional_config.assejur_facebook_url %}
+                    <a href="{{ institucional_config.assejur_facebook_url }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn" title="Facebook ASSEJUR">
+                        <i class="fab fa-facebook-f fa-lg"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% if institucional_config.assejur_instagram_url %}
+                    <a href="{{ institucional_config.assejur_instagram_url }}" target="_blank" class="btn btn-outline-danger btn-sm social-btn" title="Instagram ASSEJUR">
+                        <i class="fab fa-instagram fa-lg"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% if institucional_config.assejur_linkedin_url %}
+                    <a href="{{ institucional_config.assejur_linkedin_url }}" target="_blank" class="btn btn-outline-primary btn-sm social-btn" title="LinkedIn ASSEJUR">
+                        <i class="fab fa-linkedin-in fa-lg"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% if institucional_config.assejur_youtube_url %}
+                    <a href="{{ institucional_config.assejur_youtube_url }}" target="_blank" class="btn btn-outline-danger btn-sm social-btn" title="YouTube ASSEJUR">
+                        <i class="fab fa-youtube fa-lg"></i>
+                    </a>
+                    {% endif %}
+                    
+                    {% if institucional_config.assejur_twitter_url %}
+                    <a href="{{ institucional_config.assejur_twitter_url }}" target="_blank" class="btn btn-outline-info btn-sm social-btn" title="Twitter ASSEJUR">
+                        <i class="fab fa-twitter fa-lg"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="row">
+    <!-- Advogados -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow h-100 border-left-primary">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-balance-scale fa-3x text-primary"></i>
+                </div>
+                <h5 class="card-title">Advogados</h5>
+                <p class="card-text text-muted">Gerencie a equipe de advogados da associação</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'assejus:advogado_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-2"></i>
+                        Listar
+                    </a>
+                    <a href="{% url 'assejus:advogado_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Adicionar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atendimentos Jurídicos -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow h-100 border-left-success">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-folder-open fa-3x text-success"></i>
+                </div>
+                <h5 class="card-title">Atendimentos Jurídicos</h5>
+                <p class="card-text text-muted">Gerencie os casos e atendimentos jurídicos</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'assejus:atendimento_list' %}" class="btn btn-outline-success">
+                        <i class="fas fa-list me-2"></i>
+                        Listar
+                    </a>
+                    <a href="{% url 'assejus:atendimento_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>
+                        Adicionar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Consultas Jurídicas -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow h-100 border-left-info">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-question-circle fa-3x text-info"></i>
+                </div>
+                <h5 class="card-title">Consultas Jurídicas</h5>
+                <p class="card-text text-muted">Gerencie consultas e dúvidas jurídicas</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'assejus:consulta_list' %}" class="btn btn-outline-info">
+                        <i class="fas fa-list me-2"></i>
+                        Listar
+                    </a>
+                    <a href="{% url 'assejus:consulta_create' %}" class="btn btn-info">
+                        <i class="fas fa-plus me-2"></i>
+                        Adicionar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Relatórios Jurídicos -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card shadow h-100 border-left-danger">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-chart-bar fa-3x text-danger"></i>
+                </div>
+                <h5 class="card-title">Relatórios Jurídicos</h5>
+                <p class="card-text text-muted">Gere relatórios e estatísticas jurídicas</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'assejus:relatorio_list' %}" class="btn btn-outline-danger">
+                        <i class="fas fa-list me-2"></i>
+                        Listar
+                    </a>
+                    <a href="{% url 'assejus:relatorio_create' %}" class="btn btn-danger">
+                        <i class="fas fa-plus me-2"></i>
+                        Adicionar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Resumo Estatístico -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Resumo Estatístico
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-2">
+                        <div class="border-end">
+                            <h4 class="text-primary">{{ total_advogados|default:0 }}</h4>
+                            <small class="text-muted">Advogados</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="border-end">
+                            <h4 class="text-success">{{ total_atendimentos|default:0 }}</h4>
+                            <small class="text-muted">Atendimentos</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="border-end">
+                            <h4 class="text-warning">{{ total_andamentos|default:0 }}</h4>
+                            <small class="text-muted">Andamentos</small>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="border-end">
+                            <h4 class="text-info">{{ total_consultas|default:0 }}</h4>
+                            <small class="text-muted">Consultas</small>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div>
+                            <h4 class="text-danger">{{ total_relatorios|default:0 }}</h4>
+                            <small class="text-muted">Relatórios</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-secondary {
+    border-left: 0.25rem solid #858796 !important;
+}
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+.border-end {
+    border-right: 1px solid #e3e6f0 !important;
+}
+
+/* Estilos para os botões das redes sociais */
+.social-btn {
+    transition: all 0.3s ease;
+    min-width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.social-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.social-btn i {
+    font-size: 1.2rem;
+}
+
+/* Cores específicas para cada rede social */
+.btn-outline-primary.social-btn:hover {
+    background-color: #1877f2;
+    border-color: #1877f2;
+    color: white;
+}
+
+.btn-outline-danger.social-btn:hover {
+    background-color: #e4405f;
+    border-color: #e4405f;
+    color: white;
+}
+
+.btn-outline-info.social-btn:hover {
+    background-color: #1da1f2;
+    border-color: #1da1f2;
+    color: white;
+}
+</style>
+{% endblock %}

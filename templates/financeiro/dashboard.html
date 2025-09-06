@@ -1,0 +1,607 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Financeiro - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-chart-line me-2"></i>
+            Dashboard Financeiro
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="openConfigModal()">
+                    <i class="fas fa-cog me-1"></i>
+                    Configuração de Cobrança
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de estatísticas -->
+    <div class="row mb-4">
+        <!-- Total de Recebíveis de Associados -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Recebíveis Associados (Mês)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ total_mensalidades_associados|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recebíveis de Associados Pagos -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Recebíveis Associados Pagos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ mensalidades_associados_pagas|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recebíveis de Associados Pendentes -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Recebíveis Associados Pendentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ mensalidades_associados_pendentes|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recebíveis de Associados Atrasados -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Recebíveis Associados Atrasados
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ mensalidades_associados_atrasadas|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Segunda linha de cards -->
+    <div class="row mb-4">
+        <!-- Total de Despesas -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Total Despesas (Mês)
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ total_despesas|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Despesas Pagas -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Despesas Pagas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ despesas_pagas|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-receipt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Saldo do Mês -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-{% if saldo_mes >= 0 %}success{% else %}danger{% endif %} shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-{% if saldo_mes >= 0 %}success{% else %}danger{% endif %} text-uppercase mb-1">
+                                Saldo do Mês
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                <i class="fas fa-dollar-sign me-1"></i>
+                                R$ {{ saldo_mes|floatformat:2 }}
+                                <br>
+                                <small class="text-muted">BRL</small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-balance-scale fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                Ações Rápidas
+                            </div>
+                                        <div class="d-grid gap-2">
+                <a href="{% url 'financeiro:mensalidade_associados_list' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-users me-1"></i>
+                    Recebíveis Associados
+                </a>
+                <a href="{% url 'financeiro:despesa_list' %}" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-list me-1"></i>
+                    Despesas
+                </a>
+            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráfico de receitas -->
+    <div class="row mb-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-chart-area me-2"></i>
+                        Receitas dos Últimos 12 Meses
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="receitasChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Próximos vencimentos -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-calendar-day me-2"></i>
+                        Próximos Vencimentos (7 dias)
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if proximos_vencimentos %}
+                        <div class="list-group list-group-flush">
+                            {% for mensalidade in proximos_vencimentos %}
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ mensalidade.associado.nome }}</h6>
+                                    <small class="text-muted">{{ mensalidade.tipo.nome }}</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-warning">{{ mensalidade.data_vencimento|date:"d/m" }}</span>
+                                    <br>
+                                    <small class="text-muted">R$ {{ mensalidade.valor }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">
+                            <i class="fas fa-check-circle fa-2x mb-2"></i><br>
+                            Nenhum vencimento nos próximos 7 dias
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+                    <!-- Recebíveis em atraso -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Recebíveis em Atraso
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if mensalidades_atraso %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Associado</th>
+                                        <th>Tipo</th>
+                                        <th>Vencimento</th>
+                                        <th>Dias Atraso</th>
+                                        <th>Valor</th>
+                                        <th>Valor com Multa</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for mensalidade in mensalidades_atraso %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ mensalidade.associado.nome }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ mensalidade.associado.cpf }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ mensalidade.tipo.nome }}</span>
+                                        </td>
+                                        <td>{{ mensalidade.data_vencimento|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ mensalidade.get_dias_atraso }} dias</span>
+                                        </td>
+                                        <td>R$ {{ mensalidade.valor }}</td>
+                                        <td>
+                                            <strong class="text-danger">R$ {{ mensalidade.get_valor_com_multa|floatformat:2 }}</strong>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'financeiro:pagamento_create' %}" class="btn btn-sm btn-outline-success">
+                                                    <i class="fas fa-dollar-sign"></i>
+                                                </a>
+                                                <a href="{% url 'financeiro:mensalidade_update' mensalidade.pk %}" class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">
+                            <i class="fas fa-thumbs-up fa-2x mb-2"></i><br>
+                            Nenhum recebível em atraso!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Configuração de Cobrança -->
+<div class="modal fade" id="configModal" tabindex="-1" aria-labelledby="configModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="configModalLabel">
+                    <i class="fas fa-cog me-2"></i>Configuração de Cobrança
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="configForm" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Informações Gerais</h6>
+                            <div class="mb-3">
+                                <label for="id_nome" class="form-label">Nome da Configuração</label>
+                                <input type="text" class="form-control" id="id_nome" name="nome" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="id_ativo" name="ativo">
+                                    <label class="form-check-label" for="id_ativo">
+                                        Configuração Ativa
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3">Dados de Cobrança</h6>
+                            <div class="mb-3">
+                                <label for="id_chave_pix" class="form-label">Chave PIX</label>
+                                <input type="text" class="form-control" id="id_chave_pix" name="chave_pix" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_titular" class="form-label">Titular</label>
+                                <input type="text" class="form-control" id="id_titular" name="titular" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="id_banco" class="form-label">Banco</label>
+                                <input type="text" class="form-control" id="id_banco" name="banco" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="text-primary mb-3">Mensagem Personalizada</h6>
+                            <div class="mb-3">
+                                <label for="id_mensagem" class="form-label">Mensagem</label>
+                                <textarea class="form-control" id="id_mensagem" name="mensagem" rows="3" 
+                                          placeholder="Digite a mensagem personalizada para o carnê" required></textarea>
+                                <small class="form-text text-muted">Esta mensagem aparecerá nos PDFs de recebíveis</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_telefone_comprovante" class="form-label">Telefone</label>
+                                <input type="text" class="form-control" id="id_telefone_comprovante" name="telefone_comprovante" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h6 class="text-primary mb-3">Configurações do QR Code</h6>
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="id_qr_code_ativo" name="qr_code_ativo">
+                                    <label class="form-check-label" for="id_qr_code_ativo">
+                                        Exibir QR Code
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_qr_code_imagem" class="form-label">Imagem do QR Code</label>
+                                <input type="file" class="form-control" id="id_qr_code_imagem" name="qr_code_imagem" accept="image/*">
+                                <small class="form-text text-muted">PNG, JPG (máx. 2MB)</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_qr_code_tamanho" class="form-label">Tamanho (mm)</label>
+                                <input type="number" class="form-control" id="id_qr_code_tamanho" name="qr_code_tamanho" 
+                                       min="10" max="30" value="15">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="text-muted text-center">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Última atualização: <span id="lastUpdate">-</span>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Salvar Configuração
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de receitas
+    const ctx = document.getElementById('receitasChart').getContext('2d');
+    const receitasChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [{% for item in receitas_por_mes %}'{{ item.mes }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                label: 'Receitas (R$)',
+                data: [{% for item in receitas_por_mes %}{{ item.valor }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Receita: R$ ' + context.parsed.y.toLocaleString('pt-BR');
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // Modal de Configuração de Cobrança
+    function openConfigModal() {
+        // Carregar dados da configuração atual
+        loadConfigData();
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('configModal'));
+        modal.show();
+    }
+
+    // Verificar se deve abrir o modal automaticamente
+    function checkAutoOpenModal() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('open_config') === '1') {
+            // Remover o parâmetro da URL
+            urlParams.delete('open_config');
+            const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+            window.history.replaceState({}, '', newUrl);
+            
+            // Abrir o modal
+            setTimeout(() => {
+                openConfigModal();
+            }, 500); // Pequeno delay para garantir que a página carregou
+        }
+    }
+
+    // Executar verificação quando a página carregar
+    document.addEventListener('DOMContentLoaded', function() {
+        checkAutoOpenModal();
+    });
+
+    function loadConfigData() {
+        // Carregar dados da configuração via AJAX
+        fetch('/financeiro/configuracao-cobranca/dados/')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('id_nome').value = data.nome;
+                    document.getElementById('id_ativo').checked = data.ativo;
+                    document.getElementById('id_chave_pix').value = data.chave_pix;
+                    document.getElementById('id_titular').value = data.titular;
+                    document.getElementById('id_banco').value = data.banco;
+                    document.getElementById('id_mensagem').value = data.mensagem;
+                    document.getElementById('id_telefone_comprovante').value = data.telefone_comprovante;
+                    document.getElementById('id_qr_code_ativo').checked = data.qr_code_ativo;
+                    document.getElementById('id_qr_code_tamanho').value = data.qr_code_tamanho;
+                    
+                    // Atualizar data da última atualização
+                    const lastUpdate = new Date().toLocaleString('pt-BR');
+                    document.getElementById('lastUpdate').textContent = lastUpdate;
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar dados:', error);
+                alert('Erro ao carregar dados da configuração');
+            });
+    }
+
+    // Submissão do formulário
+    document.getElementById('configForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch('/financeiro/configuracao-cobranca/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('configModal'));
+                modal.hide();
+                
+                // Mostrar mensagem de sucesso
+                alert('Configuração salva com sucesso!');
+                
+                // Recarregar dados
+                loadConfigData();
+            } else {
+                alert('Erro ao salvar configuração: ' + (data.error || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao salvar configuração');
+        });
+    });
+</script>
+{% endblock %}

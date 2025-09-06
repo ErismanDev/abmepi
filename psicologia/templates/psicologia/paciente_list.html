@@ -1,0 +1,739 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pacientes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/error-styles.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+<script>
+function abrirModalNovoPaciente() {
+    console.log('Abrindo modal de novo paciente...');
+    
+    // Configurar o formulário para criar novo paciente
+    document.getElementById('formNovoPaciente').action = "{% url 'psicologia:paciente_create_modal' %}";
+    document.getElementById('formNovoPaciente').reset();
+    
+    // Resetar título e botão para estado de criação
+    document.getElementById('modalNovoPacienteLabel').innerHTML = '<i class="fas fa-user-plus"></i> Novo Paciente';
+    const submitButton = document.querySelector('#formNovoPaciente button[type="submit"]');
+    if (submitButton) {
+        submitButton.innerHTML = '<i class="fas fa-save"></i> Criar Paciente';
+    }
+    
+    console.log('Formulário configurado, abrindo modal...');
+    const modal = new bootstrap.Modal(document.getElementById('modalNovoPaciente'));
+    modal.show();
+    
+    console.log('Modal aberto com sucesso!');
+}
+
+function editarPacienteLista(pacienteId, associadoId, dataPrimeiraConsulta, psicologoResponsavel, observacoesIniciais) {
+    // Usar a função openPacienteEditModal do sistema de modais
+    if (typeof window.openPacienteEditModal === 'function') {
+        window.openPacienteEditModal(pacienteId);
+    } else {
+        // Fallback para o método antigo se a função não estiver disponível
+        console.warn('openPacienteEditModal não disponível, usando método antigo');
+        
+        // Configurar o formulário para editar paciente
+        document.getElementById('formNovoPaciente').action = `/psicologia/pacientes/modal/${pacienteId}/editar/`;
+        
+        // Preencher os campos com os dados existentes (apenas campos do modelo Paciente)
+        if (document.getElementById('associado')) {
+            document.getElementById('associado').value = associadoId || '';
+        }
+        if (document.getElementById('data_primeira_consulta')) {
+            document.getElementById('data_primeira_consulta').value = dataPrimeiraConsulta || '';
+        }
+        if (document.getElementById('psicologo_responsavel')) {
+            document.getElementById('psicologo_responsavel').value = psicologoResponsavel || '';
+        }
+        if (document.getElementById('observacoes_iniciais')) {
+            document.getElementById('observacoes_iniciais').value = observacoesIniciais || '';
+        }
+        
+        // Atualizar título e botão
+        document.getElementById('modalNovoPacienteLabel').innerHTML = '<i class="fas fa-user-edit"></i> Editar Paciente';
+        const submitButton = document.querySelector('#formNovoPaciente button[type="submit"]');
+        if (submitButton) {
+            submitButton.innerHTML = '<i class="fas fa-save"></i> Salvar Alterações';
+        }
+        
+        const modal = new bootstrap.Modal(document.getElementById('modalNovoPaciente'));
+        modal.show();
+    }
+}
+
+// Função para mostrar mensagens
+function mostrarMensagem(mensagem, tipo = 'success') {
+    const alertClass = tipo === 'success' ? 'alert-success' : 'alert-danger';
+    const iconClass = tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert ${alertClass} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        <i class="fas ${iconClass}"></i> ${mensagem}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Inserir no topo da página
+    const container = document.querySelector('.container-fluid');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Função para abrir modal de transferência
+function abrirModalTransferirPaciente(pacienteId, pacienteNome, psicologoAtual) {
+    console.log('Abrindo modal de transferência para paciente:', pacienteId);
+    
+    // Armazenar o ID do paciente no formulário para uso posterior
+    document.getElementById('formTransferirPaciente').dataset.pacienteId = pacienteId;
+    document.getElementById('transferir_nome_paciente').textContent = pacienteNome;
+    document.getElementById('transferir_psicologo_atual').textContent = psicologoAtual;
+    
+    // Resetar formulário
+    document.getElementById('formTransferirPaciente').reset();
+    
+    // Filtrar psicólogos para remover o atual da lista
+    const selectPsicologo = document.getElementById('novo_psicologo');
+    const options = selectPsicologo.querySelectorAll('option[data-psicologo-id]');
+    
+    // Primeiro, mostrar todas as opções
+    options.forEach(option => {
+        option.style.display = '';
+    });
+    
+    // Encontrar e esconder o psicólogo atual
+    // Buscar pelo nome do psicólogo atual nas opções
+    options.forEach(option => {
+        if (option.textContent.includes(psicologoAtual)) {
+            option.style.display = 'none';
+        }
+    });
+    
+    // Verificar se há psicólogos disponíveis
+    const optionsVisiveis = Array.from(options).filter(opt => opt.style.display !== 'none');
+    if (optionsVisiveis.length === 0) {
+        alert('Não há outros psicólogos disponíveis para transferência.');
+        return;
+    }
+    
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalTransferirPaciente'));
+    modal.show();
+    
+    console.log('Modal de transferência aberto com sucesso!');
+}
+
+// Função para submeter o formulário de transferência via AJAX
+function submeterFormularioTransferir(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Validação no frontend
+    const motivoTransf = formData.get('motivo_transferencia').trim();
+    if (motivoTransf.length < 3) {
+        mostrarMensagem('O motivo da transferência deve ter pelo menos 3 caracteres.', 'error');
+        return;
+    }
+    
+    const novoPsicologo = formData.get('novo_psicologo');
+    if (!novoPsicologo) {
+        mostrarMensagem('Selecione um psicólogo para transferir o paciente.', 'error');
+        return;
+    }
+    
+    // Desabilitar botão e mostrar loading
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Transferindo...';
+    
+    const pacienteId = form.dataset.pacienteId;
+    console.log('Enviando formulário de transferência para:', `/psicologia/pacientes/${pacienteId}/transferir-modal/`);
+    console.log('Dados do formulário:', Object.fromEntries(formData));
+    
+    fetch(`/psicologia/pacientes/${pacienteId}/transferir-modal/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Resposta recebida:', response);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Dados recebidos:', data);
+        
+        if (data.success) {
+            // Sucesso
+            console.log('✅ Transferência realizada com sucesso!');
+            mostrarMensagem(data.message, 'success');
+            
+            // Fechar modal
+            const modalElement = document.getElementById('modalTransferirPaciente');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                } else {
+                    const newModal = new bootstrap.Modal(modalElement);
+                    newModal.hide();
+                }
+            }
+            
+            // Recarregar a página para mostrar as mudanças
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            // Erro
+            console.log('❌ Erro na transferência!');
+            mostrarMensagem(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erro capturado na transferência:', error);
+        mostrarMensagem('Erro ao processar a transferência. Tente novamente.', 'error');
+    })
+    .finally(() => {
+        // Reabilitar botão
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    });
+}
+
+// Função para submeter o formulário via AJAX
+function submeterFormularioPaciente(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Desabilitar botão e mostrar loading
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    
+    console.log('Enviando formulário para:', form.action);
+    console.log('Dados do formulário:', Object.fromEntries(formData));
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Resposta recebida:', response);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Dados recebidos:', data);
+        console.log('Tipo de dados:', typeof data);
+        console.log('Sucesso:', data.success);
+        
+        if (data.success) {
+            // Sucesso
+            console.log('✅ Sucesso! Mostrando mensagem...');
+            mostrarMensagem(data.message, 'success');
+            
+            // Fechar modal
+            console.log('🔒 Tentando fechar modal...');
+            const modalElement = document.getElementById('modalNovoPaciente');
+            console.log('Modal element:', modalElement);
+            
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                console.log('Modal instance:', modal);
+                
+                if (modal) {
+                    console.log('Fechando modal...');
+                    modal.hide();
+                    console.log('Modal fechado!');
+                } else {
+                    console.log('Modal instance não encontrada, tentando criar nova...');
+                    const newModal = new bootstrap.Modal(modalElement);
+                    newModal.hide();
+                }
+            }
+            
+            // Recarregar a página para mostrar o novo paciente
+            console.log('🔄 Recarregando página em 1 segundo...');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            // Erro
+            console.log('❌ Erro! Mostrando mensagem de erro...');
+            mostrarMensagem(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erro capturado:', error);
+        console.error('Tipo de erro:', typeof error);
+        console.error('Mensagem de erro:', error.message);
+        console.error('Stack trace:', error.stack);
+        
+        // Tentar extrair mais informações do erro
+        if (error.response) {
+            console.error('Response status:', error.response.status);
+            console.error('Response headers:', error.response.headers);
+            console.error('Response body:', error.response.body);
+        }
+        
+        mostrarMensagem('Erro ao processar a requisição. Tente novamente.', 'error');
+    })
+    .finally(() => {
+        // Reabilitar botão
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    });
+}
+
+// Adicionar evento de submit ao formulário quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('formNovoPaciente');
+    if (form) {
+        console.log('Formulário encontrado, adicionando evento de submit');
+        form.addEventListener('submit', submeterFormularioPaciente);
+        
+        // Adicionar evento de click no botão para debug
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) {
+            submitButton.addEventListener('click', function(e) {
+                console.log('Botão de submit clicado');
+                console.log('Formulário será submetido normalmente');
+            });
+        }
+    } else {
+        console.log('Formulário não encontrado');
+    }
+    
+    // Adicionar event listeners para os botões de editar
+    const botoesEditar = document.querySelectorAll('.btn-editar-paciente');
+    botoesEditar.forEach(function(botao) {
+        botao.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const pacienteId = this.dataset.pacienteId;
+            const associadoId = this.dataset.associadoId;
+            const dataPrimeiraConsulta = this.dataset.dataPrimeiraConsulta;
+            const psicologoResponsavel = this.dataset.psicologoResponsavel;
+            const observacoesIniciais = this.dataset.observacoesIniciais;
+            
+            editarPacienteLista(pacienteId, associadoId, dataPrimeiraConsulta, psicologoResponsavel, observacoesIniciais);
+        });
+    });
+    
+    // Adicionar event listeners para os botões de transferir
+    const botoesTransferir = document.querySelectorAll('.btn-transferir-paciente');
+    botoesTransferir.forEach(function(botao) {
+        botao.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const pacienteId = this.dataset.pacienteId;
+            const pacienteNome = this.dataset.pacienteNome;
+            const psicologoAtual = this.dataset.psicologoAtual;
+            
+            abrirModalTransferirPaciente(pacienteId, pacienteNome, psicologoAtual);
+        });
+    });
+    
+    // Adicionar evento de submit ao formulário de transferência
+    const formTransferir = document.getElementById('formTransferirPaciente');
+    if (formTransferir) {
+        formTransferir.addEventListener('submit', submeterFormularioTransferir);
+    }
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">Pacientes</h1>
+                <button type="button" class="d-none d-sm-inline-block btn btn-primary shadow-sm" onclick="abrirModalNovoPaciente()">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Novo Paciente
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-8">
+                            <input type="text" name="search" class="form-control" placeholder="Buscar por nome ou CPF..." value="{{ request.GET.search }}">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de pacientes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if pacientes %}
+                        <div class="table-container">
+                            <div class="table-header">
+                                <h5>
+                                    <i class="fas fa-users me-2"></i>
+                                    Pacientes
+                                </h5>
+                                <div class="header-actions">
+                                    <span class="text-muted">
+                                        {{ page_obj.start_index|default:1 }}-{{ page_obj.end_index|default:pacientes|length }} de {{ page_obj.paginator.count|default:pacientes|length }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Foto</th>
+                                        <th>Nome</th>
+                                        <th>CPF</th>
+                                        <th>Psicólogo Responsável</th>
+                                        <th>Primeira Consulta</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for paciente in pacientes %}
+                                    <tr>
+                                        <td>
+                                            {% if paciente.associado.foto %}
+                                                <img src="{{ paciente.associado.foto.url }}" alt="Foto de {{ paciente.associado.nome }}" 
+                                                     class="avatar-rectangular">
+                                            {% else %}
+                                                <div class="avatar-placeholder">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ paciente.associado.nome }}</td>
+                                        <td>{{ paciente.associado.cpf }}</td>
+                                        <td>
+                                            {% if paciente.psicologo_responsavel %}
+                                                <span class="badge bg-primary text-white fw-bold">
+                                                    {{ paciente.psicologo_responsavel.nome_completo }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">Não atribuído</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if paciente.data_primeira_consulta %}
+                                                {{ paciente.data_primeira_consulta|date:"d/m/Y" }}
+                                            {% else %}
+                                                <span class="text-muted">Não registrada</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if paciente.ativo %}
+                                                <span class="badge bg-success text-white fw-bold">Ativo</span>
+                                                {% if paciente.tem_sessoes_realizadas %}
+                                                    <br><small class="badge bg-warning text-dark mt-1">
+                                                        <i class="fas fa-lock"></i> Acesso Restrito
+                                                    </small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-danger text-white fw-bold">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" 
+                                               class="btn btn-sm btn-info"
+                                               {% if paciente.tem_sessoes_realizadas %}
+                                                   title="Visualizar ficha - Acesso restrito ao psicólogo responsável após primeira sessão realizada"
+                                               {% else %}
+                                                   title="Visualizar ficha do paciente"
+                                               {% endif %}>
+                                                <i class="fas fa-eye"></i>
+                                                {% if paciente.tem_sessoes_realizadas %}
+                                                    <i class="fas fa-lock" style="font-size: 0.7em; margin-left: 2px;"></i>
+                                                {% endif %}
+                                            </a>
+                                            {% if paciente.tem_sessoes_realizadas and user_psicologo != paciente.psicologo_responsavel %}
+                                                <button class="btn btn-sm btn-warning" disabled 
+                                                        title="Edição restrita - Apenas o psicólogo responsável ({{ paciente.psicologo_responsavel.nome_completo|default:'Não definido' }}) pode editar após sessões realizadas">
+                                                    <i class="fas fa-edit"></i>
+                                                    <i class="fas fa-lock" style="font-size: 0.7em; margin-left: 2px;"></i>
+                                                </button>
+                                            {% else %}
+                                                <button type="button" class="btn btn-sm btn-warning btn-editar-paciente"
+                                                        data-paciente-id="{{ paciente.pk }}"
+                                                        data-associado-id="{{ paciente.associado.pk }}"
+                                                        data-data-primeira-consulta="{% if paciente.data_primeira_consulta %}{{ paciente.data_primeira_consulta|date:'Y-m-d' }}{% endif %}"
+                                                        data-psicologo-responsavel="{% if paciente.psicologo_responsavel %}{{ paciente.psicologo_responsavel.pk }}{% endif %}"
+                                                        data-observacoes-iniciais="{{ paciente.observacoes_iniciais|escapejs }}"
+                                                        title="Editar paciente">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                            {% endif %}
+                                            {% if is_psicologo and paciente.psicologo_responsavel and paciente.psicologo_responsavel == psicologo_usuario %}
+                                                <button type="button" class="btn btn-sm btn-success btn-transferir-paciente" 
+                                                        data-paciente-id="{{ paciente.pk }}"
+                                                        data-paciente-nome="{{ paciente.associado.nome }}"
+                                                        data-psicologo-atual="{% if paciente.psicologo_responsavel %}{{ paciente.psicologo_responsavel.nome_completo }}{% else %}Não atribuído{% endif %}"
+                                                        title="Transferir Paciente">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </button>
+                                            {% endif %}
+                                            {% if not paciente.tem_sessoes_realizadas or is_superuser %}
+                                                <a href="{% url 'psicologia:paciente_delete' paciente.pk %}" class="btn btn-sm btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            {% else %}
+                                                <button class="btn btn-sm btn-danger" disabled title="Paciente com sessões realizadas - apenas superusuários podem excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                        <nav aria-label="Paginação">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; Primeira</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Próxima</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-users fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-500">Nenhum paciente encontrado</h5>
+                            <p class="text-gray-400">Comece cadastrando o primeiro paciente.</p>
+                            <a href="{% url 'psicologia:paciente_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Cadastrar Paciente
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Criar Novo Paciente -->
+<div class="modal fade" id="modalNovoPaciente" tabindex="-1" aria-labelledby="modalNovoPacienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalNovoPacienteLabel">
+                    <i class="fas fa-user-plus"></i> Novo Paciente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formNovoPaciente" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Seleção de Associado -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-users"></i> Seleção de Associado
+                            </h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="associado" class="form-label"><strong>Associado *</strong></label>
+                                <select class="form-select" id="associado" name="associado" required>
+                                    <option value="">Selecione um associado...</option>
+                                    {% for associado in associados %}
+                                        <option value="{{ associado.pk }}">{{ associado.nome }} - {{ associado.cpf }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dados Clínicos -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-stethoscope"></i> Dados Clínicos
+                            </h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="data_primeira_consulta" class="form-label"><strong>Data da Primeira Consulta</strong></label>
+                                <input type="date" class="form-control" id="data_primeira_consulta" name="data_primeira_consulta">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="psicologo_responsavel" class="form-label"><strong>Psicólogo Responsável</strong></label>
+                                <select class="form-select" id="psicologo_responsavel" name="psicologo_responsavel">
+                                    <option value="">Selecione um psicólogo...</option>
+                                    {% for psicologo in psicologos %}
+                                        <option value="{{ psicologo.pk }}">
+                                            {{ psicologo.nome_completo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="observacoes_iniciais" class="form-label"><strong>Observações Iniciais</strong></label>
+                                <textarea class="form-control" id="observacoes_iniciais" name="observacoes_iniciais" rows="4" placeholder="Observações iniciais sobre o paciente..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Criar Paciente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Transferir Paciente -->
+<div class="modal fade" id="modalTransferirPaciente" tabindex="-1" aria-labelledby="modalTransferirPacienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTransferirPacienteLabel">
+                    <i class="fas fa-exchange-alt"></i> Transferir Paciente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formTransferirPaciente">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informações da Transferência</h6>
+                        <p class="mb-0">
+                            <strong>Paciente:</strong> <span id="transferir_nome_paciente"></span><br>
+                            <strong>Psicólogo Atual:</strong> <span id="transferir_psicologo_atual"></span>
+                        </p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="novo_psicologo" class="form-label"><strong>Novo Psicólogo *</strong></label>
+                                <select name="novo_psicologo" id="novo_psicologo" class="form-select" required>
+                                    <option value="">Selecione um psicólogo...</option>
+                                    {% for psicologo in psicologos %}
+                                        <option value="{{ psicologo.pk }}" data-psicologo-id="{{ psicologo.pk }}">{{ psicologo.nome_completo }} (CRP: {{ psicologo.crp }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="motivo_transferencia" class="form-label"><strong>Motivo da Transferência *</strong></label>
+                                <textarea name="motivo_transferencia" id="motivo_transferencia" class="form-control" rows="3" required 
+                                          placeholder="Descreva o motivo da transferência..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="observacoes" class="form-label"><strong>Observações</strong></label>
+                                <textarea name="observacoes" id="observacoes" class="form-control" rows="3" 
+                                          placeholder="Observações adicionais sobre a transferência..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante</h6>
+                        <ul class="mb-0">
+                            <li>A transferência é irreversível</li>
+                            <li>O histórico será preservado</li>
+                            <li>Notifique o novo psicólogo</li>
+                            <li>Informe o paciente sobre a mudança</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-exchange-alt"></i> Confirmar Transferência
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include 'psicologia/modal_base.html' %}
+{% endblock %}

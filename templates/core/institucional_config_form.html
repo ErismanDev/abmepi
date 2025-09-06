@@ -1,0 +1,1558 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Página Institucional - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        border-bottom: none;
+        font-weight: 600;
+    }
+    
+    .form-label {
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-check-input:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .logo-container {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-circular {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .associacao-text {
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+    }
+    
+    .main-content {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    /* Centralização e responsividade para a página de edição institucional */
+    .container-fluid {
+        max-width: 100%;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .accordion {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .accordion-item {
+        margin-bottom: 1rem;
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    
+    /* Melhorar a visualização em telas menores */
+    @media (max-width: 1200px) {
+        .container-fluid {
+            padding: 0 10px;
+        }
+        
+        .accordion-body {
+            padding: 1rem;
+        }
+        
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .col-md-6, .col-md-4, .col-md-3 {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 0 5px;
+        }
+        
+        .accordion-body {
+            padding: 0.75rem;
+        }
+        
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn-toolbar {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        font-size: 0.9rem;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .table tbody td:nth-child(2) {
+        max-width: 300px;
+        word-wrap: break-word;
+        white-space: normal;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .table-responsive {
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+    
+    .btn-group-sm {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .btn-group-sm .btn {
+        flex: 1;
+        min-width: 40px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table tbody td:nth-child(2) small {
+        display: block;
+        margin-top: 5px;
+        line-height: 1.4;
+        color: #6c757d;
+    }
+    
+    .table tbody td:first-child img,
+    .table tbody td:first-child div {
+        width: 40px !important;
+        height: 40px !important;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .modal-content {
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 1rem 1rem 0 0;
+    }
+    
+    .alert {
+        border-radius: 0.5rem;
+        border: none;
+    }
+    
+    .focused {
+        transform: scale(1.02);
+        transition: transform 0.3s ease;
+    }
+    
+    .has-content {
+        border-color: #28a745 !important;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+    }
+    
+    .progress {
+        background-color: transparent;
+    }
+    
+    .progress-bar {
+        transition: width 0.5s ease;
+    }
+    
+    .animate__animated {
+        animation-duration: 0.6s;
+    }
+    
+    .animate__fadeInUp {
+        animation-name: fadeInUp;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translate3d(0, 40px, 0);
+        }
+        to {
+            opacity: 1;
+            transform: translate3d(0, 0, 0);
+        }
+    }
+    
+    .form-control:valid {
+        border-color: #28a745;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    .form-control:invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23dc3545' viewBox='-2 -2 7 7'%3e%3cpath stroke='%23dc3545' d='M0 0l3 3m0-3L0 3'/%3e%3ccircle r='.5'/%3e%3ccircle cx='3' r='.5'/%3e%3ccircle cy='3' r='.5'/%3e%3ccircle cx='3' cy='3' r='.5'/%3e%3c/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right calc(0.375em + 0.1875rem) center;
+        background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    }
+    
+    .btn:active {
+        transform: translateY(1px);
+    }
+    
+    .modal.fade .modal-dialog {
+        transition: transform 0.3s ease-out;
+    }
+    
+    .modal.show .modal-dialog {
+        transform: none;
+    }
+    
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .btn-lg {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .sidebar {
+            position: static;
+            min-height: auto;
+        }
+    }
+    
+    /* Estilos para o acordeão */
+    .accordion-button:not(.collapsed) {
+        background-color: #e7f1ff;
+        color: #0c63e4;
+    }
+    
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .accordion-item {
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .accordion-header {
+        margin-bottom: 0;
+    }
+    
+    .accordion-button {
+        border-radius: 0.5rem 0.5rem 0 0;
+        font-weight: 600;
+        padding: 1rem 1.25rem;
+    }
+    
+    .accordion-body {
+        padding: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <main class="col-12 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div class="flex-grow-1">
+                <h1 class="h2 text-primary mb-2">
+                    <i class="fas fa-edit me-2"></i>Configuração da Página Institucional
+                </h1>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle me-2"></i>Personalize o conteúdo, seções e informações de contato da página principal da ABMEPI
+                </p>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0 flex-shrink-0">
+                <a href="{% url 'institucional' %}" class="btn btn-outline-primary me-2">
+                    <i class="fas fa-eye me-2"></i>Visualizar Página
+                </a>
+                <button type="submit" form="institucional-form" class="btn btn-success">
+                    <i class="fas fa-save me-2"></i>Salvar Alterações
+                </button>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-10">
+                <form id="institucional-form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Acordeão Principal -->
+                    <div class="accordion" id="institucionalAccordion">
+                
+                <!-- Seção 1: Hero e Título Principal -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingHero">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseHero" aria-expanded="true" aria-controls="collapseHero">
+                            <i class="fas fa-star me-2"></i>
+                            Seção Hero (Principal)
+                        </button>
+                    </h2>
+                    <div id="collapseHero" class="accordion-collapse collapse show" aria-labelledby="headingHero" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Seção Hero:</strong> Esta é a primeira seção que os visitantes veem. Configure o título principal e subtítulo para criar uma primeira impressão impactante.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.titulo_principal.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-heading me-1"></i>Título Principal *
+                                        </label>
+                                        {{ form.titulo_principal }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Título principal que aparece no topo da página
+                                        </div>
+                                        {% if form.titulo_principal.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.titulo_principal.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.subtitulo_hero.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-quote-left me-1"></i>Subtítulo
+                                        </label>
+                                        {{ form.subtitulo_hero }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Subtítulo descritivo da seção hero
+                                        </div>
+                                        {% if form.subtitulo_hero.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.subtitulo_hero.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 2: Contato e Footer -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingContato">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseContato" aria-expanded="false" aria-controls="collapseContato">
+                            <i class="fas fa-address-book me-2"></i>
+                            Contato e Footer
+                        </button>
+                    </h2>
+                    <div id="collapseContato" class="accordion-collapse collapse" aria-labelledby="headingContato" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Footer e Contato:</strong> Esta seção exibe automaticamente as informações de contato, links úteis e redes sociais no rodapé da página.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.telefone.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-phone me-1"></i>Telefone
+                                        </label>
+                                        {{ form.telefone }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Telefone principal para contato
+                                        </div>
+                                        {% if form.telefone.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.telefone.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-envelope me-1"></i>E-mail
+                                        </label>
+                                        {{ form.email }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>E-mail principal para contato
+                                        </div>
+                                        {% if form.email.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.email.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.endereco.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-map-marker-alt me-1"></i>Endereço
+                                        </label>
+                                        {{ form.endereco }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Endereço da sede da associação
+                                        </div>
+                                        {% if form.endereco.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.endereco.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-link me-1"></i>Links Úteis (Automáticos)
+                                        </label>
+                                        <div class="list-group">
+                                            <div class="list-group-item d-flex align-items-center">
+                                                <i class="fas fa-sign-in-alt text-primary me-3"></i>
+                                                <div>
+                                                    <strong>Acessar Sistema</strong>
+                                                    <small class="d-block text-muted">Link para login do sistema</small>
+                                                </div>
+                                            </div>
+                                            <div class="list-group-item d-flex align-items-center">
+                                                <i class="fas fa-info-circle text-info me-3"></i>
+                                                <div>
+                                                    <strong>Sobre Nós</strong>
+                                                    <small class="d-block text-muted">Link para seção sobre</small>
+                                                </div>
+                                            </div>
+                                            <div class="list-group-item d-flex align-items-center">
+                                                <i class="fas fa-cogs text-success me-3"></i>
+                                                <div>
+                                                    <strong>Serviços</strong>
+                                                    <small class="d-block text-muted">Link para seção serviços</small>
+                                                </div>
+                                            </div>
+                                            <div class="list-group-item d-flex align-items-center">
+                                                <i class="fas fa-address-book text-warning me-3"></i>
+                                                <div>
+                                                    <strong>Contato</strong>
+                                                    <small class="d-block text-muted">Link para seção contato</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Estes links são gerados automaticamente e apontam para as seções da página.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 3: Redes Sociais ABMEPI -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingRedesSociais">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRedesSociais" aria-expanded="false" aria-controls="collapseRedesSociais">
+                            <i class="fas fa-share-alt me-2"></i>
+                            Redes Sociais ABMEPI
+                        </button>
+                    </h2>
+                    <div id="collapseRedesSociais" class="accordion-collapse collapse" aria-labelledby="headingRedesSociais" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Redes Sociais ABMEPI:</strong> Configure os links para as redes sociais da ABMEPI. Estes aparecerão no footer da página e no menu lateral.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.facebook_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-facebook text-primary me-2"></i>Facebook
+                                        </label>
+                                        {{ form.facebook_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no Facebook<br>
+                                            <small class="text-muted">Exemplo: https://www.facebook.com/abmepi</small>
+                                        </div>
+                                        {% if form.facebook_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.facebook_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.instagram_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-instagram text-danger me-2"></i>Instagram
+                                        </label>
+                                        {{ form.instagram_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no Instagram<br>
+                                            <small class="text-muted">Exemplo: https://www.instagram.com/abmepi</small>
+                                        </div>
+                                        {% if form.instagram_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.instagram_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.linkedin_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-linkedin text-primary me-2"></i>LinkedIn
+                                        </label>
+                                        {{ form.linkedin_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no LinkedIn<br>
+                                            <small class="text-muted">Exemplo: https://www.linkedin.com/company/abmepi</small>
+                                        </div>
+                                        {% if form.linkedin_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.linkedin_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.youtube_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-youtube text-danger me-2"></i>YouTube
+                                        </label>
+                                        {{ form.youtube_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do canal no YouTube<br>
+                                            <small class="text-muted">Exemplo: https://www.youtube.com/@abmepi</small>
+                                        </div>
+                                        {% if form.youtube_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.youtube_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 5: Serviços Prestados aos Associados -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingServicos">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseServicos" aria-expanded="false" aria-controls="collapseServicos">
+                            <i class="fas fa-cogs me-2"></i>
+                            Serviços Prestados aos Associados
+                        </button>
+                    </h2>
+                    <div id="collapseServicos" class="accordion-collapse collapse" aria-labelledby="headingServicos" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Serviços aos Associados:</strong> Marque quais serviços estão disponíveis para os associados da ABMEPI. Estes aparecerão no menu lateral da página institucional.
+                            </div>
+                            
+                            <!-- Debug: Verificar se os campos existem -->
+                            <div class="alert alert-warning">
+                                <strong>Debug:</strong> 
+                                servicos_juridicos: {{ form.servicos_juridicos|default:"NÃO ENCONTRADO" }}<br>
+                                servicos_psicologicos: {{ form.servicos_psicologicos|default:"NÃO ENCONTRADO" }}<br>
+                                Total de campos: {{ form.fields|length }}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_juridicos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_juridicos.id_for_label }}">
+                                                <i class="fas fa-gavel text-primary me-2"></i>Serviços Jurídicos
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Assessoria jurídica e consultoria legal
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_psicologicos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_psicologicos.id_for_label }}">
+                                                <i class="fas fa-brain text-success me-2"></i>Serviços Psicológicos
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Apoio psicológico e saúde mental
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_medicos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_medicos.id_for_label }}">
+                                                <i class="fas fa-user-md text-danger me-2"></i>Serviços Médicos
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Consultas médicas e exames
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_odontologicos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_odontologicos.id_for_label }}">
+                                                <i class="fas fa-tooth text-info me-2"></i>Serviços Odontológicos
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Tratamentos odontológicos
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_financeiros }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_financeiros.id_for_label }}">
+                                                <i class="fas fa-chart-line text-warning me-2"></i>Serviços Financeiros
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Consultoria financeira e planejamento
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_educacionais }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_educacionais.id_for_label }}">
+                                                <i class="fas fa-graduation-cap text-primary me-2"></i>Serviços Educacionais
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Cursos, treinamentos e capacitação
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_recreativos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_recreativos.id_for_label }}">
+                                                <i class="fas fa-gamepad text-success me-2"></i>Serviços Recreativos
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Atividades de lazer e entretenimento
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_sociais }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_sociais.id_for_label }}">
+                                                <i class="fas fa-hands-helping text-info me-2"></i>Serviços Sociais
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Assistência social e apoio comunitário
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_esportivos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_esportivos.id_for_label }}">
+                                                <i class="fas fa-dumbbell text-warning me-2"></i>Serviços Esportivos
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Atividades esportivas e fitness
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_culturais }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_culturais.id_for_label }}">
+                                                <i class="fas fa-theater-masks text-danger me-2"></i>Serviços Culturais
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Eventos culturais e artísticos
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.servicos_hotel_transito }}
+                                            <label class="form-check-label fw-bold" for="{{ form.servicos_hotel_transito.id_for_label }}">
+                                                <i class="fas fa-bed text-success me-2"></i>Hotel de Trânsito
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Hospedagem para associados em trânsito
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Configurações específicas do Hotel de Trânsito -->
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ form.hotel_transito_telefone.id_for_label }}" class="form-label fw-bold">
+                                                    <i class="fas fa-phone text-success me-2"></i>Telefone para Reserva
+                                                </label>
+                                                {{ form.hotel_transito_telefone }}
+                                                <div class="form-text">
+                                                    <i class="fas fa-info-circle me-1"></i>Número de telefone para reservas do hotel
+                                                </div>
+                                                {% if form.hotel_transito_telefone.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.hotel_transito_telefone.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label for="{{ form.hotel_transito_imagem.id_for_label }}" class="form-label fw-bold">
+                                                    <i class="fas fa-image text-info me-2"></i>Imagem do Hotel
+                                                </label>
+                                                {{ form.hotel_transito_imagem }}
+                                                <div class="form-text">
+                                                    <i class="fas fa-info-circle me-1"></i>Imagem para exibir na seção do hotel
+                                                </div>
+                                                {% if form.hotel_transito_imagem.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {{ form.hotel_transito_imagem.errors.0 }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 4: Redes Sociais ASSEJUR -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingRedesAssejur">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRedesAssejur" aria-expanded="false" aria-controls="collapseRedesAssejur">
+                            <i class="fas fa-gavel me-2"></i>
+                            Redes Sociais ASSEJUR
+                        </button>
+                    </h2>
+                    <div id="collapseRedesAssejur" class="accordion-collapse collapse" aria-labelledby="headingRedesAssejur" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Redes Sociais ASSEJUR:</strong> Configure os links para as redes sociais da Assessoria Jurídica. Estes aparecerão no portal de notícias e na seção ASSEJUR.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.assejur_facebook_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-facebook text-primary me-2"></i>Facebook ASSEJUR
+                                        </label>
+                                        {{ form.assejur_facebook_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no Facebook<br>
+                                            <small class="text-muted">Exemplo: https://www.facebook.com/assejur.abmepi</small>
+                                        </div>
+                                        {% if form.assejur_facebook_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.assejur_facebook_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.assejur_instagram_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-instagram text-danger me-2"></i>Instagram ASSEJUR
+                                        </label>
+                                        {{ form.assejur_instagram_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no Instagram<br>
+                                            <small class="text-muted">Exemplo: https://www.instagram.com/assejur.abmepi</small>
+                                        </div>
+                                        {% if form.assejur_instagram_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.assejur_instagram_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.assejur_twitter_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-twitter text-info me-2"></i>Twitter ASSEJUR
+                                        </label>
+                                        {{ form.assejur_twitter_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no Twitter<br>
+                                            <small class="text-muted">Exemplo: https://twitter.com/assejur_abmepi</small>
+                                        </div>
+                                        {% if form.assejur_twitter_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.assejur_twitter_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.assejur_linkedin_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-linkedin text-primary me-2"></i>LinkedIn ASSEJUR
+                                        </label>
+                                        {{ form.assejur_linkedin_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do perfil no LinkedIn<br>
+                                            <small class="text-muted">Exemplo: https://www.linkedin.com/company/assejur-abmepi</small>
+                                        </div>
+                                        {% if form.assejur_linkedin_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.assejur_linkedin_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="{{ form.assejur_youtube_url.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fab fa-youtube text-danger me-2"></i>YouTube ASSEJUR
+                                        </label>
+                                        {{ form.assejur_youtube_url }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>URL do canal no YouTube<br>
+                                            <small class="text-muted">Exemplo: https://www.youtube.com/@assejur-abmepi</small>
+                                        </div>
+                                        {% if form.assejur_youtube_url.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.assejur_youtube_url.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 5: Sobre -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSobre">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSobre" aria-expanded="false" aria-controls="collapseSobre">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Seção Sobre
+                        </button>
+                    </h2>
+                    <div id="collapseSobre" class="accordion-collapse collapse" aria-labelledby="headingSobre" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Seção Sobre:</strong> Configure o conteúdo da seção "Sobre Nós" que apresenta a ABMEPI aos visitantes.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label for="{{ form.titulo_sobre.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-heading me-1"></i>Título da Seção Sobre
+                                        </label>
+                                        {{ form.titulo_sobre }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Título da seção "Sobre Nós"
+                                        </div>
+                                        {% if form.titulo_sobre.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.titulo_sobre.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.texto_sobre_1.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-paragraph me-1"></i>Primeiro Parágrafo
+                                        </label>
+                                        {{ form.texto_sobre_1 }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Primeiro parágrafo da seção sobre
+                                        </div>
+                                        {% if form.texto_sobre_1.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.texto_sobre_1.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.texto_sobre_2.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-paragraph me-1"></i>Segundo Parágrafo
+                                        </label>
+                                        {{ form.texto_sobre_2 }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Segundo parágrafo da seção sobre
+                                        </div>
+                                        {% if form.texto_sobre_2.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.texto_sobre_2.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.texto_sobre_3.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-paragraph me-1"></i>Terceiro Parágrafo
+                                        </label>
+                                        {{ form.texto_sobre_3 }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Terceiro parágrafo da seção sobre
+                                        </div>
+                                        {% if form.texto_sobre_3.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.texto_sobre_3.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 6: CTA (Call to Action) -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingCTA">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCTA" aria-expanded="false" aria-controls="collapseCTA">
+                            <i class="fas fa-bullhorn me-2"></i>
+                            Call to Action (CTA)
+                        </button>
+                    </h2>
+                    <div id="collapseCTA" class="accordion-collapse collapse" aria-labelledby="headingCTA" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Call to Action:</strong> Configure a seção que incentiva os visitantes a tomar uma ação específica (ex: se tornar associado, entrar em contato).
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.titulo_cta.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-heading me-1"></i>Título do CTA
+                                        </label>
+                                        {{ form.titulo_cta }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Título da seção de call to action
+                                        </div>
+                                        {% if form.titulo_cta.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.titulo_cta.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.texto_cta.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-paragraph me-1"></i>Texto do CTA
+                                        </label>
+                                        {{ form.texto_cta }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Texto descritivo do call to action
+                                        </div>
+                                        {% if form.texto_cta.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.texto_cta.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 7: Configurações de Exibição -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingExibicao">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExibicao" aria-expanded="false" aria-controls="collapseExibicao">
+                            <i class="fas fa-eye me-2"></i>
+                            Configurações de Exibição
+                        </button>
+                    </h2>
+                    <div id="collapseExibicao" class="accordion-collapse collapse" aria-labelledby="headingExibicao" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Configurações de Exibição:</strong> Controle quais seções serão exibidas na página institucional.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.mostrar_estatisticas }}
+                                            <label class="form-check-label fw-bold" for="{{ form.mostrar_estatisticas.id_for_label }}">
+                                                <i class="fas fa-chart-bar me-1"></i>Mostrar Estatísticas
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Exibe estatísticas da associação
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.mostrar_servicos }}
+                                            <label class="form-check-label fw-bold" for="{{ form.mostrar_servicos.id_for_label }}">
+                                                <i class="fas fa-cogs me-1"></i>Mostrar Serviços
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Exibe seção de serviços
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.mostrar_sobre }}
+                                            <label class="form-check-label fw-bold" for="{{ form.mostrar_sobre.id_for_label }}">
+                                                <i class="fas fa-info-circle me-1"></i>Mostrar Sobre
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Exibe seção sobre nós
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.mostrar_cta }}
+                                            <label class="form-check-label fw-bold" for="{{ form.mostrar_cta.id_for_label }}">
+                                                <i class="fas fa-bullhorn me-1"></i>Mostrar CTA
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Exibe seção call to action
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 8: SEO -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingSEO">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSEO" aria-expanded="false" aria-controls="collapseSEO">
+                            <i class="fas fa-search me-2"></i>
+                            SEO e Meta Tags
+                        </button>
+                    </h2>
+                    <div id="collapseSEO" class="accordion-collapse collapse" aria-labelledby="headingSEO" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>SEO e Meta Tags:</strong> Configure as meta tags para melhorar o posicionamento da página nos motores de busca.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.meta_description.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-tag me-1"></i>Meta Description
+                                        </label>
+                                        {{ form.meta_description }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Descrição da página para motores de busca
+                                        </div>
+                                        {% if form.meta_description.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.meta_description.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.meta_keywords.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-key me-1"></i>Meta Keywords
+                                        </label>
+                                        {{ form.meta_keywords }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Palavras-chave para motores de busca
+                                        </div>
+                                        {% if form.meta_keywords.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.meta_keywords.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 9: Feed Social -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFeedSocial">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFeedSocial" aria-expanded="false" aria-controls="collapseFeedSocial">
+                            <i class="fas fa-share-alt me-2"></i>
+                            Feed Social ABMEPI
+                        </button>
+                    </h2>
+                    <div id="collapseFeedSocial" class="accordion-collapse collapse" aria-labelledby="headingFeedSocial" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Feed Social ABMEPI:</strong> Gerencie os posts do feed social que aparecem na página institucional.
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-share-alt me-2"></i>
+                                                Feed Social ABMEPI
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted mb-3">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Gerencie os posts do feed social que aparecem na página institucional.
+                                            </p>
+                                            
+                                            <div class="d-flex gap-2 mb-3">
+                                                <a href="{% url 'core:feed_posts_list' %}" class="btn btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver Feed
+                                                </a>
+                                                <a href="{% url 'core:feed_post_create' %}" class="btn btn-primary">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    Novo Post
+                                                </a>
+                                                <a href="{% url 'core:feed_posts_list' %}" class="btn btn-outline-secondary">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    Gerenciar Posts
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 10: Portal de Notícias -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingPortalNoticias">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePortalNoticias" aria-expanded="false" aria-controls="collapsePortalNoticias">
+                            <i class="fas fa-newspaper me-2"></i>
+                            Portal de Notícias Jurídicas
+                        </button>
+                    </h2>
+                    <div id="collapsePortalNoticias" class="accordion-collapse collapse" aria-labelledby="headingPortalNoticias" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Portal de Notícias Jurídicas:</strong> Gerencie as notícias da Assessoria Jurídica que aparecem no portal.
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-newspaper me-2"></i>
+                                                Portal de Notícias Jurídicas
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted mb-3">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Gerencie as notícias da Assessoria Jurídica que aparecem no portal de notícias.
+                                            </p>
+                                            
+                                            <div class="d-flex gap-2 mb-3">
+                                                <a href="{% url 'core:assejur_news_list' %}" class="btn btn-outline-success" target="_blank">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver Portal
+                                                </a>
+                                                <a href="{% url 'core:assejur_news_create' %}" class="btn btn-success">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    Nova Notícia
+                                                </a>
+                                                <a href="{% url 'core:assejur_news_list' %}" class="btn btn-outline-secondary">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    Gerenciar Notícias
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Seção 11: Galeria e História -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingGaleria">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseGaleria" aria-expanded="false" aria-controls="collapseGaleria">
+                            <i class="fas fa-users-cog me-2"></i>
+                            Galeria de Ex-Presidentes e História
+                        </button>
+                    </h2>
+                    <div id="collapseGaleria" class="accordion-collapse collapse" aria-labelledby="headingGaleria" data-bs-parent="#institucionalAccordion">
+                        <div class="accordion-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Galeria e História:</strong> Gerencie a galeria de ex-presidentes e os marcos históricos da ABMEPI.
+                            </div>
+                            
+                            <!-- Ex-Presidentes -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-users-cog me-2"></i>
+                                                Galeria de Ex-Presidentes
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted mb-3">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Gerencie os ex-presidentes da ABMEPI que aparecem na galeria institucional.
+                                            </p>
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <div class="text-center">
+                                                        <h4 class="text-primary mb-0">{{ total_ex_presidentes|default:0 }}</h4>
+                                                        <small class="text-muted">Total de Ex-Presidentes</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-center">
+                                                        <h4 class="text-success mb-0">{{ ex_presidentes_ativos|default:0 }}</h4>
+                                                        <small class="text-muted">Ativos na Galeria</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-center">
+                                                        <h4 class="text-info mb-0">{{ total_marcos_historicos|default:0 }}</h4>
+                                                        <small class="text-muted">Marcos Históricos</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex gap-2 mb-3">
+                                                <a href="{% url 'core:ex_presidentes' %}" class="btn btn-outline-primary" target="_blank">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver Galeria
+                                                </a>
+                                                <a href="{% url 'core:ex_presidente_create' %}" class="btn btn-primary">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    Adicionar Ex-Presidente
+                                                </a>
+                                                <a href="{% url 'core:ex_presidente_list' %}" class="btn btn-outline-secondary" title="Gerenciar Ex-Presidentes - Página Administrativa">
+                                                    <i class="fas fa-cogs me-1"></i>
+                                                    Gerenciar
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="alert alert-light">
+                                                        <h6><i class="fas fa-lightbulb me-1"></i>Dicas para Ex-Presidentes:</h6>
+                                                        <ul class="mb-0 small">
+                                                            <li>Adicione foto de boa qualidade</li>
+                                                            <li>Preencha biografia completa</li>
+                                                            <li>Liste principais realizações</li>
+                                                            <li>Defina ordem de exibição</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="alert alert-light">
+                                                        <h6><i class="fas fa-cog me-1"></i>Configurações:</h6>
+                                                        <ul class="mb-0 small">
+                                                            <li>Marque "Ativo" para exibir</li>
+                                                            <li>Use ordem 0, 1, 2... para sequência</li>
+                                                            <li>Período de mandato obrigatório</li>
+                                                            <li>Posto/graduação recomendado</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- História da Associação -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-landmark me-2"></i>
+                                                História da Associação
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted mb-3">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                Gerencie os marcos históricos e conquistas da ABMEPI.
+                                            </p>
+                                            
+                                            <div class="row mb-3">
+                                                <div class="col-md-4">
+                                                    <div class="text-center">
+                                                        <h4 class="text-success mb-0">{{ marcos_historicos_ativos|default:0 }}</h4>
+                                                        <small class="text-muted">Marcos Ativos</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-center">
+                                                        <h4 class="text-warning mb-0">{{ marcos_destaque|default:0 }}</h4>
+                                                        <small class="text-muted">Em Destaque</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="text-center">
+                                                        <h4 class="text-info mb-0">{{ total_marcos_historicos|default:0 }}</h4>
+                                                        <small class="text-muted">Total de Marcos</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="d-flex gap-2 mb-3">
+                                                <a href="{% url 'core:historia_associacao' %}" class="btn btn-outline-success" target="_blank">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver História
+                                                </a>
+                                                <a href="{% url 'core:historia_list' %}" class="btn btn-primary">
+                                                    <i class="fas fa-list me-1"></i>
+                                                    Gerenciar Marcos
+                                                </a>
+                                                <a href="{% url 'core:historia_create' %}" class="btn btn-success">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    Adicionar Marco
+                                                </a>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="alert alert-light">
+                                                        <h6><i class="fas fa-lightbulb me-1"></i>Dicas para Marcos Históricos:</h6>
+                                                        <ul class="mb-0 small">
+                                                            <li>Escolha tipo apropriado</li>
+                                                            <li>Adicione imagem quando possível</li>
+                                                            <li>Descrição detalhada e clara</li>
+                                                            <li>Data marcante precisa</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="alert alert-light">
+                                                        <h6><i class="fas fa-cog me-1"></i>Tipos Disponíveis:</h6>
+                                                        <ul class="mb-0 small">
+                                                            <li><strong>Fundação:</strong> Criação da associação</li>
+                                                            <li><strong>Conquista:</strong> Vitórias importantes</li>
+                                                            <li><strong>Evento:</strong> Eventos marcantes</li>
+                                                            <li><strong>Reconhecimento:</strong> Prêmios e homenagens</li>
+                                                            <li><strong>Expansão:</strong> Crescimento da associação</li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            </div>
+            
+            <!-- Botões de ação -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'institucional' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-save me-2"></i>Salvar Alterações
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Expandir automaticamente a primeira seção
+    $('#collapseHero').addClass('show');
+    
+    // Validação do formulário
+    $('#institucional-form').on('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    });
+    
+    // Feedback visual para campos com conteúdo
+    $('.form-control, .form-select').on('input change', function() {
+        if ($(this).val()) {
+            $(this).addClass('has-content');
+        } else {
+            $(this).removeClass('has-content');
+        }
+    });
+    
+    // Foco nos campos
+    $('.form-control, .form-select').on('focus', function() {
+        $(this).addClass('focused');
+    }).on('blur', function() {
+        $(this).removeClass('focused');
+    });
+});
+</script>
+{% endblock %}

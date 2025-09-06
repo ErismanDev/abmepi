@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Documento{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-trash text-danger me-2"></i>
+                        Excluir Documento
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+                    
+                    <p>Tem certeza que deseja excluir o documento:</p>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ documento.titulo }}</h5>
+                            <p class="card-text">
+                                <strong>Tipo:</strong> {{ documento.get_tipo_documento_display }}<br>
+                                <strong>Processo:</strong> {{ documento.processo.numero_processo }}<br>
+                                <strong>Data de Upload:</strong> {{ documento.data_upload|date:"d/m/Y H:i" }}
+                            </p>
+                            {% if documento.descricao %}
+                                <p class="card-text">
+                                    <strong>Descrição:</strong><br>
+                                    {{ documento.descricao }}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>
+                                Sim, Excluir
+                            </button>
+                            <a href="{% url 'assejus:processo_detail' documento.processo.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

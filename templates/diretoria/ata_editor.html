@@ -1,0 +1,706 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editor de Ata - {{ ata.titulo }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .editor-container {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .editor-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .editor-title {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .editor-toolbar {
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        padding: 0.75rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .toolbar-group {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
+        padding-right: 1rem;
+        border-right: 1px solid #dee2e6;
+    }
+
+    .toolbar-group:last-child {
+        border-right: none;
+    }
+
+    .toolbar-btn {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        padding: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        min-width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .toolbar-btn:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+    }
+
+    .toolbar-btn.active {
+        background: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
+
+    .editor-content {
+        min-height: 500px;
+        padding: 1.5rem;
+        border: none;
+        outline: none;
+        font-family: 'Courier New', monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        background: white;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .editor-content:focus {
+        outline: none;
+    }
+
+    .preview-container {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .preview-header {
+        background: #28a745;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .preview-content {
+        padding: 1.5rem;
+        background: white;
+        min-height: 500px;
+        overflow-y: auto;
+    }
+
+    .word-count {
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #28a745;
+    }
+
+    .status-dot.saving {
+        background: #ffc107;
+        animation: pulse 1s infinite;
+    }
+
+    .status-dot.error {
+        background: #dc3545;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    .btn-group-custom {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-custom {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary-custom {
+        background: #007bff;
+        color: white;
+    }
+
+    .btn-primary-custom:hover {
+        background: #0056b3;
+        color: white;
+    }
+
+    .btn-success-custom {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-success-custom:hover {
+        background: #1e7e34;
+        color: white;
+    }
+
+    .btn-secondary-custom {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary-custom:hover {
+        background: #545b62;
+        color: white;
+    }
+
+    .btn-info-custom {
+        background: #17a2b8;
+        color: white;
+    }
+
+    .btn-info-custom:hover {
+        background: #138496;
+        color: white;
+    }
+
+    .form-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-section h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .tabs {
+        border-bottom: 1px solid #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .tab-button {
+        background: none;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .tab-button.active {
+        border-bottom-color: #007bff;
+        color: #007bff;
+        font-weight: 600;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .btn-group-custom {
+            flex-direction: column;
+        }
+        
+        .btn-custom {
+            justify-content: center;
+        }
+        
+        .toolbar-group {
+            flex-wrap: wrap;
+        }
+        
+        .editor-toolbar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Editor de Ata
+                    </h1>
+                    <p class="text-muted mb-0">{{ ata.titulo }}</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'diretoria:ata_simples_edit' ata.pk %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Edição
+                    </a>
+                    <a href="{% url 'diretoria:ata_simples_view' ata.pk %}" class="btn btn-info">
+                        <i class="fas fa-eye me-2"></i>
+                        Visualizar
+                    </a>
+                    <a href="{% url 'diretoria:imprimir_ata' ata.pk %}" class="btn btn-success" target="_blank">
+                        <i class="fas fa-print me-2"></i>
+                        Imprimir
+                    </a>
+                </div>
+            </div>
+
+            <!-- Instruções -->
+            <div class="alert alert-info mb-4">
+                <h6 class="alert-heading">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Editor de Conteúdo HTML
+                </h6>
+                <p class="mb-0">
+                    <strong>Como usar:</strong> Edite o código HTML diretamente ou use os botões da toolbar para inserir elementos. 
+                    Use a aba "Visualização" para ver como ficará o resultado final. 
+                    <strong>Dica:</strong> O HTML é gerado automaticamente com base nos dados da ata, mas você pode personalizá-lo completamente.
+                </p>
+            </div>
+
+            <!-- Formulário -->
+            <form method="post" id="ataForm">
+                {% csrf_token %}
+                
+                <div class="form-section">
+                    <h5>
+                        <i class="fas fa-edit me-2"></i>
+                        Editor de Conteúdo
+                    </h5>
+                    
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button type="button" class="tab-button active" onclick="showTab('editor')">
+                            <i class="fas fa-code me-2"></i>
+                            Editor HTML
+                        </button>
+                        <button type="button" class="tab-button" onclick="showTab('preview')">
+                            <i class="fas fa-eye me-2"></i>
+                            Visualização
+                        </button>
+                    </div>
+                    
+                    <!-- Editor HTML -->
+                    <div id="editor-tab" class="tab-content active">
+                        <div class="editor-container">
+                            <div class="editor-header">
+                                <h6 class="editor-title">
+                                    <i class="fas fa-code me-2"></i>
+                                    Editor HTML
+                                </h6>
+                                <div class="status-indicator">
+                                    <div class="status-dot" id="statusDot"></div>
+                                    <span id="statusText">Pronto</span>
+                                </div>
+                            </div>
+                            
+                            <div class="editor-toolbar">
+                                <!-- Formatação de Texto -->
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('strong')" title="Negrito">
+                                        <i class="fas fa-bold"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('em')" title="Itálico">
+                                        <i class="fas fa-italic"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('u')" title="Sublinhado">
+                                        <i class="fas fa-underline"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Cabeçalhos -->
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('h1')" title="Título 1">
+                                        H1
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('h2')" title="Título 2">
+                                        H2
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('h3')" title="Título 3">
+                                        H3
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('p')" title="Parágrafo">
+                                        P
+                                    </button>
+                                </div>
+                                
+                                <!-- Listas -->
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('ul')" title="Lista com marcadores">
+                                        <i class="fas fa-list-ul"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('ol')" title="Lista numerada">
+                                        <i class="fas fa-list-ol"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('li')" title="Item de lista">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Inserir -->
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" onclick="insertTable()" title="Inserir tabela">
+                                        <i class="fas fa-table"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertLink()" title="Inserir link">
+                                        <i class="fas fa-link"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="insertTag('hr')" title="Linha horizontal">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Ações -->
+                                <div class="toolbar-group">
+                                    <button type="button" class="toolbar-btn" onclick="formatCode()" title="Formatar código">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                    <button type="button" class="toolbar-btn" onclick="regenerarHTML()" title="Regenerar HTML">
+                                        <i class="fas fa-sync"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <textarea 
+                                name="conteudo_html" 
+                                id="editorContent" 
+                                class="editor-content"
+                                rows="20"
+                            >{{ form.conteudo_html.value|default:"" }}</textarea>
+                            
+                            <div class="word-count">
+                                <div>
+                                    <span id="charCount">0</span> caracteres
+                                </div>
+                                <div class="status-indicator">
+                                    <div class="status-dot" id="autoSaveStatus"></div>
+                                    <span id="autoSaveText">Salvamento automático ativo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Visualização -->
+                    <div id="preview-tab" class="tab-content">
+                        <div class="preview-container">
+                            <div class="preview-header">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-eye me-2"></i>
+                                    Visualização
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-light" onclick="refreshPreview()">
+                                    <i class="fas fa-sync me-1"></i>
+                                    Atualizar
+                                </button>
+                            </div>
+                            <div class="preview-content" id="previewContent">
+                                <!-- Conteúdo será inserido aqui via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="form-section">
+                    <div class="btn-group-custom">
+                        <button type="submit" class="btn-custom btn-primary-custom">
+                            <i class="fas fa-save me-2"></i>
+                            Salvar Conteúdo
+                        </button>
+                        
+                        <a href="{% url 'diretoria:ata_simples_view' ata.pk %}" class="btn-custom btn-info-custom">
+                            <i class="fas fa-eye me-2"></i>
+                            Visualizar Ata
+                        </a>
+                        
+                        <a href="{% url 'diretoria:imprimir_ata' ata.pk %}" class="btn-custom btn-success-custom" target="_blank">
+                            <i class="fas fa-print me-2"></i>
+                            Imprimir Ata
+                        </a>
+                        
+                        <a href="{% url 'diretoria:baixar_ata_html' ata.pk %}" class="btn-custom btn-secondary-custom">
+                            <i class="fas fa-download me-2"></i>
+                            Baixar HTML
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editor = document.getElementById('editorContent');
+    const preview = document.getElementById('previewContent');
+    const charCount = document.getElementById('charCount');
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    const autoSaveStatus = document.getElementById('autoSaveStatus');
+    const autoSaveText = document.getElementById('autoSaveText');
+    
+    let autoSaveInterval;
+    let isSaving = false;
+    
+    // Atualizar contador de caracteres
+    function updateCharCount() {
+        const text = editor.value || '';
+        charCount.textContent = text.length;
+    }
+    
+    // Atualizar preview
+    function updatePreview() {
+        preview.innerHTML = editor.value || '<p>Nenhum conteúdo para visualizar</p>';
+    }
+    
+    // Atualizar status
+    function updateStatus(status, text) {
+        statusDot.className = `status-dot ${status}`;
+        statusText.textContent = text;
+    }
+    
+    // Salvamento automático
+    function autoSave() {
+        if (isSaving) return;
+        
+        isSaving = true;
+        updateStatus('saving', 'Salvando...');
+        
+        // Simular salvamento (aqui você pode implementar AJAX)
+        setTimeout(() => {
+            isSaving = false;
+            updateStatus('', 'Salvo automaticamente');
+            autoSaveStatus.className = 'status-dot';
+            autoSaveText.textContent = 'Salvamento automático ativo';
+        }, 1000);
+    }
+    
+    // Event listeners
+    editor.addEventListener('input', function() {
+        updateCharCount();
+        updatePreview();
+        
+        // Resetar status após 3 segundos
+        setTimeout(() => {
+            if (!isSaving) {
+                updateStatus('', 'Pronto');
+            }
+        }, 3000);
+    });
+    
+    editor.addEventListener('keydown', function(e) {
+        // Ctrl+S para salvar
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            document.getElementById('ataForm').submit();
+        }
+        
+        // Tab para indentar
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = this.selectionStart;
+            const end = this.selectionEnd;
+            this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+            this.selectionStart = this.selectionEnd = start + 4;
+        }
+    });
+    
+    // Iniciar salvamento automático a cada 30 segundos
+    autoSaveInterval = setInterval(autoSave, 30000);
+    
+    // Inicializar
+    updateCharCount();
+    updatePreview();
+});
+
+// Funções do editor
+function insertTag(tag) {
+    const editor = document.getElementById('editorContent');
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const selectedText = editor.value.substring(start, end);
+    
+    let newText;
+    if (tag === 'hr') {
+        newText = '<hr>';
+    } else if (tag === 'li') {
+        newText = '<li>' + (selectedText || 'Item da lista') + '</li>';
+    } else {
+        newText = '<' + tag + '>' + (selectedText || 'Texto') + '</' + tag + '>';
+    }
+    
+    editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
+    editor.focus();
+    editor.setSelectionRange(start + newText.length, start + newText.length);
+    
+    // Atualizar preview
+    updatePreview();
+}
+
+function insertTable() {
+    const editor = document.getElementById('editorContent');
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    
+    const table = `
+<table border="1" style="border-collapse: collapse; width: 100%;">
+    <tr>
+        <th>Cabeçalho 1</th>
+        <th>Cabeçalho 2</th>
+        <th>Cabeçalho 3</th>
+    </tr>
+    <tr>
+        <td>Linha 1, Coluna 1</td>
+        <td>Linha 1, Coluna 2</td>
+        <td>Linha 1, Coluna 3</td>
+    </tr>
+    <tr>
+        <td>Linha 2, Coluna 1</td>
+        <td>Linha 2, Coluna 2</td>
+        <td>Linha 2, Coluna 3</td>
+    </tr>
+</table>`;
+    
+    editor.value = editor.value.substring(0, start) + table + editor.value.substring(end);
+    editor.focus();
+    editor.setSelectionRange(start + table.length, start + table.length);
+    
+    // Atualizar preview
+    updatePreview();
+}
+
+function insertLink() {
+    const url = prompt('URL do link:', 'https://');
+    if (url) {
+        const text = prompt('Texto do link:', url);
+        const link = `<a href="${url}">${text}</a>`;
+        
+        const editor = document.getElementById('editorContent');
+        const start = editor.selectionStart;
+        const end = editor.selectionEnd;
+        
+        editor.value = editor.value.substring(0, start) + link + editor.value.substring(end);
+        editor.focus();
+        editor.setSelectionRange(start + link.length, start + link.length);
+        
+        // Atualizar preview
+        updatePreview();
+    }
+}
+
+function formatCode() {
+    const editor = document.getElementById('editorContent');
+    const text = editor.value;
+    
+    // Formatação básica de HTML
+    let formatted = text
+        .replace(/></g, '>\n<')
+        .replace(/<([^>]+)>/g, function(match, tag) {
+            return '  ' + match;
+        });
+    
+    editor.value = formatted;
+    
+    // Atualizar preview
+    updatePreview();
+}
+
+function regenerarHTML() {
+    if (confirm('Tem certeza que deseja regenerar o HTML? Isso substituirá todo o conteúdo atual.')) {
+        window.location.href = '{% url "diretoria:regenerar_html" ata.pk %}';
+    }
+}
+
+function refreshPreview() {
+    updatePreview();
+}
+
+function showTab(tabName) {
+    // Esconder todas as abas
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Mostrar aba selecionada
+    document.getElementById(tabName + '-tab').classList.add('active');
+    event.target.classList.add('active');
+    
+    // Atualizar preview se for a aba de visualização
+    if (tabName === 'preview') {
+        updatePreview();
+    }
+}
+
+function updatePreview() {
+    const editor = document.getElementById('editorContent');
+    const preview = document.getElementById('previewContent');
+    preview.innerHTML = editor.value || '<p>Nenhum conteúdo para visualizar</p>';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Resolução - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+                    
+                    <p>Tem certeza que deseja excluir a resolução:</p>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ object.numero_resolucao }} - {{ object.titulo }}</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Status:</strong> {{ object.get_status_display }}
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Data:</strong> {{ object.data_resolucao|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% if object.ata_reuniao %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Ata:</strong> {{ object.ata_reuniao.titulo|truncatechars:50 }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                            {% if object.conteudo %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Conteúdo:</strong> {{ object.conteudo|truncatechars:100 }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'diretoria:resolucao_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>
+                                Sim, Excluir
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

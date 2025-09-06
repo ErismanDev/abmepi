@@ -1,0 +1,415 @@
+/* ========================================
+   ESTILOS DO MÓDULO DIRETORIA
+   Baseado no padrão visual de associados
+   ======================================== */
+
+:root {
+    --primary-color: #1a365d;
+    --secondary-color: #2d3748;
+    --accent-color: #3182ce;
+    --accent-light: #63b3ed;
+    --white: #ffffff;
+    --gradient-primary: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+    --shadow-light: 0 4px 20px rgba(26, 54, 93, 0.08);
+    --shadow-medium: 0 8px 30px rgba(26, 54, 93, 0.12);
+    --success-color: #1cc88a;
+    --warning-color: #f6c23e;
+    --danger-color: #e74a3b;
+    --info-color: #36b9cc;
+}
+
+/* ========================================
+   LAYOUT PRINCIPAL
+   ======================================== */
+
+.diretoria-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ========================================
+   CARDS E COMPONENTES
+   ======================================== */
+
+.diretoria-card {
+    border: none;
+    box-shadow: var(--shadow-light);
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    background: var(--white);
+}
+
+.diretoria-card:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.diretoria-card-header {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border-radius: 1rem 1rem 0 0 !important;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.diretoria-card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.diretoria-card-body {
+    padding: 1.5rem;
+}
+
+/* ========================================
+   BOTÕES
+   ======================================== */
+
+.btn-diretoria-primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #2c5aa0 100%);
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: var(--white);
+    transition: all 0.3s ease;
+}
+
+.btn-diretoria-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(49, 130, 206, 0.3);
+    color: var(--white);
+}
+
+.btn-diretoria-outline {
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-diretoria-outline:hover {
+    background: var(--accent-color);
+    color: var(--white);
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   FORMULÁRIOS
+   ======================================== */
+
+.form-control-diretoria,
+.form-select-diretoria {
+    border-radius: 0.5rem;
+    border: 2px solid #e9ecef;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1rem;
+}
+
+.form-control-diretoria:focus,
+.form-select-diretoria:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem rgba(49, 130, 206, 0.25);
+}
+
+.form-label-diretoria {
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 0.5rem;
+}
+
+/* ========================================
+   ESTATÍSTICAS
+   ======================================== */
+
+.stats-card {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.stats-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.stats-card-primary {
+    background: linear-gradient(135deg, var(--accent-color) 0%, #2c5aa0 100%);
+    color: var(--white);
+}
+
+.stats-card-success {
+    background: linear-gradient(135deg, var(--success-color) 0%, #17a673 100%);
+    color: var(--white);
+}
+
+.stats-card-warning {
+    background: linear-gradient(135deg, var(--warning-color) 0%, #e0a800 100%);
+    color: var(--white);
+}
+
+.stats-card-info {
+    background: linear-gradient(135deg, var(--info-color) 0%, #2c9faf 100%);
+    color: var(--white);
+}
+
+.stats-card-danger {
+    background: linear-gradient(135deg, var(--danger-color) 0%, #c0392b 100%);
+    color: var(--white);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    opacity: 0.8;
+}
+
+.stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+/* ========================================
+   TABELAS
+   ======================================== */
+
+.table-diretoria {
+    background: var(--white);
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-light);
+}
+
+.table-diretoria thead th {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border: none;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.table-diretoria tbody td {
+    padding: 1rem;
+    border-color: #f8f9fa;
+    vertical-align: middle;
+}
+
+.table-diretoria tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* ========================================
+   BADGES E STATUS
+   ======================================== */
+
+.badge-diretoria {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.badge-status-aprovada {
+    background: var(--success-color);
+    color: var(--white);
+}
+
+.badge-status-pendente {
+    background: var(--warning-color);
+    color: var(--white);
+}
+
+.badge-status-rascunho {
+    background: var(--info-color);
+    color: var(--white);
+}
+
+.badge-status-rejeitada {
+    background: var(--danger-color);
+    color: var(--white);
+}
+
+/* ========================================
+   FILTROS E BUSCA
+   ======================================== */
+
+.filtros-container {
+    background: var(--white);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-light);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.filtros-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f8f9fa;
+}
+
+.filtros-header h6 {
+    margin: 0;
+    color: var(--secondary-color);
+    font-weight: 600;
+}
+
+.filtros-header i {
+    color: var(--accent-color);
+    margin-right: 0.5rem;
+}
+
+/* ========================================
+   MODAIS
+   ======================================== */
+
+.modal-diretoria .modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: var(--shadow-medium);
+}
+
+.modal-diretoria .modal-header {
+    background: var(--gradient-primary);
+    color: var(--white);
+    border-radius: 1rem 1rem 0 0;
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-diretoria .modal-title {
+    font-weight: 600;
+    margin: 0;
+}
+
+.modal-diretoria .btn-close {
+    filter: invert(1);
+}
+
+.modal-diretoria .modal-body {
+    padding: 1.5rem;
+}
+
+.modal-diretoria .modal-footer {
+    border-top: 1px solid #f8f9fa;
+    padding: 1.5rem;
+}
+
+/* ========================================
+   ALERTAS
+   ======================================== */
+
+.alert-diretoria {
+    border: none;
+    border-radius: 0.75rem;
+    padding: 1rem 1.5rem;
+    font-weight: 500;
+}
+
+.alert-diretoria-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-diretoria-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border-left: 4px solid var(--warning-color);
+}
+
+.alert-diretoria-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 4px solid var(--danger-color);
+}
+
+.alert-diretoria-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-left: 4px solid var(--info-color);
+}
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .diretoria-card-body {
+        padding: 1rem;
+    }
+    
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+    
+    .filtros-container {
+        padding: 1rem;
+    }
+    
+    .btn-diretoria-primary,
+    .btn-diretoria-outline {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================================
+   ANIMAÇÕES
+   ======================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* ========================================
+   UTILITÁRIOS
+   ======================================== */
+
+.text-diretoria-primary {
+    color: var(--accent-color) !important;
+}
+
+.text-diretoria-secondary {
+    color: var(--secondary-color) !important;
+}
+
+.bg-diretoria-light {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+}
+
+.border-diretoria {
+    border: 2px solid var(--accent-color) !important;
+}
+
+.shadow-diretoria {
+    box-shadow: var(--shadow-light) !important;
+}
+
+.shadow-diretoria-medium {
+    box-shadow: var(--shadow-medium) !important;
+}

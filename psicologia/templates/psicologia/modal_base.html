@@ -1,0 +1,278 @@
+{% load static %}
+
+<!-- Modal Base para Formulários -->
+<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="formModalLabel">
+                    <i class="fas fa-edit me-2"></i>Título do Modal
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="formModalBody">
+                <!-- Conteúdo do formulário será inserido aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="formModalSubmit">
+                    <i class="fas fa-save me-2"></i>Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">
+                    <i class="fas fa-question-circle me-2"></i>Confirmar Ação
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+                <!-- Mensagem de confirmação será inserida aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmModalConfirm">
+                    <i class="fas fa-check me-2"></i>Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Mensagem -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">
+                    <i class="fas fa-info-circle me-2"></i>Mensagem
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="messageModalBody">
+                <!-- Mensagem será inserida aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="fas fa-check me-2"></i>OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sistema de Visualização de Erros -->
+<script src="{% static 'js/error-handling.js' %}"></script>
+
+<script>
+// Função para abrir modal de formulário
+function openFormModal(titulo, conteudo, formId, actionUrl) {
+    // Atualizar título e conteúdo do modal
+    document.getElementById('formModalLabel').innerHTML = titulo;
+    document.getElementById('formModalBody').innerHTML = conteudo;
+    
+    // Configurar o formulário
+    const form = document.getElementById(formId);
+    if (form) {
+        form.action = actionUrl;
+        
+        // Adicionar listener para submit
+        const submitBtn = document.getElementById('formModalSubmit');
+        submitBtn.onclick = function() {
+            submitForm(form);
+        };
+    }
+    
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('formModal'));
+    modal.show();
+}
+
+// Função para submeter formulário via AJAX
+function submitForm(form) {
+    const formData = new FormData(form);
+    const submitBtn = document.getElementById('formModalSubmit');
+    const originalText = submitBtn.innerHTML;
+    
+    // Mostrar loading
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    submitBtn.disabled = true;
+    
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Sucesso
+            showMessage('Sucesso!', data.message || 'Operação realizada com sucesso.', 'success');
+            closeFormModal();
+            
+            // Recarregar página ou atualizar dados
+            if (data.reload) {
+                location.reload();
+            }
+        } else {
+            // Erro de validação - aplicar visualização de erros
+            if (data.errors && Object.keys(data.errors).length > 0) {
+                console.log('❌ Erros de validação detectados:', data.errors);
+                
+                // Exibir resumo dos erros no topo do modal
+                if (typeof showErrorSummaryInModal === 'function') {
+                    showErrorSummaryInModal(data.errors, Object.keys(data.errors).length, data.message);
+                }
+                
+                // Aplicar estilos de erro aos campos
+                if (typeof applyErrorStylesToFields === 'function') {
+                    setTimeout(() => {
+                        applyErrorStylesToFields(data.errors);
+                        if (typeof scrollToFirstError === 'function') {
+                            scrollToFirstError();
+                        }
+                    }, 100);
+                }
+            } else {
+                // Erro geral
+                showMessage('Erro!', data.message || 'Ocorreu um erro ao processar a solicitação.', 'error');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showMessage('Erro!', 'Ocorreu um erro inesperado.', 'error');
+    })
+    .finally(() => {
+        // Restaurar botão
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+// Função para fechar modal de formulário
+function closeFormModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('formModal'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+// Função para abrir modal de confirmação
+function openConfirmModal(titulo, mensagem, onConfirm) {
+    document.getElementById('confirmModalLabel').innerHTML = titulo;
+    document.getElementById('confirmModalBody').innerHTML = mensagem;
+    
+    const confirmBtn = document.getElementById('confirmModalConfirm');
+    confirmBtn.onclick = function() {
+        if (onConfirm) {
+            onConfirm();
+        }
+        closeConfirmModal();
+    };
+    
+    const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    modal.show();
+}
+
+// Função para fechar modal de confirmação
+function closeConfirmModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+    if (modal) {
+        modal.hide();
+    }
+}
+
+// Função para abrir modal de mensagem
+function openMessageModal(titulo, mensagem, tipo = 'info') {
+    let icon = 'fas fa-info-circle';
+    let btnClass = 'btn-primary';
+    
+    switch(tipo) {
+        case 'success':
+            icon = 'fas fa-check-circle';
+            btnClass = 'btn-success';
+            break;
+        case 'warning':
+            icon = 'fas fa-exclamation-triangle';
+            btnClass = 'btn-warning';
+            break;
+        case 'error':
+            icon = 'fas fa-times-circle';
+            btnClass = 'btn-danger';
+            break;
+    }
+    
+    document.getElementById('messageModalLabel').innerHTML = `<i class="${icon} me-2"></i>${titulo}`;
+    document.getElementById('messageModalBody').innerHTML = mensagem;
+    
+    const okBtn = document.querySelector('#messageModal .btn');
+    okBtn.className = `btn ${btnClass}`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+    modal.show();
+}
+
+// Função para mostrar mensagem rápida
+function showMessage(titulo, mensagem, tipo = 'info') {
+    openMessageModal(titulo, mensagem, tipo);
+}
+
+// Função para obter cookie CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Inicializar tooltips e popovers quando modais são abertos
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Inicializar popovers
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+});
+
+// Event listener para modais
+document.addEventListener('shown.bs.modal', function (event) {
+    // Re-inicializar tooltips e popovers quando modal é aberto
+    var tooltipTriggerList = [].slice.call(event.target.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    var popoverTriggerList = [].slice.call(event.target.querySelectorAll('[data-bs-toggle="popover"]'));
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+});
+</script>

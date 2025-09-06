@@ -1,0 +1,477 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Atas de Reunião - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/modais.css' %}">
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Estilos para campos com erro */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+}
+
+/* Estilos para alertas de erro */
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.alert-danger .alert-heading {
+    color: #721c24;
+}
+
+/* Animação para campos com erro */
+.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Estilo para botões de ação */
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para o resumo de erros */
+.error-summary {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.error-summary h6 {
+    color: #721c24;
+    margin-bottom: 0.5rem;
+}
+
+.error-summary ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+.error-summary li {
+    color: #721c24;
+    margin-bottom: 0.25rem;
+}
+
+/* Avatar styles */
+.avatar-rectangular {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    border: 2px solid #e3e6f0;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fc;
+    border: 2px solid #e3e6f0;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5a5c69;
+}
+
+/* Table styles */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.table td {
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Button group styles */
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Pagination styles */
+.pagination .page-link {
+    color: #4e73df;
+    border-color: #e3e6f0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.pagination .page-link:hover {
+    color: #2e59d9;
+    background-color: #eaecf4;
+    border-color: #e3e6f0;
+}
+
+/* Stats cards */
+.stats-card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    transition: all 0.15s ease-in-out;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.2);
+}
+
+.stats-card-primary {
+    background: linear-gradient(45deg, #4e73df, #224abe);
+    color: white;
+}
+
+.stats-card-success {
+    background: linear-gradient(45deg, #1cc88a, #17a673);
+    color: white;
+}
+
+.stats-card-warning {
+    background: linear-gradient(45deg, #f6c23e, #dda20a);
+    color: white;
+}
+
+.stats-card-info {
+    background: linear-gradient(45deg, #36b9cc, #258391);
+    color: white;
+}
+
+.stats-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0;
+}
+
+.stats-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+.stats-icon {
+    font-size: 2rem;
+    opacity: 0.3;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-calendar me-2"></i>
+                            Atas de Reunião
+                        </h1>
+                        <p class="text-muted mb-0">Gerencie as atas de reunião da diretoria</p>
+                    </div>
+                    <div>
+                    <a href="{% url 'diretoria:ata_create' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            Nova Ata
+                        </a>
+                    </div>
+                </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                            <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ request.GET.search }}" placeholder="Título, local ou pauta...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="tipo_reuniao" class="form-label">Tipo</label>
+                            <select class="form-select" id="tipo_reuniao" name="tipo_reuniao">
+                                <option value="">Todos</option>
+                                {% for value, label in tipos_reuniao %}
+                                    <option value="{{ value }}" {% if request.GET.tipo_reuniao == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="aprovada" class="form-label">Status</label>
+                            <select class="form-select" id="aprovada" name="aprovada">
+                                <option value="">Todos</option>
+                                <option value="true" {% if request.GET.aprovada == 'true' %}selected{% endif %}>Aprovadas</option>
+                                <option value="false" {% if request.GET.aprovada == 'false' %}selected{% endif %}>Pendentes</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio" 
+                                   value="{{ request.GET.data_inicio }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="data_fim" name="data_fim" 
+                                   value="{{ request.GET.data_fim }}">
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search me-1"></i> Buscar
+                                </button>
+                                <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i> Limpar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+                <!-- Lista de atas -->
+            <div class="card">
+                <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            Lista de Atas
+                        </h5>
+                    </div>
+                <div class="card-body">
+                    {% if atas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Data</th>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Presidente</th>
+                                        <th>Secretário</th>
+                                        <th>Local</th>
+                                        <th>Status</th>
+                                        <th width="200">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ata in atas %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">{{ ata.get_numero_formatado }}</span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ ata.data_reuniao|date:"d/m/Y" }}</strong>
+                                            </div>
+                                            <small class="text-muted">{{ ata.data_reuniao|date:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <h6 class="mb-0">{{ ata.titulo }}</h6>
+                                            {% if ata.pauta %}
+                                                <small class="text-muted">{{ ata.pauta|truncatechars:50|striptags }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if ata.tipo_reuniao == 'ordinaria' %}primary{% elif ata.tipo_reuniao == 'extraordinaria' %}warning{% elif ata.tipo_reuniao == 'emergencia' %}danger{% else %}info{% endif %}">
+                                                {{ ata.get_tipo_reuniao_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if ata.presidente %}
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-user-tie me-2 text-primary"></i>
+                                                    <div>
+                                                        <div class="fw-bold">{{ ata.presidente.associado.nome }}</div>
+                                                        <small class="text-muted">{{ ata.presidente.cargo.nome }}</small>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">Não definido</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ata.secretario %}
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-user-edit me-2 text-success"></i>
+                                                    <div>
+                                                        <div class="fw-bold">{{ ata.secretario.associado.nome }}</div>
+                                                        <small class="text-muted">{{ ata.secretario.cargo.nome }}</small>
+                                                    </div>
+                                                </div>
+                                            {% else %}
+                                                <span class="text-muted">Não definido</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ ata.local|truncatechars:30 }}</small>
+                                        </td>
+                                        <td>
+                                            {% if ata.aprovada %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-check me-1"></i>Aprovada
+                                                </span>
+                                                {% if ata.data_aprovacao %}
+                                                    <br><small class="text-muted">{{ ata.data_aprovacao|date:"d/m/Y" }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-clock me-1"></i>Pendente
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'diretoria:ata_detail' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_pdf' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-success" title="Gerar PDF" target="_blank">
+                                                    <i class="fas fa-file-pdf"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_update' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_delete' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                        <nav aria-label="Paginação">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhuma ata encontrada</h5>
+                            <p class="text-muted">
+                                {% if request.GET.search %}
+                                    Tente ajustar o filtro de busca.
+                                {% else %}
+                                    Comece criando a primeira ata de reunião.
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'diretoria:ata_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Criar Ata
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

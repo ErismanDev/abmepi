@@ -1,0 +1,609 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hospedagem.hospede.nome_completo }} - Detalhes da Hospedagem{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .actions-bar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #212529;
+        border: none;
+    }
+    
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: #212529;
+        text-decoration: none;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-finalizar {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-finalizar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .info-card h3 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+        min-width: 120px;
+    }
+    
+    .info-value {
+        color: #6c757d;
+        text-align: right;
+        flex: 1;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-ativa {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-finalizada {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    
+    .status-cancelada {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .quarto-info {
+        background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        border: 1px solid #2196f3;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .quarto-info h4 {
+        color: #1976d2;
+        margin: 0 0 1rem 0;
+        font-size: 1.2rem;
+    }
+    
+    .quarto-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+    
+    .feature-badge {
+        background: #2196f3;
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .servicos-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .servicos-section h3 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        font-size: 1.3rem;
+    }
+    
+    .servico-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .servico-info {
+        flex: 1;
+    }
+    
+    .servico-nome {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .servico-detalhes {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .servico-valor {
+        font-weight: 600;
+        color: #28a745;
+        font-size: 1.1rem;
+    }
+    
+    .no-servicos {
+        text-align: center;
+        color: #6c757d;
+        font-style: italic;
+        padding: 2rem;
+    }
+    
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2.5rem;
+        top: 0.5rem;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #667eea;
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px #e9ecef;
+    }
+    
+    .timeline-date {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.25rem;
+    }
+    
+    .timeline-text {
+        color: #6c757d;
+    }
+    
+    @media (max-width: 768px) {
+        .info-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .actions-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .page-header h1 {
+            font-size: 2rem;
+        }
+        
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .info-value {
+            text-align: left;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da página -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-bed"></i> Detalhes da Hospedagem
+        </h1>
+        <p>
+            Informações completas sobre a hospedagem de {{ hospedagem.hospede.nome_completo }}
+        </p>
+    </div>
+
+    <!-- Barra de ações -->
+    <div class="actions-bar">
+        <div>
+            <a href="{% url 'hotel_transito:hospedagem_list' %}" class="btn-action btn-back">
+                <i class="fas fa-arrow-left"></i> Voltar à Lista
+            </a>
+        </div>
+        <div>
+            {% if hospedagem.status == 'ativa' %}
+                <a href="{% url 'hotel_transito:finalizar_hospedagem' hospedagem.pk %}" 
+                   class="btn-action btn-finalizar"
+                   onclick="return confirm('Tem certeza que deseja finalizar esta hospedagem?')">
+                    <i class="fas fa-check"></i> Finalizar Hospedagem
+                </a>
+            {% endif %}
+            
+            <a href="{% url 'hotel_transito:hospedagem_update' hospedagem.pk %}" class="btn-action btn-edit">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            
+            <a href="{% url 'hotel_transito:hospedagem_delete' hospedagem.pk %}" class="btn-action btn-delete">
+                <i class="fas fa-trash"></i> Excluir
+            </a>
+        </div>
+    </div>
+
+    <!-- Cards de informações -->
+    <div class="info-cards">
+        <!-- Informações da Hospedagem -->
+        <div class="info-card">
+            <h3><i class="fas fa-info-circle"></i> Informações da Hospedagem</h3>
+            
+            <div class="info-item">
+                <span class="info-label">ID:</span>
+                <span class="info-value">#{{ hospedagem.id }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Status:</span>
+                <span class="info-value">
+                    <span class="status-badge status-{{ hospedagem.status }}">
+                        {{ hospedagem.get_status_display }}
+                    </span>
+                </span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Data de Cadastro:</span>
+                <span class="info-value">{{ hospedagem.data_cadastro|date:"d/m/Y H:i" }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Última Atualização:</span>
+                <span class="info-value">{{ hospedagem.data_atualizacao|date:"d/m/Y H:i" }}</span>
+            </div>
+            
+            {% if hospedagem.observacoes %}
+            <div class="info-item">
+                <span class="info-label">Observações:</span>
+                <span class="info-value">{{ hospedagem.observacoes }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Informações do Hóspede -->
+        <div class="info-card">
+            <h3><i class="fas fa-user"></i> Informações do Hóspede</h3>
+            
+            <div class="info-item">
+                <span class="info-label">Nome:</span>
+                <span class="info-value">{{ hospedagem.hospede.nome_completo }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Tipo:</span>
+                <span class="info-value">{{ hospedagem.hospede.get_tipo_hospede_display }}</span>
+            </div>
+            
+            {% if hospedagem.hospede.telefone %}
+            <div class="info-item">
+                <span class="info-label">Telefone:</span>
+                <span class="info-value">{{ hospedagem.hospede.telefone }}</span>
+            </div>
+            {% endif %}
+            
+            {% if hospedagem.hospede.email %}
+            <div class="info-item">
+                <span class="info-label">E-mail:</span>
+                <span class="info-value">{{ hospedagem.hospede.email }}</span>
+            </div>
+            {% endif %}
+            
+            {% if hospedagem.hospede.associado %}
+            <div class="info-item">
+                <span class="info-label">Associado:</span>
+                <span class="info-value">Sim (ID: {{ hospedagem.hospede.associado.id }})</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Informações Financeiras -->
+        <div class="info-card">
+            <h3><i class="fas fa-dollar-sign"></i> Informações Financeiras</h3>
+            
+            <div class="info-item">
+                <span class="info-label">Valor da Diária:</span>
+                <span class="info-value">R$ {{ hospedagem.valor_diaria_real|floatformat:2 }}</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Quantidade de Diárias:</span>
+                <span class="info-value">{{ hospedagem.quantidade_diarias_real }} diária(s)</span>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Valor Total:</span>
+                <span class="info-value">
+                    <strong>R$ {{ hospedagem.valor_total_real|floatformat:2 }}</strong>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informações do Quarto -->
+    <div class="quarto-info">
+        <h4><i class="fas fa-bed"></i> Quarto {{ hospedagem.quarto.numero }}</h4>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-item">
+                    <span class="info-label">Tipo:</span>
+                    <span class="info-value">{{ hospedagem.quarto.get_tipo_display }}</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Capacidade:</span>
+                    <span class="info-value">{{ hospedagem.quarto.capacidade }} pessoa(s)</span>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Valor da Diária:</span>
+                    <span class="info-value">R$ {{ hospedagem.quarto.valor_diaria|floatformat:2 }}</span>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="info-item">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value">
+                        <span class="status-badge status-{{ hospedagem.quarto.status }}">
+                            {{ hospedagem.quarto.get_status_display }}
+                        </span>
+                    </span>
+                </div>
+                
+                <div class="quarto-features">
+                    {% if hospedagem.quarto.ar_condicionado %}
+                        <span class="feature-badge">Ar Condicionado</span>
+                    {% endif %}
+                    {% if hospedagem.quarto.tv %}
+                        <span class="feature-badge">TV</span>
+                    {% endif %}
+                    {% if hospedagem.quarto.wifi %}
+                        <span class="feature-badge">Wi-Fi</span>
+                    {% endif %}
+                    {% if hospedagem.quarto.banheiro_privativo %}
+                        <span class="feature-badge">Banheiro Privativo</span>
+                    {% endif %}
+                    {% if hospedagem.quarto.frigobar %}
+                        <span class="feature-badge">Frigobar</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cronograma da Hospedagem -->
+    <div class="info-card">
+        <h3><i class="fas fa-calendar-alt"></i> Cronograma da Hospedagem</h3>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-date">{{ hospedagem.data_entrada_real|date:"d/m/Y H:i" }}</div>
+                <div class="timeline-text">Check-in realizado</div>
+            </div>
+            
+            {% if hospedagem.data_saida_real %}
+            <div class="timeline-item">
+                <div class="timeline-date">{{ hospedagem.data_saida_real|date:"d/m/Y H:i" }}</div>
+                <div class="timeline-text">Check-out realizado</div>
+            </div>
+            {% endif %}
+            
+            {% if hospedagem.status == 'finalizada' %}
+            <div class="timeline-item">
+                <div class="timeline-date">{{ hospedagem.data_atualizacao|date:"d/m/Y H:i" }}</div>
+                <div class="timeline-text">Hospedagem finalizada</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Serviços Utilizados -->
+    <div class="servicos-section">
+        <h3><i class="fas fa-concierge-bell"></i> Serviços Utilizados</h3>
+        
+        {% if hospedagem.servicoutilizado_set.exists %}
+            {% for servico in hospedagem.servicoutilizado_set.all %}
+            <div class="servico-item">
+                <div class="servico-info">
+                    <div class="servico-nome">{{ servico.servico.nome }}</div>
+                    <div class="servico-detalhes">
+                        {{ servico.quantidade }}x - {{ servico.data_utilizacao|date:"d/m/Y H:i" }}
+                        {% if servico.observacoes %}
+                            - {{ servico.observacoes }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="servico-valor">
+                    R$ {{ servico.valor_total|floatformat:2 }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-servicos">
+                <i class="fas fa-info-circle"></i>
+                Nenhum serviço adicional foi utilizado nesta hospedagem.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Informações da Reserva (se houver) -->
+    {% if hospedagem.reserva %}
+    <div class="info-card">
+        <h3><i class="fas fa-calendar-check"></i> Reserva Associada</h3>
+        
+        <div class="info-item">
+            <span class="info-label">ID da Reserva:</span>
+            <span class="info-value">#{{ hospedagem.reserva.id }}</span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Status da Reserva:</span>
+            <span class="info-value">
+                <span class="status-badge status-{{ hospedagem.reserva.status }}">
+                    {{ hospedagem.reserva.get_status_display }}
+                </span>
+            </span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Data de Entrada (Reserva):</span>
+            <span class="info-value">{{ hospedagem.reserva.data_entrada|date:"d/m/Y" }}</span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Data de Saída (Reserva):</span>
+            <span class="info-value">{{ hospedagem.reserva.data_saida|date:"d/m/Y" }}</span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Valor da Diária (Reserva):</span>
+            <span class="info-value">R$ {{ hospedagem.reserva.valor_diaria|floatformat:2 }}</span>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

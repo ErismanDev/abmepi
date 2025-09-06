@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Categoria{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:categoria_list' %}">Categorias</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">{{ title }}</h1>
+            <p class="text-muted mb-0">Preencha as informações da categoria</p>
+        </div>
+        <a href="{% url 'beneficios:categoria_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tags me-2"></i>
+                        Dados da Categoria
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                {{ form.nome|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.ordem|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.descricao|as_crispy_field }}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.icone|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.ativo|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.observacoes|as_crispy_field }}
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'beneficios:categoria_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ action }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dicas -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Dicas para uma boa categoria
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><strong>Nome:</strong> Use nomes claros e descritivos (ex: Saúde, Educação, Lazer)</li>
+                        <li><strong>Ordem:</strong> Números menores aparecem primeiro na listagem</li>
+                        <li><strong>Descrição:</strong> Explique o que a categoria representa</li>
+                        <li><strong>Ícone:</strong> Use ícones do FontAwesome (ex: fas fa-heartbeat)</li>
+                        <li><strong>Observações:</strong> Adicione informações importantes para organização</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-popular ordem se estiver vazio
+    document.addEventListener('DOMContentLoaded', function() {
+        const ordemField = document.getElementById('id_ordem');
+        if (ordemField && !ordemField.value) {
+            // Buscar a maior ordem atual e adicionar 1
+            fetch('{% url "beneficios:api_categorias_ordem" %}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.max_ordem !== null) {
+                        ordemField.value = data.max_ordem + 1;
+                    } else {
+                        ordemField.value = 1;
+                    }
+                })
+                .catch(() => {
+                    ordemField.value = 1;
+                });
+        }
+    });
+</script>
+{% endblock %}

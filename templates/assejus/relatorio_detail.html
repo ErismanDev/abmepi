@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if relatorio.escopo == 'por_advogado' and relatorio.advogado %}
+        Relatório {{ relatorio.tipo|title }} - {{ relatorio.advogado.nome }} - ASSEJUS
+    {% else %}
+        Relatório {{ relatorio.tipo|title }} - ASSEJUS
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:relatorio_list' %}">Relatórios</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                {% if relatorio.escopo == 'por_advogado' and relatorio.advogado %}
+                                    {{ relatorio.advogado.nome }}
+                                {% else %}
+                                    Detalhes
+                                {% endif %}
+                            </li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {% if relatorio.escopo == 'por_advogado' and relatorio.advogado %}
+                            Relatório {{ relatorio.tipo|title }} - {{ relatorio.advogado.nome }}
+                        {% else %}
+                            Relatório {{ relatorio.tipo|title }}
+                        {% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {{ escopo_info }} — Período: {{ periodo_inicio|date:"d/m/Y" }} a {{ periodo_fim|date:"d/m/Y" }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:relatorio_pdf' pk=relatorio.pk %}" class="btn btn-success me-2">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Visualizar PDF
+                    </a>
+                    <a href="{% url 'assejus:relatorio_pdf' pk=relatorio.pk %}?download=1" class="btn btn-outline-success me-2">
+                        <i class="fas fa-download me-2"></i>
+                        Download PDF
+                    </a>
+                    <button type="button" class="btn btn-warning me-2" onclick="openRelatorioEditModal({{ relatorio.pk }})">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </button>
+                    <a href="{% url 'assejus:relatorio_delete' pk=relatorio.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações do Relatório
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Tipo</h6>
+                                    <p class="mb-3"><span class="badge bg-info">{{ relatorio.get_tipo_display }}</span></p>
+
+                                    <h6 class="text-muted mb-2">Escopo</h6>
+                                    <p class="mb-3">{{ escopo_info }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Período</h6>
+                                    <p class="mb-3">{{ periodo_inicio|date:"d/m/Y" }} a {{ periodo_fim|date:"d/m/Y" }}</p>
+
+                                    <h6 class="text-muted mb-2">Data de Geração</h6>
+                                    <p class="mb-3"><span class="badge bg-secondary">{{ relatorio.data_geracao|date:"d/m/Y H:i" }}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Estatísticas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <h6 class="text-muted">Atendimentos</h6>
+                                    <p class="display-6">{{ total_atendimentos }}</p>
+                                    <ul class="list-unstyled">
+                                        {% for item in atendimentos_por_status %}
+                                            <li><span class="badge bg-light text-dark">{{ item.status }}:</span> {{ item.total }}</li>
+                                        {% empty %}
+                                            <li class="text-muted">Sem dados</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <h6 class="text-muted">Consultas</h6>
+                                    <p class="display-6">{{ total_consultas }}</p>
+                                    <ul class="list-unstyled">
+                                        {% for item in consultas_por_status %}
+                                            <li><span class="badge bg-light text-dark">{{ item.status }}:</span> {{ item.total }}</li>
+                                        {% empty %}
+                                            <li class="text-muted">Sem dados</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-user me-2"></i>
+                                Usuário Responsável
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if relatorio.usuario_geracao %}
+                                <h6 class="text-muted mb-2">Usuário</h6>
+                                <p class="mb-3"><span class="badge bg-primary">{{ relatorio.usuario_geracao.username }}</span></p>
+
+                                <h6 class="text-muted mb-2">Email</h6>
+                                <p class="mb-3">
+                                    {% if relatorio.usuario_geracao.email %}
+                                        <a href="mailto:{{ relatorio.usuario_geracao.email }}" class="text-decoration-none">{{ relatorio.usuario_geracao.email }}</a>
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </p>
+                            {% else %}
+                                <p class="text-muted">Usuário não informado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Metadados
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Data de Criação</h6>
+                            <p class="mb-3"><small class="text-muted">{{ relatorio.data_geracao|date:"d/m/Y H:i:s" }}</small></p>
+
+                            <h6 class="text-muted mb-2">ID do Relatório</h6>
+                            <p class="mb-3"><code class="small">{{ relatorio.pk }}</code></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

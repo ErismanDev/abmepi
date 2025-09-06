@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Categoria - {{ categoria.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:categoria_list' %}">Categorias</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Excluir</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-tags fa-3x text-danger mb-3"></i>
+                    
+                    <h4 class="text-danger mb-3">Atenção!</h4>
+                    
+                    <p class="lead">Você está prestes a excluir a categoria:</p>
+                    <h5 class="mb-3">{{ categoria.nome }}</h5>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Esta ação não pode ser desfeita!</strong><br>
+                        A categoria e todos os seus dados serão perdidos permanentemente.
+                    </div>
+
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6">
+                            <strong>Nome:</strong> {{ categoria.nome }}<br>
+                            <strong>Ordem:</strong> {{ categoria.ordem }}<br>
+                            <strong>Status:</strong> 
+                            <span class="badge bg-{{ categoria.ativo|yesno:'success,danger' }}">
+                                {{ categoria.ativo|yesno:'Ativo,Inativo' }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Convênios:</strong> {{ categoria.convenios.count }}<br>
+                            <strong>Ícone:</strong> {{ categoria.icone|default:"Não definido" }}<br>
+                            <strong>Descrição:</strong> {{ categoria.descricao|truncatechars:30|default:"Sem descrição" }}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'beneficios:categoria_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações adicionais -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        O que será excluído
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>A categoria "{{ categoria.nome }}"</li>
+                        <li>Todos os convênios relacionados ({{ categoria.convenios.count }})</li>
+                        <li>Histórico de benefícios da categoria</li>
+                        <li>Configurações e preferências</li>
+                        <li>Organização e ordenação</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

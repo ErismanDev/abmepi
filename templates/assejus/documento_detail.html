@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ documento.titulo }} - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ documento.titulo }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Detalhes do documento jurídico
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:documento_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                    <button type="button" class="btn btn-warning" onclick="openDocumentoEditModal({{ documento.pk }})">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </button>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informações principais -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações do Documento
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Título:</label>
+                                    <p class="mb-0">{{ documento.titulo }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Tipo:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-info">{{ documento.get_tipo_documento_display }}</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Processo:</label>
+                                    <p class="mb-0">
+                                        <a href="{% url 'assejus:processo_detail' documento.processo.pk %}" 
+                                           class="text-decoration-none">
+                                            {{ documento.processo.numero_processo }}
+                                        </a>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Status:</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-success">Ativo</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Data de Upload:</label>
+                                    <p class="mb-0">{{ documento.data_upload|date:"d/m/Y H:i" }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Usuário:</label>
+                                    <p class="mb-0">
+                                        {% if documento.usuario_upload %}
+                                            {{ documento.usuario_upload.get_full_name|default:documento.usuario_upload.username }}
+                                        {% else %}
+                                            <span class="text-muted">Não informado</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                {% if documento.descricao %}
+                                <div class="col-12 mb-3">
+                                    <label class="form-label fw-bold">Descrição:</label>
+                                    <p class="mb-0">{{ documento.descricao|linebreaks }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualização do arquivo -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-eye me-2"></i>
+                                Visualização do Arquivo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center">
+                                {% if documento.arquivo.name|lower|slice:"-4:" in '.pdf' %}
+                                    <!-- PDF Viewer -->
+                                    <div class="ratio ratio-16x9">
+                                        <iframe src="{{ documento.arquivo.url }}" 
+                                                title="{{ documento.titulo }}"
+                                                allowfullscreen></iframe>
+                                    </div>
+                                {% elif documento.arquivo.name|lower|slice:"-4:" in '.jpg,.jpeg,.png,.gif' %}
+                                    <!-- Image Viewer -->
+                                    <img src="{{ documento.arquivo.url }}" 
+                                         alt="{{ documento.titulo }}" 
+                                         class="img-fluid rounded"
+                                         style="max-height: 500px;">
+                                {% else %}
+                                    <!-- Generic File Info -->
+                                    <div class="py-5">
+                                        <i class="fas fa-file fa-4x text-muted mb-3"></i>
+                                        <h5 class="text-muted">{{ documento.arquivo.name|slice:"-4:"|upper }}</h5>
+                                        <p class="text-muted">Este tipo de arquivo não pode ser visualizado diretamente</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <a href="{{ documento.arquivo.url }}" 
+                                   class="btn btn-primary" 
+                                   target="_blank" 
+                                   download>
+                                    <i class="fas fa-download me-2"></i>
+                                    Download do Arquivo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar com informações adicionais -->
+                <div class="col-lg-4">
+                    <!-- Informações do arquivo -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-file me-2"></i>
+                                Informações do Arquivo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nome do arquivo:</label>
+                                <p class="mb-0 text-break">{{ documento.arquivo.name|slice:"24:" }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tamanho:</label>
+                                <p class="mb-0">
+                                    {% if documento.arquivo.size < 1024 %}
+                                        {{ documento.arquivo.size }} bytes
+                                    {% elif documento.arquivo.size < 1048576 %}
+                                        {{ documento.arquivo.size|floatformat:1 }} KB
+                                    {% else %}
+                                        {{ documento.arquivo.size|floatformat:1 }} MB
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Tipo MIME:</label>
+                                <p class="mb-0">{{ documento.arquivo.content_type|default:"Não detectado" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ações rápidas -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                Ações Rápidas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{{ documento.arquivo.url }}" 
+                                   class="btn btn-outline-primary"
+                                   target="_blank">
+                                    <i class="fas fa-external-link-alt me-2"></i>
+                                    Abrir em Nova Aba
+                                </a>
+                                <a href="{{ documento.arquivo.url }}" 
+                                   class="btn btn-outline-success"
+                                   download>
+                                    <i class="fas fa-download me-2"></i>
+                                    Baixar Arquivo
+                                </a>
+                                <a href="{% url 'assejus:documento_update' documento.pk %}" 
+                                   class="btn btn-outline-warning">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editar Documento
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Histórico -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-clock me-2"></i>
+                                Histórico
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline-mini">
+                                <div class="timeline-item-mini">
+                                    <div class="timeline-marker-mini bg-primary"></div>
+                                    <div class="timeline-content-mini">
+                                        <h6 class="timeline-title-mini">Documento Anexado</h6>
+                                        <small class="text-muted">{{ documento.data_upload|date:"d/m/Y H:i" }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline-mini {
+    position: relative;
+    padding-left: 20px;
+}
+
+.timeline-item-mini {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.timeline-marker-mini {
+    position: absolute;
+    left: -25px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #007bff;
+}
+
+.timeline-title-mini {
+    margin-bottom: 4px;
+    font-size: 14px;
+    color: #495057;
+}
+
+.bg-primary {
+    background-color: #007bff !important;
+}
+</style>
+{% endblock %}

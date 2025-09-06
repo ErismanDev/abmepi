@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ resolucao.numero_resolucao }} - {{ resolucao.titulo }} - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        {{ resolucao.numero_resolucao }} - {{ resolucao.titulo }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Resolução da Diretoria - {{ resolucao.data_resolucao|date:"d/m/Y" }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:resolucao_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                    <a href="{% url 'diretoria:resolucao_update' resolucao.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informações da Resolução -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações da Resolução
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-hashtag me-2"></i>Número</h6>
+                                    <p class="text-muted">{{ resolucao.numero_resolucao }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-flag me-2"></i>Status</h6>
+                                    <span class="badge bg-{% if resolucao.status == 'aprovada' %}success{% elif resolucao.status == 'rascunho' %}warning{% elif resolucao.status == 'revogada' %}danger{% else %}secondary{% endif %}">
+                                        {{ resolucao.get_status_display }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-calendar me-2"></i>Data de Resolução</h6>
+                                    <p class="text-muted">{{ resolucao.data_resolucao|date:"d/m/Y" }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-calendar me-2"></i>Data de Publicação</h6>
+                                    <p class="text-muted">{{ resolucao.data_publicacao|date:"d/m/Y"|default:"Não publicada" }}</p>
+                                </div>
+                            </div>
+
+                            {% if resolucao.data_vigencia %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-calendar me-2"></i>Data de Vigência</h6>
+                                    <p class="text-muted">{{ resolucao.data_vigencia|date:"d/m/Y" }}</p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Conteúdo -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-align-left me-2"></i>
+                                Conteúdo da Resolução
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-muted">{{ resolucao.conteudo|linebreaks }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Observações -->
+                    {% if resolucao.observacoes %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-sticky-note me-2"></i>
+                                Observações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-muted">{{ resolucao.observacoes|linebreaks }}</div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Sidebar -->
+                <div class="col-md-4">
+                    <!-- Ações -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-cogs me-2"></i>
+                                Ações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'diretoria:resolucao_update' resolucao.pk %}" class="btn btn-primary">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editar Resolução
+                                </a>
+                                <a href="{% url 'diretoria:resolucao_delete' resolucao.pk %}" class="btn btn-outline-danger">
+                                    <i class="fas fa-trash me-2"></i>
+                                    Excluir Resolução
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ata Relacionada -->
+                    {% if resolucao.ata_reuniao %}
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar me-2"></i>
+                                Ata Relacionada
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{ resolucao.ata_reuniao.titulo }}</h6>
+                            <p class="text-muted mb-2">
+                                <small>{{ resolucao.ata_reuniao.data_reuniao|date:"d/m/Y" }}</small>
+                            </p>
+                            <a href="{% url 'diretoria:ata_detail' resolucao.ata_reuniao.pk %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-eye me-1"></i>
+                                Ver Ata
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Histórico -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-history me-2"></i>
+                                Histórico
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="timeline">
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-primary"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Criada</h6>
+                                        <p class="timeline-text">{{ resolucao.data_criacao|date:"d/m/Y H:i" }}</p>
+                                    </div>
+                                </div>
+                                
+                                {% if resolucao.data_publicacao %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-success"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Publicada</h6>
+                                        <p class="timeline-text">{{ resolucao.data_publicacao|date:"d/m/Y" }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                {% if resolucao.data_vigencia %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker bg-info"></div>
+                                    <div class="timeline-content">
+                                        <h6 class="timeline-title">Vigência</h6>
+                                        <p class="timeline-text">{{ resolucao.data_vigencia|date:"d/m/Y" }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 3px solid #007bff;
+}
+
+.timeline-title {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.timeline-text {
+    margin: 0;
+    font-size: 12px;
+    color: #6c757d;
+}
+</style>
+{% endblock %}
+

@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Editar Modelo{% else %}Novo Modelo{% endif %} - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-save me-2"></i>
+                        {% if object %}Editar Modelo{% else %}Novo Modelo de Ata{% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if object %}
+                            Atualize as informações do modelo "{{ object.nome }}"
+                        {% else %}
+                            Crie um novo modelo de ata personalizado
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:modelo_ata_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Lista
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Formulário -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Informações do Modelo
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" id="modeloForm">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label for="{{ form.nome.id_for_label }}" class="form-label">
+                                                Nome do Modelo *
+                                            </label>
+                                            {{ form.nome }}
+                                            {% if form.nome.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.nome.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="{{ form.categoria.id_for_label }}" class="form-label">
+                                                Categoria
+                                            </label>
+                                            {{ form.categoria }}
+                                            {% if form.categoria.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.categoria.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                        Descrição
+                                    </label>
+                                    {{ form.descricao }}
+                                    {% if form.descricao.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.descricao.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Descreva brevemente o propósito deste modelo de ata.
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="{{ form.titulo_original.id_for_label }}" class="form-label">
+                                                Título Original
+                                            </label>
+                                            <input type="text" class="form-control" id="{{ form.titulo_original.id_for_label }}" 
+                                                   name="titulo_original" value="{{ form.titulo_original.value|default:'' }}">
+                                            <div class="form-text">
+                                                Título da ata que originou este modelo (opcional).
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="tipo_reuniao" class="form-label">
+                                                Tipo de Reunião
+                                            </label>
+                                            <select class="form-select" id="tipo_reuniao" name="tipo_reuniao">
+                                                <option value="ordinaria" {% if form.tipo_reuniao.value == 'ordinaria' %}selected{% endif %}>Ordinária</option>
+                                                <option value="extraordinaria" {% if form.tipo_reuniao.value == 'extraordinaria' %}selected{% endif %}>Extraordinária</option>
+                                                <option value="emergencia" {% if form.tipo_reuniao.value == 'emergencia' %}selected{% endif %}>Emergência</option>
+                                                <option value="assembleia" {% if form.tipo_reuniao.value == 'assembleia' %}selected{% endif %}>Assembleia</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="{{ form.conteudo_html.id_for_label }}" class="form-label">
+                                        Conteúdo HTML do Modelo *
+                                    </label>
+                                    <textarea class="form-control" id="{{ form.conteudo_html.id_for_label }}" 
+                                              name="conteudo_html" rows="15" required>{{ form.conteudo_html.value|default:'' }}</textarea>
+                                    {% if form.conteudo_html.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.conteudo_html.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Cole aqui o conteúdo HTML da ata que servirá como modelo.
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            {{ form.publico }}
+                                            <label class="form-check-label" for="{{ form.publico.id_for_label }}">
+                                                Modelo Público
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            Se marcado, outros usuários poderão usar este modelo.
+                                        </div>
+                                    </div>
+                                    {% if object %}
+                                    <div class="col-md-6">
+                                        <div class="form-check">
+                                            {{ form.ativo }}
+                                            <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                                Modelo Ativo
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            Modelos inativos não aparecem na lista de modelos disponíveis.
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="d-flex justify-content-between mt-4">
+                                    <a href="{% url 'diretoria:modelo_ata_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if object %}Atualizar Modelo{% else %}Criar Modelo{% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Informações adicionais -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6>Como usar modelos:</h6>
+                            <ol class="small">
+                                <li>Crie o conteúdo da ata no editor avançado</li>
+                                <li>Salve como modelo usando o botão "Salvar Modelo"</li>
+                                <li>Em novas atas, use o botão "Modelos" para aplicar</li>
+                                <li>O conteúdo será inserido automaticamente</li>
+                            </ol>
+
+                            <h6 class="mt-3">Dicas:</h6>
+                            <ul class="small">
+                                <li>Use nomes descritivos para facilitar a busca</li>
+                                <li>Organize por categorias (ordinária, assembleia, etc.)</li>
+                                <li>Modelos públicos podem ser usados por todos</li>
+                                <li>Você pode editar modelos a qualquer momento</li>
+                            </ul>
+
+                            {% if object %}
+                            <hr>
+                            <h6>Estatísticas do Modelo:</h6>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h5 mb-0 text-primary">{{ object.vezes_usado }}</div>
+                                        <small class="text-muted">Vezes Usado</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h5 mb-0 text-info">{{ object.data_criacao|date:"d/m/Y" }}</div>
+                                        <small class="text-muted">Criado em</small>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Preview do HTML -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-eye me-2"></i>
+                                Preview
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="htmlPreview" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                <p class="text-muted small">O preview aparecerá aqui quando você inserir conteúdo HTML.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const conteudoTextarea = document.getElementById('{{ form.conteudo_html.id_for_label }}');
+    const preview = document.getElementById('htmlPreview');
+    
+    function updatePreview() {
+        const content = conteudoTextarea.value;
+        if (content.trim()) {
+            preview.innerHTML = content;
+        } else {
+            preview.innerHTML = '<p class="text-muted small">O preview aparecerá aqui quando você inserir conteúdo HTML.</p>';
+        }
+    }
+    
+    conteudoTextarea.addEventListener('input', updatePreview);
+    
+    // Atualizar preview inicial
+    updatePreview();
+});
+</script>
+{% endblock %}

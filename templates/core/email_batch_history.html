@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .history-container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    
+    .log-item {
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        margin-bottom: 20px;
+        background: #f8f9fa;
+        border-radius: 0 10px 10px 0;
+        transition: all 0.3s ease;
+    }
+    
+    .log-item:hover {
+        background: #e9ecef;
+        transform: translateX(5px);
+    }
+    
+    .log-header {
+        display: flex;
+        justify-content-between;
+        align-items-center;
+        margin-bottom: 10px;
+    }
+    
+    .log-action {
+        font-weight: bold;
+        color: #333;
+        font-size: 1.1rem;
+    }
+    
+    .log-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .log-user {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .log-details {
+        color: #555;
+        line-height: 1.5;
+        margin-top: 10px;
+    }
+    
+    .log-module {
+        display: inline-block;
+        background: #667eea;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-right: 10px;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .pagination {
+        justify-content: center;
+        margin-top: 30px;
+    }
+    
+    .page-link {
+        border-radius: 10px;
+        margin: 0 2px;
+        border: 2px solid #e9ecef;
+        color: #667eea;
+    }
+    
+    .page-link:hover {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+    
+    .page-item.active .page-link {
+        background: #667eea;
+        border-color: #667eea;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        color: #dee2e6;
+    }
+    
+    .stats-summary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .stats-summary h3 {
+        margin: 0;
+        font-size: 2rem;
+    }
+    
+    .stats-summary p {
+        margin: 5px 0 0 0;
+        opacity: 0.9;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+                    <p class="text-muted">{{ subtitle }}</p>
+                </div>
+                <div>
+                    <a href="{% url 'core:email_batch_dashboard' %}" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="stats-summary">
+                <h3>{{ page_obj.paginator.count }}</h3>
+                <p>Total de Envios Registrados</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="history-container">
+                {% if page_obj %}
+                    {% for log in page_obj %}
+                        <div class="log-item">
+                            <div class="log-header">
+                                <div>
+                                    <span class="log-module">{{ log.modulo }}</span>
+                                    <span class="log-action">{{ log.acao }}</span>
+                                </div>
+                                <div class="log-date">
+                                    <i class="fas fa-clock"></i> {{ log.data_hora|date:"d/m/Y H:i" }}
+                                </div>
+                            </div>
+                            
+                            <div class="log-details">
+                                <div class="log-user">
+                                    <i class="fas fa-user"></i> {{ log.usuario.get_full_name|default:log.usuario.username }}
+                                </div>
+                                <div class="mt-2">
+                                    {{ log.detalhes }}
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    
+                    <!-- Paginação -->
+                    {% if page_obj.has_other_pages %}
+                        <nav aria-label="Navegação do histórico">
+                            <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    {% endif %}
+                    
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h4>Nenhum envio registrado</h4>
+                        <p>Ainda não há histórico de envios de emails em lote.</p>
+                        <a href="{% url 'core:email_batch_dashboard' %}" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Enviar Primeiro Email
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar animação aos itens do log
+    const logItems = document.querySelectorAll('.log-item');
+    logItems.forEach((item, index) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            item.style.transition = 'all 0.5s ease';
+            item.style.opacity = '1';
+            item.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Adicionar tooltip para datas
+    const logDates = document.querySelectorAll('.log-date');
+    logDates.forEach(date => {
+        date.title = 'Clique para ver detalhes completos';
+        date.style.cursor = 'pointer';
+    });
+});
+</script>
+{% endblock %}

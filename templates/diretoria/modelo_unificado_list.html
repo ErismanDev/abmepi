@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Modelos de Ata - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/modais.css' %}">
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Estilos para campos com erro */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+}
+
+/* Estilos para alertas de erro */
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.alert-danger .alert-heading {
+    color: #721c24;
+}
+
+/* Animação para campos com erro */
+.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Estilo para botões de ação */
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para o resumo de erros */
+.error-summary {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.error-summary h6 {
+    color: #721c24;
+    margin-bottom: 0.5rem;
+}
+
+.error-summary ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+.error-summary li {
+    color: #721c24;
+    margin-bottom: 0.25rem;
+}
+
+/* Avatar styles */
+.avatar-rectangular {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    border: 2px solid #e3e6f0;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fc;
+    border: 2px solid #e3e6f0;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5a5c69;
+}
+
+/* Table styles */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.table td {
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Button group styles */
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Pagination styles */
+.pagination .page-link {
+    color: #4e73df;
+    border-color: #e3e6f0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.pagination .page-link:hover {
+    color: #2e59d9;
+    background-color: #eaecf4;
+    border-color: #e3e6f0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-save me-2"></i>
+                        Modelos de Ata
+                    </h1>
+                    <p class="text-muted mb-0">Gerencie seus modelos de ata personalizados</p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:modelo_unificado_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Modelo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Nome, descrição ou tags...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="categoria" name="categoria">
+                                <option value="">Todas</option>
+                                {% for value, label in categorias %}
+                                    <option value="{{ value }}" {% if categoria_atual == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="tipo_conteudo" class="form-label">Tipo</label>
+                            <select class="form-select" id="tipo_conteudo" name="tipo_conteudo">
+                                <option value="">Todos</option>
+                                {% for value, label in tipos_conteudo %}
+                                    <option value="{{ value }}" {% if tipo_atual == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="tag" class="form-label">Tag</label>
+                            <input type="text" class="form-control" id="tag" name="tag" 
+                                   value="{{ tag_atual }}" placeholder="Filtrar por tag...">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid gap-2 d-md-flex">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i>
+                                    Buscar
+                                </button>
+                                <a href="{% url 'diretoria:modelo_unificado_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Limpar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de modelos -->
+            {% if modelos %}
+                <div class="row">
+                    {% for modelo in modelos %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ modelo.nome }}</h6>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                                    data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" onclick="usarModelo({{ modelo.id }})">
+                                                        <i class="fas fa-download me-2"></i>Usar Modelo
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" onclick="duplicarModelo({{ modelo.id }})">
+                                                        <i class="fas fa-copy me-2"></i>Duplicar
+                                                    </a>
+                                                </li>
+                                                {% if modelo.can_edit user %}
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'diretoria:modelo_unificado_update' modelo.pk %}">
+                                                        <i class="fas fa-edit me-2"></i>Editar
+                                                    </a>
+                                                </li>
+                                                {% endif %}
+                                                {% if modelo.can_delete user %}
+                                                <li>
+                                                    <a class="dropdown-item text-danger" href="{% url 'diretoria:modelo_unificado_delete' modelo.pk %}">
+                                                        <i class="fas fa-trash me-2"></i>Excluir
+                                                    </a>
+                                                </li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text small text-muted mb-3">
+                                        {{ modelo.descricao|truncatechars:100|default:"Sem descrição" }}
+                                    </p>
+                                    
+                                    <div class="row text-center mb-3">
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Categoria</small>
+                                            <span class="badge bg-secondary">{{ modelo.get_categoria_display }}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Tipo</small>
+                                            <span class="badge bg-info">{{ modelo.get_tipo_conteudo_display }}</span>
+                                        </div>
+                                        <div class="col-4">
+                                            <small class="text-muted d-block">Usado</small>
+                                            <span class="badge bg-success">{{ modelo.vezes_usado }}x</span>
+                                        </div>
+                                    </div>
+                                    
+                                    {% if modelo.get_tags_list %}
+                                    <div class="mb-3">
+                                        {% for tag in modelo.get_tags_list %}
+                                            <span class="badge bg-light text-dark me-1">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>{{ modelo.criado_por.get_full_name|default:modelo.criado_por.username }}
+                                            <br>
+                                            <i class="fas fa-calendar me-1"></i>{{ modelo.data_criacao|date:"d/m/Y" }}
+                                            {% if modelo.publico %}
+                                                <br><i class="fas fa-globe me-1"></i>Público
+                                            {% endif %}
+                                        </small>
+                                        <div>
+                                            <button class="btn btn-sm btn-primary" onclick="usarModelo({{ modelo.id }})">
+                                                <i class="fas fa-download me-1"></i>
+                                                Usar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginação -->
+                {% if is_paginated %}
+                    <nav aria-label="Paginação de modelos">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if categoria_atual %}&categoria={{ categoria_atual }}{% endif %}{% if tipo_atual %}&tipo_conteudo={{ tipo_atual }}{% endif %}{% if tag_atual %}&tag={{ tag_atual }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if categoria_atual %}&categoria={{ categoria_atual }}{% endif %}{% if tipo_atual %}&tipo_conteudo={{ tipo_atual }}{% endif %}{% if tag_atual %}&tag={{ tag_atual }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if categoria_atual %}&categoria={{ categoria_atual }}{% endif %}{% if tipo_atual %}&tipo_conteudo={{ tipo_atual }}{% endif %}{% if tag_atual %}&tag={{ tag_atual }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if categoria_atual %}&categoria={{ categoria_atual }}{% endif %}{% if tipo_atual %}&tipo_conteudo={{ tipo_atual }}{% endif %}{% if tag_atual %}&tag={{ tag_atual }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-save fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhum modelo encontrado</h4>
+                    <p class="text-muted">
+                        {% if search or categoria_atual or tipo_atual or tag_atual %}
+                            Tente ajustar os filtros de busca.
+                        {% else %}
+                            Crie seu primeiro modelo de ata personalizado.
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'diretoria:modelo_unificado_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Criar Primeiro Modelo
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function usarModelo(modeloId) {
+    fetch(`/diretoria/api/modelos-unificados/usar/${modeloId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Aqui você pode implementar a lógica para usar o modelo
+            console.log('Modelo carregado:', data.modelo);
+            alert(`Modelo "${data.modelo.nome}" carregado com sucesso!`);
+        } else {
+            alert('Erro ao carregar modelo: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao carregar modelo');
+    });
+}
+
+function duplicarModelo(modeloId) {
+    if (confirm('Tem certeza que deseja duplicar este modelo?')) {
+        fetch(`/diretoria/api/modelos-unificados/duplicar/${modeloId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert('Erro ao duplicar modelo: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao duplicar modelo');
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,553 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Andamento do Pré-Cadastro - ABMEPI</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2d3748;
+            --accent-color: #3182ce;
+            --accent-light: #63b3ed;
+            --white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+            --shadow-light: 0 4px 20px rgba(26, 54, 93, 0.08);
+            --shadow-medium: 0 8px 30px rgba(26, 54, 93, 0.12);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Navegação Moderna */
+        .modern-navbar {
+            background: rgba(26, 54, 93, 0.95) !important;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 8px 40px rgba(26, 54, 93, 0.25);
+            transition: all 0.4s ease;
+            padding: 1rem 0;
+            height: 85px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modern-navbar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 179, 237, 0.5), transparent);
+        }
+        
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 100%;
+            padding-top: 8px;
+        }
+        
+        .brand-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            background: white;
+            padding: 4px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            min-width: 250px;
+        }
+        
+        .brand-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: unset;
+        }
+        
+        /* Links de navegação */
+        .modern-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .modern-nav .nav-link:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .modern-nav .nav-link i {
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .main-container {
+            padding: 6rem 0 2rem 0; /* Compensar navbar fixo */
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 1rem;
+        }
+        
+        .card-header {
+            border-radius: 1rem 1rem 0 0 !important;
+            border-bottom: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 123, 255, 0.3);
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .alert {
+            border-radius: 0.75rem;
+            border: none;
+        }
+        
+        .section-title {
+            color: #495057;
+            font-weight: 600;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 0.5rem;
+        }
+        
+        .status-badge {
+            font-size: 0.875rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+        }
+        
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .status-aprovado {
+            background-color: #d1edff;
+            color: #0c5460;
+            border: 1px solid #74c0fc;
+        }
+        
+        .status-rejeitado {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status-analise {
+            background-color: #e2e3e5;
+            color: #383d41;
+            border: 1px solid #d6d8db;
+        }
+        
+        .footer {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-radius: 1rem 1rem 0 0;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .main-logo {
+            height: 80px;
+            width: auto;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+        
+        .main-logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-container img {
+            max-height: 80px;
+            margin-bottom: 1rem;
+        }
+        
+        .logo-container h4 {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .info-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 1px solid #dee2e6;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .info-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .info-value {
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg fixed-top modern-navbar">
+        <div class="container">
+            <!-- Logo ABMEPI Destacada -->
+            <a class="navbar-brand" href="{% url 'institucional' %}">
+                <div class="logo-container">
+                    <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="brand-logo">
+                    <div class="brand-text">
+                        <span class="brand-title">ABMEPI</span>
+                        <span class="brand-subtitle">Associação de Bombeiros e Policiais Militares</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Menu de Navegação -->
+            <div class="collapse navbar-collapse">
+                <ul class="navbar-nav modern-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/associados/pre-cadastro/">
+                            <i class="fas fa-edit"></i>
+                            Novo Pré-Cadastro
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'institucional' %}">
+                            <i class="fas fa-home"></i>
+                            Voltar ao Portal
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <div class="container">
+            <!-- Logo e título -->
+            <div class="logo-container">
+                <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="main-logo mb-3">
+                <h4>Consultar Andamento do Pré-Cadastro</h4>
+            </div>
+            
+            <!-- Alertas informativos -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <!-- Formulário de Consulta -->
+                    <div class="card mb-4">
+                        <div class="card-header py-3 bg-primary text-white">
+                            <h5 class="m-0 font-weight-bold">
+                                <i class="fas fa-search me-2"></i>
+                                Consultar Status
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="alert alert-info mb-4">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Como Consultar
+                                    </h6>
+                                    <p class="mb-0">
+                                        Digite seu CPF e e-mail utilizados no pré-cadastro para consultar o andamento da sua solicitação.
+                                    </p>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="cpf" class="form-label">CPF *</label>
+                                        <input type="text" class="form-control" id="cpf" name="cpf" 
+                                               placeholder="000.000.000-00" required>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">E-mail *</label>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               placeholder="seu@email.com" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search me-1"></i>
+                                        Consultar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Resultado da Consulta -->
+                    {% if pre_cadastro %}
+                        <div class="card">
+                            <div class="card-header py-3 bg-success text-white">
+                                <h5 class="m-0 font-weight-bold">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Status do Pré-Cadastro
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <!-- Status -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6 class="mb-0">Status Atual:</h6>
+                                            {% if pre_cadastro.status == 'pendente' %}
+                                                <span class="status-badge status-pendente">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    Pendente de Análise
+                                                </span>
+                                            {% elif pre_cadastro.status == 'aprovado' %}
+                                                <span class="status-badge status-aprovado">
+                                                    <i class="fas fa-check-circle me-1"></i>
+                                                    Aprovado
+                                                </span>
+                                            {% elif pre_cadastro.status == 'rejeitado' %}
+                                                <span class="status-badge status-rejeitado">
+                                                    <i class="fas fa-times-circle me-1"></i>
+                                                    Rejeitado
+                                                </span>
+                                            {% else %}
+                                                <span class="status-badge status-analise">
+                                                    <i class="fas fa-search me-1"></i>
+                                                    Em Análise
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Informações do Pré-Cadastro -->
+                                <div class="info-card">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-user me-2"></i>
+                                        Dados do Solicitante
+                                    </h6>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">Nome:</span>
+                                        <span class="info-value">{{ pre_cadastro.nome }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">CPF:</span>
+                                        <span class="info-value">{{ pre_cadastro.cpf }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">E-mail:</span>
+                                        <span class="info-value">{{ pre_cadastro.email }}</span>
+                                    </div>
+                                    
+                                    <div class="info-item">
+                                        <span class="info-label">Data do Cadastro:</span>
+                                        <span class="info-value">{{ pre_cadastro.data_cadastro|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                    
+                                    {% if pre_cadastro.data_analise %}
+                                    <div class="info-item">
+                                        <span class="info-label">Data da Análise:</span>
+                                        <span class="info-value">{{ pre_cadastro.data_analise|date:"d/m/Y H:i" }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Observações -->
+                                {% if pre_cadastro.observacoes %}
+                                <div class="info-card">
+                                    <h6 class="section-title mb-3">
+                                        <i class="fas fa-comment me-2"></i>
+                                        Observações
+                                    </h6>
+                                    <p class="mb-0">{{ pre_cadastro.observacoes }}</p>
+                                </div>
+                                {% endif %}
+
+                                <!-- Ações baseadas no status -->
+                                <div class="mt-4">
+                                    {% if pre_cadastro.status == 'aprovado' %}
+                                        <div class="alert alert-success">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-check-circle me-2"></i>
+                                                Parabéns! Seu pré-cadastro foi aprovado!
+                                            </h6>
+                                            <p class="mb-0">
+                                                Você receberá em breve um e-mail com instruções para acessar o sistema da ABMEPI.
+                                                Verifique sua caixa de entrada e spam.
+                                            </p>
+                                        </div>
+                                    {% elif pre_cadastro.status == 'rejeitado' %}
+                                        <div class="alert alert-danger">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-times-circle me-2"></i>
+                                                Pré-cadastro não aprovado
+                                            </h6>
+                                            <p class="mb-0">
+                                                Infelizmente, seu pré-cadastro não foi aprovado. 
+                                                Entre em contato conosco para mais informações.
+                                            </p>
+                                        </div>
+                                    {% else %}
+                                        <div class="alert alert-warning">
+                                            <h6 class="alert-heading">
+                                                <i class="fas fa-clock me-2"></i>
+                                                Aguardando Análise
+                                            </h6>
+                                            <p class="mb-0">
+                                                Seu pré-cadastro está sendo analisado pela diretoria da ABMEPI. 
+                                                O processo pode levar até 5 dias úteis. Você será notificado por e-mail assim que houver uma atualização.
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% elif erro %}
+                        <div class="card">
+                            <div class="card-header py-3 bg-danger text-white">
+                                <h5 class="m-0 font-weight-bold">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Erro na Consulta
+                                </h5>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="alert alert-danger">
+                                    <h6 class="alert-heading">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        {{ erro }}
+                                    </h6>
+                                    <p class="mb-0">
+                                        Verifique se os dados informados estão corretos e tente novamente.
+                                        Se o problema persistir, entre em contato conosco.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer simples -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p class="text-muted mb-0">
+                © 2025 Erisman@TI. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Máscara para CPF
+    document.addEventListener('DOMContentLoaded', function() {
+        const cpfField = document.getElementById('cpf');
+        if (cpfField) {
+            cpfField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length <= 11) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                    e.target.value = value;
+                }
+            });
+        }
+    });
+    </script>
+</body>
+</html>

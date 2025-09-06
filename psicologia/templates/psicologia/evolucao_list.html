@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Evoluções Clínicas{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-chart-line text-info"></i> 
+                    Evoluções Clínicas
+                </h1>
+                <div>
+                    <button type="button" class="btn btn-primary shadow-sm" onclick="openEvolucaoModal()">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> Nova Evolução
+                    </button>
+                    <a href="{% url 'psicologia:dashboard' %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Lista de Evoluções</h6>
+                </div>
+                <div class="card-body">
+                    {% if evolucoes %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Paciente</th>
+                                        <th>Psicólogo</th>
+                                        <th>Sessão</th>
+                                        <th>Conteúdo</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evolucao in evolucoes %}
+                                    <tr>
+                                        <td>{{ evolucao.data_evolucao|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <a href="{% url 'psicologia:paciente_detail' evolucao.sessao.paciente.pk %}">
+                                                {{ evolucao.sessao.paciente.associado.nome }}
+                                            </a>
+                                        </td>
+                                        <td>{{ evolucao.sessao.psicologo.nome_completo }}</td>
+                                        <td>
+                                            <a href="{% url 'psicologia:sessao_detail' evolucao.sessao.pk %}">
+                                                {{ evolucao.sessao.data_hora|date:"d/m/Y H:i" }}
+                                            </a>
+                                        </td>
+                                        <td>{{ evolucao.conteudo|truncatewords:15 }}</td>
+                                        <td>
+                                            <a href="{% url 'psicologia:evolucao_detail' evolucao.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="openEvolucaoEditModal({{ evolucao.pk }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a href="{% url 'psicologia:evolucao_delete' evolucao.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-line fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-500">Nenhuma evolução encontrada</h5>
+                            <p class="text-gray-400">Clique no botão "Nova Evolução" para começar a registrar evoluções clínicas.</p>
+                            <button type="button" class="btn btn-primary" onclick="openEvolucaoModal()">
+                                <i class="fas fa-plus"></i> Nova Evolução
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#dataTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json"
+        },
+        "order": [[0, "desc"]], // Ordenar por data decrescente
+        "pageLength": 25,
+        "responsive": true
+    });
+});
+</script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}

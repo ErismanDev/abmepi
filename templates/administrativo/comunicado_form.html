@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Comunicado{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:dashboard' %}">Administrativo</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:comunicado_list' %}">Comunicados</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">{{ title }}</h1>
+            <p class="text-muted mb-0">Preencha as informações do comunicado</p>
+        </div>
+        <a href="{% url 'administrativo:comunicado_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Dados do Comunicado
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">Título *</label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.titulo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label">Tipo *</label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.prioridade.id_for_label }}" class="form-label">Prioridade *</label>
+                                {{ form.prioridade }}
+                                {% if form.prioridade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.prioridade.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_expiracao.id_for_label }}" class="form-label">Data de Expiração</label>
+                                {{ form.data_expiracao }}
+                                {% if form.data_expiracao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_expiracao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.conteudo.id_for_label }}" class="form-label">Conteúdo *</label>
+                            {{ form.conteudo }}
+                            {% if form.conteudo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.conteudo.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.arquivos_anexados.id_for_label }}" class="form-label">Arquivos Anexos</label>
+                                {{ form.arquivos_anexados }}
+                                {% if form.arquivos_anexados.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.arquivos_anexados.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Opções de Envio</label>
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="form-check">
+                                        {{ form.enviar_email }}
+                                        <label class="form-check-label" for="{{ form.enviar_email.id_for_label }}">
+                                            <i class="fas fa-envelope me-1"></i>Enviar por E-mail
+                                        </label>
+                                        {% if form.enviar_email.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.enviar_email.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-check">
+                                        {{ form.enviar_sms }}
+                                        <label class="form-check-label" for="{{ form.enviar_sms.id_for_label }}">
+                                            <i class="fas fa-sms me-1"></i>Enviar por SMS
+                                        </label>
+                                        {% if form.enviar_sms.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.enviar_sms.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-check">
+                                        {{ form.enviar_notificacao }}
+                                        <label class="form-check-label" for="{{ form.enviar_notificacao.id_for_label }}">
+                                            <i class="fas fa-bell me-1"></i>Enviar Notificação
+                                        </label>
+                                        {% if form.enviar_notificacao.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.enviar_notificacao.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.destinatarios.id_for_label }}" class="form-label">Destinatários</label>
+                            {{ form.destinatarios }}
+                            {% if form.destinatarios.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.destinatarios.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <div class="form-text">Deixe em branco para enviar para todos os associados</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.tipo_destinatarios.id_for_label }}" class="form-label">Tipo de Destinatários *</label>
+                            {{ form.tipo_destinatarios }}
+                            {% if form.tipo_destinatarios.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.tipo_destinatarios.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="row" id="destinatarios-especificos" style="display: none;">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.associados_especificos.id_for_label }}" class="form-label">Associados Específicos</label>
+                                {{ form.associados_especificos }}
+                                {% if form.associados_especificos.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.associados_especificos.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Use Ctrl+Click para selecionar múltiplos</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.advogados_especificos.id_for_label }}" class="form-label">Advogados Específicos</label>
+                                {{ form.advogados_especificos }}
+                                {% if form.advogados_especificos.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.advogados_especificos.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Use Ctrl+Click para selecionar múltiplos</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.psicologos_especificos.id_for_label }}" class="form-label">Psicólogos Específicos</label>
+                                {{ form.psicologos_especificos }}
+                                {% if form.psicologos_especificos.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.psicologos_especificos.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">Use Ctrl+Click para selecionar múltiplos</div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                {{ form.ativo }}
+                                <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                    Ativo
+                                </label>
+                                {% if form.ativo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.ativo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-text">Comunicados inativos não são exibidos na lista</div>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'administrativo:comunicado_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>{{ action }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Dicas -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Dicas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>Use um título claro e objetivo para facilitar a identificação</li>
+                        <li>Selecione a prioridade adequada para organizar a importância</li>
+                        <li>O conteúdo pode incluir formatação HTML básica</li>
+                        <li>Escolha o tipo de destinatários: todos, apenas associados, apenas advogados, apenas psicólogos ou seleção específica</li>
+                        <li>Para seleção específica, use Ctrl+Click para selecionar múltiplos associados, advogados e/ou psicólogos</li>
+                        <li>Arquivos anexos são opcionais mas úteis para documentos</li>
+                        <li>Marque como inativo quando o comunicado não for mais relevante</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Controle de exibição dos campos de destinatários específicos
+    document.addEventListener('DOMContentLoaded', function() {
+        const tipoDestinatariosField = document.getElementById('id_tipo_destinatarios');
+        const destinatariosEspecificosDiv = document.getElementById('destinatarios-especificos');
+        
+        function toggleDestinatariosEspecificos() {
+            const selectedValue = tipoDestinatariosField.value;
+            if (selectedValue === 'especificos') {
+                destinatariosEspecificosDiv.style.display = 'block';
+            } else {
+                destinatariosEspecificosDiv.style.display = 'none';
+            }
+        }
+        
+        // Executa na carga da página
+        toggleDestinatariosEspecificos();
+        
+        // Executa quando o valor muda
+        tipoDestinatariosField.addEventListener('change', toggleDestinatariosEspecificos);
+    });
+</script>
+{% endblock %}

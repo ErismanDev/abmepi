@@ -1,0 +1,343 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Editar Ata{% else %}Nova Ata{% endif %} - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {% if object %}Editar Ata{% else %}Nova Ata{% endif %}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if object %}
+                            Edite os dados básicos da ata e o conteúdo
+                        {% else %}
+                            Preencha os dados básicos da ata e crie o conteúdo
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Formulário de Dados Básicos -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados Básicos da Ata
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="ataForm">
+                        {% csrf_token %}
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>
+                                    Título da Ata <span class="text-danger">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.titulo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.tipo_reuniao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Tipo de Reunião <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_reuniao }}
+                                {% if form.tipo_reuniao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_reuniao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="{{ form.data_reuniao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data e Hora <span class="text-danger">*</span>
+                                </label>
+                                {{ form.data_reuniao }}
+                                {% if form.data_reuniao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_reuniao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.local.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Local <span class="text-danger">*</span>
+                                </label>
+                                {{ form.local }}
+                                {% if form.local.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.local.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="{{ form.presidente.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Presidente <span class="text-danger">*</span>
+                                </label>
+                                {{ form.presidente }}
+                                {% if form.presidente.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.presidente.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.secretario.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-edit me-1"></i>
+                                    Secretário <span class="text-danger">*</span>
+                                </label>
+                                {{ form.secretario }}
+                                {% if form.secretario.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.secretario.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="{{ form.membros_presentes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-users me-1"></i>
+                                    Membros Presentes <span class="text-danger">*</span>
+                                </label>
+                                {{ form.membros_presentes }}
+                                {% if form.membros_presentes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.membros_presentes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.membros_ausentes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-times me-1"></i>
+                                    Membros Ausentes
+                                </label>
+                                {{ form.membros_ausentes }}
+                                {% if form.membros_ausentes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.membros_ausentes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-12">
+                                <label for="{{ form.arquivo_ata.id_for_label }}" class="form-label">
+                                    <i class="fas fa-paperclip me-1"></i>
+                                    Arquivo da Ata
+                                </label>
+                                {{ form.arquivo_ata }}
+                                {% if form.arquivo_ata.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.arquivo_ata.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Arquivo PDF, DOC ou DOCX da ata (opcional)
+                                </small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Seção do Conteúdo da Ata -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-edit me-2"></i>
+                            Conteúdo da Ata
+                        </h5>
+                        <div>
+                            <button type="button" class="btn btn-primary" onclick="abrirEditorConteudo()">
+                                <i class="fas fa-edit me-2"></i>
+                                {% if object and object.conteudo_completo %}Editar Conteúdo{% else %}Criar Conteúdo{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if object and object.conteudo_completo %}
+                        <div class="conteudo-preview">
+                            <div class="bg-light p-3 rounded">
+                                <pre class="mb-0" style="white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 14px;">{{ object.conteudo_completo }}</pre>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-file-alt fa-3x mb-3"></i>
+                            <h5>Nenhum conteúdo criado</h5>
+                            <p>Clique em "Criar Conteúdo" para começar a escrever a ata</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </a>
+                        <div>
+                            <button type="button" class="btn btn-outline-warning me-2" onclick="salvarRascunho()">
+                                <i class="fas fa-save me-2"></i>
+                                Salvar Rascunho
+                            </button>
+                            <button type="button" class="btn btn-success" onclick="salvarAta()">
+                                <i class="fas fa-check me-2"></i>
+                                {% if object %}Atualizar Ata{% else %}Salvar Ata{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Editor de Conteúdo -->
+{% include 'diretoria/ata_modal_conteudo.html' %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Salvar ata
+async function salvarAta() {
+    const form = document.getElementById('ataForm');
+    const formData = new FormData(form);
+    
+    const ataId = '{{ object.pk|default:"" }}';
+    const url = ataId ? `/diretoria/atas/${ataId}/editar/` : '/diretoria/atas/nova/';
+    const method = ataId ? 'POST' : 'POST';
+    
+    try {
+        const response = await fetch(url, {
+            method: method,
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        if (response.ok) {
+            // Mostrar mensagem de sucesso
+            alert('Ata salva com sucesso!');
+            
+            // Recarregar página
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('Erro ao salvar ata: ' + (error.message || 'Erro desconhecido'));
+        }
+    } catch (error) {
+        console.error('Erro ao salvar ata:', error);
+        alert('Erro ao salvar ata. Tente novamente.');
+    }
+}
+
+// Salvar rascunho
+function salvarRascunho() {
+    alert('Funcionalidade de rascunho será implementada em breve!');
+}
+
+// Abrir modal do editor de conteúdo
+function abrirEditorConteudo() {
+    const modal = new bootstrap.Modal(document.getElementById('conteudoModal'));
+    const editor = document.getElementById('conteudo_ata');
+    
+    // Carregar conteúdo existente se houver
+    {% if object and object.conteudo_completo %}
+        editor.value = `{{ object.conteudo_completo|escapejs }}`;
+    {% else %}
+        editor.value = '';
+    {% endif %}
+    
+    modal.show();
+    setTimeout(() => {
+        editor.focus();
+    }, 300);
+}
+
+// Salvar conteúdo do modal
+async function salvarConteudo() {
+    const conteudo = document.getElementById('conteudo_ata').value.trim();
+    
+    if (!conteudo) {
+        alert('Digite o conteúdo da ata antes de salvar!');
+        document.getElementById('conteudo_ata').focus();
+        return;
+    }
+    
+    const ataId = '{{ object.pk|default:"" }}';
+    if (!ataId) {
+        alert('Salve primeiro os dados básicos da ata!');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/diretoria/api/atas/${ataId}/conteudo/`, {
+            method: 'POST',
+            body: JSON.stringify({ conteudo: conteudo }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        if (response.ok) {
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('conteudoModal'));
+            modal.hide();
+            
+            // Mostrar mensagem de sucesso
+            alert('Conteúdo salvo com sucesso!');
+            
+            // Recarregar página
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('Erro ao salvar conteúdo: ' + (error.message || 'Erro desconhecido'));
+        }
+    } catch (error) {
+        console.error('Erro ao salvar conteúdo:', error);
+        alert('Erro ao salvar conteúdo. Tente novamente.');
+    }
+}
+</script>
+{% endblock %}

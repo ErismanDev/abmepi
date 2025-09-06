@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if cargo %}Editar{% else %}Novo{% endif %} Cargo da Diretoria - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-briefcase me-2"></i>
+                        {% if cargo %}Editar{% else %}Novo{% endif %} Cargo da Diretoria
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if cargo %}
+                            Editando: <strong>{{ cargo.nome }}</strong>
+                        {% else %}
+                            Crie um novo cargo para a diretoria
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:cargo_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados do Cargo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Nome do Cargo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.nome.id_for_label }}" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>
+                                    Nome do Cargo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.nome }}
+                                {% if form.nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.nome.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Ordem Hierárquica -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.ordem_hierarquica.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sort-numeric-up me-1"></i>
+                                    Ordem Hierárquica <span class="text-danger">*</span>
+                                </label>
+                                {{ form.ordem_hierarquica }}
+                                {% if form.ordem_hierarquica.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.ordem_hierarquica.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    1 = mais alto, 100 = mais baixo
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Descrição -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    Descrição
+                                </label>
+                                {{ form.descricao }}
+                                {% if form.descricao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.descricao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Descreva as responsabilidades e atribuições do cargo
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Status -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.ativo }}
+                                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Cargo Ativo
+                                    </label>
+                                </div>
+                                {% if form.ativo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.ativo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Cargos inativos não aparecerão nas listas de seleção
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{% url 'diretoria:cargo_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if cargo %}Atualizar Cargo{% else %}Criar Cargo{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

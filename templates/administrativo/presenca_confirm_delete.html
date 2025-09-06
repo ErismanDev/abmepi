@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Presença{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:dashboard' %}">Administrativo</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:lista_presenca_list' %}">Listas de Presença</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:lista_presenca_detail' presenca.lista_presenca.pk %}">{{ presenca.lista_presenca.evento.titulo }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Excluir Presença</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Excluir Presença</h1>
+            <p class="text-muted mb-0">Evento: {{ presenca.lista_presenca.evento.titulo }}</p>
+        </div>
+        <a href="{% url 'administrativo:lista_presenca_detail' presenca.lista_presenca.pk %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Atenção!
+                        </h6>
+                        <p class="mb-0">
+                            Você está prestes a excluir a presença de <strong>{{ presenca.associado.nome }}</strong> 
+                            do evento <strong>{{ presenca.lista_presenca.evento.titulo }}</strong>.
+                        </p>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Associado:</strong><br>
+                            {{ presenca.associado.nome }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Status:</strong><br>
+                            <span class="badge bg-{{ presenca.presente|yesno:'success,danger' }}">
+                                {% if presenca.presente %}
+                                    Presente
+                                {% else %}
+                                    Ausente
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+
+                    {% if presenca.horario_chegada %}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Horário de Chegada:</strong><br>
+                            {{ presenca.horario_chegada }}
+                        </div>
+                        {% if presenca.horario_saida %}
+                        <div class="col-md-6">
+                            <strong>Horário de Saída:</strong><br>
+                            {{ presenca.horario_saida }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+
+                    {% if presenca.observacoes %}
+                    <div class="mb-3">
+                        <strong>Observações:</strong><br>
+                        {{ presenca.observacoes }}
+                    </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'administrativo:lista_presenca_detail' presenca.lista_presenca.pk %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações do Evento -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-calendar me-2"></i>
+                        Informações do Evento
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Título:</strong> {{ presenca.lista_presenca.evento.titulo }}<br>
+                            <strong>Tipo:</strong> {{ presenca.lista_presenca.evento.get_tipo_display }}<br>
+                            <strong>Status:</strong> 
+                            <span class="badge bg-{{ presenca.lista_presenca.evento.status|yesno:'success,danger,warning' }}">
+                                {{ presenca.lista_presenca.evento.get_status_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Data de Início:</strong> {{ presenca.lista_presenca.evento.data_inicio|date:"d/m/Y H:i" }}<br>
+                            <strong>Data de Fim:</strong> {{ presenca.lista_presenca.evento.data_fim|date:"d/m/Y H:i" }}<br>
+                            <strong>Local:</strong> {{ presenca.lista_presenca.evento.local|default:"Não informado" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

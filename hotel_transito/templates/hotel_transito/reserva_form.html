@@ -1,0 +1,503 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Reserva{% else %}Nova Reserva{% endif %} - Hotel de Trânsito
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .actions-bar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-cancel {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .form-section h3 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+        font-size: 1.3rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 1rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        outline: 0;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    
+    .invalid-feedback {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: #dc3545;
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .reservation-summary {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .reservation-summary h4 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .summary-item:last-child {
+        border-bottom: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #667eea;
+    }
+    
+    .summary-label {
+        color: #6c757d;
+    }
+    
+    .summary-value {
+        color: #495057;
+        font-weight: 600;
+    }
+    
+    .alert {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        border-radius: 8px;
+    }
+    
+    .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+    
+    .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+    }
+    
+    .date-time-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .date-time-group {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-calendar-check me-3"></i>
+            {% if form.instance.pk %}Editar Reserva{% else %}Nova Reserva{% endif %}
+        </h1>
+        <p>
+            {% if form.instance.pk %}
+                Atualize as informações da reserva
+            {% else %}
+                Crie uma nova reserva para o hotel de trânsito
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Barra de Ações -->
+    <div class="actions-bar">
+        <div>
+            <a href="{% url 'hotel_transito:reserva_list' %}" class="btn-action btn-cancel">
+                <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+            </a>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" form="reserva-form" class="btn-action btn-save">
+                <i class="fas fa-save me-2"></i>
+                {% if form.instance.pk %}Atualizar{% else %}Salvar{% endif %}
+            </button>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <form method="post" id="reserva-form" class="form-container">
+        {% csrf_token %}
+        
+        <!-- Informações Básicas -->
+        <div class="form-section">
+            <h3><i class="fas fa-info-circle me-2"></i>Informações Básicas</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.quarto.id_for_label }}">{{ form.quarto.label }}</label>
+                    {{ form.quarto }}
+                    {% if form.quarto.errors %}
+                        <div class="invalid-feedback">{{ form.quarto.errors.0 }}</div>
+                    {% endif %}
+                    {% if form.quarto.help_text %}
+                        <div class="help-text">{{ form.quarto.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.hospede.id_for_label }}">{{ form.hospede.label }}</label>
+                    {{ form.hospede }}
+                    {% if form.hospede.errors %}
+                        <div class="invalid-feedback">{{ form.hospede.errors.0 }}</div>
+                    {% endif %}
+                    {% if form.hospede.help_text %}
+                        <div class="help-text">{{ form.hospede.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Datas e Horários -->
+        <div class="form-section">
+            <h3><i class="fas fa-calendar-alt me-2"></i>Datas e Horários</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.data_entrada.id_for_label }}">{{ form.data_entrada.label }}</label>
+                    {{ form.data_entrada }}
+                    {% if form.data_entrada.errors %}
+                        <div class="invalid-feedback">{{ form.data_entrada.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.data_saida.id_for_label }}">{{ form.data_saida.label }}</label>
+                    {{ form.data_saida }}
+                    {% if form.data_saida.errors %}
+                        <div class="invalid-feedback">{{ form.data_saida.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.hora_entrada.id_for_label }}">{{ form.hora_entrada.label }}</label>
+                    {{ form.hora_entrada }}
+                    {% if form.hora_entrada.errors %}
+                        <div class="invalid-feedback">{{ form.hora_entrada.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.hora_saida.id_for_label }}">{{ form.hora_saida.label }}</label>
+                    {{ form.hora_saida }}
+                    {% if form.hora_saida.errors %}
+                        <div class="invalid-feedback">{{ form.hora_saida.errors.0 }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Valores -->
+        <div class="form-section">
+            <h3><i class="fas fa-dollar-sign me-2"></i>Valores</h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="{{ form.valor_diaria.id_for_label }}">{{ form.valor_diaria.label }}</label>
+                    {{ form.valor_diaria }}
+                    {% if form.valor_diaria.errors %}
+                        <div class="invalid-feedback">{{ form.valor_diaria.errors.0 }}</div>
+                    {% endif %}
+                    {% if form.valor_diaria.help_text %}
+                        <div class="help-text">{{ form.valor_diaria.help_text }}</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        <div class="form-section">
+            <h3><i class="fas fa-sticky-note me-2"></i>Observações</h3>
+            
+            <div class="form-group">
+                <label for="{{ form.observacoes.id_for_label }}">{{ form.observacoes.label }}</label>
+                {{ form.observacoes }}
+                {% if form.observacoes.errors %}
+                    <div class="invalid-feedback">{{ form.observacoes.errors.0 }}</div>
+                {% endif %}
+                {% if form.observacoes.help_text %}
+                    <div class="help-text">{{ form.observacoes.help_text }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Resumo da Reserva (calculado via JavaScript) -->
+        <div class="reservation-summary" id="reservation-summary" style="display: none;">
+            <h4><i class="fas fa-calculator me-2"></i>Resumo da Reserva</h4>
+            <div class="summary-item">
+                <span class="summary-label">Quantidade de Diárias:</span>
+                <span class="summary-value" id="summary-days">0</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Valor Total:</span>
+                <span class="summary-value" id="summary-total">R$ 0,00</span>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Informações Importantes -->
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Importante:</strong> 
+            <ul class="mb-0 mt-2">
+                <li>A data de entrada deve ser posterior à data atual</li>
+                <li>A data de saída deve ser posterior à data de entrada</li>
+                <li>O sistema verificará automaticamente a disponibilidade do quarto</li>
+                <li>O valor total será calculado automaticamente baseado nas diárias</li>
+            </ul>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Função para calcular diárias e valor total
+        function calculateReservation() {
+            const dataEntrada = $('#id_data_entrada').val();
+            const dataSaida = $('#id_data_saida').val();
+            const valorDiaria = parseFloat($('#id_valor_diaria').val()) || 0;
+            
+            if (dataEntrada && dataSaida) {
+                const entrada = new Date(dataEntrada);
+                const saida = new Date(dataSaida);
+                const diffTime = Math.abs(saida - entrada);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays > 0) {
+                    const valorTotal = diffDays * valorDiaria;
+                    
+                    $('#summary-days').text(diffDays);
+                    $('#summary-total').text('R$ ' + valorTotal.toFixed(2).replace('.', ','));
+                    $('#reservation-summary').show();
+                } else {
+                    $('#reservation-summary').hide();
+                }
+            } else {
+                $('#reservation-summary').hide();
+            }
+        }
+        
+        // Calcular quando as datas ou valor mudarem
+        $('#id_data_entrada, #id_data_saida, #id_valor_diaria').on('change input', function() {
+            calculateReservation();
+        });
+        
+        // Definir data mínima para entrada (hoje)
+        const today = new Date().toISOString().split('T')[0];
+        $('#id_data_entrada').attr('min', today);
+        
+        // Definir data mínima para saída (baseada na entrada)
+        $('#id_data_entrada').on('change', function() {
+            const dataEntrada = $(this).val();
+            if (dataEntrada) {
+                $('#id_data_saida').attr('min', dataEntrada);
+            }
+        });
+        
+        // Auto-calcular valor da diária baseado no quarto selecionado
+        $('#id_quarto').on('change', function() {
+            const quartoId = $(this).val();
+            if (quartoId) {
+                // Aqui você pode fazer uma requisição AJAX para buscar o valor da diária
+                // Por enquanto, vamos apenas recalcular se já houver valores
+                calculateReservation();
+            }
+        });
+        
+        // Validação do formulário
+        $('#reserva-form').on('submit', function(e) {
+            const dataEntrada = $('#id_data_entrada').val();
+            const dataSaida = $('#id_data_saida').val();
+            const quarto = $('#id_quarto').val();
+            const hospede = $('#id_hospede').val();
+            
+            if (!quarto) {
+                alert('Por favor, selecione um quarto.');
+                e.preventDefault();
+                return false;
+            }
+            
+            if (!hospede) {
+                alert('Por favor, selecione um hóspede.');
+                e.preventDefault();
+                return false;
+            }
+            
+            if (!dataEntrada || !dataSaida) {
+                alert('Por favor, preencha as datas de entrada e saída.');
+                e.preventDefault();
+                return false;
+            }
+            
+            if (dataEntrada >= dataSaida) {
+                alert('A data de saída deve ser posterior à data de entrada.');
+                e.preventDefault();
+                return false;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            if (dataEntrada < today) {
+                alert('A data de entrada não pode ser anterior à data atual.');
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // Calcular inicialmente se houver dados
+        calculateReservation();
+    });
+</script>
+{% endblock %}

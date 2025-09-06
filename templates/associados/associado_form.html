@@ -1,0 +1,518 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user me-2"></i>
+        {{ title }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'associados:associado_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-edit me-2"></i>
+                    Dados do Associado
+                </h6>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Dados Pessoais -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-user me-2"></i>
+                                Dados Pessoais
+                            </h5>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.nome|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.cpf|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.rg|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.data_nascimento|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.sexo|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.estado_civil|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.foto|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.telefone|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.celular|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- Dados dos Pais -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-users me-2"></i>
+                                Dados dos Pais
+                            </h5>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.nome_pai|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.nome_mae|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                Endereço
+                            </h5>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.cep|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.rua|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-3">
+                            {{ form.numero|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.complemento|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.bairro|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.cidade|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {{ form.estado|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- Dados Funcionais -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Dados Funcionais
+                            </h5>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.tipo_socio|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.tipo_profissional|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.matricula_militar|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.posto_graduacao|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.nome_civil|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.unidade_lotacao|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.data_ingresso|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.situacao|as_crispy_field }}
+                        </div>
+                        
+                        <div class="col-md-4">
+                            {{ form.tipo_documento|as_crispy_field }}
+                        </div>
+                    </div>
+
+                    <!-- Dados do Sistema -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-cogs me-2"></i>
+                                Dados do Sistema
+                            </h5>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.usuario.id_for_label }}">{{ form.usuario.label }}</label>
+                                {{ form.usuario }}
+                                {% if form.usuario.help_text %}
+                                    <small class="form-text text-muted">{{ form.usuario.help_text }}</small>
+                                {% endif %}
+                                {% if form.usuario.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.usuario.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form.ativo }}
+                                <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                    {{ form.ativo.label }}
+                                </label>
+                                {% if form.ativo.help_text %}
+                                    <small class="form-text text-muted">{{ form.ativo.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="{{ form.observacoes.id_for_label }}">{{ form.observacoes.label }}</label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.help_text %}
+                                    <small class="form-text text-muted">{{ form.observacoes.help_text }}</small>
+                                {% endif %}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.observacoes.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dependentes -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="border-bottom pb-2 mb-3">
+                                <i class="fas fa-users me-2"></i>
+                                Dependentes
+                            </h5>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <p class="text-muted mb-0">Gerencie os dependentes do associado</p>
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#dependenteModal" onclick="console.log('Botão clicado')">
+                                    <i class="fas fa-plus me-1"></i>
+                                    Adicionar Dependente
+                                </button>
+                            </div>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Nome</th>
+                                            <th>Parentesco</th>
+                                            <th>Data Nascimento</th>
+                                            <th>CPF</th>
+                                            <th>Idade</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for dependente in associado.dependentes.all %}
+                                        <tr>
+                                            <td>
+                                                {% if dependente.foto %}
+                                                    <img src="{{ dependente.foto.url }}" alt="{{ dependente.nome }}" class="rounded-circle me-2" width="30" height="30">
+                                                {% else %}
+                                                    <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-2" style="width: 30px; height: 30px;">
+                                                        <i class="fas fa-user text-white" style="font-size: 12px;"></i>
+                                                    </div>
+                                                {% endif %}
+                                                {{ dependente.nome }}
+                                            </td>
+                                            <td>{{ dependente.get_parentesco_display }}</td>
+                                            <td>{{ dependente.data_nascimento|date:"d/m/Y" }}</td>
+                                            <td>{{ dependente.cpf|default:"-" }}</td>
+                                            <td>{{ dependente.get_idade }} anos</td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <a href="{% url 'associados:dependente_edit' associado.id dependente.id %}" class="btn btn-outline-primary" title="Editar">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="{% url 'associados:dependente_delete' associado.id dependente.id %}" class="btn btn-outline-danger" title="Excluir" onclick="return confirm('Tem certeza que deseja excluir este dependente?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="6" class="text-center text-muted py-4">
+                                                <i class="fas fa-users fa-2x mb-2 d-block"></i>
+                                                Nenhum dependente cadastrado
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de ação -->
+                    <div class="row">
+                        <div class="col-12">
+                            <hr class="my-4">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'associados:associado_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i>
+                                    {{ submit_text }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Adicionar/Editar Dependente -->
+<div class="modal fade" id="dependenteModal" tabindex="-1" aria-labelledby="dependenteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dependenteModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Adicionar Dependente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="dependenteFormContainer">
+                    <!-- O formulário será carregado aqui via AJAX -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'associados/js/modais.js' %}"></script>
+<script>
+// Máscaras adicionais específicas para este formulário
+document.addEventListener('DOMContentLoaded', function() {
+    const cpfField = document.getElementById('id_cpf');
+    if (cpfField) {
+        cpfField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                e.target.value = value;
+            }
+        });
+    }
+
+    // Máscara para CEP
+    const cepField = document.getElementById('id_cep');
+    if (cepField) {
+        cepField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 8) {
+                value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                e.target.value = value;
+            }
+        });
+    }
+
+    // Máscara para telefone
+    const telefoneField = document.getElementById('id_telefone');
+    if (telefoneField) {
+        telefoneField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                if (value.length <= 10) {
+                    value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                } else {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                }
+                e.target.value = value;
+            }
+        });
+    }
+
+    // Máscara para celular
+    const celularField = document.getElementById('id_celular');
+    if (celularField) {
+        celularField.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 11) {
+                if (value.length <= 10) {
+                    value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                } else {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                }
+                e.target.value = value;
+            }
+        });
+    }
+
+    // Carregar formulário de dependente via AJAX
+    $('#dependenteModal').on('show.bs.modal', function (event) {
+        console.log('Modal de dependente aberto');
+        var button = $(event.relatedTarget);
+        
+        // Tentar obter o ID do associado de diferentes formas
+        var associadoId = null;
+        
+        // Primeiro, tentar do contexto do template
+        {% if associado %}
+        associadoId = {{ associado.id }};
+        {% endif %}
+        
+        // Se não encontrou, tentar extrair da URL
+        if (!associadoId) {
+            var urlParts = window.location.pathname.split('/');
+            for (var i = 0; i < urlParts.length; i++) {
+                if (urlParts[i] === 'editar' && i + 1 < urlParts.length) {
+                    associadoId = parseInt(urlParts[i + 1]);
+                    break;
+                }
+            }
+        }
+        
+        console.log('ID do associado:', associadoId);
+        
+        if (associadoId) {
+            var url = '{% url "associados:dependente_modal_create" %}?associado=' + associadoId;
+            console.log('URL da requisição:', url);
+            
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success: function(data) {
+                    console.log('Resposta recebida:', data);
+                    if (data.form_html) {
+                        $('#dependenteFormContainer').html(data.form_html);
+                    } else {
+                        $('#dependenteFormContainer').html('<div class="alert alert-danger">Erro ao carregar formulário</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log('Erro na requisição:', error);
+                    console.log('Status:', status);
+                    console.log('Response:', xhr.responseText);
+                    $('#dependenteFormContainer').html('<div class="alert alert-danger">Erro ao carregar formulário: ' + error + '</div>');
+                }
+            });
+        } else {
+            $('#dependenteFormContainer').html('<div class="alert alert-warning">ID do associado não encontrado. Certifique-se de estar editando um associado existente.</div>');
+        }
+    });
+
+    // Processar envio do formulário de dependente
+    $(document).on('submit', '#dependenteForm', function(e) {
+        e.preventDefault();
+        
+        var form = $(this);
+        var formData = new FormData(this);
+        
+        $.ajax({
+            url: '{% url "associados:dependente_modal_create" %}',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                if (data.success) {
+                    // Fechar modal
+                    $('#dependenteModal').modal('hide');
+                    
+                    // Mostrar mensagem de sucesso
+                    alert(data.message);
+                    
+                    // Recarregar a página para mostrar o novo dependente
+                    if (data.reload) {
+                        location.reload();
+                    }
+                } else {
+                    // Mostrar erros de validação
+                    if (data.errors) {
+                        var errorHtml = '<div class="alert alert-danger"><ul>';
+                        for (var field in data.errors) {
+                            errorHtml += '<li>' + data.errors[field][0] + '</li>';
+                        }
+                        errorHtml += '</ul></div>';
+                        $('#dependenteFormContainer').prepend(errorHtml);
+                    } else {
+                        alert(data.message);
+                    }
+                }
+            },
+            error: function() {
+                alert('Erro ao salvar dependente. Tente novamente.');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

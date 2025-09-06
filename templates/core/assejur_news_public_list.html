@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - ABMEPI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #3498db;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #ff8c42 100%);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+            padding-top: 80px; /* Espaço para navbar fixa */
+        }
+        
+        /* Navbar igual às outras páginas do sistema */
+        .modern-navbar {
+            background: rgba(44, 62, 80, 0.95) !important;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 4px 30px rgba(44, 62, 80, 0.2);
+            transition: all 0.3s ease;
+            padding: 0.75rem 0;
+            height: 80px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .modern-navbar.scrolled {
+            background: rgba(44, 62, 80, 0.98) !important;
+            box-shadow: 0 8px 40px rgba(44, 62, 80, 0.3);
+            height: 70px;
+        }
+        
+        /* Logo Container */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .brand-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(44, 62, 80, 0.3);
+            transition: all 0.3s ease;
+            background: white;
+            padding: 4px;
+        }
+        
+        .modern-navbar.scrolled .brand-logo {
+            width: 45px;
+            height: 45px;
+        }
+        
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+            min-width: 250px;
+        }
+        
+        .brand-title {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: #ffffff;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        
+        .modern-navbar.scrolled .brand-title {
+            font-size: 1.3rem;
+        }
+        
+        .brand-subtitle {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: unset;
+        }
+        
+        .modern-navbar.scrolled .brand-subtitle {
+            font-size: 0.65rem;
+        }
+        
+        /* Botão Mobile */
+        .modern-toggler {
+            border: none;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .modern-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .toggler-icon {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: white;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+        }
+        
+        /* Menu de Navegação */
+        .modern-nav {
+            margin: 0 auto;
+        }
+        
+        .modern-nav .nav-item {
+            margin: 0;
+        }
+        
+        .modern-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 600;
+            padding: 0.75rem 1rem !important;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .modern-link:hover,
+        .modern-link.active {
+            color: white !important;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .modern-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 3px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+
+        
+        /* Hero Section */
+        .hero-section {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Barra de Pesquisa Discreta e Compacta */
+        .search-section {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9ecef;
+        }
+        
+        .search-header {
+            display: none; /* Remove o cabeçalho para economizar espaço */
+        }
+        
+        .search-container {
+            position: relative;
+            max-width: 400px;
+            margin: 0 auto 0.75rem;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: white;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+        
+        .search-clear {
+            position: absolute;
+            right: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #e9ecef;
+            color: var(--text-light);
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.7rem;
+            z-index: 10;
+        }
+        
+        .search-clear:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        .search-clear:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        /* Destaque dos termos de pesquisa */
+        .search-highlight {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 0.1rem 0.2rem;
+            border-radius: 0.2rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+
+        
+        /* Filtros de Categoria Compactos */
+        .category-filters {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 0.75rem;
+            align-items: center;
+        }
+        
+        .category-btn {
+            background: white;
+            border: 1px solid #e9ecef;
+            color: var(--text-dark);
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            height: 28px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        /* Resultados da Pesquisa Compactos */
+        .search-results-info {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(52, 152, 219, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-color);
+            font-size: 0.8rem;
+        }
+        
+        .results-count {
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .search-time {
+            color: var(--text-light);
+            font-size: 0.75rem;
+        }
+        
+
+        
+        /* Notícias em Destaque */
+        .featured-news {
+            background: var(--gradient-accent);
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: var(--shadow-medium);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .featured-news::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+        
+        .featured-badge {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .featured-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .featured-excerpt {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .featured-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .featured-category {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+        
+        .featured-priority {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-featured {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .btn-featured:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+        
+        /* Grid de Notícias */
+        .news-grid {
+            margin-bottom: 3rem;
+        }
+        
+        .news-item {
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+        
+        .news-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .news-card {
+            background: white;
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            height: 100%;
+            overflow: hidden;
+        }
+        
+        .news-card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-5px);
+        }
+        
+        .news-image {
+            height: auto;
+            overflow: visible;
+            position: relative;
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .news-image img {
+            max-width: 100%;
+            height: auto;
+            max-height: 200px;
+            width: auto;
+            border-radius: 8px;
+            transition: var(--transition);
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .news-card:hover .news-image img {
+            transform: scale(1.05);
+        }
+        
+        .news-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 3rem;
+        }
+        
+        .news-card-body {
+            padding: 1.5rem;
+        }
+        
+        .news-category {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .news-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            color: var(--text-dark);
+        }
+        
+        .news-title a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        .news-title a:hover {
+            color: var(--accent-color);
+        }
+        
+        .news-excerpt {
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+                 .news-meta {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             padding-top: 1rem;
+             border-top: 1px solid #e9ecef;
+             font-size: 0.875rem;
+             margin-bottom: 1rem;
+         }
+         
+         .news-date {
+             color: var(--text-light);
+             display: flex;
+             align-items: center;
+         }
+         
+         .news-date i {
+             margin-right: 0.5rem;
+             color: var(--accent-color);
+         }
+         
+         .news-priority {
+             padding: 0.25rem 0.5rem;
+             border-radius: 12px;
+             font-size: 0.75rem;
+             font-weight: 600;
+         }
+         
+         .priority-baixa { background: #d1ecf1; color: #0c5460; }
+         .priority-media { background: #fff3cd; color: #856404; }
+         .priority-alta { background: #f8d7da; color: #721c24; }
+         .priority-urgente { background: #d4edda; color: #155724; }
+         
+         /* Botão Ler Notícia Completa */
+         .news-actions {
+             text-align: center;
+             padding-top: 1rem;
+             border-top: 1px solid #e9ecef;
+         }
+         
+         .btn-read-more {
+             background: var(--gradient-primary);
+             color: white;
+             padding: 0.6rem 1.2rem;
+             border-radius: 20px;
+             font-weight: 600;
+             text-decoration: none;
+             transition: all 0.3s ease;
+             display: inline-flex;
+             align-items: center;
+             font-size: 0.85rem;
+             box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+         }
+         
+                  .btn-read-more:hover {
+             color: white;
+             transform: translateY(-2px);
+             box-shadow: 0 6px 20px rgba(30, 60, 114, 0.3);
+         }
+         
+                   /* Seção de Notícias Antigas */
+          .old-news-section {
+              background: white;
+              border-radius: var(--border-radius);
+              padding: 2rem;
+              margin-bottom: 3rem;
+              box-shadow: var(--shadow-light);
+              border: 1px solid #e9ecef;
+          }
+          
+          .section-header {
+              text-align: center;
+              margin-bottom: 2rem;
+          }
+          
+          .section-title {
+              font-size: 1.75rem;
+              font-weight: 700;
+              color: var(--text-dark);
+              margin-bottom: 0.5rem;
+          }
+          
+          .section-subtitle {
+              color: var(--text-light);
+              font-size: 1rem;
+              margin-bottom: 0;
+          }
+          
+          /* Lista de Notícias Antigas */
+          .old-news-list {
+              margin-top: 2rem;
+          }
+          
+          .old-news-item {
+              background: #f8f9fa;
+              border-radius: 12px;
+              padding: 1.5rem;
+              margin-bottom: 1rem;
+              border: 1px solid #e9ecef;
+              transition: all 0.3s ease;
+              border-left: 4px solid var(--accent-color);
+          }
+          
+          .old-news-item:hover {
+              transform: translateY(-2px);
+              box-shadow: var(--shadow-medium);
+              border-color: var(--accent-color);
+              background: white;
+          }
+          
+          .old-news-content {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              gap: 1.5rem;
+          }
+          
+          .old-news-info {
+              flex: 1;
+          }
+          
+          .old-news-meta {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              margin-bottom: 0.75rem;
+              flex-wrap: wrap;
+          }
+          
+          .old-news-category {
+              background: var(--gradient-primary);
+              color: white;
+              padding: 0.25rem 0.75rem;
+              border-radius: 15px;
+              font-size: 0.75rem;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+          }
+          
+          .old-news-date {
+              color: var(--text-light);
+              font-size: 0.875rem;
+              display: flex;
+              align-items: center;
+          }
+          
+          .old-news-date i {
+              color: var(--accent-color);
+              margin-right: 0.25rem;
+          }
+          
+          .old-news-title {
+              font-size: 1.1rem;
+              font-weight: 600;
+              color: var(--text-dark);
+              margin-bottom: 0.75rem;
+              line-height: 1.4;
+          }
+          
+          .old-news-excerpt {
+              color: var(--text-light);
+              line-height: 1.6;
+              margin-bottom: 0;
+              font-size: 0.9rem;
+          }
+          
+          .old-news-actions {
+              flex-shrink: 0;
+          }
+          
+          .btn-old-news-read {
+              background: var(--accent-color);
+              color: white;
+              border: none;
+              padding: 0.6rem 1.2rem;
+              border-radius: 20px;
+              font-weight: 600;
+              transition: all 0.3s ease;
+              display: inline-flex;
+              align-items: center;
+              font-size: 0.85rem;
+              cursor: pointer;
+              white-space: nowrap;
+          }
+          
+          .btn-old-news-read:hover {
+              background: var(--primary-color);
+              transform: translateY(-2px);
+              box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+          }
+          
+          /* Estado vazio para notícias antigas */
+          .empty-old-news {
+              text-align: center;
+              padding: 3rem 2rem;
+              color: var(--text-light);
+          }
+          
+          .empty-old-news i {
+              opacity: 0.5;
+              margin-bottom: 1rem;
+          }
+          
+          .empty-old-news h5 {
+              color: var(--text-dark);
+              margin-bottom: 0.5rem;
+          }
+          
+          /* Paginação das notícias antigas */
+          .old-news-pagination {
+              margin-top: 2rem;
+              text-align: center;
+          }
+          
+          .old-news-pagination .pagination {
+              justify-content: center;
+          }
+         
+         /* Paginação */
+        .pagination-container {
+            text-align: center;
+            margin-top: 3rem;
+        }
+        
+        .pagination {
+            display: inline-flex;
+            gap: 0.5rem;
+        }
+        
+        .page-link {
+            border-radius: 8px;
+            border: none;
+            color: var(--accent-color);
+            background: white;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .page-link:hover {
+            background: var(--accent-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .page-item.active .page-link {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        /* Estado Vazio */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+            color: var(--accent-color);
+        }
+        
+        .empty-state h4 {
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 70px;
+            }
+            
+            .modern-navbar {
+                height: 70px;
+            }
+            
+            .brand-text {
+                min-width: 200px;
+            }
+            
+            .brand-title {
+                font-size: 1.2rem;
+            }
+            
+            .brand-subtitle {
+                font-size: 0.6rem;
+            }
+            
+            .modern-nav {
+                margin: 0 auto;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .search-section {
+                padding: 0.75rem;
+            }
+            
+            .search-container {
+                max-width: 100%;
+            }
+            
+            /* Filtros em coluna para tablets */
+            .filters-grid {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.4rem;
+            }
+            
+            .filter-group {
+                min-width: auto;
+            }
+            
+            .category-filters {
+                justify-content: center;
+                gap: 0.3rem;
+            }
+            
+            .category-btn {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.75rem;
+                height: 26px;
+            }
+            
+            .search-actions {
+                gap: 0.4rem;
+            }
+            
+            .btn-search,
+            .btn-reset {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.8rem;
+                height: 26px;
+            }
+            
+            .featured-news {
+                padding: 1.5rem;
+            }
+            
+            .featured-title {
+                font-size: 1.5rem;
+            }
+            
+                         .featured-meta {
+                 flex-direction: column;
+                 align-items: flex-start;
+                 gap: 0.5rem;
+             }
+             
+                           /* Responsividade para Notícias Antigas */
+              .old-news-section {
+                  padding: 1.5rem;
+              }
+              
+              .section-title {
+                  font-size: 1.5rem;
+              }
+              
+              .old-news-item {
+                  padding: 1rem;
+              }
+              
+              .old-news-content {
+                  flex-direction: column;
+                  gap: 1rem;
+              }
+              
+              .old-news-actions {
+                  align-self: stretch;
+              }
+              
+              .btn-old-news-read {
+                  width: 100%;
+                  justify-content: center;
+              }
+        }
+        
+        @media (max-width: 576px) {
+            .brand-text {
+                min-width: 150px;
+            }
+            
+            .brand-title {
+                font-size: 1rem;
+            }
+            
+            .brand-subtitle {
+                font-size: 0.55rem;
+            }
+            
+            .hero-section {
+                padding: 2rem 0;
+            }
+            
+            .hero-title {
+                font-size: 1.75rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .search-section {
+                padding: 0.5rem;
+            }
+            
+            .search-container {
+                margin-bottom: 0.5rem;
+            }
+            
+            .search-box {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.8rem 0.4rem 2rem;
+                height: 32px;
+            }
+            
+            .search-icon {
+                left: 0.6rem;
+                font-size: 0.8rem;
+            }
+            
+            /* Filtros ainda mais compactos para mobile */
+            .filters-grid {
+                gap: 0.5rem;
+            }
+            
+            .filter-select,
+            .filter-date {
+                padding: 0.3rem 0.4rem;
+                font-size: 0.75rem;
+                height: 28px;
+            }
+            
+            .category-filters {
+                gap: 0.25rem;
+                margin-top: 0.5rem;
+            }
+            
+            .category-btn {
+                font-size: 0.7rem;
+                padding: 0.25rem 0.5rem;
+                height: 24px;
+            }
+            
+            .search-actions {
+                flex-direction: row;
+                gap: 0.3rem;
+                width: auto;
+                justify-content: center;
+            }
+            
+                         .btn-search,
+             .btn-reset {
+                 width: auto;
+                 justify-content: center;
+                 padding: 0.3rem 0.6rem;
+                 font-size: 0.75rem;
+                 height: 24px;
+             }
+             
+                           /* Responsividade para Notícias Antigas em Mobile */
+              .old-news-section {
+                  padding: 1rem;
+              }
+              
+              .section-title {
+                  font-size: 1.25rem;
+              }
+              
+              .section-subtitle {
+                  font-size: 0.9rem;
+              }
+              
+              .old-news-item {
+                  padding: 0.75rem;
+                  margin-bottom: 0.75rem;
+              }
+              
+              .old-news-title {
+                  font-size: 1rem;
+              }
+              
+              .old-news-excerpt {
+                  font-size: 0.8rem;
+              }
+              
+              .old-news-meta {
+                  gap: 0.5rem;
+              }
+              
+              .old-news-category {
+                  font-size: 0.7rem;
+                  padding: 0.2rem 0.5rem;
+              }
+              
+              .old-news-date {
+                  font-size: 0.8rem;
+              }
+              
+              .btn-old-news-read {
+                  padding: 0.5rem 1rem;
+                  font-size: 0.8rem;
+              }
+        }
+    </style>
+</head>
+<body data-news-functions="true">
+    <!-- Navigation igual às outras páginas do sistema -->
+    <nav class="navbar navbar-expand-lg fixed-top modern-navbar">
+        <div class="container">
+            <!-- Logo ABMEPI Destacada -->
+            <a class="navbar-brand modern-brand" href="{% url 'institucional' %}">
+                <div class="logo-container">
+                    <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="brand-logo">
+                    <div class="brand-text">
+                        <span class="brand-title">ABMEPI</span>
+                        <span class="brand-subtitle">Associação de Bombeiros e Policiais Militares</span>
+                    </div>
+                </div>
+            </a>
+            
+            <!-- Botão Mobile -->
+            <button class="navbar-toggler modern-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="toggler-icon"></span>
+                <span class="toggler-icon"></span>
+                <span class="toggler-icon"></span>
+            </button>
+            
+            <!-- Menu de Navegação -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav modern-nav">
+                    <li class="nav-item">
+                        <a class="nav-link modern-link" href="{% url 'institucional' %}">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar à Página Principal
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link modern-link" href="{% url 'core:assejur_news_list' %}">
+                            <i class="fas fa-edit me-2"></i>Página de Edição
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">
+                <i class="fas fa-gavel me-3"></i>{{ title }}
+            </h1>
+            <p class="hero-subtitle">{{ subtitle }}</p>
+        </div>
+    </section>
+
+    <div class="container">
+
+        <!-- Barra de Pesquisa Discreta -->
+        <div class="search-section" id="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       class="search-box" 
+                       placeholder="🔍 Pesquisar notícias..." 
+                       id="searchInput"
+                       autocomplete="off">
+                <button class="search-clear" id="searchClear" title="Limpar pesquisa">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+
+            
+            <!-- Filtros de Categoria Rápidos -->
+            <div class="category-filters">
+                <a href="{% url 'core:assejur_news_public_list' %}" 
+                   class="category-btn {% if not request.GET.categoria %}active{% endif %}"
+                   data-category="">
+                    <i class="fas fa-globe me-2"></i>Todas
+                </a>
+                {% for value, label in categorias %}
+                <a href="?categoria={{ value }}" 
+                   class="category-btn {% if request.GET.categoria == value %}active{% endif %}"
+                   data-category="{{ value }}">
+                    <i class="fas fa-tag me-2"></i>{{ label }}
+                </a>
+                {% endfor %}
+            </div>
+            
+            <!-- Informações dos Resultados -->
+            <div class="search-results-info" id="searchResultsInfo" style="display: none;">
+                <div class="results-count">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <span id="resultsCount">0</span> notícias encontradas
+                </div>
+                <div class="search-time">
+                    <i class="fas fa-clock me-1"></i>
+                    Pesquisa realizada em <span id="searchTime">0</span>ms
+                </div>
+            </div>
+        </div>
+
+        <!-- Notícias em Destaque -->
+        {% for noticia in noticias %}
+            {% if noticia.destaque and forloop.first %}
+            <div class="featured-news">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <span class="featured-badge">
+                            <i class="fas fa-star me-2"></i>Destaque
+                        </span>
+                        <h2 class="featured-title">{{ noticia.titulo }}</h2>
+                        <p class="featured-excerpt">{{ noticia.resumo }}</p>
+                        <div class="featured-meta">
+                            <span class="featured-category">{{ noticia.get_categoria_display }}</span>
+                            <span class="featured-priority">{{ noticia.get_prioridade_display }}</span>
+                        </div>
+                                                 <a href="{% url 'core:assejur_news_detail' pk=noticia.id %}" class="btn-featured">
+                             <i class="fas fa-arrow-right me-2"></i>Ler Notícia Completa
+                         </a>
+                    </div>
+                    <div class="col-lg-4">
+                        {% if noticia.imagem %}
+                        <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}" class="img-fluid rounded">
+                        {% else %}
+                        <div class="text-center">
+                            <i class="{{ noticia.icone }} fa-5x opacity-50"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+
+                 <!-- Grid de Notícias Principais -->
+         <div class="news-grid">
+             <div class="row" id="newsGrid">
+                 {% for noticia in noticias %}
+                     {% if not forloop.first or not noticia.destaque %}
+                     <div class="col-lg-4 col-md-6 news-item" data-category="{{ noticia.categoria }}" data-title="{{ noticia.titulo|lower }}" data-content="{{ noticia.resumo|lower }}" data-news-id="{{ noticia.id }}">
+                         <div class="news-card">
+                             {% if noticia.imagem %}
+                             <div class="news-image">
+                                 <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}">
+                             </div>
+                             {% else %}
+                             <div class="news-image">
+                                 <div class="news-image-placeholder">
+                                     <i class="{{ noticia.icone }}"></i>
+                                 </div>
+                             </div>
+                             {% endif %}
+                             
+                                                          <div class="news-card-body">
+                                  <span class="news-category">{{ noticia.get_categoria_display }}</span>
+                                  <h5 class="news-title">
+                                      <a href="{% url 'core:assejur_news_detail' noticia.pk %}">
+                                          {{ noticia.titulo }}
+                                      </a>
+                                  </h5>
+                                  <p class="news-excerpt">{{ noticia.resumo|truncatechars:120 }}</p>
+                                  
+                                  <div class="news-meta">
+                                      <div class="news-date">
+                                          <i class="fas fa-calendar-alt"></i>
+                                          {{ noticia.data_publicacao|date:"d/m/Y" }}
+                                      </div>
+                                                                           <span class="news-priority priority-{{ noticia.prioridade }}">
+                                         {{ noticia.get_prioridade_display }}
+                                     </span>
+                                  </div>
+                                  
+                                                                     <div class="news-actions">
+                                       <a href="{% url 'core:assejur_news_detail' pk=noticia.id %}" class="btn-read-more">
+                                           <i class="fas fa-arrow-right me-2"></i>Ler Notícia Completa
+                                       </a>
+                                   </div>
+                              </div>
+                         </div>
+                     </div>
+                     {% endif %}
+                 {% empty %}
+                 <div class="col-12">
+                     <div class="empty-state">
+                         <i class="fas fa-newspaper"></i>
+                         <h4>Nenhuma notícia encontrada</h4>
+                         <p>Não há notícias disponíveis no momento.</p>
+                     </div>
+                 </div>
+                 {% endfor %}
+             </div>
+         </div>
+         
+         <!-- Redes Sociais ASSEJUR -->
+         <div class="social-section mb-4">
+             <div class="card shadow-sm">
+                 <div class="card-header bg-primary text-white">
+                     <h5 class="mb-0">
+                         <i class="fas fa-share-alt me-2"></i>Redes Sociais ASSEJUR
+                     </h5>
+                 </div>
+                 <div class="card-body">
+                     <p class="text-muted mb-3">
+                         <i class="fas fa-info-circle me-2"></i>
+                         Siga-nos nas redes sociais para ficar por dentro das últimas notícias jurídicas e atualizações importantes.
+                     </p>
+                     <div class="social-links">
+                         {% if config.assejur_facebook_url %}
+                         <a href="{{ config.assejur_facebook_url }}" target="_blank" class="btn btn-outline-primary me-2 mb-2" title="Facebook ASSEJUR">
+                             <i class="fab fa-facebook me-2"></i>Facebook
+                         </a>
+                         {% endif %}
+                         
+                         {% if config.assejur_instagram_url %}
+                         <a href="{{ config.assejur_instagram_url }}" target="_blank" class="btn btn-outline-danger me-2 mb-2" title="Instagram ASSEJUR">
+                             <i class="fab fa-instagram me-2"></i>Instagram
+                         </a>
+                         {% endif %}
+                         
+                         {% if config.assejur_linkedin_url %}
+                         <a href="{{ config.assejur_linkedin_url }}" target="_blank" class="btn btn-outline-primary me-2 mb-2" title="LinkedIn ASSEJUR">
+                             <i class="fab fa-linkedin me-2"></i>LinkedIn
+                         </a>
+                         {% endif %}
+                         
+                         {% if config.assejur_youtube_url %}
+                         <a href="{{ config.assejur_youtube_url }}" target="_blank" class="btn btn-outline-danger me-2 mb-2" title="YouTube ASSEJUR">
+                             <i class="fab fa-youtube me-2"></i>YouTube
+                         </a>
+                         {% endif %}
+                         
+                         {% if config.assejur_twitter_url %}
+                         <a href="{{ config.assejur_twitter_url }}" target="_blank" class="btn btn-outline-info me-2 mb-2" title="Twitter ASSEJUR">
+                             <i class="fab fa-twitter me-2"></i>Twitter
+                         </a>
+                         {% endif %}
+                         
+                         {% if not config.assejur_facebook_url and not config.assejur_instagram_url and not config.assejur_linkedin_url and not config.assejur_youtube_url and not config.assejur_twitter_url %}
+                         <div class="text-center text-muted">
+                             <i class="fas fa-link fa-2x mb-2"></i>
+                             <p>Redes sociais da ASSEJUR serão configuradas em breve.</p>
+                         </div>
+                         {% endif %}
+                     </div>
+                 </div>
+             </div>
+         </div>
+         
+         <!-- Seção de Notícias Antigas -->
+          <div class="old-news-section">
+              <div class="section-header">
+                  <h3 class="section-title">
+                      <i class="fas fa-archive me-2"></i>Notícias Antigas
+                  </h3>
+                  <p class="section-subtitle">Notícias publicadas anteriormente - arquivo histórico</p>
+              </div>
+              
+              <div class="old-news-list">
+                  {% for noticia in noticias_antigas %}
+                  <div class="old-news-item" data-category="{{ noticia.categoria }}" data-title="{{ noticia.titulo|lower }}" data-content="{{ noticia.resumo|lower }}" data-news-id="{{ noticia.id }}">
+                      <div class="old-news-content">
+                          <div class="old-news-info">
+                              <div class="old-news-meta">
+                                  <span class="old-news-category">{{ noticia.get_categoria_display }}</span>
+                                  <span class="old-news-date">
+                                      <i class="fas fa-calendar-alt me-1"></i>
+                                      {{ noticia.data_publicacao|date:"d/m/Y" }}
+                                  </span>
+                                  <span class="old-news-priority priority-{{ noticia.prioridade }}">
+                                      {{ noticia.get_prioridade_display }}
+                                  </span>
+                              </div>
+                              <h4 class="old-news-title">{{ noticia.titulo }}</h4>
+                              <p class="old-news-excerpt">{{ noticia.resumo|truncatechars:150 }}</p>
+                          </div>
+                          <div class="old-news-actions">
+                              <a href="{% url 'core:assejur_news_detail' pk=noticia.id %}" class="btn-old-news-read">
+                                  <i class="fas fa-book-open me-2"></i>Ler Notícia
+                              </a>
+                          </div>
+                      </div>
+                  </div>
+                  {% empty %}
+                  <div class="empty-old-news">
+                      <i class="fas fa-archive fa-3x text-muted mb-3"></i>
+                      <h5>Nenhuma notícia antiga disponível</h5>
+                      <p>As notícias mais antigas aparecerão aqui conforme forem publicadas.</p>
+                  </div>
+                  {% endfor %}
+              </div>
+              
+              {% if noticias_antigas.has_other_pages %}
+              <div class="old-news-pagination">
+                  <nav aria-label="Paginação das notícias antigas">
+                      <ul class="pagination pagination-sm">
+                          {% if noticias_antigas.has_previous %}
+                          <li class="page-item">
+                              <a class="page-link" href="?page_old={{ noticias_antigas.previous_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                                  <i class="fas fa-angle-left"></i>
+                              </a>
+                          </li>
+                          {% endif %}
+                          
+                          {% for num in noticias_antigas.paginator.page_range %}
+                              {% if noticias_antigas.number == num %}
+                              <li class="page-item active">
+                                  <span class="page-link">{{ num }}</span>
+                              </li>
+                              {% elif num > noticias_antigas.number|add:'-2' and num < noticias_antigas.number|add:'2' %}
+                              <li class="page-item">
+                                  <a class="page-link" href="?page_old={{ num }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">{{ num }}</a>
+                              </li>
+                              {% endif %}
+                          {% endfor %}
+                          
+                          {% if noticias_antigas.has_next %}
+                          <li class="page-item">
+                              <a class="page-link" href="?page_old={{ noticias_antigas.next_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                                  <i class="fas fa-angle-right"></i>
+                              </a>
+                          </li>
+                          {% endif %}
+                      </ul>
+                  </nav>
+              </div>
+              {% endif %}
+          </div>
+
+        <!-- Paginação -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination-container">
+            <nav aria-label="Paginação das notícias">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+             <!-- Modal para Notícia Completa -->
+         <div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="newsModalLabel" aria-hidden="true">
+             <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                 <div class="modal-content">
+                     <div class="modal-header">
+                         <h5 class="modal-title" id="newsModalLabel">
+                             <i class="fas fa-newspaper me-2"></i>Notícia Completa
+                         </h5>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                     </div>
+                     <div class="modal-body" id="newsModalBody">
+                         <!-- Conteúdo da notícia será inserido aqui via JavaScript -->
+                     </div>
+                     <div class="modal-footer">
+                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                             <i class="fas fa-times me-2"></i>Fechar
+                         </button>
+                         <button type="button" class="btn btn-primary" id="shareNewsBtn">
+                             <i class="fas fa-share-alt me-2"></i>Compartilhar
+                         </button>
+                     </div>
+                 </div>
+             </div>
+         </div>
+         
+        <!-- Bootstrap 5 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        
+        <!-- Script das funções de modal APÓS o Bootstrap -->
+        <script>
+            // Verificar se as funções já existem antes de definir
+            console.log('🔍 Verificando funções existentes antes da definição:');
+            console.log('openFeaturedNewsModal:', typeof window.openFeaturedNewsModal);
+            console.log('openNewsModal:', typeof window.openNewsModal);
+            
+            // Dados das notícias em JavaScript
+            window.assejurNewsData = JSON.parse('{{ assejur_news_json|escapejs }}');
+            console.log('DEBUG: Dados das notícias carregados:', window.assejurNewsData);
+            
+            // Função para abrir modal da notícia em destaque (escopo global)
+            window.openFeaturedNewsModal = function(title, category, priority, date, excerpt, image) {
+                console.log('DEBUG: openFeaturedNewsModal chamada com:', {title, category, priority, date, excerpt, image});
+                
+                const newsData = {
+                    title: title || 'Sem título',
+                    category: category || 'Sem categoria',
+                    priority: priority ? priority.toLowerCase() : 'média',
+                    date: date || 'Data não disponível',
+                    excerpt: excerpt || 'Sem resumo',
+                    image: image || null,
+                    content: (excerpt || 'Sem resumo') + ' Esta é uma notícia em destaque da ABMEPI com informações importantes sobre questões jurídicas relevantes para os associados.'
+                };
+                
+                console.log('DEBUG: Dados processados:', newsData);
+                openNewsModal(newsData);
+            }
+            
+            // Função para abrir modal a partir de data attributes
+            window.openFeaturedNewsModalFromData = function(button) {
+                const title = button.getAttribute('data-news-title');
+                const category = button.getAttribute('data-news-category');
+                const priority = button.getAttribute('data-news-priority');
+                const date = button.getAttribute('data-news-date');
+                const excerpt = button.getAttribute('data-news-excerpt');
+                const image = button.getAttribute('data-news-image');
+                
+                openFeaturedNewsModal(title, category, priority, date, excerpt, image);
+            }
+            
+            // Verificar se as funções foram definidas corretamente
+            console.log('DEBUG: openFeaturedNewsModal definida:', typeof window.openFeaturedNewsModal);
+            console.log('DEBUG: openNewsModal definida:', typeof window.openNewsModal);
+            
+            // Fallback para garantir que as funções estejam disponíveis
+            if (typeof window.openFeaturedNewsModal === 'undefined') {
+                console.error('ERRO: openFeaturedNewsModal não foi definida!');
+            }
+            
+            if (typeof window.openNewsModal === 'undefined') {
+                console.error('ERRO: openNewsModal não foi definida!');
+            }
+            
+            // Forçar definição das funções no escopo global imediatamente
+            if (typeof window.openFeaturedNewsModal === 'undefined') {
+                console.log('🔧 Forçando definição de openFeaturedNewsModal...');
+                window.openFeaturedNewsModal = function(title, category, priority, date, excerpt, image) {
+                    console.log('🔧 openFeaturedNewsModal (forçada) chamada com:', {title, category, priority, date, excerpt, image});
+                    alert('Modal de notícia em destaque: ' + (title || 'Sem título'));
+                };
+            }
+            
+            if (typeof window.openNewsModal === 'undefined') {
+                console.log('🔧 Forçando definição de openNewsModal...');
+                window.openNewsModal = function(newsData) {
+                    console.log('🔧 openNewsModal (forçada) chamada com:', newsData);
+                    alert('Modal de notícia: ' + (newsData.title || 'Sem título'));
+                };
+            }
+            
+            // Verificação final após todas as definições
+            console.log('✅ VERIFICAÇÃO FINAL:');
+            console.log('openFeaturedNewsModal definida:', typeof window.openFeaturedNewsModal);
+            console.log('openNewsModal definida:', typeof window.openNewsModal);
+            
+            // Teste de chamada das funções
+            if (typeof window.openFeaturedNewsModal === 'function') {
+                console.log('✅ openFeaturedNewsModal está funcionando');
+            } else {
+                console.error('❌ openFeaturedNewsModal NÃO está funcionando');
+            }
+            
+            if (typeof window.openNewsModal === 'function') {
+                console.log('✅ openNewsModal está funcionando');
+            } else {
+                console.error('❌ openNewsModal NÃO está funcionando');
+            }
+        </script>
+        
+       <script>
+            document.addEventListener('DOMContentLoaded', function() {
+             // Navbar scroll effect
+             const navbar = document.querySelector('.modern-navbar');
+             window.addEventListener('scroll', function() {
+                 if (window.scrollY > 50) {
+                     navbar.classList.add('scrolled');
+                 } else {
+                     navbar.classList.remove('scrolled');
+                 }
+             });
+             
+             
+            const searchInput = document.getElementById('searchInput');
+            const newsItems = document.querySelectorAll('.news-item, .old-news-item');
+             
+            // Função de pesquisa
+            function filterNews() {
+                const searchTerm = searchInput.value.toLowerCase().trim();
+                let visibleCount = 0;
+                const startTime = performance.now();
+                
+                newsItems.forEach(item => {
+                    const title = item.dataset.title || '';
+                    const content = item.dataset.content || '';
+                    const category = item.dataset.category || '';
+                    
+                    const matchesSearch = searchTerm === '' || 
+                                        title.includes(searchTerm) || 
+                                        content.includes(searchTerm) || 
+                                        category.includes(searchTerm);
+                    
+                    if (matchesSearch) {
+                        item.style.display = 'block';
+                        visibleCount++;
+                        
+                        // Destacar termos de pesquisa se houver
+                        if (searchTerm !== '') {
+                            highlightSearchTerms(item, searchTerm);
+                        } else {
+                            removeHighlights(item);
+                        }
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+                
+                // Atualizar informações dos resultados
+                updateSearchResults(visibleCount, performance.now() - startTime);
+            }
+            
+            // Função para destacar termos de pesquisa
+            function highlightSearchTerms(item, searchTerm) {
+                const titleElement = item.querySelector('.news-title, .old-news-title');
+                const contentElement = item.querySelector('.news-excerpt, .old-news-excerpt');
+                
+                if (titleElement) {
+                    highlightText(titleElement, searchTerm);
+                }
+                if (contentElement) {
+                    highlightText(contentElement, searchTerm);
+                }
+            }
+            
+            // Função para destacar texto
+            function highlightText(element, searchTerm) {
+                const text = element.textContent;
+                const regex = new RegExp(`(${searchTerm})`, 'gi');
+                const highlightedText = text.replace(regex, '<mark class="search-highlight">$1</mark>');
+                element.innerHTML = highlightedText;
+            }
+            
+            // Função para remover destaques
+            function removeHighlights(item) {
+                const highlights = item.querySelectorAll('.search-highlight');
+                highlights.forEach(highlight => {
+                    const parent = highlight.parentNode;
+                    parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
+                    parent.normalize();
+                });
+            }
+            
+            // Função para atualizar informações dos resultados
+            function updateSearchResults(count, time) {
+                const resultsInfo = document.getElementById('searchResultsInfo');
+                const resultsCount = document.getElementById('resultsCount');
+                const searchTime = document.getElementById('searchTime');
+                
+                if (resultsInfo && resultsCount && searchTime) {
+                    resultsCount.textContent = count;
+                    searchTime.textContent = Math.round(time);
+                    
+                    if (searchInput.value.trim() !== '') {
+                        resultsInfo.style.display = 'block';
+                    } else {
+                        resultsInfo.style.display = 'none';
+                    }
+                }
+            }
+             
+             // Event listener para pesquisa em tempo real
+             searchInput.addEventListener('input', filterNews);
+             
+            // Pesquisa ao pressionar Enter
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterNews();
+                }
+            });
+            
+            // Botão de limpar pesquisa
+            const searchClear = document.getElementById('searchClear');
+            if (searchClear) {
+                searchClear.addEventListener('click', function() {
+                    searchInput.value = '';
+                    filterNews();
+                    searchInput.focus();
+                });
+            }
+            
+            // Mostrar/ocultar botão de limpar baseado no conteúdo
+            searchInput.addEventListener('input', function() {
+                if (searchClear) {
+                    if (this.value.trim() !== '') {
+                        searchClear.style.display = 'block';
+                    } else {
+                        searchClear.style.display = 'none';
+                    }
+                }
+            });
+             
+            // Função para abrir modal com notícia completa (escopo global)
+            window.openNewsModal = function(newsData) {
+                 const modal = new bootstrap.Modal(document.getElementById('newsModal'));
+                 const modalBody = document.getElementById('newsModalBody');
+                 const modalTitle = document.getElementById('newsModalLabel');
+                 
+                 // Atualizar título do modal
+                 modalTitle.innerHTML = `<i class="fas fa-newspaper me-2"></i>${newsData.title}`;
+                 
+                 // Buscar conteúdo completo nos dados JSON se tivermos o ID da notícia
+                 if (newsData.id && newsData.id !== 'null' && newsData.id !== 'undefined') {
+                     console.log('DEBUG: Buscando conteúdo para notícia ID:', newsData.id);
+                     
+                     // Buscar nos dados JSON disponíveis
+                     const fullNewsData = window.assejurNewsData.find(news => news.id == newsData.id);
+                     console.log('DEBUG: Dados completos encontrados:', fullNewsData);
+                     
+                     if (fullNewsData && fullNewsData.conteudo) {
+                         newsData.content = fullNewsData.conteudo;
+                         console.log('DEBUG: Conteúdo atualizado do JSON:', newsData.content);
+                     }
+                 } else {
+                     console.log('DEBUG: Sem ID da notícia, usando conteúdo padrão');
+                 }
+                 
+                 showModalContent(modal, modalBody, newsData);
+             }
+             
+             // Função para mostrar o conteúdo do modal
+             function showModalContent(modal, modalBody, newsData) {
+                 // Construir conteúdo do modal
+                 let modalContent = `
+                     <div class="news-modal-content">
+                         <div class="news-modal-header mb-4">
+                             <div class="d-flex justify-content-between align-items-start mb-3">
+                                 <span class="badge bg-primary fs-6">${newsData.category}</span>
+                                 <span class="badge bg-${getPriorityColor(newsData.priority)} fs-6">${newsData.priority}</span>
+                             </div>
+                             <div class="news-modal-date text-muted mb-3">
+                                 <i class="fas fa-calendar-alt me-2"></i>
+                                 Publicado em ${newsData.date}
+                             </div>
+                         </div>
+                         
+                         <div class="news-modal-image mb-4">
+                             ${newsData.image ? 
+                                 `<img src="${newsData.image}" alt="${newsData.title}" class="img-fluid rounded shadow-sm">` :
+                                 `<div class="text-center py-5 bg-light rounded">
+                                     <i class="fas fa-newspaper fa-4x text-muted"></i>
+                                 </div>`
+                             }
+                         </div>
+                         
+                         <div class="news-modal-body">
+                             <h4 class="news-modal-title mb-3">${newsData.title}</h4>
+                             <div class="news-modal-excerpt mb-4">
+                                 <p class="lead text-muted">${newsData.excerpt}</p>
+                             </div>
+                             <div class="news-modal-content-text">
+                                 <div class="news-content-full">
+                                     ${newsData.content}
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 `;
+                 
+                 modalBody.innerHTML = modalContent;
+                 modal.show();
+             }
+             
+             // Função para obter cor da prioridade
+             function getPriorityColor(priority) {
+                 const colors = {
+                     'baixa': 'success',
+                     'media': 'warning',
+                     'alta': 'danger',
+                     'urgente': 'danger'
+                 };
+                 return colors[priority] || 'secondary';
+             }
+             
+            // Os botões "Ler Notícia Completa" agora redirecionam diretamente para a página de detalhes
+             
+             // Event listener para botão de compartilhamento
+             document.getElementById('shareNewsBtn').addEventListener('click', function() {
+                 if (navigator.share) {
+                     navigator.share({
+                         title: document.getElementById('newsModalLabel').textContent,
+                         text: 'Confira esta notícia jurídica da ABMEPI',
+                         url: window.location.href
+                     });
+                 } else {
+                     // Fallback para navegadores que não suportam Web Share API
+                     const textArea = document.createElement('textarea');
+                     textArea.value = window.location.href;
+                     document.body.appendChild(textArea);
+                     textArea.select();
+                     document.execCommand('copy');
+                     document.body.removeChild(textArea);
+                     
+                     // Mostrar feedback
+                     const originalText = this.innerHTML;
+                     this.innerHTML = '<i class="fas fa-check me-2"></i>Link Copiado!';
+                     this.classList.remove('btn-primary');
+                     this.classList.add('btn-success');
+                     
+                     setTimeout(() => {
+                         this.innerHTML = originalText;
+                         this.classList.remove('btn-success');
+                         this.classList.add('btn-primary');
+                     }, 2000);
+                 }
+             });
+             
+             // Animações de entrada para as notícias
+             const observerOptions = {
+                 threshold: 0.1,
+                 rootMargin: '0px 0px -50px 0px'
+             };
+             
+             const observer = new IntersectionObserver(function(entries) {
+                 entries.forEach(entry => {
+                     if (entry.isIntersecting) {
+                         entry.target.classList.add('visible');
+                     }
+                 });
+             }, observerOptions);
+             
+             newsItems.forEach(item => {
+                 observer.observe(item);
+             });
+         });
+         </script>
+    <!-- Scripts dos Modais da Psicologia -->
+    <script src="{% static 'psicologia/js/modais.js' %}"></script>
+    
+    <!-- Scripts dos Modais da ASEJUS -->
+    <script src="{% static 'assejus/js/modais_assejus.js' %}"></script>
+    
+    <!-- Scripts dos Modais dos Associados -->
+    <script src="{% static 'associados/js/modais.js' %}"></script>
+
+    <!-- CORREÇÃO PARA ERRO DE BACKDROP -->
+    <script src="{% static 'js/modal-fix.js' %}"></script>
+</body>
+</html>

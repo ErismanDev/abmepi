@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Procuração - {{ procuracao.outorgante.nome }} - ASSEJUS{% endblock %}
+
+{% block content %}
+<!-- Controles flutuantes -->
+<div class="pdf-controls">
+    <button onclick="window.print()" class="btn btn-primary btn-sm">
+        <i class="fas fa-print me-1"></i>
+        Imprimir
+    </button>
+    <a href="{% url 'assejus:procuracao_detail' pk=procuracao.pk %}" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>
+        Voltar
+    </a>
+</div>
+
+<!-- Documento PDF-like -->
+<div class="pdf-container">
+    <div class="pdf-document">
+                        <!-- Logo -->
+                        <div class="text-center mb-4">
+                            <img src="{% static 'logo2assejur.png' %}" alt="Logo ASEJUR" class="logo-header">
+                        </div>
+                        
+                        <!-- Título -->
+                        <div class="text-center mb-4">
+                            <h2 class="document-title">
+                                <strong>P R O C U R A Ç Ã O   A D   J U D I C I A   E T   E X T R A</strong>
+                            </h2>
+                        </div>
+                        
+                        <!-- Texto da procuração -->
+                        <div class="document-content">
+                            {{ texto_procuracao|safe|linebreaks }}
+                        </div>
+                        
+                        <!-- Data e assinatura -->
+                        <div class="signature-section">
+                            <div class="location-date">
+                                {{ procuracao.outorgante.cidade|default:"Teresina" }} ({{ procuracao.outorgante.estado|default:"PI" }}), {{ data_pt }}.
+                            </div>
+                            <div class="signature-name">
+                                <strong>{{ procuracao.outorgante.nome }}</strong>
+                            </div>
+                        </div>
+                        
+                        <!-- Rodapé institucional -->
+                        <div class="institutional-footer">
+                            <div class="footer-info">
+                                Reconhecimento de Utilidade Pública Estadual Lei nº 5.614 28/11/06 |<br>
+                                Reconhecimento de Utilidade Pública Municipal Lei nº 3.634 14/05/07 |<br>
+                                Fone: 86 3085-1722 | E-mail: abmepi@gmail.com |<br>
+                                Endereço: Rua Coelho Rodrigues, nº. 2442, Bairro: Centro - Sul, CEP: 64000-080, em Teresina - Piauí |
+                            </div>
+                            <div class="footer-logo">
+                                <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="footer-logo-img">
+                                <div class="footer-details">
+                                    <span>Documento gerado em {{ "now"|date:"d/m/Y às H:i" }}</span><br>
+                                    <span>ABMEPI</span>
+                                </div>
+                            </div>
+                        </div>
+    </div>
+</div>
+
+<style>
+/* Reset e configuração base */
+body {
+    background: #f5f5f5;
+    margin: 0;
+    padding: 0;
+    font-family: 'Times New Roman', serif;
+}
+
+/* Controles flutuantes */
+.pdf-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Container principal do PDF */
+.pdf-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+/* Documento PDF-like */
+.pdf-document {
+    background: white;
+    width: 210mm; /* A4 width */
+    min-height: 297mm; /* A4 height */
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    position: relative;
+    padding: 25mm 20mm; /* Margens padrão */
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000;
+}
+
+/* Logo */
+.logo-header {
+    width: 180px;
+    height: 50px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+
+/* Título do documento */
+.document-title {
+    font-size: 14pt;
+    font-weight: bold;
+    margin: 0 0 30px 0;
+    font-family: 'Helvetica', sans-serif;
+    text-align: center;
+    letter-spacing: 1px;
+}
+
+/* Conteúdo do documento */
+.document-content {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    text-align: justify;
+    margin: 20px 0;
+    text-indent: 1.5cm;
+}
+
+/* Estilos para seções específicas da procuração */
+.document-content b {
+    font-weight: bold;
+    text-indent: 0;
+    display: inline;
+    margin-top: 15px;
+    margin-bottom: 0;
+    line-height: 1.2;
+}
+
+.document-content p {
+    margin-bottom: 10px;
+    text-indent: 1.5cm;
+}
+
+.document-content p:first-child {
+    text-indent: 0;
+}
+
+/* Estilo especial para parágrafos que começam com texto em negrito */
+.document-content p:has(b:first-child) {
+    text-indent: 0;
+}
+
+.document-content p:has(b:first-child) b {
+    margin-right: 0;
+}
+
+/* Garantir que linhas subsequentes tenham recuo */
+.document-content p:has(b:first-child) {
+    text-indent: 0;
+    hanging-punctuation: first;
+}
+
+/* Fallback para navegadores que não suportam :has() */
+.document-content p b:first-child {
+    margin-right: 0;
+}
+
+/* Seção de assinatura */
+.signature-section {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    margin-bottom: 30mm;
+}
+
+.location-date {
+    font-size: 12pt;
+    font-family: 'Helvetica', sans-serif;
+    margin-bottom: 20px;
+}
+
+.signature-name {
+    font-size: 12pt;
+    font-family: 'Helvetica', sans-serif;
+    border-top: 1px solid #000;
+    padding-top: 20px;
+    margin-top: 20px;
+    display: inline-block;
+    min-width: 200px;
+}
+
+/* Rodapé institucional */
+.institutional-footer {
+    position: absolute;
+    bottom: 8mm;
+    left: 20mm;
+    right: 20mm;
+    font-size: 7pt;
+    font-family: 'Helvetica', sans-serif;
+    border-top: 0.5pt solid #000;
+    padding-top: 3mm;
+    margin-top: 20mm;
+}
+
+.footer-info {
+    text-align: left;
+    margin-bottom: 3mm;
+    line-height: 1.3;
+    font-size: 7pt;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.footer-logo-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+}
+
+.footer-details {
+    font-size: 6pt;
+    text-align: right;
+}
+
+/* Estilos para impressão */
+@media print {
+    body {
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    .pdf-controls {
+        display: none !important;
+    }
+    
+    .pdf-container {
+        padding: 0 !important;
+        justify-content: flex-start !important;
+    }
+    
+    .pdf-document {
+        width: 100% !important;
+        min-height: 100vh !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 25mm 20mm !important;
+    }
+    
+    .logo-header {
+        width: 160px !important;
+        height: 45px !important;
+    }
+    
+    .document-title {
+        font-size: 13pt !important;
+    }
+    
+    .document-content {
+        font-size: 11pt !important;
+        line-height: 1.5 !important;
+    }
+    
+    .document-content b {
+        margin-top: 10px !important;
+        margin-bottom: 0 !important;
+        line-height: 1.2 !important;
+        display: inline !important;
+    }
+    
+    .document-content p {
+        margin-bottom: 8px !important;
+        text-indent: 1.5cm !important;
+    }
+    
+    .document-content p:first-child {
+        text-indent: 0 !important;
+    }
+    
+    .document-content p:has(b:first-child) {
+        text-indent: 0 !important;
+    }
+    
+    .document-content p b:first-child {
+        margin-right: 0 !important;
+    }
+    
+    .signature-section {
+        margin-top: 30px !important;
+        margin-bottom: 25mm !important;
+    }
+    
+    .location-date, .signature-name {
+        font-size: 11pt !important;
+    }
+    
+    .institutional-footer {
+        position: fixed !important;
+        bottom: 5mm !important;
+        left: 20mm !important;
+        right: 20mm !important;
+        font-size: 6pt !important;
+        margin-top: 20mm !important;
+    }
+    
+    .footer-info {
+        font-size: 5pt !important;
+        line-height: 1.3 !important;
+        text-align: left !important;
+    }
+    
+    .footer-logo-img {
+        width: 25px !important;
+        height: 25px !important;
+    }
+    
+    .footer-details {
+        font-size: 5pt !important;
+    }
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 768px) {
+    .pdf-container {
+        padding: 20px 10px;
+    }
+    
+    .pdf-document {
+        width: 100%;
+        min-height: auto;
+        padding: 20px 15px;
+    }
+    
+    .logo-header {
+        width: 150px;
+        height: 42px;
+    }
+    
+    .document-title {
+        font-size: 13pt;
+    }
+    
+    .document-content {
+        font-size: 11pt;
+    }
+    
+    .institutional-footer {
+        position: relative;
+        margin-top: 40px;
+        bottom: auto;
+    }
+    
+    .pdf-controls {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+}
+
+/* Estilo para texto em negrito */
+strong, b {
+    font-weight: bold;
+}
+
+/* Simulação de página A4 */
+@media screen and (min-width: 769px) {
+    .pdf-document {
+        max-width: 210mm;
+    }
+}
+</style>
+{% endblock %}

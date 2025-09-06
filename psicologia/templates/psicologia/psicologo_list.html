@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Psicólogos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    {% if is_psicologo_user %}
+                        Minha Ficha
+                    {% else %}
+                        Psicólogos
+                    {% endif %}
+                </h1>
+                {% if can_create %}
+                <button type="button" class="d-none d-sm-inline-block btn btn-primary shadow-sm" onclick="openPsicologoModal()">
+                    <i class="fas fa-plus fa-sm text-white-50"></i> Novo Psicólogo
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    <form method="get" class="row">
+                        <div class="col-md-8">
+                            <input type="text" name="search" class="form-control" placeholder="Buscar por nome, CRP ou email..." value="{{ request.GET.search }}">
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de psicólogos -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body">
+                    {% if psicologos %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Foto</th>
+                                        <th>Nome</th>
+                                        <th>CRP</th>
+                                        <th>Especialidades</th>
+                                        <th>Telefone</th>
+                                        <th>Email</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for psicologo in psicologos %}
+                                    <tr>
+                                        <td class="text-center">
+                                            {% if psicologo.foto %}
+                                                <img src="{{ psicologo.foto.url }}" alt="{{ psicologo.nome_completo }}" 
+                                                     class="avatar-rectangular">
+                                            {% else %}
+                                                <div class="avatar-placeholder">
+                                                    <i class="fas fa-user"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ psicologo.nome_completo }}</td>
+                                        <td>{{ psicologo.crp }}</td>
+                                        <td>{{ psicologo.especialidades|truncatewords:10 }}</td>
+                                        <td>{{ psicologo.telefone }}</td>
+                                        <td>{{ psicologo.email }}</td>
+                                        <td>
+                                            {% if psicologo.ativo %}
+                                                <span class="badge bg-success text-white fw-bold">Ativo</span>
+                                            {% else %}
+                                                <span class="badge bg-danger text-white fw-bold">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if is_psicologo_user %}
+                                                <!-- Psicólogo logado: só pode visualizar sua própria ficha -->
+                                                {% if psicologo.id == request.user.psicologo.id %}
+                                                    <button type="button" class="btn btn-sm btn-info" title="Visualizar" onclick="openPsicologoDetailModal({{ psicologo.pk }})">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <span class="text-muted small">Sua ficha - Apenas visualização</span>
+                                                {% else %}
+                                                    <span class="text-muted small">Acesso restrito</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <!-- Administradores e atendentes: podem ver, editar e excluir todos -->
+                                                <button type="button" class="btn btn-sm btn-info" title="Visualizar" onclick="openPsicologoDetailModal({{ psicologo.pk }})">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-warning" title="Editar" onclick="openPsicologoEditModal({{ psicologo.pk }})">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" title="Excluir" 
+                                                        onclick="confirmarExclusaoPsicologo({{ psicologo.pk }}, '{{ psicologo.nome_completo|escapejs }}')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                        <nav aria-label="Paginação">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">&laquo; Primeira</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Anterior</a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Próxima</a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Última &raquo;</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-md fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-500">Nenhum psicólogo encontrado</h5>
+                            <p class="text-gray-400">Comece cadastrando o primeiro psicólogo.</p>
+                            <button type="button" class="btn btn-primary" onclick="openPsicologoModal()">
+                                <i class="fas fa-plus"></i> Cadastrar Psicólogo
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes do Psicólogo -->
+<div class="modal fade" id="psicologoDetailModal" tabindex="-1" aria-labelledby="psicologoDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-body p-0" id="psicologoDetailModalBody">
+                <!-- Conteúdo será carregado via AJAX -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Carregando detalhes do psicólogo...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+<script>
+// Função para abrir modal de detalhes do psicólogo
+function openPsicologoDetailModal(psicologoId) {
+    const modal = new bootstrap.Modal(document.getElementById('psicologoDetailModal'));
+    const modalBody = document.getElementById('psicologoDetailModalBody');
+    
+    // Mostrar loading
+    modalBody.innerHTML = `
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando detalhes do psicólogo...</p>
+        </div>
+    `;
+    
+    // Abrir modal
+    modal.show();
+    
+    // Fazer requisição AJAX para obter detalhes
+    fetch(`/psicologia/psicologos/${psicologoId}/detalhes-modal/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Inserir o conteúdo completo do modal
+                modalBody.innerHTML = data.html;
+            } else {
+                modalBody.innerHTML = `
+                    <div class="alert alert-danger m-4">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Erro ao carregar detalhes do psicólogo: ${data.error}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            modalBody.innerHTML = `
+                <div class="alert alert-danger m-4">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Erro ao carregar detalhes do psicólogo. Tente novamente.
+                </div>
+            `;
+        });
+}
+</script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}

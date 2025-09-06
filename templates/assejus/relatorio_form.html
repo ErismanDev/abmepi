@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:relatorio_list' %}">Relatórios</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if relatorio %}
+                            Editar relatório existente
+                        {% else %}
+                            Criar novo relatório jurídico
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:relatorio_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Dados do Relatório
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" novalidate>
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.tipo|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.escopo|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row" id="advogado-field" style="display: none;">
+                                    <div class="col-md-12 mb-3">
+                                        {{ form.advogado|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.periodo_inicio|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {{ form.periodo_fim|as_crispy_field }}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="{% url 'assejus:relatorio_list' %}" class="btn btn-secondary">
+                                                <i class="fas fa-times me-2"></i>
+                                                Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-2"></i>
+                                                {{ action }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    Dicas para relatórios
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Selecione o tipo de relatório adequado</li>
+                                    <li>Escolha o escopo: Total Geral ou Por Advogado Específico</li>
+                                    <li>Se escolher "Por Advogado", selecione o advogado desejado</li>
+                                    <li>Defina o período de análise (início e fim)</li>
+                                    <li>Os campos de data e usuário são preenchidos automaticamente</li>
+                                    <li>Após criar o relatório, você pode gerar o conteúdo conforme necessário</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleAdvogadoField() {
+    const escopoField = document.getElementById('id_escopo');
+    const advogadoField = document.getElementById('advogado-field');
+    const advogadoSelect = document.getElementById('id_advogado');
+    
+    if (escopoField.value === 'por_advogado') {
+        advogadoField.style.display = 'block';
+        advogadoSelect.required = true;
+    } else {
+        advogadoField.style.display = 'none';
+        advogadoSelect.required = false;
+        advogadoSelect.value = '';
+    }
+}
+
+// Executa quando a página carrega para definir o estado inicial
+document.addEventListener('DOMContentLoaded', function() {
+    toggleAdvogadoField();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Documento - {{ documento.get_tipo_display }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-minus me-2"></i>
+                        Excluir Documento
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Associado: <strong>{{ associado.nome }}</strong>
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'associados:associado_detail' associado.id %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar ao Associado
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card de confirmação -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Atenção!
+                        </h6>
+                        <p class="mb-0">
+                            Você está prestes a excluir o documento <strong>{{ documento.get_tipo_display }}</strong>.
+                            Esta ação não pode ser desfeita e o arquivo será removido permanentemente.
+                        </p>
+                    </div>
+
+                    <!-- Informações do documento -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Dados do Documento</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Tipo:</strong></td>
+                                    <td>{{ documento.get_tipo_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Arquivo:</strong></td>
+                                    <td>{{ documento.arquivo.name|slice:"25:" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Data Upload:</strong></td>
+                                    <td>{{ documento.data_upload|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                                {% if documento.descricao %}
+                                <tr>
+                                    <td><strong>Descrição:</strong></td>
+                                    <td>{{ documento.descricao }}</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Informações Adicionais</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Associado:</strong></td>
+                                    <td>{{ documento.associado.nome }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        {% if documento.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tamanho:</strong></td>
+                                    <td>{{ documento.arquivo.size|filesizeformat }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de confirmação -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'associados:associado_detail' associado.id %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>
+                                Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

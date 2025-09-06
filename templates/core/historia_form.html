@@ -1,0 +1,896 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar Marco Histórico{% else %}Adicionar Marco Histórico{% endif %} - ABMEPI
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px 15px 0 0;
+        margin: -2rem -2rem 2rem -2rem;
+        text-align: center;
+    }
+    
+    .form-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .form-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #28a745;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .btn {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+    }
+    
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    .image-preview {
+        max-width: 300px;
+        max-height: 200px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 1rem;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    .tipo-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 0.5rem;
+    }
+    
+    .tipo-info h6 {
+        color: #28a745;
+        margin-bottom: 0.5rem;
+    }
+    
+    .tipo-info ul {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+    
+    .upload-area {
+        border: 2px dashed #28a745;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .upload-area:hover {
+        border-color: #20c997;
+        background: #e8f5e8;
+    }
+    
+    .upload-area.dragover {
+        border-color: #20c997;
+        background: #d4edda;
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: #28a745;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-text {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-hint {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .image-preview {
+        max-width: 200px;
+        max-height: 150px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .gallery-preview .card {
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        transition: transform 0.2s ease;
+    }
+    
+    .gallery-preview .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    /* Estilos do carrossel */
+    .gallery-item {
+        transition: all 0.3s ease;
+    }
+    
+    .gallery-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    
+    #galleryCarousel .carousel-item img {
+        border-radius: 10px;
+    }
+    
+    #galleryCarousel .carousel-caption {
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: auto;
+        padding: 10px 20px;
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 5%;
+        background: rgba(0,0,0,0.3);
+        border-radius: 10px;
+        margin: 0 10px;
+    }
+    
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        background: rgba(0,0,0,0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>
+                        <i class="fas fa-landmark me-3"></i>
+                        {% if object %}Editar Marco Histórico{% else %}Adicionar Marco Histórico{% endif %}
+                    </h1>
+                    <p>
+                        {% if object %}
+                            Atualize as informações do marco histórico
+                        {% else %}
+                            Preencha os dados do novo marco histórico
+                        {% endif %}
+                    </p>
+                </div>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data" id="historia-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Título e Tipo -->
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label required-field">
+                                    <i class="fas fa-heading me-1"></i>
+                                    Título
+                                </label>
+                                {{ form.titulo }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Título do marco histórico
+                                </div>
+                                {% if form.titulo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.titulo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label required-field">
+                                    <i class="fas fa-tag me-1"></i>
+                                    Tipo
+                                </label>
+                                {{ form.tipo }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Categoria do marco
+                                </div>
+                                {% if form.tipo.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.tipo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Data Marcante -->
+                    <div class="form-group">
+                        <label for="{{ form.data_marcante.id_for_label }}" class="form-label required-field">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            Data Marcante
+                        </label>
+                        {{ form.data_marcante }}
+                        {% if debug_data_marcante %}
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const dateInput = document.getElementById('{{ form.data_marcante.id_for_label }}');
+                                    if (dateInput && '{{ debug_data_marcante }}') {
+                                        const formattedDate = '{{ debug_data_marcante|date:"Y-m-d" }}';
+                                        dateInput.value = formattedDate;
+                                        console.log('Data definida via JavaScript:', formattedDate);
+                                    }
+                                });
+                            </script>
+                        {% endif %}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Data em que o marco histórico ocorreu
+                        </div>
+                        {% if debug_data_marcante %}
+                            <div class="alert alert-info small">
+                                <strong>Debug:</strong> Data do objeto: {{ debug_data_marcante }}<br>
+                                <strong>Valor do campo:</strong> {{ form.data_marcante.value }}<br>
+                                <strong>Valor inicial:</strong> {{ form.data_marcante.initial }}<br>
+                                <strong>Atributos do widget:</strong> {{ form.data_marcante.widget.attrs }}
+                            </div>
+                        {% endif %}
+                        {% if form.data_marcante.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.data_marcante.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Imagem Principal -->
+                    <div class="form-group">
+                        <label for="{{ form.imagem.id_for_label }}" class="form-label">
+                            <i class="fas fa-image me-1"></i>
+                            Imagem Principal
+                        </label>
+                        {{ form.imagem }}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Imagem principal do marco histórico (opcional)
+                        </div>
+                        {% if form.imagem.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.imagem.errors.0 }}
+                            </div>
+                        {% endif %}
+                        
+                        {% if object and object.imagem %}
+                            <div class="mt-2">
+                                <img src="{{ object.imagem.url }}" alt="Imagem atual" class="image-preview">
+                                <p class="small text-muted mt-1">Imagem principal atual</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Galeria de Imagens -->
+                    <div class="form-group">
+                        <label for="{{ form.imagens_galeria.id_for_label }}" class="form-label">
+                            <i class="fas fa-images me-1"></i>
+                            Galeria de Imagens
+                        </label>
+                        
+                        <!-- Área de Upload -->
+                        <div class="upload-area">
+                            <div class="upload-icon">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="upload-text">
+                                Clique para selecionar múltiplas imagens
+                            </div>
+                            <div class="upload-hint">
+                                ou arraste e solte as imagens aqui
+                            </div>
+                        </div>
+                        
+                        {{ form.imagens_galeria }}
+                        
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {{ form.imagens_galeria.help_text }}
+                        </div>
+                        {% if form.imagens_galeria.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.imagens_galeria.errors.0 }}
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Preview das imagens existentes -->
+                        {% if object and galeria_imagens %}
+                            <div class="mt-3 gallery-preview">
+                                <h6 class="text-success">
+                                    <i class="fas fa-images me-1"></i>
+                                    Imagens na Galeria ({{ galeria_imagens.count }})
+                                </h6>
+                                <div class="row">
+                                    {% for imagem in galeria_imagens %}
+                                    <div class="col-md-3 mb-2">
+                                        <div class="card gallery-item" data-image-src="{{ imagem.imagem.url }}" data-image-caption="{{ imagem.legenda|default:'Sem legenda' }}" style="cursor: pointer;">
+                                            <img src="{{ imagem.imagem.url }}" alt="{{ imagem.legenda }}" class="card-img-top" style="height: 100px; object-fit: cover;">
+                                            <div class="card-body p-2">
+                                                <small class="text-muted">{{ imagem.legenda|default:"Sem legenda" }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Descrição -->
+                    <div class="form-group">
+                        <label for="{{ form.descricao.id_for_label }}" class="form-label required-field">
+                            <i class="fas fa-align-left me-1"></i>
+                            Descrição
+                        </label>
+                        {{ form.descricao }}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Descrição detalhada do marco histórico
+                        </div>
+                        {% if form.descricao.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.descricao.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Configurações -->
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    {{ form.ativo }}
+                                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Exibir na história
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Marque para exibir na timeline
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    {{ form.destaque }}
+                                    <label class="form-check-label" for="{{ form.destaque.id_for_label }}">
+                                        <i class="fas fa-star me-1"></i>
+                                        Destaque
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Marque para destacar na seção especial
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="{{ form.ordem_exibicao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sort me-1"></i>
+                                    Ordem de Exibição
+                                </label>
+                                {{ form.ordem_exibicao }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    0 = primeiro, 1 = segundo, etc.
+                                </div>
+                                {% if form.ordem_exibicao.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.ordem_exibicao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações sobre tipos -->
+                    <div class="tipo-info">
+                        <h6><i class="fas fa-lightbulb me-1"></i>Tipos de Marcos Históricos:</h6>
+                        <ul>
+                            <li><strong>Fundação:</strong> Criação da associação, estatuto, etc.</li>
+                            <li><strong>Conquista:</strong> Vitórias importantes, prêmios, reconhecimentos</li>
+                            <li><strong>Evento:</strong> Eventos marcantes, comemorações, reuniões importantes</li>
+                            <li><strong>Reconhecimento:</strong> Homenagens, prêmios, certificações</li>
+                            <li><strong>Expansão:</strong> Crescimento da associação, novas sedes, etc.</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'core:historia_associacao' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à História
+                        </a>
+                        
+                        <div>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>
+                                {% if object %}Atualizar{% else %}Adicionar{% endif %} Marco Histórico
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal do Carrossel de Imagens -->
+<div class="modal fade" id="galleryModal" tabindex="-1" aria-labelledby="galleryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="galleryModalLabel">
+                    <i class="fas fa-images me-2"></i>
+                    Galeria de Imagens
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="galleryCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+                    <div class="carousel-inner">
+                        <!-- Itens do carrossel serão preenchidos via JavaScript -->
+                    </div>
+                    
+                    <!-- Controles do carrossel -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#galleryCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Anterior</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#galleryCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Próximo</span>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="d-flex justify-content-between align-items-center w-100">
+                    <div>
+                        <span id="imageCounter" class="badge bg-primary">1 / 1</span>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary me-2" id="pauseCarousel">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" id="playCarousel" style="display: none;">
+                            <i class="fas fa-play"></i> Reproduzir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se o Bootstrap está carregado
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap não está carregado. Verifique se o script do Bootstrap está incluído.');
+        return;
+    }
+    
+    console.log('Bootstrap carregado com sucesso');
+    
+    // Preview da imagem principal
+    const imagemInput = document.getElementById('{{ form.imagem.id_for_label }}');
+    if (imagemInput) {
+        imagemInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Remover preview anterior se existir
+                    const existingPreview = document.querySelector('.image-preview-new');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                    
+                    // Criar novo preview
+                    const preview = document.createElement('img');
+                    preview.src = e.target.result;
+                    preview.className = 'image-preview image-preview-new';
+                    preview.style.marginTop = '1rem';
+                    
+                    // Inserir após o input
+                    imagemInput.parentNode.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Upload múltiplo de imagens
+    const imagensInput = document.getElementById('{{ form.imagens_galeria.id_for_label }}');
+    const uploadArea = document.querySelector('.upload-area');
+    
+    if (imagensInput && uploadArea) {
+        // Clique na área de upload
+        uploadArea.addEventListener('click', function() {
+            imagensInput.click();
+        });
+        
+        // Drag and drop
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                imagensInput.files = files;
+                updateFileList(files);
+            }
+        });
+        
+        // Mudança no input de arquivos
+        imagensInput.addEventListener('change', function(e) {
+            console.log('Input change event triggered');
+            const files = e.target.files;
+            console.log('Files selected:', files.length);
+            if (files.length > 0) {
+                updateFileList(files);
+            }
+        });
+        
+        function updateFileList(files) {
+            // Remover lista anterior se existir
+            const existingList = document.querySelector('.file-list');
+            if (existingList) {
+                existingList.remove();
+            }
+            
+            // Só criar nova lista se houver arquivos
+            if (files.length > 0) {
+                const fileList = document.createElement('div');
+                fileList.className = 'file-list mt-3';
+                fileList.innerHTML = '<h6 class="text-success"><i class="fas fa-check-circle me-1"></i>Arquivos selecionados:</h6>';
+                
+                const list = document.createElement('ul');
+                list.className = 'list-group';
+                
+                // Adicionar arquivos à lista
+                for (let i = 0; i < files.length; i++) {
+                    const item = document.createElement('li');
+                    item.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    item.innerHTML = `
+                        <div>
+                            <i class="fas fa-image me-2 text-success"></i>
+                            ${files[i].name}
+                            <small class="text-muted ms-2">(${(files[i].size / 1024 / 1024).toFixed(2)} MB)</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">${i + 1}</span>
+                    `;
+                    list.appendChild(item);
+                }
+                
+                fileList.appendChild(list);
+                
+                // Adicionar botão para limpar seleção
+                const buttonDiv = document.createElement('div');
+                buttonDiv.className = 'mt-2';
+                buttonDiv.innerHTML = `
+                    <button type="button" class="btn btn-sm btn-outline-danger clear-files-btn">
+                        <i class="fas fa-trash me-1"></i>
+                        Limpar Seleção
+                    </button>
+                `;
+                fileList.appendChild(buttonDiv);
+                
+                // Adicionar evento ao botão de limpar
+                buttonDiv.querySelector('.clear-files-btn').addEventListener('click', function() {
+                    imagensInput.value = '';
+                    fileList.remove();
+                });
+                
+                imagensInput.parentNode.appendChild(fileList);
+            }
+        }
+    }
+    
+    // Validação do formulário
+    const form = document.getElementById('historia-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const titulo = document.getElementById('{{ form.titulo.id_for_label }}').value.trim();
+            const descricao = document.getElementById('{{ form.descricao.id_for_label }}').value.trim();
+            const dataMarcante = document.getElementById('{{ form.data_marcante.id_for_label }}').value;
+            
+            if (!titulo) {
+                e.preventDefault();
+                alert('Por favor, preencha o título do marco histórico.');
+                return;
+            }
+            
+            if (!descricao) {
+                e.preventDefault();
+                alert('Por favor, preencha a descrição do marco histórico.');
+                return;
+            }
+            
+            if (!dataMarcante) {
+                e.preventDefault();
+                alert('Por favor, selecione a data marcante.');
+                return;
+            }
+        });
+    }
+    
+    // Funcionalidade do carrossel de imagens
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    const galleryModal = document.getElementById('galleryModal');
+    const carouselInner = document.querySelector('#galleryCarousel .carousel-inner');
+    const imageCounter = document.getElementById('imageCounter');
+    const pauseBtn = document.getElementById('pauseCarousel');
+    const playBtn = document.getElementById('playCarousel');
+    let currentCarousel = null;
+    
+    // Debug: verificar se os elementos foram encontrados
+    if (galleryItems.length === 0) {
+        console.log('Nenhuma imagem da galeria encontrada');
+    } else {
+        console.log(`Encontradas ${galleryItems.length} imagens na galeria`);
+    }
+    
+    // Verificar se os elementos essenciais existem
+    if (!galleryModal) {
+        console.error('Modal da galeria não encontrado');
+        return;
+    }
+    
+    if (!carouselInner) {
+        console.error('Container do carrossel não encontrado');
+        return;
+    }
+    
+    // Preencher o carrossel com as imagens
+    function populateCarousel() {
+        if (!carouselInner) {
+            console.error('Container do carrossel não encontrado');
+            return;
+        }
+        
+        carouselInner.innerHTML = '';
+        
+        galleryItems.forEach((item, index) => {
+            const imageSrc = item.getAttribute('data-image-src');
+            const imageCaption = item.getAttribute('data-image-caption');
+            
+            if (!imageSrc) {
+                console.warn(`Imagem ${index} não tem src definido`);
+                return;
+            }
+            
+            const carouselItem = document.createElement('div');
+            carouselItem.className = `carousel-item ${index === 0 ? 'active' : ''}`;
+            carouselItem.innerHTML = `
+                <div class="d-flex justify-content-center align-items-center" style="height: 70vh;">
+                    <img src="${imageSrc}" class="d-block img-fluid" alt="${imageCaption || 'Imagem'}" style="max-height: 100%; max-width: 100%; object-fit: contain;">
+                </div>
+                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded">
+                    <h5>${imageCaption || 'Imagem'}</h5>
+                </div>
+            `;
+            
+            carouselInner.appendChild(carouselItem);
+        });
+        
+        // Atualizar contador
+        updateImageCounter();
+    }
+    
+    // Atualizar contador de imagens
+    function updateImageCounter() {
+        if (!imageCounter) return;
+        
+        const activeItem = document.querySelector('#galleryCarousel .carousel-item.active');
+        const allItems = document.querySelectorAll('#galleryCarousel .carousel-item');
+        const currentIndex = Array.from(allItems).indexOf(activeItem) + 1;
+        imageCounter.textContent = `${currentIndex} / ${allItems.length}`;
+    }
+    
+    // Event listeners para os itens da galeria
+    galleryItems.forEach((item, index) => {
+        item.addEventListener('click', function() {
+            console.log(`Imagem ${index} clicada!`);
+            
+            // Preencher o carrossel
+            populateCarousel();
+            
+            // Abrir o modal manualmente
+            try {
+                const modal = new bootstrap.Modal(galleryModal);
+                modal.show();
+                console.log('Modal aberto com sucesso');
+            } catch (error) {
+                console.error('Erro ao abrir modal:', error);
+            }
+            
+            // Aguardar o modal abrir para inicializar o carrossel
+            galleryModal.addEventListener('shown.bs.modal', function() {
+                console.log('Modal aberto, inicializando carrossel...');
+                
+                // Verificar se o Bootstrap está disponível
+                if (typeof bootstrap === 'undefined' || typeof bootstrap.Carousel === 'undefined') {
+                    console.error('Bootstrap Carousel não está disponível');
+                    return;
+                }
+                
+                // Inicializar o carrossel na imagem clicada
+                const carouselElement = document.getElementById('galleryCarousel');
+                if (!carouselElement) {
+                    console.error('Elemento do carrossel não encontrado');
+                    return;
+                }
+                
+                try {
+                    const carousel = new bootstrap.Carousel(carouselElement, {
+                        interval: 5000,
+                        wrap: true
+                    });
+                    
+                    // Ir para a imagem clicada
+                    carousel.to(index);
+                    currentCarousel = carousel;
+                    
+                    console.log('Carrossel inicializado com sucesso');
+                } catch (error) {
+                    console.error('Erro ao inicializar carrossel:', error);
+                }
+                
+                // Atualizar contador
+                updateImageCounter();
+            }, { once: true });
+        });
+    });
+    
+    // Event listeners para o carrossel
+    const galleryCarousel = document.getElementById('galleryCarousel');
+    if (galleryCarousel) {
+        galleryCarousel.addEventListener('slid.bs.carousel', function() {
+            updateImageCounter();
+        });
+    }
+    
+    // Controles de pausar/reproduzir
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', function() {
+            if (currentCarousel) {
+                currentCarousel.pause();
+                pauseBtn.style.display = 'none';
+                if (playBtn) playBtn.style.display = 'inline-block';
+            }
+        });
+    }
+    
+    if (playBtn) {
+        playBtn.addEventListener('click', function() {
+            if (currentCarousel) {
+                currentCarousel.cycle();
+                playBtn.style.display = 'none';
+                if (pauseBtn) pauseBtn.style.display = 'inline-block';
+            }
+        });
+    }
+    
+    // Resetar controles quando o modal for fechado
+    if (galleryModal) {
+        galleryModal.addEventListener('hidden.bs.modal', function() {
+            if (pauseBtn) pauseBtn.style.display = 'inline-block';
+            if (playBtn) playBtn.style.display = 'none';
+            currentCarousel = null;
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,108 @@
+<!-- Modal de visualização de comunicado -->
+<div class="comunicado-modal-content">
+    <!-- Informações básicas -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Tipo:</strong>
+            <p class="mb-2">
+                <span class="badge bg-info">
+                    {{ comunicado.get_tipo_display }}
+                </span>
+            </p>
+        </div>
+        <div class="col-md-6">
+            <strong>Prioridade:</strong>
+            <p class="mb-2">
+                <span class="badge bg-{% if comunicado.prioridade == 'urgente' %}danger{% elif comunicado.prioridade == 'alta' %}warning{% elif comunicado.prioridade == 'normal' %}primary{% else %}secondary{% endif %}">
+                    {{ comunicado.get_prioridade_display }}
+                </span>
+            </p>
+        </div>
+    </div>
+    
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Data de Publicação:</strong>
+            <p class="mb-2">{{ comunicado.data_publicacao|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="col-md-6">
+            <strong>Autor:</strong>
+            <p class="mb-2">{{ comunicado.autor.username|default:"Sistema" }}</p>
+        </div>
+    </div>
+    
+    {% if comunicado.data_expiracao %}
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <strong>Data de Expiração:</strong>
+            <p class="mb-2">{{ comunicado.data_expiracao|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="col-md-6">
+            <strong>Status:</strong>
+            <p class="mb-2">
+                {% if comunicado.data_expiracao > now %}
+                    <span class="badge bg-success">Válido</span>
+                {% else %}
+                    <span class="badge bg-danger">Expirado</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Conteúdo principal -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <strong>Conteúdo:</strong>
+            <div class="border rounded p-3 bg-light mt-2">
+                {{ comunicado.conteudo|linebreaks }}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Arquivos anexados -->
+    {% if comunicado.arquivos_anexados %}
+    <div class="row mb-3">
+        <div class="col-12">
+            <strong>Arquivo Anexado:</strong>
+            <div class="mt-2">
+                <a href="{{ comunicado.arquivos_anexados.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-download me-2"></i>
+                    Download do Arquivo
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Informações do destinatário -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Informação:</strong> Este comunicado foi enviado para {{ comunicado.get_tipo_destinatarios_display|lower }}.
+                {% if user_type %}
+                    Você está visualizando como {{ user_type|title }}.
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.comunicado-modal-content {
+    font-size: 0.95rem;
+}
+
+.comunicado-modal-content .badge {
+    font-size: 0.8rem;
+}
+
+.comunicado-modal-content .border {
+    border-color: #dee2e6 !important;
+}
+
+.comunicado-modal-content .bg-light {
+    background-color: #f8f9fa !important;
+}
+</style>

@@ -1,0 +1,1069 @@
+<!-- Modal Editor de Conteúdo da Ata - Estilo SEI -->
+<div class="modal fade" id="conteudoModal" tabindex="-1" aria-labelledby="conteudoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content sei-editor">
+            <!-- Barra de Título do SEI -->
+            <div class="sei-header">
+                <div class="sei-title-bar">
+                    <div class="sei-title">Editor de Ata - ABMEPI</div>
+                    <div class="sei-window-controls">
+                        <button type="button" class="sei-btn sei-minimize" title="Minimizar">_</button>
+                        <button type="button" class="sei-btn sei-maximize" title="Maximizar">□</button>
+                        <button type="button" class="sei-btn sei-close" data-bs-dismiss="modal" title="Fechar">×</button>
+                    </div>
+                </div>
+                <div class="sei-action-buttons">
+                    <button type="button" class="sei-action-btn sei-save" onclick="salvarConteudo()">
+                        <i class="fas fa-save"></i> Salvar
+                    </button>
+                    <button type="button" class="sei-action-btn sei-sign" onclick="previsualizarConteudo()">
+                        <i class="fas fa-eye"></i> Visualizar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Toolbar do SEI -->
+            <div class="sei-toolbar">
+                <!-- Primeira Linha da Toolbar -->
+                <div class="sei-toolbar-row">
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('undo')" title="Desfazer">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('redo')" title="Refazer">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <div class="sei-separator"></div>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('cut')" title="Cortar">
+                            <i class="fas fa-cut"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('copy')" title="Copiar">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('paste')" title="Colar">
+                            <i class="fas fa-paste"></i>
+                        </button>
+                    </div>
+
+                    <div class="sei-toolbar-group">
+                        <select class="sei-font-select" id="fontFamily" onchange="changeFontFamily(this.value)">
+                            <option value="Arial">Arial</option>
+                            <option value="Times New Roman" selected>Times New Roman</option>
+                            <option value="Calibri">Calibri</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Courier New">Courier New</option>
+                        </select>
+                        <select class="sei-size-select" id="fontSize" onchange="changeFontSize(this.value)">
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12" selected>12</option>
+                            <option value="14">14</option>
+                            <option value="16">16</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                            <option value="24">24</option>
+                        </select>
+                    </div>
+
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('bold')" title="Negrito">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('italic')" title="Itálico">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('underline')" title="Sublinhado">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('strikeThrough')" title="Riscado">
+                            <i class="fas fa-strikethrough"></i>
+                        </button>
+                        <div class="sei-separator"></div>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('subscript')" title="Subscrito">
+                            <i class="fas fa-subscript"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('superscript')" title="Sobrescrito">
+                            <i class="fas fa-superscript"></i>
+                        </button>
+                    </div>
+
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="changeTextColor()" title="Cor do Texto">
+                            <i class="fas fa-font"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="changeBackgroundColor()" title="Cor de Fundo">
+                            <i class="fas fa-highlighter"></i>
+                        </button>
+                    </div>
+
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyLeft')" title="Alinhar à Esquerda">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyCenter')" title="Centralizar">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyRight')" title="Alinhar à Direita">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyFull')" title="Justificar">
+                            <i class="fas fa-align-justify"></i>
+                        </button>
+                    </div>
+
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('insertUnorderedList')" title="Lista com Marcadores">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('insertOrderedList')" title="Lista Numerada">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+                        <div class="sei-separator"></div>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('outdent')" title="Diminuir Recuo">
+                            <i class="fas fa-outdent"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('indent')" title="Aumentar Recuo">
+                            <i class="fas fa-indent"></i>
+                        </button>
+                    </div>
+
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="insertImage()" title="Inserir Imagem">
+                            <i class="fas fa-image"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="insertTable()" title="Inserir Tabela">
+                            <i class="fas fa-table"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="insertLink()" title="Inserir Link">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <div class="sei-separator"></div>
+                        <button type="button" class="sei-toolbar-btn" onclick="execCommand('removeFormat')" title="Remover Formatação">
+                            <i class="fas fa-remove-format"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="toggleSourceCode()" title="Código Fonte">
+                            <i class="fas fa-code"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="toggleFullscreen()" title="Tela Cheia">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Segunda Linha da Toolbar -->
+                <div class="sei-toolbar-row">
+                    <div class="sei-toolbar-group">
+                        <div class="sei-logo">ABMEPI</div>
+                    </div>
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" title="Moeda">
+                            <i class="fas fa-dollar-sign"></i>
+                        </button>
+                        <select class="sei-zoom-select">
+                            <option value="50">50%</option>
+                            <option value="75">75%</option>
+                            <option value="100" selected>100%</option>
+                            <option value="125">125%</option>
+                            <option value="150">150%</option>
+                            <option value="200">200%</option>
+                        </select>
+                    </div>
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="showAutoText()" title="AutoTexto">
+                            AutoTexto
+                        </button>
+                        <select class="sei-style-select">
+                            <option value="">Estilo</option>
+                            <option value="normal">Normal</option>
+                            <option value="heading1">Título 1</option>
+                            <option value="heading2">Título 2</option>
+                            <option value="heading3">Título 3</option>
+                        </select>
+                    </div>
+                    <div class="sei-toolbar-group">
+                        <button type="button" class="sei-toolbar-btn" onclick="insertSpecialChar()" title="Caracteres Especiais">
+                            <i class="fas fa-symbols"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="showTemplates()" title="Modelos">
+                            <i class="fas fa-file-alt"></i>
+                        </button>
+                        <button type="button" class="sei-toolbar-btn" onclick="showSettings()" title="Configurações">
+                            <i class="fas fa-cog"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor Principal -->
+            <div class="sei-editor-container">
+                <div id="conteudo_ata" 
+                     class="sei-editor-content" 
+                     contenteditable="true"
+                     data-placeholder="Digite aqui o conteúdo da ata..."></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilo do Editor SEI */
+.sei-editor {
+    background: #f5f5f5;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Barra de Título do SEI */
+.sei-header {
+    background: #2c3e50;
+    color: white;
+    border-bottom: 1px solid #34495e;
+}
+
+.sei-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #34495e;
+    border-bottom: 1px solid #2c3e50;
+}
+
+.sei-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #ecf0f1;
+}
+
+.sei-window-controls {
+    display: flex;
+    gap: 2px;
+}
+
+.sei-btn {
+    width: 24px;
+    height: 20px;
+    border: none;
+    background: #34495e;
+    color: #ecf0f1;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+}
+
+.sei-btn:hover {
+    background: #4a5f7a;
+}
+
+.sei-btn.sei-close:hover {
+    background: #e74c3c;
+}
+
+.sei-action-buttons {
+    display: flex;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #2c3e50;
+}
+
+.sei-action-btn {
+    padding: 6px 12px;
+    border: 1px solid #34495e;
+    background: #34495e;
+    color: #ecf0f1;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.sei-action-btn:hover {
+    background: #4a5f7a;
+    border-color: #5a6f8a;
+}
+
+.sei-action-btn.sei-save {
+    background: #27ae60;
+    border-color: #2ecc71;
+}
+
+.sei-action-btn.sei-save:hover {
+    background: #2ecc71;
+}
+
+.sei-action-btn.sei-sign {
+    background: #3498db;
+    border-color: #5dade2;
+}
+
+.sei-action-btn.sei-sign:hover {
+    background: #5dade2;
+}
+
+/* Toolbar do SEI */
+.sei-toolbar {
+    background: #ecf0f1;
+    border-bottom: 1px solid #bdc3c7;
+    padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.sei-toolbar-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    min-height: 28px;
+}
+
+.sei-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-right: 8px;
+}
+
+.sei-toolbar-btn {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #bdc3c7;
+    background: #ffffff;
+    color: #2c3e50;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    transition: all 0.2s;
+}
+
+.sei-toolbar-btn:hover {
+    background: #e8f4f8;
+    border-color: #3498db;
+}
+
+.sei-toolbar-btn.active {
+    background: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+.sei-separator {
+    width: 1px;
+    height: 20px;
+    background: #bdc3c7;
+    margin: 0 4px;
+}
+
+.sei-font-select, .sei-size-select, .sei-zoom-select, .sei-style-select {
+    height: 24px;
+    border: 1px solid #bdc3c7;
+    background: #ffffff;
+    color: #2c3e50;
+    font-size: 11px;
+    padding: 0 4px;
+    border-radius: 2px;
+    min-width: 80px;
+}
+
+.sei-font-select:focus, .sei-size-select:focus, .sei-zoom-select:focus, .sei-style-select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 1px #3498db;
+}
+
+.sei-logo {
+    font-weight: bold;
+    font-size: 12px;
+    color: #2c3e50;
+    padding: 0 8px;
+    background: #d5dbdb;
+    border: 1px solid #bdc3c7;
+    border-radius: 2px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+}
+
+/* Editor Principal */
+.sei-editor-container {
+    flex: 1;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.sei-editor-content {
+    flex: 1;
+    padding: 20px;
+    font-family: 'Times New Roman', serif;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #2c3e50;
+    background: white;
+    border: none;
+    outline: none;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: calc(100vh - 200px);
+}
+
+.sei-editor-content:empty:before {
+    content: attr(data-placeholder);
+    color: #7f8c8d;
+    font-style: italic;
+    pointer-events: none;
+}
+
+.sei-editor-content:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Estilo do modal fullscreen */
+.modal-fullscreen {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    margin: 0;
+}
+
+.modal-fullscreen .modal-content {
+    height: 100vh;
+    border: 0;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-fullscreen .modal-body {
+    flex: 1;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scrollbar personalizada */
+.sei-editor-content::-webkit-scrollbar {
+    width: 12px;
+}
+
+.sei-editor-content::-webkit-scrollbar-track {
+    background: #ecf0f1;
+    border-radius: 6px;
+}
+
+.sei-editor-content::-webkit-scrollbar-thumb {
+    background: #bdc3c7;
+    border-radius: 6px;
+    border: 2px solid #ecf0f1;
+}
+
+.sei-editor-content::-webkit-scrollbar-thumb:hover {
+    background: #95a5a6;
+}
+
+/* Estilo para elementos inseridos */
+.sei-editor-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 10px 0;
+    border: 1px solid #bdc3c7;
+}
+
+.sei-editor-content table td, .sei-editor-content table th {
+    border: 1px solid #bdc3c7;
+    padding: 6px 8px;
+    text-align: left;
+    font-size: 12px;
+}
+
+.sei-editor-content table th {
+    background-color: #ecf0f1;
+    font-weight: bold;
+}
+
+.sei-editor-content hr {
+    border: none;
+    border-top: 1px solid #bdc3c7;
+    margin: 15px 0;
+}
+
+.sei-editor-content a {
+    color: #3498db;
+    text-decoration: underline;
+}
+
+.sei-editor-content a:hover {
+    color: #2980b9;
+}
+
+/* Estilo para listas */
+.sei-editor-content ul, .sei-editor-content ol {
+    margin: 8px 0;
+    padding-left: 25px;
+}
+
+.sei-editor-content li {
+    margin: 3px 0;
+    font-size: 12px;
+}
+
+/* Estilo para formatação de texto */
+.sei-editor-content strong, .sei-editor-content b {
+    font-weight: bold;
+}
+
+.sei-editor-content em, .sei-editor-content i {
+    font-style: italic;
+}
+
+.sei-editor-content u {
+    text-decoration: underline;
+}
+
+.sei-editor-content s, .sei-editor-content strike {
+    text-decoration: line-through;
+}
+
+.sei-editor-content sub {
+    vertical-align: sub;
+    font-size: 10px;
+}
+
+.sei-editor-content sup {
+    vertical-align: super;
+    font-size: 10px;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .sei-toolbar-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 4px;
+    }
+    
+    .sei-toolbar-group {
+        margin-bottom: 4px;
+        justify-content: flex-start;
+    }
+    
+    .sei-editor-content {
+        padding: 15px;
+        font-size: 11px;
+    }
+    
+    .sei-title {
+        font-size: 12px;
+    }
+    
+    .sei-action-btn {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+}
+
+/* Estilo para botões de cor */
+.color-picker {
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #bdc3c7;
+    border-radius: 4px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.color-option {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #bdc3c7;
+    margin: 2px;
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 2px;
+}
+
+.color-option:hover {
+    border-color: #3498db;
+    transform: scale(1.1);
+}
+</style>
+
+<script>
+// Funções básicas do editor SEI
+function inserirDataAtual() {
+    const hoje = new Date();
+    const data = hoje.toLocaleDateString('pt-BR');
+    inserirTextoConteudo(data);
+}
+
+function inserirHoraAtual() {
+    const agora = new Date();
+    const hora = agora.toLocaleTimeString('pt-BR');
+    inserirTextoConteudo(hora);
+}
+
+function inserirTextoConteudo(texto) {
+    const editor = document.getElementById('conteudo_ata');
+    editor.focus();
+    document.execCommand('insertText', false, texto);
+}
+
+function limparConteudo() {
+    if (confirm('Tem certeza que deseja limpar todo o conteúdo?')) {
+        document.getElementById('conteudo_ata').innerHTML = '';
+        document.getElementById('conteudo_ata').focus();
+    }
+}
+
+// Funções de formatação do SEI
+function execCommand(command, value = null) {
+    const editor = document.getElementById('conteudo_ata');
+    editor.focus();
+    document.execCommand(command, false, value);
+    updateToolbarState();
+}
+
+function changeFontSize(size) {
+    execCommand('fontSize', size);
+}
+
+function changeFontFamily(font) {
+    execCommand('fontName', font);
+}
+
+function changeTextColor() {
+    const color = prompt('Digite a cor do texto (ex: #000000):', '#000000');
+    if (color) {
+        execCommand('foreColor', color);
+    }
+}
+
+function changeBackgroundColor() {
+    const color = prompt('Digite a cor de fundo (ex: #ffff00):', '#ffff00');
+    if (color) {
+        execCommand('backColor', color);
+    }
+}
+
+// Funções para inserir elementos
+function insertImage() {
+    const url = prompt('Digite a URL da imagem:');
+    if (url) {
+        const alt = prompt('Digite o texto alternativo (opcional):') || '';
+        const img = `<img src="${url}" alt="${alt}" style="max-width: 100%; height: auto;">`;
+        execCommand('insertHTML', img);
+    }
+}
+
+function insertTable() {
+    const rows = prompt('Número de linhas:', '3');
+    const cols = prompt('Número de colunas:', '3');
+    
+    if (rows && cols) {
+        let table = '<table border="1" style="border-collapse: collapse; width: 100%; margin: 10px 0;">';
+        for (let i = 0; i < rows; i++) {
+            table += '<tr>';
+            for (let j = 0; j < cols; j++) {
+                table += '<td style="padding: 6px 8px; border: 1px solid #bdc3c7;">&nbsp;</td>';
+            }
+            table += '</tr>';
+        }
+        table += '</table>';
+        
+        execCommand('insertHTML', table);
+    }
+}
+
+function insertLink() {
+    const url = prompt('Digite a URL do link:');
+    if (url) {
+        const text = prompt('Digite o texto do link (opcional):') || url;
+        execCommand('createLink', url);
+    }
+}
+
+function insertHorizontalRule() {
+    execCommand('insertHorizontalRule');
+}
+
+// Funções específicas do SEI
+function showAutoText() {
+    const autoTexts = [
+        'ATA DE REUNIÃO ORDINÁRIA',
+        'ATA DE REUNIÃO EXTRAORDINÁRIA',
+        'PRESENTES:',
+        'AUSENTES:',
+        'PAUTA:',
+        'DELIBERAÇÕES:',
+        'OBSERVAÇÕES:',
+        'A ata foi lida, aprovada e assinada pelos presentes.',
+        'Teresina, ' + new Date().toLocaleDateString('pt-BR')
+    ];
+    
+    const selected = prompt('Selecione um texto automático:\n\n' + 
+        autoTexts.map((text, index) => `${index + 1}. ${text}`).join('\n') + 
+        '\n\nDigite o número:');
+    
+    if (selected && !isNaN(selected) && selected > 0 && selected <= autoTexts.length) {
+        inserirTextoConteudo(autoTexts[selected - 1]);
+    }
+}
+
+function showTemplates() {
+    const templates = [
+        'Ata de Reunião Ordinária',
+        'Ata de Reunião Extraordinária',
+        'Ata de Assembleia Geral',
+        'Ata de Conselho Fiscal'
+    ];
+    
+    const selected = prompt('Selecione um modelo:\n\n' + 
+        templates.map((template, index) => `${index + 1}. ${template}`).join('\n') + 
+        '\n\nDigite o número:');
+    
+    if (selected && !isNaN(selected) && selected > 0 && selected <= templates.length) {
+        loadTemplate(templates[selected - 1]);
+    }
+}
+
+function loadTemplate(templateName) {
+    const templates = {
+        'Ata de Reunião Ordinária': `
+ATA DE REUNIÃO ORDINÁRIA Nº 001/2025
+
+Aos ${new Date().toLocaleDateString('pt-BR')}, às ${new Date().toLocaleTimeString('pt-BR')}, na sede da ABMEPI, reuniram-se os membros da Diretoria para deliberar sobre os assuntos da pauta.
+
+PRESENTES:
+- Presidente: [Nome do Presidente]
+- Secretário: [Nome do Secretário]
+- Membros: [Lista de membros presentes]
+
+AUSENTES:
+- [Lista de membros ausentes]
+
+PAUTA:
+1. Abertura da reunião
+2. Leitura e aprovação da ata anterior
+3. Assuntos gerais
+4. Encerramento
+
+DELIBERAÇÕES:
+[Descrever as decisões tomadas]
+
+OBSERVAÇÕES:
+[Observações adicionais]
+
+A ata foi lida, aprovada e assinada pelos presentes.
+
+Teresina, ${new Date().toLocaleDateString('pt-BR')}.
+
+_________________________        _________________________
+Presidente                        Secretário
+        `,
+        'Ata de Reunião Extraordinária': `
+ATA DE REUNIÃO EXTRAORDINÁRIA Nº 001/2025
+
+Aos ${new Date().toLocaleDateString('pt-BR')}, às ${new Date().toLocaleTimeString('pt-BR')}, na sede da ABMEPI, reuniram-se os membros da Diretoria em caráter extraordinário para deliberar sobre os assuntos da pauta.
+
+PRESENTES:
+- Presidente: [Nome do Presidente]
+- Secretário: [Nome do Secretário]
+- Membros: [Lista de membros presentes]
+
+AUSENTES:
+- [Lista de membros ausentes]
+
+PAUTA:
+1. Abertura da reunião
+2. Assuntos extraordinários
+3. Deliberações
+4. Encerramento
+
+DELIBERAÇÕES:
+[Descrever as decisões tomadas]
+
+OBSERVAÇÕES:
+[Observações adicionais]
+
+A ata foi lida, aprovada e assinada pelos presentes.
+
+Teresina, ${new Date().toLocaleDateString('pt-BR')}.
+
+_________________________        _________________________
+Presidente                        Secretário
+        `
+    };
+    
+    if (templates[templateName]) {
+        document.getElementById('conteudo_ata').innerHTML = templates[templateName];
+        document.getElementById('conteudo_ata').focus();
+    }
+}
+
+function insertSpecialChar() {
+    const chars = [
+        '©', '®', '™', '°', '±', '×', '÷', '≤', '≥', '≠',
+        '≈', '∞', '∑', '∏', '√', '∆', 'Ω', 'α', 'β', 'γ',
+        'δ', 'ε', 'ζ', 'η', 'θ', 'λ', 'μ', 'π', 'ρ', 'σ',
+        'τ', 'φ', 'χ', 'ψ', 'ω', '€', '£', '¥', '¢', '§'
+    ];
+    
+    const selected = prompt('Selecione um caractere especial:\n\n' + 
+        chars.map((char, index) => `${index + 1}. ${char}`).join(' ') + 
+        '\n\nDigite o número:');
+    
+    if (selected && !isNaN(selected) && selected > 0 && selected <= chars.length) {
+        inserirTextoConteudo(chars[selected - 1]);
+    }
+}
+
+function showSettings() {
+    alert('Configurações do Editor:\n\n' +
+          '• Fonte padrão: Times New Roman\n' +
+          '• Tamanho padrão: 12pt\n' +
+          '• Salvar automaticamente: Ativado\n' +
+          '• Verificação ortográfica: Ativada\n' +
+          '• Atalhos de teclado: Ativados');
+}
+
+function toggleSourceCode() {
+    const editor = document.getElementById('conteudo_ata');
+    const isSourceMode = editor.getAttribute('data-source-mode') === 'true';
+    
+    if (isSourceMode) {
+        // Voltar ao modo visual
+        editor.innerHTML = editor.textContent;
+        editor.setAttribute('data-source-mode', 'false');
+        editor.contentEditable = 'true';
+    } else {
+        // Modo código fonte
+        editor.textContent = editor.innerHTML;
+        editor.setAttribute('data-source-mode', 'true');
+        editor.contentEditable = 'true';
+    }
+}
+
+function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+// Atualizar estado da toolbar
+function updateToolbarState() {
+    const editor = document.getElementById('conteudo_ata');
+    
+    // Atualizar botões de formatação
+    const boldBtn = document.querySelector('[onclick="execCommand(\'bold\')"]');
+    const italicBtn = document.querySelector('[onclick="execCommand(\'italic\')"]');
+    const underlineBtn = document.querySelector('[onclick="execCommand(\'underline\')"]');
+    
+    if (boldBtn) boldBtn.classList.toggle('active', document.queryCommandState('bold'));
+    if (italicBtn) italicBtn.classList.toggle('active', document.queryCommandState('italic'));
+    if (underlineBtn) underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
+}
+
+// Pré-visualizar conteúdo
+function previsualizarConteudo() {
+    const conteudo = document.getElementById('conteudo_ata').innerHTML;
+    
+    if (!conteudo.trim()) {
+        alert('Digite algum conteúdo antes de visualizar!');
+        return;
+    }
+    
+    const janela = window.open('', '_blank', 'width=800,height=600');
+    janela.document.write(`
+        <html>
+            <head>
+                <title>Pré-visualização da Ata - ABMEPI</title>
+                <style>
+                    body { 
+                        font-family: 'Times New Roman', serif; 
+                        margin: 40px; 
+                        line-height: 1.6;
+                        color: #2c3e50;
+                        background: white;
+                    }
+                    .conteudo {
+                        font-size: 12px;
+                        background: white;
+                        padding: 20px;
+                        border: 1px solid #bdc3c7;
+                        border-radius: 5px;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="conteudo">${conteudo}</div>
+            </body>
+        </html>
+    `);
+}
+
+// Salvar rascunho do conteúdo
+function salvarRascunhoConteudo() {
+    const conteudo = document.getElementById('conteudo_ata').innerHTML.trim();
+    
+    if (!conteudo) {
+        alert('Digite o conteúdo da ata antes de salvar!');
+        document.getElementById('conteudo_ata').focus();
+        return;
+    }
+    
+    // Salvar no localStorage como rascunho
+    localStorage.setItem('ata_conteudo_rascunho', conteudo);
+    alert('Rascunho do conteúdo salvo localmente!');
+}
+
+// Carregar rascunho do conteúdo
+function carregarRascunhoConteudo() {
+    const rascunho = localStorage.getItem('ata_conteudo_rascunho');
+    if (rascunho) {
+        if (confirm('Existe um rascunho do conteúdo salvo. Deseja carregá-lo?')) {
+            document.getElementById('conteudo_ata').innerHTML = rascunho;
+            document.getElementById('conteudo_ata').focus();
+        }
+    } else {
+        alert('Nenhum rascunho do conteúdo encontrado!');
+    }
+}
+
+// Salvar conteúdo
+async function salvarConteudo() {
+    const conteudo = document.getElementById('conteudo_ata').innerHTML.trim();
+    
+    if (!conteudo) {
+        alert('Digite o conteúdo da ata antes de salvar!');
+        document.getElementById('conteudo_ata').focus();
+        return;
+    }
+    
+    const ataId = '{{ object.pk|default:"" }}';
+    if (!ataId) {
+        alert('Salve primeiro os dados básicos da ata!');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/diretoria/api/atas/${ataId}/conteudo/`, {
+            method: 'POST',
+            body: JSON.stringify({ conteudo: conteudo }),
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        });
+        
+        if (response.ok) {
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('conteudoModal'));
+            modal.hide();
+            
+            // Mostrar mensagem de sucesso
+            alert('Conteúdo salvo com sucesso!');
+            
+            // Recarregar página
+            location.reload();
+        } else {
+            const error = await response.json();
+            alert('Erro ao salvar conteúdo: ' + (error.message || 'Erro desconhecido'));
+        }
+    } catch (error) {
+        console.error('Erro ao salvar conteúdo:', error);
+        alert('Erro ao salvar conteúdo. Tente novamente.');
+    }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const editor = document.getElementById('conteudo_ata');
+    
+    if (editor) {
+        // Atualizar toolbar quando seleção muda
+        editor.addEventListener('mouseup', updateToolbarState);
+        editor.addEventListener('keyup', updateToolbarState);
+        editor.addEventListener('focus', updateToolbarState);
+        
+        // Atalhos de teclado
+        editor.addEventListener('keydown', function(e) {
+            // Ctrl+B para negrito
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                execCommand('bold');
+            }
+            
+            // Ctrl+I para itálico
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                execCommand('italic');
+            }
+            
+            // Ctrl+U para sublinhado
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                execCommand('underline');
+            }
+            
+            // Ctrl+Z para desfazer
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                execCommand('undo');
+            }
+            
+            // Ctrl+Y ou Ctrl+Shift+Z para refazer
+            if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'Z')) {
+                e.preventDefault();
+                execCommand('redo');
+            }
+        });
+    }
+});
+
+// Atalhos de teclado globais para o modal
+document.addEventListener('keydown', function(e) {
+    // Só funciona quando o modal está aberto
+    if (document.getElementById('conteudoModal').classList.contains('show')) {
+        // Ctrl+S para salvar
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            salvarConteudo();
+        }
+        
+        // Ctrl+Shift+S para salvar rascunho
+        if (e.ctrlKey && e.shiftKey && e.key === 'S') {
+            e.preventDefault();
+            salvarRascunhoConteudo();
+        }
+        
+        // F5 para pré-visualizar
+        if (e.key === 'F5') {
+            e.preventDefault();
+            previsualizarConteudo();
+        }
+    }
+});
+</script>

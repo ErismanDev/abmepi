@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Atas de Reunião - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/modais.css' %}">
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Estilos para campos com erro */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+}
+
+/* Estilos para alertas de erro */
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.alert-danger .alert-heading {
+    color: #721c24;
+}
+
+/* Animação para campos com erro */
+.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Estilo para botões de ação */
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para o resumo de erros */
+.error-summary {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.error-summary h6 {
+    color: #721c24;
+    margin-bottom: 0.5rem;
+}
+
+.error-summary ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+.error-summary li {
+    color: #721c24;
+    margin-bottom: 0.25rem;
+}
+
+/* Avatar styles */
+.avatar-rectangular {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    border: 2px solid #e3e6f0;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fc;
+    border: 2px solid #e3e6f0;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5a5c69;
+}
+
+/* Table styles */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.table td {
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Button group styles */
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Pagination styles */
+.pagination .page-link {
+    color: #4e73df;
+    border-color: #e3e6f0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.pagination .page-link:hover {
+    color: #2e59d9;
+    background-color: #eaecf4;
+    border-color: #e3e6f0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Atas de Reunião
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Sistema simplificado de criação e gerenciamento de atas
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:ata_simples_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Nova Ata
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informações sobre o sistema -->
+            <div class="alert alert-info mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="alert-heading mb-1">
+                            <i class="fas fa-magic me-2"></i>
+                            Sistema Simplificado de Atas
+                        </h6>
+                        <p class="mb-0">
+                            <strong>Como funciona:</strong> Clique em "Nova Ata" → Preencha os dados básicos → 
+                            Clique em "Inserir Ata" para editar o conteúdo → Visualize e imprima o resultado final.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'diretoria:ata_simples_create' %}" class="btn btn-info">
+                            <i class="fas fa-plus me-2"></i>
+                            Criar Nova Ata
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de atas -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Atas
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if atas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Data</th>
+                                        <th>Status</th>
+                                        <th>Criada em</th>
+                                        <th width="200">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ata in atas %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">{{ ata.get_numero_formatado }}</span>
+                                        </td>
+                                        <td>
+                                            <h6 class="mb-0">{{ ata.titulo }}</h6>
+                                            <small class="text-muted">{{ ata.local }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if ata.tipo_reuniao == 'ordinaria' %}primary{% elif ata.tipo_reuniao == 'extraordinaria' %}warning{% elif ata.tipo_reuniao == 'emergencia' %}danger{% else %}info{% endif %}">
+                                                {{ ata.get_tipo_reuniao_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ ata.data_reuniao|date:"d/m/Y" }}</strong>
+                                            </div>
+                                            <small class="text-muted">{{ ata.data_reuniao|date:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if ata.status == 'rascunho' %}secondary{% elif ata.status == 'finalizada' %}success{% elif ata.status == 'assinada' %}primary{% endif %}">
+                                                {{ ata.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ ata.data_criacao|date:"d/m/Y H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'diretoria:ata_simples_edit' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning" title="Editar Dados">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_editor' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Inserir Ata">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_simples_view' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-info" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:imprimir_ata' ata.pk %}" 
+                                                   class="btn btn-sm btn-outline-success" title="Imprimir" target="_blank">
+                                                    <i class="fas fa-print"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhuma ata encontrada</h5>
+                            <p class="text-muted">
+                                <a href="{% url 'diretoria:ata_simples_create' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Criar Primeira Ata
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            {% if is_paginated %}
+                <nav aria-label="Paginação das atas" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

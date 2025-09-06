@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lista de Presença - {{ lista.evento.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:dashboard' %}">Administrativo</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:lista_presenca_list' %}">Listas de Presença</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ lista.evento.titulo }}</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Lista de Presença</h1>
+            <p class="text-muted mb-0">{{ lista.evento.titulo }} • {{ lista.data_registro|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="{% url 'administrativo:lista_presenca_update' lista.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Editar
+            </a>
+            <a href="{% url 'administrativo:lista_presenca_delete' lista.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Excluir
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações principais -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informações da Lista
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Evento:</label>
+                            <p class="mb-0">
+                                <a href="{% url 'administrativo:evento_detail' lista.evento.pk %}" class="text-decoration-none">
+                                    {{ lista.evento.titulo }}
+                                </a>
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data do Evento:</label>
+                            <p class="mb-0">{{ lista.evento.data_inicio|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data de Registro:</label>
+                            <p class="mb-0">{{ lista.data_registro|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Registrado por:</label>
+                            <p class="mb-0">{{ lista.usuario_registro.get_full_name|default:lista.usuario_registro.username }}</p>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">Observações:</label>
+                            <p class="mb-0">{{ lista.observacoes|linebreaks|default:"Sem observações" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Presenças -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user-check me-2"></i>
+                        Presenças Registradas
+                    </h5>
+                    <div>
+                        <a href="{% url 'administrativo:presenca_create' lista.pk %}" class="btn btn-success btn-sm me-2">
+                            <i class="fas fa-plus me-2"></i>Adicionar Presença
+                        </a>
+                        <span class="badge bg-primary fs-6">{{ presencas.count }} participantes</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if presencas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Telefone</th>
+                                        <th>Status</th>
+                                        <th>Observações</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for presenca in presencas %}
+                                    <tr>
+                                        <td>{{ presenca.associado.nome }}</td>
+                                        <td>{{ presenca.associado.email|default:"-" }}</td>
+                                        <td>{{ presenca.associado.telefone|default:"-" }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ presenca.presente|yesno:'success,danger' }}">
+                                                {% if presenca.presente %}
+                                                    Presente
+                                                {% else %}
+                                                    Ausente
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if presenca.observacoes %}
+                                                <span class="text-truncate d-inline-block" style="max-width: 150px;" 
+                                                      title="{{ presenca.observacoes }}">
+                                                    {{ presenca.observacoes }}
+                                                </span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'administrativo:presenca_update' presenca.pk %}" class="btn btn-outline-primary btn-sm" title="Editar Presença">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'administrativo:presenca_delete' presenca.pk %}" class="btn btn-outline-danger btn-sm" title="Excluir Presença">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-user-check fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Nenhuma presença registrada nesta lista.</p>
+                            <p class="text-muted">Adicione participantes ao evento para começar a marcar presenças.</p>
+                            <a href="{% url 'administrativo:presenca_create' lista.pk %}" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>Adicionar Primeira Presença
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com informações adicionais -->
+        <div class="col-lg-4">
+            <!-- Estatísticas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Estatísticas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-1">{{ presencas.count }}</h4>
+                                <small class="text-muted">Total</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success mb-1">
+                                {{ total_presentes }}
+                            </h4>
+                            <small class="text-muted">Presentes</small>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-3">
+                        <div class="col-6">
+                            <h4 class="text-danger mb-1">
+                                {{ total_ausentes }}
+                            </h4>
+                            <small class="text-muted">Ausentes</small>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-info mb-1">
+                                {% if presencas.count > 0 %}
+                                    {% widthratio total_presentes presencas.count 100 %}
+                                {% else %}
+                                    0
+                                {% endif %}
+                            </h4>
+                            <small class="text-muted">% Presentes</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações do Evento -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-calendar me-2"></i>
+                        Evento
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <h6>{{ lista.evento.titulo }}</h6>
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ lista.evento.data_inicio|date:"d/m/Y H:i" }} - {{ lista.evento.data_fim|date:"H:i" }}
+                    </p>
+                    <p class="text-muted small mb-2">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ lista.evento.local|default:"Local não informado" }}
+                    </p>
+                    <a href="{% url 'administrativo:evento_detail' lista.evento.pk %}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="fas fa-eye me-2"></i>Ver Evento
+                    </a>
+                </div>
+            </div>
+
+            <!-- Ações rápidas -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'administrativo:lista_presenca_update' lista.pk %}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Editar Lista
+                        </a>
+                        <a href="{% url 'administrativo:evento_detail' lista.evento.pk %}" class="btn btn-outline-primary">
+                            <i class="fas fa-calendar me-2"></i>Ver Evento
+                        </a>
+                        <a href="{% url 'administrativo:lista_presenca_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

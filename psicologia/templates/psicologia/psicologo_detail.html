@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ psicologo.nome_completo }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">{{ psicologo.nome_completo }}</h1>
+                    {% if is_own_profile %}
+                        <small class="text-muted">Sua ficha de cadastro - Apenas visualização</small>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if not is_own_profile %}
+                        <button type="button" class="btn btn-warning shadow-sm" onclick="openPsicologoEditModal({{ psicologo.pk }})">
+                            <i class="fas fa-edit fa-sm text-white-50"></i> Editar
+                        </button>
+                    {% endif %}
+                    <a href="{% url 'psicologia:psicologo_list' %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações principais -->
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações do Psicólogo</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            {% if psicologo.foto %}
+                                <img src="{{ psicologo.foto.url }}" alt="{{ psicologo.nome_completo }}" 
+                                     class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto" 
+                                     style="width: 150px; height: 150px;">
+                                    <i class="fas fa-user fa-3x text-white"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nome Completo:</strong><br>{{ psicologo.nome_completo }}</p>
+                                    <p><strong>CRP:</strong><br>{{ psicologo.crp }}{% if psicologo.uf_crp %}/{{ psicologo.uf_crp }}{% endif %}</p>
+                                    <p><strong>Email:</strong><br>{{ psicologo.email }}</p>
+                                    {% if psicologo.cpf %}
+                                    <p><strong>CPF:</strong><br>{{ psicologo.cpf }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Telefone:</strong><br>{{ psicologo.telefone }}</p>
+                                    {% if psicologo.telefone_secundario %}
+                                    <p><strong>Telefone Secundário:</strong><br>{{ psicologo.telefone_secundario }}</p>
+                                    {% endif %}
+                                    <p><strong>Status:</strong> 
+                                        {% if psicologo.ativo %}
+                                            <span class="badge bg-success text-white fw-bold">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger text-white fw-bold">Inativo</span>
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Data de Cadastro:</strong><br>{{ psicologo.data_cadastro|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if psicologo.especialidades %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Especialidades:</strong></p>
+                            <p>{{ psicologo.especialidades }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if psicologo.endereco or psicologo.cidade or psicologo.estado %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Endereço:</strong></p>
+                            <p>
+                                {% if psicologo.endereco %}{{ psicologo.endereco }}{% endif %}
+                                {% if psicologo.numero %}, {{ psicologo.numero }}{% endif %}
+                                {% if psicologo.complemento %}, {{ psicologo.complemento }}{% endif %}
+                                {% if psicologo.bairro %}<br>{{ psicologo.bairro }}{% endif %}
+                                {% if psicologo.cidade %} - {{ psicologo.cidade }}{% endif %}
+                                {% if psicologo.estado %}/{{ psicologo.estado }}{% endif %}
+                                {% if psicologo.cep %}<br>CEP: {{ psicologo.cep }}{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if psicologo.formacao_academica %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Formação Acadêmica:</strong></p>
+                            <p>{{ psicologo.formacao_academica }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if psicologo.areas_atuacao %}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Áreas de Atuação:</strong></p>
+                            <p>{{ psicologo.areas_atuacao }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sessões recentes -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Sessões Recentes</h6>
+                    <a href="{% url 'psicologia:paciente_list' %}?psicologo={{ psicologo.pk }}" class="btn btn-sm btn-primary">
+                        Ver Pacientes
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if sessoes %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Paciente</th>
+                                        <th>Data/Hora</th>
+                                        <th>Tipo</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sessao in sessoes %}
+                                    <tr>
+                                        <td>{{ sessao.paciente.associado.nome }}</td>
+                                        <td>{{ sessao.data_hora|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <span class="badge bg-info text-white fw-bold">{{ sessao.get_tipo_sessao_display }}</span>
+                                        </td>
+                                        <td>
+                                            {% if sessao.status == 'agendada' %}
+                                                <span class="badge bg-warning text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% elif sessao.status == 'confirmada' %}
+                                                <span class="badge bg-info text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% elif sessao.status == 'realizada' %}
+                                                <span class="badge bg-success text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% elif sessao.status == 'cancelada' %}
+                                                <span class="badge bg-danger text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary text-white fw-bold">{{ sessao.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:sessao_detail' sessao.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhuma sessão encontrada.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Informações Profissionais -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações Profissionais</h6>
+                </div>
+                <div class="card-body">
+                    {% if psicologo.valor_consulta %}
+                    <div class="row no-gutters align-items-center mb-3">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Valor da Consulta</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">R$ {{ psicologo.valor_consulta }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row no-gutters align-items-center mb-3">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Aceita Planos</div>
+                            <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                {% if psicologo.aceita_planos_saude %}
+                                    <span class="badge bg-success text-white fw-bold">Sim</span>
+                                {% else %}
+                                    <span class="badge bg-secondary text-white fw-bold">Não</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-heartbeat fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    
+                    {% if psicologo.horario_atendimento %}
+                    <div class="row no-gutters align-items-center mb-3">
+                        <div class="col-12">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Horário de Atendimento</div>
+                            <p class="small mb-0">{{ psicologo.horario_atendimento }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Estatísticas -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Estatísticas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center mb-3">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Sessões</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sessoes.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="row no-gutters align-items-center mb-3">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Pacientes Atendidos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pacientes.count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pacientes ativos -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Pacientes Ativos</h6>
+                </div>
+                <div class="card-body">
+                    {% if pacientes %}
+                        <div class="list-group list-group-flush">
+                            {% for paciente in pacientes %}
+                            <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ paciente.associado.nome }}</h6>
+                                    {% if paciente.ativo %}
+                                        <small class="text-success">Ativo</small>
+                                    {% else %}
+                                        <small class="text-danger">Inativo</small>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    {% if paciente.data_primeira_consulta %}
+                                        Primeira consulta: {{ paciente.data_primeira_consulta|date:"d/m/Y" }}
+                                    {% else %}
+                                        Sem consultas registradas
+                                    {% endif %}
+                                </small>
+                                <p><strong>Psicólogo Responsável:</strong> 
+                                        {% if paciente.psicologo_responsavel %}
+                                            <span class="badge bg-primary text-white fw-bold">
+                                                {{ paciente.psicologo_responsavel.nome_completo }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">Não atribuído</span>
+                                        {% endif %}
+                                    </p>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhum paciente responsável.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ações rápidas -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ações Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <button type="button" class="btn btn-primary btn-block mb-2" onclick="openSessaoModal()">
+                        <i class="fas fa-plus"></i> Nova Sessão
+                    </button>
+                    <button type="button" class="btn btn-warning btn-block mb-2" onclick="openAgendaModal()">
+                        <i class="fas fa-calendar-plus"></i> Nova Agenda
+                    </button>
+                    {% if not is_own_profile %}
+                        <button type="button" class="btn btn-info btn-block mb-2" onclick="openPsicologoEditModal({{ psicologo.pk }})">
+                            <i class="fas fa-edit"></i> Editar Psicólogo
+                        </button>
+                        <button type="button" class="btn btn-danger btn-block" 
+                                onclick="confirmarExclusaoPsicologo({{ psicologo.pk }}, '{{ psicologo.nome_completo|escapejs }}')">
+                            <i class="fas fa-trash"></i> Excluir Psicólogo
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}
+
+{% endblock %}

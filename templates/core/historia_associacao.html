@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - ABMEPI</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #3498db;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-light: #f8f9fa;
+            --white: #ffffff;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            --gradient-accent: linear-gradient(135deg, var(--accent-color) 0%, #ff8c42 100%);
+            --shadow-light: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            background: var(--bg-light);
+        }
+        
+        /* Botão de voltar */
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            color: white;
+            padding: 3rem 0 2rem 0;
+            margin-bottom: 3rem;
+            min-height: 40vh;
+            display: flex;
+            align-items: center;
+        }
+        
+    
+    .timeline-container {
+        position: relative;
+        padding: 2rem 0;
+    }
+    
+    .timeline-line {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(to bottom, #1a365d, #2c5282);
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 3rem;
+        width: 100%;
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-content {
+        margin-right: 50%;
+        padding-right: 3rem;
+        text-align: right;
+    }
+    
+    .timeline-item:nth-child(even) .timeline-content {
+        margin-left: 50%;
+        padding-left: 3rem;
+        text-align: left;
+    }
+    
+    .timeline-dot {
+        position: absolute;
+        left: 50%;
+        top: 2rem;
+        width: 20px;
+        height: 20px;
+        background: #1a365d;
+        border: 4px solid white;
+        border-radius: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        box-shadow: 0 0 0 4px #1a365d;
+    }
+    
+    .timeline-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .timeline-content:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    }
+    
+    .timeline-year {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1a365d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .timeline-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2c5282;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-type {
+        display: inline-block;
+        padding: 0.25rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-type.fundacao { background: #e8f5e8; color: #2e7d32; }
+    .timeline-type.conquista { background: #fff3e0; color: #f57c00; }
+    .timeline-type.evento { background: #e3f2fd; color: #1976d2; }
+    .timeline-type.reconhecimento { background: #fce4ec; color: #c2185b; }
+    .timeline-type.expansao { background: #f3e5f5; color: #7b1fa2; }
+    .timeline-type.outro { background: #f5f5f5; color: #616161; }
+    
+    .timeline-description {
+        color: #495057;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+    }
+    
+    /* Galeria de Imagens */
+    .timeline-gallery {
+        margin: 1.5rem 0;
+    }
+    
+    .gallery-title {
+        color: #2c5282;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .gallery-item {
+        position: relative;
+        cursor: pointer;
+        border-radius: 10px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .gallery-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .gallery-item img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .gallery-item:hover img {
+        transform: scale(1.05);
+    }
+    
+    .gallery-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        color: white;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.2;
+    }
+    
+    /* Modal para visualização de imagens */
+    .gallery-modal .modal-dialog {
+        max-width: 90vw;
+        max-height: 90vh;
+    }
+    
+    .gallery-modal .modal-content {
+        background: transparent;
+        border: none;
+    }
+    
+    .gallery-modal .modal-body {
+        padding: 0;
+        text-align: center;
+    }
+    
+    .gallery-modal .modal-body img {
+        max-width: 100%;
+        max-height: 80vh;
+        object-fit: contain;
+        border-radius: 10px;
+    }
+    
+    .gallery-modal .modal-header {
+        border: none;
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1050;
+    }
+    
+    .gallery-modal .btn-close {
+        background: rgba(0,0,0,0.5);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        opacity: 1;
+    }
+    
+    .highlight-section {
+        background: #f8f9fa;
+        padding: 3rem 0;
+        margin: 3rem 0;
+    }
+    
+    .highlight-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 2rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .highlight-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .highlight-icon {
+        font-size: 3rem;
+        color: #1a365d;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-section {
+        background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        color: white;
+        padding: 3rem 0;
+        margin: 3rem 0;
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        color: #dee2e6;
+    }
+    
+    @media (max-width: 768px) {
+        .timeline-line {
+            left: 2rem;
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content,
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 4rem;
+            margin-right: 0;
+            padding-left: 2rem;
+            padding-right: 1rem;
+            text-align: left;
+        }
+        
+        .timeline-dot {
+            left: 2rem;
+        }
+        
+        .hero-section {
+            padding: 2rem 0;
+        }
+        
+        /* Card do presidente atual em mobile */
+        .presidente-atual-card {
+            margin-bottom: 1rem;
+            max-width: 100% !important;
+        }
+        
+        .presidente-atual-card .d-flex {
+            flex-direction: column;
+            text-align: left;
+        }
+        
+        .presidente-atual-card img,
+        .presidente-atual-card div[style*="width: 50px"] {
+            margin-right: 0 !important;
+            margin-bottom: 10px;
+        }
+        
+        /* Layout responsivo para presidente e galeria */
+        .d-flex.justify-content-between {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .galeria-link {
+            text-align: center;
+        }
+        
+        .galeria-link .btn {
+            width: 100%;
+        }
+    }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+<div class="hero-section">
+    <div class="container-fluid px-4">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center mb-4">
+                    <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="hero-logo me-4" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3); object-fit: cover; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                    <div>
+                        <h1 class="display-4 fw-bold mb-2">
+                            {{ title }}
+                        </h1>
+                        <p class="lead mb-0">{{ subtitle }}</p>
+                    </div>
+                </div>
+                
+                <p class="mb-4">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    Uma jornada de dedicação, conquistas e crescimento
+                </p>
+                
+                <div class="mt-3">
+                    <a href="{% url 'core:institucional' %}" class="btn-back">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar ao Início
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <i class="fas fa-history" style="font-size: 8rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Presidente Atual -->
+{% if presidente_atual %}
+<div class="container-fluid px-4 mb-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="presidente-atual-card" style="background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #1a365d; max-width: 300px;">
+                    <div class="d-flex align-items-center">
+                        {% if presidente_atual.associado.foto %}
+                            <img src="{{ presidente_atual.associado.foto.url }}" alt="{{ presidente_atual.associado.nome }}" style="width: 50px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 2px solid #1a365d;">
+                        {% else %}
+                            <div style="width: 50px; height: 60px; border-radius: 8px; background: #1a365d; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-1 fw-bold text-dark">{{ presidente_atual.associado.nome }}</h6>
+                            <small class="text-muted">{{ presidente_atual.associado.get_posto_graduacao_display }}</small>
+                            <br><small class="text-primary fw-bold">Presidente Atual</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="galeria-link">
+                    <a href="{% url 'core:ex_presidentes' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-users me-2"></i>
+                        Ver Galeria de Ex-Presidentes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<div class="container">
+    {% if marcos_historicos %}
+        <!-- Marcos em Destaque -->
+        {% if marcos_destaque %}
+        <div class="highlight-section">
+            <div class="container">
+                <h2 class="text-center mb-5">
+                    <i class="fas fa-star me-3"></i>
+                    Marcos em Destaque
+                </h2>
+                <div class="row">
+                    {% for marco in marcos_destaque %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="highlight-card">
+                            <div class="highlight-icon">
+                                {% if marco.tipo == 'fundacao' %}
+                                    <i class="fas fa-seedling"></i>
+                                {% elif marco.tipo == 'conquista' %}
+                                    <i class="fas fa-trophy"></i>
+                                {% elif marco.tipo == 'evento' %}
+                                    <i class="fas fa-calendar-check"></i>
+                                {% elif marco.tipo == 'reconhecimento' %}
+                                    <i class="fas fa-award"></i>
+                                {% elif marco.tipo == 'expansao' %}
+                                    <i class="fas fa-expand-arrows-alt"></i>
+                                {% else %}
+                                    <i class="fas fa-bookmark"></i>
+                                {% endif %}
+                            </div>
+                            <h4>{{ marco.titulo }}</h4>
+                            <p class="text-muted">{{ marco.ano }}</p>
+                            <p>{{ marco.descricao|truncatewords:20 }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Timeline Principal -->
+        <div class="timeline-container">
+            <div class="timeline-line"></div>
+            
+            {% for marco in marcos_historicos %}
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-year">{{ marco.ano }}</div>
+                    <h3 class="timeline-title">{{ marco.titulo }}</h3>
+                    <span class="timeline-type {{ marco.tipo }}">{{ marco.get_tipo_display }}</span>
+                    
+                    {% if marco.imagem %}
+                        <img src="{{ marco.imagem.url }}" alt="{{ marco.titulo }}" class="timeline-image">
+                    {% endif %}
+                    
+                    <!-- Galeria de Imagens -->
+                    {% if marco.galeria_imagens.all %}
+                    <div class="timeline-gallery">
+                        <h5 class="gallery-title">
+                            <i class="fas fa-images me-2"></i>
+                            Galeria de Imagens
+                        </h5>
+                        <div class="gallery-grid">
+                            {% for imagem in marco.galeria_imagens.all %}
+                            <div class="gallery-item" data-bs-toggle="modal" data-bs-target="#imageModal{{ imagem.id }}">
+                                <img src="{{ imagem.imagem.url }}" alt="{{ imagem.legenda|default:marco.titulo }}" class="img-fluid">
+                                {% if imagem.legenda %}
+                                <div class="gallery-caption">
+                                    <small>{{ imagem.legenda }}</small>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="timeline-description">
+                        {{ marco.descricao|linebreaks }}
+                    </div>
+                    
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Estatísticas -->
+        <div class="stats-section">
+            <div class="container">
+                <h2 class="text-center mb-5">
+                    <i class="fas fa-chart-line me-3"></i>
+                    Nossa Trajetória em Números
+                </h2>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ marcos_historicos|length }}</div>
+                            <div class="stat-label">Marcos Históricos</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-item">
+                            <div class="stat-number">
+                                {% now "Y" as ano_atual %}
+                                {% now "m" as mes_atual %}
+                                {% now "d" as dia_atual %}
+                                {% if mes_atual|add:0 > 8 or mes_atual|add:0 == 8 and dia_atual|add:0 >= 30 %}
+                                    {{ ano_atual|add:0|add:"-2005" }}
+                                {% else %}
+                                    {{ ano_atual|add:0|add:"-2006" }}
+                                {% endif %}
+                            </div>
+                            <div class="stat-label">Anos de História</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-item">
+                            <div class="stat-number">{{ marcos_destaque|length }}</div>
+                            <div class="stat-label">Marcos em Destaque</div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="stat-item">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Dedicação</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    {% else %}
+        <!-- Estado Vazio -->
+        <div class="empty-state">
+            <i class="fas fa-landmark"></i>
+            <h3>História em Construção</h3>
+            <p>Os marcos históricos da ABMEPI serão exibidos aqui assim que forem cadastrados.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Footer -->
+<footer class="bg-dark text-light py-4 mt-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>ABMEPI</h5>
+                <p class="mb-0">Associação de Bombeiros e Policiais Militares do Estado do Piauí</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="mb-0">&copy; 2025 Erisman@TI. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Modais para Galeria de Imagens -->
+{% for marco in marcos_historicos %}
+    {% for imagem in marco.galeria_imagens.all %}
+    <div class="modal fade gallery-modal" id="imageModal{{ imagem.id }}" tabindex="-1" aria-labelledby="imageModalLabel{{ imagem.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="{{ imagem.imagem.url }}" alt="{{ imagem.legenda|default:marco.titulo }}" class="img-fluid">
+                    {% if imagem.legenda %}
+                    <div class="mt-3">
+                        <h5 class="text-white">{{ imagem.legenda }}</h5>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endfor %}
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação de entrada dos itens da timeline
+    const timelineItems = document.querySelectorAll('.timeline-item');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 200);
+            }
+        });
+    });
+    
+    timelineItems.forEach(item => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(50px)';
+        item.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        observer.observe(item);
+    });
+    
+    // Animação dos números das estatísticas
+    const statNumbers = document.querySelectorAll('.stat-number');
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const target = entry.target;
+                const finalNumber = parseInt(target.textContent);
+                let currentNumber = 0;
+                const increment = finalNumber / 50;
+                
+                const timer = setInterval(() => {
+                    currentNumber += increment;
+                    if (currentNumber >= finalNumber) {
+                        target.textContent = finalNumber;
+                        clearInterval(timer);
+                    } else {
+                        target.textContent = Math.floor(currentNumber);
+                    }
+                }, 30);
+            }
+        });
+    });
+    
+    statNumbers.forEach(stat => {
+        statsObserver.observe(stat);
+    });
+});
+</script>
+</body>
+</html>

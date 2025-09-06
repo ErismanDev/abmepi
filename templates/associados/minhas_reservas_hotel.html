@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .reserva-card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
+    }
+    
+    .reserva-card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .status-badge {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .priority-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #6c757d;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .date-info {
+        background: #f8f9fa;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .hotel-info {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Cabeçalho da Página -->
+<div class="page-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">{{ title }}</h1>
+                <p class="mb-0">{{ subtitle }}</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <a href="{% url 'associados:minha_ficha' %}" class="btn btn-outline-light">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Voltar para Minha Ficha
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Estatísticas Rápidas -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center bg-warning text-white">
+                <div class="card-body">
+                    <i class="fas fa-bed fa-2x mb-2"></i>
+                    <h4 class="mb-1">{{ reservas.count }}</h4>
+                    <small>Total de Reservas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-success text-white">
+                <div class="card-body">
+                    <i class="fas fa-check-circle fa-2x mb-2"></i>
+                    <h4 class="mb-1">{{ reservas|dictsort:"status"|length }}</h4>
+                    <small>Confirmadas</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-info text-white">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x mb-2"></i>
+                    <h4 class="mb-1">{{ reservas|dictsort:"status"|length }}</h4>
+                    <small>Pendentes</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center bg-primary text-white">
+                <div class="card-body">
+                    <i class="fas fa-calendar fa-2x mb-2"></i>
+                    <h4 class="mb-1">{{ reservas|dictsort:"data_entrada"|length }}</h4>
+                    <small>Este Mês</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Reservas -->
+    {% if reservas %}
+        <div class="row">
+            {% for reserva in reservas %}
+            <div class="col-12">
+                <div class="card reserva-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">
+                                <i class="fas fa-bed me-2"></i>
+                                Reserva #{{ reserva.id }}
+                            </h5>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                Criada em: {{ reserva.data_reserva|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <span class="badge status-badge 
+                                {% if reserva.status == 'confirmada' %}bg-success
+                                {% elif reserva.status == 'pendente' %}bg-warning
+                                {% elif reserva.status == 'cancelada' %}bg-danger
+                                {% elif reserva.status == 'concluida' %}bg-info
+                                {% else %}bg-secondary{% endif %}">
+                                {{ reserva.get_status_display }}
+                            </span>
+                            {% if reserva.prioridade %}
+                            <span class="badge priority-badge 
+                                {% if reserva.prioridade == 'alta' %}bg-danger
+                                {% elif reserva.prioridade == 'media' %}bg-warning
+                                {% else %}bg-success{% endif %}">
+                                {{ reserva.get_prioridade_display }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="card-title">
+                                    {% if reserva.quarto %}
+                                        {{ reserva.quarto.tipo_quarto|default:"Quarto" }} - {{ reserva.quarto.numero|default:"N/A" }}
+                                    {% else %}
+                                        Quarto não especificado
+                                    {% endif %}
+                                </h6>
+                                
+                                <div class="date-info">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <strong>Check-in:</strong><br>
+                                            <span class="text-success">{{ reserva.data_entrada|date:"d/m/Y" }}</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Check-out:</strong><br>
+                                            <span class="text-danger">{{ reserva.data_saida|date:"d/m/Y" }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-6">
+                                            <strong>Duração:</strong><br>
+                                            <span class="text-info">{{ reserva.duracao_dias|default:"N/A" }} dias</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <strong>Hóspedes:</strong><br>
+                                            <span class="text-muted">{{ reserva.numero_hospedes|default:"1" }} pessoa(s)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                {% if reserva.hotel %}
+                                <div class="hotel-info">
+                                    <strong>Hotel:</strong> {{ reserva.hotel.nome }}
+                                    {% if reserva.hotel.endereco %}
+                                    <br><small class="text-muted">{{ reserva.hotel.endereco }}</small>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                {% if reserva.observacoes %}
+                                <div class="mb-2">
+                                    <strong>Observações:</strong>
+                                    <span class="text-muted">{{ reserva.observacoes|truncatewords:20 }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-end">
+                                    {% if reserva.valor_total %}
+                                    <div class="mb-2">
+                                        <strong>Valor Total:</strong><br>
+                                        <span class="text-success fs-5">R$ {{ reserva.valor_total|floatformat:2 }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if reserva.valor_diaria %}
+                                    <div class="mb-2">
+                                        <strong>Valor da Diária:</strong><br>
+                                        <span class="text-info">R$ {{ reserva.valor_diaria|floatformat:2 }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if reserva.data_confirmacao %}
+                                    <div class="mb-2">
+                                        <strong>Confirmada em:</strong><br>
+                                        <small class="text-muted">{{ reserva.data_confirmacao|date:"d/m/Y H:i" }}</small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-outline-warning" 
+                                                onclick="verDetalhesReserva({{ reserva.id }})">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Ver Detalhes
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-bed"></i>
+            <h4>Nenhuma Reserva Encontrada</h4>
+            <p class="mb-3">Você ainda não possui reservas registradas no sistema.</p>
+            <p class="text-muted">
+                As reservas aparecerão aqui assim que forem criadas pela equipe do hotel.
+            </p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Modal para Detalhes da Reserva -->
+<div class="modal fade" id="reservaModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalhes da Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="reservaModalBody">
+                <!-- Conteúdo será carregado via AJAX -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function verDetalhesReserva(reservaId) {
+    // Aqui você pode implementar a lógica para carregar os detalhes da reserva
+    // Por enquanto, apenas mostra o modal
+    $('#reservaModal').modal('show');
+    
+    // Exemplo de como carregar dados via AJAX:
+    /*
+    $.get(`/hotel_transito/api/reserva/${reservaId}/`, function(data) {
+        $('#reservaModalBody').html(data.html);
+        $('#reservaModal').modal('show');
+    });
+    */
+}
+</script>
+{% endblock %}

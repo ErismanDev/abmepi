@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-badge {
+        font-size: 0.8em;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .status-aprovado {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .status-rejeitado {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-history text-info"></i>
+                                {{ title }}
+                            </h3>
+                            <p class="text-muted mb-0">{{ subtitle }}</p>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'associados:pre_cadastro_list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-user-clock"></i> Pendentes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" 
+                                       name="search" 
+                                       class="form-control me-2" 
+                                       placeholder="Buscar por nome, CPF ou email..."
+                                       value="{{ search }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                {% if search %}
+                                <a href="{% url 'associados:pre_cadastro_historico' %}" class="btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <select name="status" class="form-select me-2">
+                                    <option value="">Todos os status</option>
+                                    {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                                {% if status_filter %}
+                                <a href="{% url 'associados:pre_cadastro_historico' %}{% if search %}?search={{ search }}{% endif %}" class="btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                    
+                    {% if pre_cadastros %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>Email</th>
+                                    <th>Data Cadastro</th>
+                                    <th>Data Análise</th>
+                                    <th>Analisado por</th>
+                                    <th>Status</th>
+                                    <th width="100">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pre_cadastro in pre_cadastros %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ pre_cadastro.nome }}</strong>
+                                        {% if pre_cadastro.foto %}
+                                        <img src="{{ pre_cadastro.foto.url }}" 
+                                             class="rounded-circle ms-2" 
+                                             width="30" height="30" 
+                                             alt="Foto">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ pre_cadastro.cpf }}</td>
+                                    <td>{{ pre_cadastro.email|default:"-" }}</td>
+                                    <td>{{ pre_cadastro.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ pre_cadastro.data_analise|date:"d/m/Y H:i" }}</td>
+                                    <td>{{ pre_cadastro.analisado_por.get_full_name|default:pre_cadastro.analisado_por.username }}</td>
+                                    <td>
+                                        <span class="badge status-badge status-{{ pre_cadastro.status }}">
+                                            {% if pre_cadastro.status == 'aprovado' %}
+                                                <i class="fas fa-check"></i> Aprovado
+                                            {% elif pre_cadastro.status == 'rejeitado' %}
+                                                <i class="fas fa-times"></i> Rejeitado
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'associados:pre_cadastro_detail' pre_cadastro.pk %}" 
+                                           class="btn btn-sm btn-outline-info" 
+                                           title="Ver detalhes">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Paginação -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginação">
+                        <ul class="pagination justify-content-center">
+                            {% if pre_cadastros.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pre_cadastros.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ pre_cadastros.number }} de {{ pre_cadastros.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if pre_cadastros.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pre_cadastros.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ pre_cadastros.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">Nenhum histórico encontrado</h4>
+                        <p class="text-muted">
+                            {% if status_filter %}
+                                Não há pré-cadastros com status "{{ status_filter }}" no histórico.
+                            {% elif search %}
+                                Nenhum pré-cadastro encontrado para "{{ search }}".
+                            {% else %}
+                                Não há pré-cadastros no histórico ainda.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'associados:pre_cadastro_list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-user-clock"></i> Ver Pendentes
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

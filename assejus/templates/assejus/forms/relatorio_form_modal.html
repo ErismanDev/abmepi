@@ -1,0 +1,349 @@
+{% load static %}
+
+<form id="relatorioForm" method="post" class="modal-form">
+    {% csrf_token %}
+    
+    <!-- Configurações do Relatório -->
+    <div class="row">
+        <div class="col-md-8">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-chart-bar me-2"></i>Configurações do Relatório
+            </h6>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                            {{ form.tipo.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.tipo }}
+                        {% if form.tipo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.tipo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.escopo.id_for_label }}" class="form-label">
+                            {{ form.escopo.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.escopo }}
+                        {% if form.escopo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.escopo.errors.0 }}
+                            </div>
+                        {% endif %}
+                        <small class="form-text text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Escopo geral ou por advogado específico
+                        </small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.periodo_inicio.id_for_label }}" class="form-label">
+                            {{ form.periodo_inicio.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.periodo_inicio }}
+                        {% if form.periodo_inicio.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.periodo_inicio.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.periodo_fim.id_for_label }}" class="form-label">
+                            {{ form.periodo_fim.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.periodo_fim }}
+                        {% if form.periodo_fim.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.periodo_fim.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Campo advogado (condicional) -->
+            <div class="form-group" id="advogadoFieldGroup" style="display: none;">
+                <label for="{{ form.advogado.id_for_label }}" class="form-label">
+                    {{ form.advogado.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.advogado }}
+                {% if form.advogado.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.advogado.errors.0 }}
+                    </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Selecione o advogado para o relatório específico
+                </small>
+            </div>
+        </div>
+        
+        <!-- Informações Adicionais -->
+        <div class="col-md-4">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-info-circle me-2"></i>Informações
+            </h6>
+            
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fas fa-calendar me-2"></i>Período
+                    </h6>
+                    <p class="card-text">
+                        <strong>De:</strong> <span id="dataInicioDisplay">--</span><br>
+                        <strong>Até:</strong> <span id="dataFimDisplay">--</span>
+                    </p>
+                    
+                    <h6 class="card-title mt-3">
+                        <i class="fas fa-user me-2"></i>Usuário
+                    </h6>
+                    <p class="card-text">
+                        <span id="usuarioGeracao">
+                            {{ request.user.get_full_name|default:request.user.username }}
+                        </span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-3">
+                <i class="fas fa-lightbulb me-2"></i>
+                <strong>Dica:</strong> O relatório será gerado automaticamente com base nos parâmetros selecionados.
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros Adicionais -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-filter me-2"></i>Filtros Adicionais
+            </h6>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Status dos Atendimentos</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="statusAberto" checked>
+                            <label class="form-check-label" for="statusAberto">Aberto</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="statusEmAndamento" checked>
+                            <label class="form-check-label" for="statusEmAndamento">Em Andamento</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="statusConcluido" checked>
+                            <label class="form-check-input" for="statusConcluido">Concluído</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="statusArquivado">
+                            <label class="form-check-label" for="statusArquivado">Arquivado</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Tipos de Demanda</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="tipoCivil" checked>
+                            <label class="form-check-label" for="tipoCivil">Civil</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="tipoTrabalhista" checked>
+                            <label class="form-check-label" for="tipoTrabalhista">Trabalhista</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="tipoPrevidenciario" checked>
+                            <label class="form-check-label" for="tipoPrevidenciario">Previdenciário</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="tipoPenal" checked>
+                            <label class="form-check-label" for="tipoPenal">Penal</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="form-label">Prioridades</label>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="prioridadeBaixa" checked>
+                            <label class="form-check-label" for="prioridadeBaixa">Baixa</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="prioridadeMedia" checked>
+                            <label class="form-check-label" for="prioridadeMedia">Média</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="prioridadeAlta" checked>
+                            <label class="form-check-label" for="prioridadeAlta">Alta</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="prioridadeUrgente" checked>
+                            <label class="form-check-label" for="prioridadeUrgente">Urgente</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botões de ação -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-chart-bar me-2"></i>
+            {% if form.instance.pk %}Atualizar{% else %}Gerar Relatório{% endif %}
+        </button>
+    </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('relatorioForm');
+    if (form) {
+        // Campos principais
+        const escopoField = form.querySelector('select[name="escopo"]');
+        const advogadoFieldGroup = document.getElementById('advogadoFieldGroup');
+        const advogadoField = form.querySelector('select[name="advogado"]');
+        const periodoInicioField = form.querySelector('input[name="periodo_inicio"]');
+        const periodoFimField = form.querySelector('input[name="periodo_fim"]');
+        
+        // Display de datas
+        const dataInicioDisplay = document.getElementById('dataInicioDisplay');
+        const dataFimDisplay = document.getElementById('dataFimDisplay');
+        
+        // Mostrar/ocultar campo advogado baseado no escopo
+        if (escopoField) {
+            escopoField.addEventListener('change', function() {
+                if (this.value === 'por_advogado') {
+                    advogadoFieldGroup.style.display = 'block';
+                    if (advogadoField) {
+                        advogadoField.required = true;
+                    }
+                } else {
+                    advogadoFieldGroup.style.display = 'none';
+                    if (advogadoField) {
+                        advogadoField.required = false;
+                        advogadoField.value = '';
+                    }
+                }
+            });
+            
+            // Executar na inicialização
+            escopoField.dispatchEvent(new Event('change'));
+        }
+        
+        // Atualizar display de datas
+        function atualizarDisplayDatas() {
+            if (periodoInicioField && periodoInicioField.value) {
+                const dataInicio = new Date(periodoInicioField.value);
+                dataInicioDisplay.textContent = dataInicio.toLocaleDateString('pt-BR');
+            }
+            
+            if (periodoFimField && periodoFimField.value) {
+                const dataFim = new Date(periodoFimField.value);
+                dataFimDisplay.textContent = dataFim.toLocaleDateString('pt-BR');
+            }
+        }
+        
+        if (periodoInicioField) {
+            periodoInicioField.addEventListener('change', atualizarDisplayDatas);
+        }
+        
+        if (periodoFimField) {
+            periodoFimField.addEventListener('change', atualizarDisplayDatas);
+        }
+        
+        // Validação de período
+        if (periodoInicioField && periodoFimField) {
+            periodoFimField.addEventListener('change', function() {
+                const dataInicio = periodoInicioField.value ? new Date(periodoInicioField.value) : null;
+                const dataFim = this.value ? new Date(this.value) : null;
+                
+                if (dataInicio && dataFim && dataInicio > dataFim) {
+                    this.classList.add('is-invalid');
+                    let feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback d-block';
+                        feedback.textContent = 'A data de fim deve ser posterior à data de início.';
+                        this.parentNode.appendChild(feedback);
+                    }
+                } else {
+                    this.classList.remove('is-invalid');
+                    const feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.remove();
+                    }
+                }
+            });
+        }
+        
+        // Definir datas padrão (último mês)
+        function definirDatasPadrao() {
+            const hoje = new Date();
+            const primeiroDiaMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+            const ultimoDiaMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
+            
+            if (periodoInicioField && !periodoInicioField.value) {
+                periodoInicioField.value = primeiroDiaMes.toISOString().split('T')[0];
+            }
+            
+            if (periodoFimField && !periodoFimField.value) {
+                periodoFimField.value = ultimoDiaMes.toISOString().split('T')[0];
+            }
+            
+            atualizarDisplayDatas();
+        }
+        
+        // Executar na inicialização se não houver datas
+        if ((!periodoInicioField || !periodoInicioField.value) && (!periodoFimField || !periodoFimField.value)) {
+            definirDatasPadrao();
+        }
+        
+        // Validação de campos obrigatórios
+        const camposObrigatorios = [escopoField, periodoInicioField, periodoFimField];
+        
+        camposObrigatorios.forEach(campo => {
+            if (campo) {
+                campo.addEventListener('change', function() {
+                    if (this.required && !this.value) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+            }
+        });
+        
+        // Validação especial para advogado quando escopo for específico
+        if (advogadoField) {
+            advogadoField.addEventListener('change', function() {
+                if (escopoField && escopoField.value === 'por_advogado' && !this.value) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        }
+    }
+});
+</script>

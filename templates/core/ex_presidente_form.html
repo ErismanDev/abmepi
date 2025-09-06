@@ -1,0 +1,416 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if object %}Editar Ex-Presidente{% else %}Adicionar Ex-Presidente{% endif %} - ABMEPI
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .form-header {
+        background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 15px 15px 0 0;
+        margin: -2rem -2rem 2rem -2rem;
+        text-align: center;
+    }
+    
+    .form-header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .form-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #1a365d;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #1a365d;
+        box-shadow: 0 0 0 0.2rem rgba(26, 54, 93, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .btn {
+        border-radius: 10px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(26, 54, 93, 0.3);
+    }
+    
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+    }
+    
+    .btn-outline-secondary:hover {
+        background: #6c757d;
+        border-color: #6c757d;
+        color: white;
+    }
+    
+    .photo-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-top: 1rem;
+    }
+    
+    .alert {
+        border-radius: 10px;
+        border: none;
+    }
+    
+    .required-field::after {
+        content: " *";
+        color: #dc3545;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>
+                        <i class="fas fa-users-cog me-3"></i>
+                        {% if object %}Editar Ex-Presidente{% else %}Adicionar Ex-Presidente{% endif %}
+                    </h1>
+                    <p>
+                        {% if object %}
+                            Atualize as informações do ex-presidente
+                        {% else %}
+                            Preencha os dados do novo ex-presidente
+                        {% endif %}
+                    </p>
+                </div>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data" id="ex-presidente-form">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <!-- Informações Básicas -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.nome.id_for_label }}" class="form-label required-field">
+                                    <i class="fas fa-user me-1"></i>
+                                    Nome Completo
+                                </label>
+                                {{ form.nome }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Nome completo do ex-presidente
+                                </div>
+                                {% if form.nome.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.nome.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.posto_graduacao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-star me-1"></i>
+                                    Posto/Graduação
+                                </label>
+                                {{ form.posto_graduacao }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Ex: Coronel, Tenente-Coronel, etc.
+                                </div>
+                                {% if form.posto_graduacao.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.posto_graduacao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Foto -->
+                    <div class="form-group">
+                        <label for="{{ form.foto.id_for_label }}" class="form-label">
+                            <i class="fas fa-camera me-1"></i>
+                            Foto
+                        </label>
+                        {{ form.foto }}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Imagem do ex-presidente (opcional)
+                        </div>
+                        {% if form.foto.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.foto.errors.0 }}
+                            </div>
+                        {% endif %}
+                        
+                        {% if object and object.foto %}
+                            <div class="mt-2">
+                                <img src="{{ object.foto.url }}" alt="Foto atual" class="photo-preview">
+                                <p class="small text-muted mt-1">Foto atual</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Período de Mandato -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.periodo_inicio.id_for_label }}" class="form-label required-field">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Início do Mandato
+                                </label>
+                                {{ form.periodo_inicio }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Data de posse na presidência
+                                </div>
+                                {% if form.periodo_inicio.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.periodo_inicio.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.periodo_fim.id_for_label }}" class="form-label required-field">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Fim do Mandato
+                                </label>
+                                {{ form.periodo_fim }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Data de término do mandato
+                                </div>
+                                {% if form.periodo_fim.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.periodo_fim.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Biografia -->
+                    <div class="form-group">
+                        <label for="{{ form.biografia.id_for_label }}" class="form-label">
+                            <i class="fas fa-book me-1"></i>
+                            Biografia
+                        </label>
+                        {{ form.biografia }}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Biografia do ex-presidente (opcional)
+                        </div>
+                        {% if form.biografia.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.biografia.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Principais Realizações -->
+                    <div class="form-group">
+                        <label for="{{ form.principais_realizacoes.id_for_label }}" class="form-label">
+                            <i class="fas fa-trophy me-1"></i>
+                            Principais Realizações
+                        </label>
+                        {{ form.principais_realizacoes }}
+                        <div class="form-text">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Conquistas durante o mandato (opcional)
+                        </div>
+                        {% if form.principais_realizacoes.errors %}
+                            <div class="text-danger small mt-1">
+                                {{ form.principais_realizacoes.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Configurações -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <div class="form-check">
+                                    {{ form.ativo }}
+                                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Exibir na galeria
+                                    </label>
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Marque para exibir na galeria pública
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="{{ form.ordem_exibicao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sort me-1"></i>
+                                    Ordem de Exibição
+                                </label>
+                                {{ form.ordem_exibicao }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    0 = primeiro, 1 = segundo, etc.
+                                </div>
+                                {% if form.ordem_exibicao.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {{ form.ordem_exibicao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'core:ex_presidentes' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à Galeria
+                        </a>
+                        
+                        <div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                {% if object %}Atualizar{% else %}Adicionar{% endif %} Ex-Presidente
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview da foto
+    const fotoInput = document.getElementById('{{ form.foto.id_for_label }}');
+    if (fotoInput) {
+        fotoInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Remover preview anterior se existir
+                    const existingPreview = document.querySelector('.photo-preview-new');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                    
+                    // Criar novo preview
+                    const preview = document.createElement('img');
+                    preview.src = e.target.result;
+                    preview.className = 'photo-preview photo-preview-new';
+                    preview.style.marginTop = '1rem';
+                    
+                    // Inserir após o input
+                    fotoInput.parentNode.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+    
+    // Validação do formulário
+    const form = document.getElementById('ex-presidente-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const nome = document.getElementById('{{ form.nome.id_for_label }}').value.trim();
+            const periodoInicio = document.getElementById('{{ form.periodo_inicio.id_for_label }}').value;
+            const periodoFim = document.getElementById('{{ form.periodo_fim.id_for_label }}').value;
+            
+            if (!nome) {
+                e.preventDefault();
+                alert('Por favor, preencha o nome do ex-presidente.');
+                return;
+            }
+            
+            if (!periodoInicio) {
+                e.preventDefault();
+                alert('Por favor, selecione a data de início do mandato.');
+                return;
+            }
+            
+            if (!periodoFim) {
+                e.preventDefault();
+                alert('Por favor, selecione a data de fim do mandato.');
+                return;
+            }
+            
+            // Verificar se data de fim é posterior à data de início
+            if (periodoInicio && periodoFim && new Date(periodoFim) <= new Date(periodoInicio)) {
+                e.preventDefault();
+                alert('A data de fim do mandato deve ser posterior à data de início.');
+                return;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

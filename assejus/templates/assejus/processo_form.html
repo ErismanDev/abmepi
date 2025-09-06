@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-gavel text-primary"></i>
+                        {{ title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Informações do Processo
+                                </h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.numero_processo.id_for_label }}" class="form-label">
+                                                {{ form.numero_processo.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.numero_processo }}
+                                            {% if form.numero_processo.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.numero_processo.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                            <div class="form-text">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                {{ form.numero_processo.help_text }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.tipo_acao.id_for_label }}" class="form-label">
+                                                {{ form.tipo_acao.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.tipo_acao }}
+                                            {% if form.tipo_acao.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.tipo_acao.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.vara_tribunal.id_for_label }}" class="form-label">
+                                        {{ form.vara_tribunal.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.vara_tribunal }}
+                                    {% if form.vara_tribunal.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.vara_tribunal.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.parte_cliente.id_for_label }}" class="form-label">
+                                                {{ form.parte_cliente.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.parte_cliente }}
+                                            {% if form.parte_cliente.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.parte_cliente.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.situacao_atual.id_for_label }}" class="form-label">
+                                                {{ form.situacao_atual.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.situacao_atual }}
+                                            {% if form.situacao_atual.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.situacao_atual.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.parte_contraria.id_for_label }}" class="form-label">
+                                        {{ form.parte_contraria.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.parte_contraria }}
+                                    {% if form.parte_contraria.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.parte_contraria.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.advogado_parte_contraria.id_for_label }}" class="form-label">
+                                        {{ form.advogado_parte_contraria.label }}
+                                    </label>
+                                    {{ form.advogado_parte_contraria }}
+                                    {% if form.advogado_parte_contraria.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.advogado_parte_contraria.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ form.advogado_parte_contraria.help_text }}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.advogado_responsavel.id_for_label }}" class="form-label">
+                                        {{ form.advogado_responsavel.label }}
+                                    </label>
+                                    {{ form.advogado_responsavel }}
+                                    {% if form.advogado_responsavel.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.advogado_responsavel.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.observacoes_gerais.id_for_label }}" class="form-label">
+                                        {{ form.observacoes_gerais.label }}
+                                    </label>
+                                    {{ form.observacoes_gerais }}
+                                    {% if form.observacoes_gerais.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.observacoes_gerais.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-lightbulb me-2"></i>Dicas
+                                </h6>
+                                
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-file-contract me-2"></i>Formato do Processo
+                                        </h6>
+                                        <p class="card-text">
+                                            Use o formato CNJ:<br>
+                                            <code>0001234-56.2024.8.26.0001</code>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Importante:</strong> O número do processo deve ser único no sistema.
+                                </div>
+                                
+                                <div class="alert alert-warning mt-3">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Atenção:</strong> Após criar o processo, você poderá adicionar documentos e andamentos.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                {{ action }} Processo
+                            </button>
+                            <a href="{% url 'assejus:processos_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

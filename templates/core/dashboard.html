@@ -1,0 +1,690 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - ABMEPI{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-tachometer-alt me-2"></i>
+        Dashboard
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshStats()">
+                <i class="fas fa-sync-alt me-1"></i>
+                Atualizar
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Notificações Pendentes -->
+{% if total_notificacoes_pendentes > 0 %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-left-warning shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-warning">
+                    <i class="fas fa-bell me-2"></i>
+                    Notificações Pendentes ({{ total_notificacoes_pendentes }})
+                </h6>
+                <a href="#" class="btn btn-sm btn-outline-warning" onclick="marcarTodasComoLidas()">
+                    <i class="fas fa-check me-1"></i>
+                    Marcar Todas como Lidas
+                </a>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for notificacao in notificacoes_pendentes %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card h-100 border-left-{% if notificacao.prioridade == 3 %}danger{% elif notificacao.prioridade == 2 %}warning{% else %}info{% endif %}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title text-{% if notificacao.prioridade == 3 %}danger{% elif notificacao.prioridade == 2 %}warning{% else %}info{% endif %}">
+                                        {{ notificacao.titulo }}
+                                    </h6>
+                                    <small class="text-muted">
+                                        {{ notificacao.data_criacao|timesince }} atrás
+                                    </small>
+                                </div>
+                                <p class="card-text text-muted small">
+                                    {{ notificacao.mensagem|truncatechars:100 }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-{% if notificacao.tipo == 'reserva_hotel' %}primary{% else %}secondary{% endif %}">
+                                        {{ notificacao.get_tipo_display }}
+                                    </span>
+                                    {% if notificacao.url_acao %}
+                                    <a href="{{ notificacao.url_acao }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>
+                                        Ver
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Estatísticas principais -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Associados Ativos
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-associados">
+                            {{ total_associados }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Receita do Mês
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="receita-mes">
+                            R$ {{ receita_mes|floatformat:2 }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Mensalidades Pendentes
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="mensalidades-pendentes">
+                            {{ mensalidades_pendentes }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Casos Jurídicos
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800" id="casos-juridicos">
+                            {{ casos_juridicos }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-gavel fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda linha de estatísticas -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-danger shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            Mensalidades Vencidas
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ mensalidades_vencidas }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-secondary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                            Total de Usuários
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ total_usuarios }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-shield fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-dark shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                            Associados por Estado
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ associados_por_estado|length }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-map-marker-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-light shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
+                            Atividades Hoje
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ atividades_recentes|length }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gráficos e tabelas -->
+<div class="row">
+    <!-- Gráfico de associados por situação -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Associados por Situação
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="associadosChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Atividades recentes -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-history me-2"></i>
+                    Atividades Recentes
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% for atividade in atividades_recentes %}
+                    <div class="timeline-item mb-3">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h6 class="timeline-title">{{ atividade.acao }}</h6>
+                            <p class="timeline-text small text-muted">
+                                {{ atividade.usuario.get_full_name|default:atividade.usuario.username }} - 
+                                {{ atividade.data_hora|date:"d/m/Y H:i" }}
+                            </p>
+                            <span class="badge bg-light text-dark">{{ atividade.modulo }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">Nenhuma atividade recente</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Segunda linha de gráficos e informações -->
+<div class="row mb-4">
+    <!-- Gráfico de associados por estado -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Associados por Estado
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="estadosChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Associados recentes -->
+    <div class="col-xl-6 col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Associados Recentes
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Estado</th>
+                                <th>Data Cadastro</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for associado in associados_recentes %}
+                            <tr>
+                                <td>{{ associado.nome|truncatechars:20 }}</td>
+                                <td>{{ associado.estado }}</td>
+                                <td>{{ associado.data_cadastro|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Nenhum associado recente</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações rápidas - Apenas para administradores -->
+{% if user.tipo_usuario == 'administrador_sistema' or user.is_superuser %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-bolt me-2"></i>
+                    Ações Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'associados:associado_create' %}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-user-plus fa-2x mb-2"></i><br>
+                            Novo Associado
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'associados:associado_list' %}" class="btn btn-outline-success w-100">
+                            <i class="fas fa-users fa-2x mb-2"></i><br>
+                            Listar Associados
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'assejus:index' %}" class="btn btn-outline-warning w-100">
+                            <i class="fas fa-gavel fa-2x mb-2"></i><br>
+                            ASSEJUS
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'core:usuario_create' %}" class="btn btn-outline-info w-100">
+                            <i class="fas fa-user-shield fa-2x mb-2"></i><br>
+                            Novo Usuário
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+.border-left-secondary {
+    border-left: 0.25rem solid #858796 !important;
+}
+.border-left-dark {
+    border-left: 0.25rem solid #5a5c69 !important;
+}
+.border-left-light {
+    border-left: 0.25rem solid #f8f9fc !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+.chart-area {
+    position: relative;
+    height: 20rem;
+    width: 100%;
+}
+.timeline {
+    position: relative;
+    padding-left: 30px;
+}
+.timeline-item {
+    position: relative;
+}
+.timeline-marker {
+    position: absolute;
+    left: -35px;
+    top: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+.timeline-content {
+    padding-left: 20px;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Gráfico de associados por situação
+const ctx = document.getElementById('associadosChart').getContext('2d');
+const associadosChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: [
+            {% for item in associados_por_situacao %}
+                '{{ item.situacao|title }}',
+            {% endfor %}
+        ],
+        datasets: [{
+            data: [
+                {% for item in associados_por_situacao %}
+                    {{ item.total }},
+                {% endfor %}
+            ],
+            backgroundColor: [
+                '#4e73df',
+                '#1cc88a',
+                '#f6c23e',
+                '#e74a3b'
+            ],
+            hoverBackgroundColor: [
+                '#2e59d9',
+                '#17a673',
+                '#f4b619',
+                '#e02424'
+            ],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+        }],
+    },
+    options: {
+        maintainAspectRatio: false,
+        tooltips: {
+            backgroundColor: "rgb(255,255,255)",
+            bodyFontColor: "#858796",
+            borderColor: '#dddfeb',
+            borderWidth: 1,
+            xPadding: 15,
+            yPadding: 15,
+            displayColors: false,
+            caretPadding: 10,
+        },
+        legend: {
+            display: false
+        },
+        cutoutPercentage: 80,
+    },
+});
+
+// Verificar se há dados para o gráfico
+if ({{ associados_por_situacao|length }} === 0) {
+    // Se não há dados, mostrar mensagem
+    const chartElement = document.getElementById('associadosChart');
+    if (chartElement) {
+        chartElement.style.display = 'none';
+        const chartContainer = chartElement.parentElement;
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="text-center text-muted"><i class="fas fa-chart-pie fa-3x mb-3"></i><p>Nenhum dado disponível para o gráfico</p></div>';
+        }
+    }
+}
+
+// Gráfico de associados por estado
+const ctxEstados = document.getElementById('estadosChart');
+if (ctxEstados) {
+    const estadosChart = new Chart(ctxEstados.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: [
+                {% for item in associados_por_estado %}
+                    '{{ item.estado }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Associados',
+                data: [
+                    {% for item in associados_por_estado %}
+                        {{ item.total }},
+                    {% endfor %}
+                ],
+                backgroundColor: '#4e73df',
+                borderColor: '#2e59d9',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+    
+    // Verificar se há dados para o gráfico de estados
+    if ({{ associados_por_estado|length }} === 0) {
+        ctxEstados.style.display = 'none';
+        const chartContainer = ctxEstados.parentElement;
+        if (chartContainer) {
+            chartContainer.innerHTML = '<div class="text-center text-muted"><i class="fas fa-chart-bar fa-3x mb-3"></i><p>Nenhum dado disponível para o gráfico</p></div>';
+        }
+    }
+}
+
+// Função para atualizar estatísticas
+function refreshStats() {
+    fetch('{% url "core:dashboard_stats" %}', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Atualizar estatísticas com verificação de elementos
+        const totalAssociados = document.getElementById('total-associados');
+        const receitaMes = document.getElementById('receita-mes');
+        const mensalidadesPendentes = document.getElementById('mensalidades-pendentes');
+        const casosJuridicos = document.getElementById('casos-juridicos');
+        
+        if (totalAssociados) totalAssociados.textContent = data.total_associados || 0;
+        if (receitaMes) receitaMes.textContent = 'R$ ' + parseFloat(data.receita_mes || 0).toFixed(2);
+        if (mensalidadesPendentes) mensalidadesPendentes.textContent = data.mensalidades_pendentes || 0;
+        if (casosJuridicos) casosJuridicos.textContent = data.casos_juridicos || 0;
+    })
+    .catch(error => {
+        console.error('Erro ao atualizar estatísticas:', error);
+        // Em caso de erro, não fazer nada - manter os valores atuais
+    });
+}
+
+// Atualizar estatísticas a cada 5 minutos
+setInterval(refreshStats, 300000);
+
+// Função para marcar todas as notificações como lidas
+function marcarTodasComoLidas() {
+    // Mostrar loading no botão
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Marcando...';
+    btn.disabled = true;
+    
+    // Fazer requisição AJAX
+    fetch('{% url "core:marcar_notificacoes_como_lidas" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Remover a seção de notificações pendentes da tela
+            const notificacoesSection = document.querySelector('.row.mb-4');
+            if (notificacoesSection) {
+                notificacoesSection.remove();
+            }
+            
+            // Mostrar mensagem de sucesso
+            showNotification('success', data.message);
+        } else {
+            showNotification('error', data.message || 'Erro ao marcar notificações como lidas');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao marcar notificações como lidas:', error);
+        showNotification('error', 'Erro de conexão. Tente novamente.');
+    })
+    .finally(() => {
+        // Restaurar botão
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
+
+// Função para mostrar notificações
+function showNotification(type, message) {
+    // Criar elemento de notificação
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    // Adicionar ao body
+    document.body.appendChild(notification);
+    
+    // Remover automaticamente após 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Reinicializar menu após carregamento da página
+document.addEventListener('DOMContentLoaded', function() {
+    // Aguardar um pouco para garantir que todos os scripts estejam carregados
+    setTimeout(() => {
+        if (typeof window.reinitializeMenu === 'function') {
+            window.reinitializeMenu();
+        } else {
+            // Fallback: tentar inicializar diretamente se a função não estiver disponível
+            if (typeof initializeSubmenus === 'function') {
+                initializeSubmenus();
+            }
+        }
+    }, 500);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-file-upload text-primary"></i>
+                        {{ title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% if request.GET.processo %}
+                            <input type="hidden" name="processo" value="{{ request.GET.processo }}">
+                        {% endif %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-info-circle me-2"></i>Informações do Documento
+                                </h6>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                                {{ form.titulo.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.titulo }}
+                                            {% if form.titulo.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.titulo.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label for="{{ form.tipo_documento.id_for_label }}" class="form-label">
+                                                {{ form.tipo_documento.label }} <span class="text-danger">*</span>
+                                            </label>
+                                            {{ form.tipo_documento }}
+                                            {% if form.tipo_documento.errors %}
+                                                <div class="invalid-feedback d-block">
+                                                    {{ form.tipo_documento.errors.0 }}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.processo.id_for_label }}" class="form-label">
+                                        {{ form.processo.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.processo }}
+                                    {% if form.processo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.processo.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.descricao.id_for_label }}" class="form-label">
+                                        {{ form.descricao.label }}
+                                    </label>
+                                    {{ form.descricao }}
+                                    {% if form.descricao.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.descricao.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="form-group mb-3">
+                                    <label for="{{ form.arquivo.id_for_label }}" class="form-label">
+                                        {{ form.arquivo.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.arquivo }}
+                                    {% if form.arquivo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.arquivo.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        {{ form.arquivo.help_text }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <h6 class="text-primary mb-3">
+                                    <i class="fas fa-lightbulb me-2"></i>Dicas
+                                </h6>
+                                
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-file me-2"></i>Formatos Aceitos
+                                        </h6>
+                                        <ul class="list-unstyled mb-0">
+                                            <li><i class="fas fa-file-pdf text-danger me-2"></i>PDF</li>
+                                            <li><i class="fas fa-file-word text-primary me-2"></i>DOC, DOCX</li>
+                                            <li><i class="fas fa-file-image text-success me-2"></i>JPG, PNG</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Importante:</strong> O arquivo deve ter no máximo 10MB.
+                                </div>
+                                
+                                <div class="alert alert-warning mt-3">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Atenção:</strong> Certifique-se de selecionar o processo correto antes de fazer o upload.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                {{ action }} Documento
+                            </button>
+                            <a href="{% url 'assejus:documento_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

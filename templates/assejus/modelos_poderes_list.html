@@ -1,0 +1,122 @@
+{% if error %}
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Erro ao carregar modelos: {{ error }}
+    </div>
+{% else %}
+    {% for modelo in modelos %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 modelo-card shadow-sm border-0">
+                <div class="card-header bg-light border-0 pb-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="card-title mb-0 text-primary fw-bold">
+                            <i class="fas fa-file-alt me-2"></i>{{ modelo.nome }}
+                        </h6>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown" title="Mais opções">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="useModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')">
+                                        <i class="fas fa-download me-2 text-primary"></i>Usar Modelo
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="previewModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')">
+                                        <i class="fas fa-eye me-2 text-info"></i>Visualizar
+                                    </a>
+                                </li>
+                                {% if modelo.criado_por == request.user %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="editarModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')">
+                                        <i class="fas fa-edit me-2 text-warning"></i>Editar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="excluirModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')">
+                                        <i class="fas fa-trash me-2"></i>Excluir
+                                    </a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text text-muted mb-3">
+                        <i class="fas fa-align-left me-1"></i>
+                        {{ modelo.descricao|truncatechars:120|default:"Sem descrição" }}
+                    </p>
+                    
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <div class="text-center p-2 bg-light rounded">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="fas fa-tag me-1"></i>Categoria
+                                </small>
+                                <span class="badge bg-primary">{{ modelo.get_categoria_display }}</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center p-2 bg-light rounded">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="fas fa-globe me-1"></i>Status
+                                </small>
+                                {% if modelo.publico %}
+                                    <span class="badge bg-success">Público</span>
+                                {% else %}
+                                    <span class="badge bg-info">Privado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="text-muted small">
+                            <div class="mb-1">
+                                <i class="fas fa-user me-1"></i>
+                                <strong>{{ modelo.criado_por.get_full_name|default:modelo.criado_por.username }}</strong>
+                            </div>
+                            <div>
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ modelo.data_criacao|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 pt-0">
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary btn-sm" onclick="useModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')">
+                            <i class="fas fa-download me-1"></i>
+                            Usar Modelo
+                        </button>
+                        {% if modelo.criado_por == request.user %}
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-outline-warning btn-sm" onclick="editarModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')" title="Editar modelo">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-outline-info btn-sm" onclick="previewModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')" title="Visualizar modelo">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="excluirModeloPoderes({{ modelo.id }}, '{{ modelo.tipo }}')" title="Excluir modelo">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-save fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">Nenhum modelo encontrado</h5>
+                <p class="text-muted">Tente ajustar os filtros de busca ou criar um novo modelo.</p>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}

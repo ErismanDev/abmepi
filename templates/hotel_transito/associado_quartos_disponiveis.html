@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Hotel de Trânsito{% endblock %}
+
+{% block extra_css %}
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+    }
+    
+    .table-section {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .table-header {
+        background: #f8f9fa;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .table-responsive {
+        border-radius: 0 0 15px 15px;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    .status-pendente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-confirmada {
+        background: #d1edff;
+        color: #0c5460;
+    }
+    
+    .status-cancelada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .btn-reservar {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-reservar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        color: white;
+    }
+    
+    /* Estilos do Calendário */
+    .calendar-mini {
+        font-size: 0.75rem;
+    }
+    
+    .calendar-header {
+        text-align: center;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .calendar-week {
+        display: flex;
+        margin-bottom: 0.25rem;
+    }
+    
+    .calendar-day {
+        flex: 1;
+        text-align: center;
+        padding: 0.25rem;
+        border-radius: 3px;
+        margin: 0 1px;
+        min-height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .calendar-day.available {
+        background: #d4edda;
+        color: #155724;
+        font-weight: 600;
+    }
+    
+    .calendar-day.reserved {
+        background: #fff3cd;
+        color: #856404;
+        font-weight: 600;
+        position: relative;
+    }
+    
+    .calendar-day.reserved::after {
+        content: "R";
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        font-size: 8px;
+        color: #856404;
+        font-weight: bold;
+    }
+    
+    .calendar-day.occupied {
+        background: #f8d7da;
+        color: #721c24;
+        font-weight: 600;
+        position: relative;
+    }
+    
+    .calendar-day.occupied::after {
+        content: "✕";
+        position: absolute;
+        top: 1px;
+        right: 1px;
+        font-size: 8px;
+        color: #721c24;
+    }
+    
+    .calendar-day:empty {
+        background: transparent;
+    }
+    
+    .day-number {
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1><i class="fas fa-bed me-3"></i>Hotel de Trânsito</h1>
+        <p>Reserve quartos e acompanhe suas reservas</p>
+    </div>
+
+    <!-- Calendário de Disponibilidade -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3 class="mb-0">
+                <i class="fas fa-calendar-alt me-2"></i>Calendário de Disponibilidade
+                <div class="float-end">
+                    <a href="?mes={{ calendario.mes_anterior }}&ano={{ calendario.ano_anterior }}" 
+                       class="btn btn-outline-secondary btn-sm me-2">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    <span class="fw-bold">{{ calendario.nome_mes }} {{ calendario.ano }}</span>
+                    <a href="?mes={{ calendario.mes_proximo }}&ano={{ calendario.ano_proximo }}" 
+                       class="btn btn-outline-secondary btn-sm ms-2">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </h3>
+        </div>
+        <div class="p-3">
+            <div class="row">
+                {% for quarto in quartos_disponiveis %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">Quarto {{ quarto.numero }}</h6>
+                        </div>
+                        <div class="card-body p-2">
+                            <div class="calendar-mini">
+                                <div class="calendar-header">
+                                    <small class="text-muted">Dom Seg Ter Qua Qui Sex Sáb</small>
+                                </div>
+                                {% for week in calendario.cal %}
+                                <div class="calendar-week">
+                                    {% for day in week %}
+                                    <div class="calendar-day {% if day != 0 %}{% if day in quarto.dias_ocupados %}occupied{% elif day in quarto.dias_reservados %}reserved{% else %}available{% endif %}{% endif %}">
+                                        {% if day != 0 %}
+                                            <span class="day-number">{{ day }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <span class="badge bg-success me-1">●</span> Disponível
+                                    <span class="badge bg-warning ms-2 me-1">R</span> Reservado
+                                    <span class="badge bg-danger ms-2 me-1">✕</span> Ocupado
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quartos Disponíveis -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3 class="mb-0"><i class="fas fa-bed me-2"></i>Quartos Disponíveis</h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Quarto</th>
+                        <th>Tipo</th>
+                        <th>Capacidade</th>
+                        <th>Valor Diária</th>
+                        <th>Descrição</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for quarto in quartos_disponiveis %}
+                    <tr>
+                        <td>
+                            <strong>{{ quarto.numero }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">{{ quarto.get_tipo_display }}</span>
+                        </td>
+                        <td>
+                            <i class="fas fa-users me-1"></i>{{ quarto.capacidade }} pessoa{{ quarto.capacidade|pluralize }}
+                        </td>
+                        <td>
+                            <strong class="text-success">R$ {{ quarto.valor_diaria|floatformat:2 }}</strong>
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ quarto.descricao|truncatechars:50 }}</small>
+                        </td>
+                        <td>
+                            <a href="{% url 'hotel_transito:associado_reservar_quarto' quarto.id %}" 
+                               class="btn btn-reservar btn-sm">
+                                <i class="fas fa-calendar-plus me-1"></i>
+                                Reservar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">
+                            <i class="fas fa-bed fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">Nenhum quarto disponível no momento</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Minhas Reservas -->
+    <div class="table-section">
+        <div class="table-header">
+            <h3 class="mb-0">
+                <i class="fas fa-calendar-check me-2"></i>Minhas Reservas
+                {% if reservas %}
+                    <span class="badge bg-primary ms-2">{{ reservas|length }}</span>
+                {% endif %}
+            </h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Quarto</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Diárias</th>
+                        <th>Valor Total</th>
+                        <th>Status</th>
+                        <th>Data Reserva</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reserva in reservas %}
+                    <tr>
+                        <td>
+                            <strong>{{ reserva.codigo_reserva }}</strong>
+                        </td>
+                        <td>
+                            <i class="fas fa-bed me-1"></i>{{ reserva.quarto.numero }}
+                            <br><small class="text-muted">{{ reserva.quarto.get_tipo_display }}</small>
+                        </td>
+                        <td>
+                            <i class="fas fa-sign-in-alt me-1 text-success"></i>
+                            {{ reserva.data_entrada|date:"d/m/Y" }}
+                        </td>
+                        <td>
+                            <i class="fas fa-sign-out-alt me-1 text-danger"></i>
+                            {{ reserva.data_saida|date:"d/m/Y" }}
+                        </td>
+                        <td>
+                            <span class="badge bg-info">{{ reserva.quantidade_diarias }} diária{{ reserva.quantidade_diarias|pluralize }}</span>
+                        </td>
+                        <td>
+                            <strong class="text-success">R$ {{ reserva.valor_total|floatformat:2 }}</strong>
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ reserva.status }}">
+                                {{ reserva.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <small class="text-muted">
+                                {{ reserva.data_reserva|date:"d/m/Y H:i" }}
+                            </small>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4">
+                            <i class="fas fa-calendar-times fa-2x text-muted mb-2"></i>
+                            <p class="text-muted mb-0">Você ainda não possui reservas</p>
+                            <small class="text-muted">Faça sua primeira reserva acima!</small>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

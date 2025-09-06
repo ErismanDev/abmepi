@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if consulta %}Editar{% else %}Nova{% endif %} Consulta Jurídica - ASSEJUS
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        {% if consulta %}Editar{% else %}Nova{% endif %} Consulta Jurídica
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if consulta %}
+                            Editando consulta de <strong>{{ consulta.associado }}</strong>
+                        {% else %}
+                            Registre uma nova consulta jurídica
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:consulta_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados da Consulta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Associado -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.associado.id_for_label }}" class="form-label">
+                                    {{ form.associado.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.associado }}
+                                {% if form.associado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.associado.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Tipo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                                    {{ form.tipo.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.tipo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Advogado Responsável -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.advogado_responsavel.id_for_label }}" class="form-label">
+                                    {{ form.advogado_responsavel.label }}
+                                </label>
+                                {{ form.advogado_responsavel }}
+                                {% if form.advogado_responsavel.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.advogado_responsavel.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Selecione o advogado responsável por responder esta consulta
+                                </small>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    {{ form.status.label }}
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.status.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Prioridade -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.prioridade.id_for_label }}" class="form-label">
+                                    {{ form.prioridade.label }}
+                                </label>
+                                {{ form.prioridade }}
+                                {% if form.prioridade.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.prioridade.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Resolvida -->
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.resolvida }}
+                                    <label class="form-check-label" for="{{ form.resolvida.id_for_label }}">
+                                        {{ form.resolvida.label }}
+                                    </label>
+                                    {% if form.resolvida.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.resolvida.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pergunta -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.pergunta.id_for_label }}" class="form-label">
+                                    {{ form.pergunta.label }} <span class="text-danger">*</span>
+                                </label>
+                                {{ form.pergunta }}
+                                {% if form.pergunta.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.pergunta.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Descreva detalhadamente sua dúvida ou questão jurídica
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Resposta (apenas para edição) -->
+                        {% if consulta %}
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.resposta.id_for_label }}" class="form-label">
+                                    {{ form.resposta.label }}
+                                </label>
+                                {{ form.resposta }}
+                                {% if form.resposta.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.resposta.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Forneça uma resposta completa e detalhada para a consulta
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Status de Resolvida -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.resolvida }}
+                                    <label class="form-check-label" for="{{ form.resolvida.id_for_label }}">
+                                        {{ form.resolvida.label }}
+                                    </label>
+                                </div>
+                                {% if form.resolvida.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {% for error in form.resolvida.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Marque quando a consulta for respondida
+                                </small>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Botões de ação -->
+                        <div class="row">
+                            <div class="col-12">
+                                <hr class="my-4">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <a href="{% url 'assejus:consulta_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>
+                                        {% if consulta %}Atualizar{% else %}Criar{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

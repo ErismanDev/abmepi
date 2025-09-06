@@ -1,0 +1,1062 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ ata.titulo }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ata-content {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .ata-header {
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+    .ata-meta {
+        background: #f8f9fa;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .ata-meta .row {
+        margin-bottom: 0.5rem;
+    }
+    .ata-meta .col-sm-3 {
+        font-weight: 600;
+        color: #495057;
+    }
+    .ata-meta .col-sm-9 {
+        color: #212529;
+    }
+    .ata-section {
+        margin-bottom: 2rem;
+    }
+    .ata-section h3 {
+        color: #007bff;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .ata-section h4 {
+        color: #495057;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+    }
+    .membros-list {
+        list-style: none;
+        padding-left: 0;
+    }
+    .membros-list li {
+        padding: 0.25rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    .membros-list li:last-child {
+        border-bottom: none;
+    }
+    .membros-list .badge {
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+    .ata-actions {
+        background: #f8f9fa;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-top: 2rem;
+    }
+    .print-button {
+        background: #28a745;
+        border-color: #28a745;
+    }
+    .print-button:hover {
+        background: #218838;
+        border-color: #1e7e34;
+    }
+    
+    /* Estilos para acordeões */
+    .accordion-button {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        font-weight: 600;
+    }
+    .accordion-button:not(.collapsed) {
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+        box-shadow: none;
+    }
+    .accordion-button:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .accordion-item {
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        margin-bottom: 1rem;
+    }
+    .accordion-body {
+        background-color: #ffffff;
+        border-top: 1px solid #dee2e6;
+    }
+    .accordion-button .badge {
+        font-size: 0.75rem;
+    }
+    .download-button {
+        background: #17a2b8;
+        border-color: #17a2b8;
+    }
+    .download-button:hover {
+        background: #138496;
+        border-color: #117a8b;
+    }
+    @media print {
+        .ata-actions, .btn, .navbar, .sidebar {
+            display: none !important;
+        }
+        .ata-content {
+            border: none;
+            box-shadow: none;
+            padding: 0;
+        }
+        .container-fluid {
+            padding: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% csrf_token %}
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {{ ata.titulo }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Ata de Reunião - {{ ata.get_tipo_reuniao_display }}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                    <a href="{% url 'diretoria:ata_pdf' ata.pk %}" class="btn btn-success me-2" target="_blank">
+                        <i class="fas fa-file-pdf me-2"></i>
+                        Gerar PDF
+                    </a>
+                    <a href="{% url 'diretoria:ata_update' ata.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </a>
+                </div>
+            </div>
+
+            <!-- Conteúdo da Ata -->
+            <div class="ata-content">
+                <!-- Cabeçalho da Ata -->
+                <div class="ata-header">
+                    <h2 class="text-center mb-3">
+                        <i class="fas fa-file-alt me-2"></i>
+                        ATA DE REUNIÃO
+                    </h2>
+                    <h3 class="text-center text-muted">{{ ata.titulo }}</h3>
+                </div>
+
+                <!-- Metadados da Ata -->
+                <div class="ata-meta">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Informações da Ata
+                        </h4>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-sm-3">Tipo de Reunião:</div>
+                        <div class="col-sm-9">
+                            <span class="badge bg-primary">{{ ata.get_tipo_reuniao_display }}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Data e Hora:</div>
+                        <div class="col-sm-9">
+                            {{ ata.data_reuniao|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Local:</div>
+                        <div class="col-sm-9">
+                            {{ ata.local|default:"Não informado" }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Presidente:</div>
+                        <div class="col-sm-9">
+                            {% if ata.presidente and ata.presidente.associado %}
+                                {{ ata.presidente.associado.nome }}
+                            {% else %}
+                                <span class="text-muted">Não definido</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3">Secretário:</div>
+                        <div class="col-sm-9">
+                            {% if ata.secretario and ata.secretario.associado %}
+                                {{ ata.secretario.associado.nome }}
+                            {% else %}
+                                <span class="text-muted">Não definido</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Membros da Diretoria Presentes - Acordeão -->
+                <div class="ata-section">
+                    <div class="accordion" id="accordionMembrosPresentes">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingMembrosPresentes">
+                                <button class="accordion-button d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMembrosPresentes" aria-expanded="true" aria-controls="collapseMembrosPresentes">
+                                    <div>
+                                        <i class="fas fa-users me-2"></i>
+                                        <strong>MEMBROS DA DIRETORIA PRESENTES</strong>
+                                        <span class="badge bg-success ms-2">{{ ata.membros_presentes.count }}</span>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#selecionarMembrosModal" onclick="event.stopPropagation();">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Adicionar
+                                    </button>
+                                </button>
+                            </h2>
+                            <div id="collapseMembrosPresentes" class="accordion-collapse collapse show" aria-labelledby="headingMembrosPresentes" data-bs-parent="#accordionMembrosPresentes">
+                                <div class="accordion-body">
+                                    <!-- Lista de membros da diretoria presentes -->
+                                    <div id="membros-presentes-lista">
+                                        <ul class="membros-list">
+                                            {% for membro in ata.membros_presentes.all %}
+                                            <li class="membro-item" data-membro-id="{{ membro.id }}">
+                                                <i class="fas fa-user-check me-2 text-success"></i>
+                                                {{ membro.associado.nome }}
+                                                <span class="badge bg-secondary">{{ membro.cargo.nome }}</span>
+                                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 remover-membro" data-membro-id="{{ membro.id }}" data-associado-id="{{ membro.associado.id }}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </li>
+                                            {% empty %}
+                                            <li class="text-muted">Nenhum membro presente registrado</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Associados Presentes - Acordeão -->
+                <div class="ata-section">
+                    <div class="accordion" id="accordionAssociadosPresentes">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingAssociadosPresentes">
+                                <button class="accordion-button d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAssociadosPresentes" aria-expanded="true" aria-controls="collapseAssociadosPresentes">
+                                    <div>
+                                        <i class="fas fa-user-friends me-2"></i>
+                                        <strong>ASSOCIADOS PRESENTES</strong>
+                                        <span class="badge bg-info ms-2">{{ ata.associados_presentes.count }}</span>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm me-2" data-bs-toggle="modal" data-bs-target="#selecionarAssociadosModal" onclick="event.stopPropagation();">
+                                        <i class="fas fa-plus me-1"></i>
+                                        Adicionar
+                                    </button>
+                                </button>
+                            </h2>
+                            <div id="collapseAssociadosPresentes" class="accordion-collapse collapse show" aria-labelledby="headingAssociadosPresentes" data-bs-parent="#accordionAssociadosPresentes">
+                                <div class="accordion-body">
+                                    <!-- Lista de associados presentes -->
+                                    <div id="associados-presentes-lista">
+                                        <ul class="membros-list">
+                                            {% for associado in ata.associados_presentes.all %}
+                                            <li class="membro-item" data-associado-id="{{ associado.id }}">
+                                                <i class="fas fa-user-check me-2 text-info"></i>
+                                                {{ associado.nome }}
+                                                <span class="badge bg-primary">Associado</span>
+                                                <button type="button" class="btn btn-sm btn-outline-danger ms-2 remover-associado" data-associado-id="{{ associado.id }}">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </li>
+                                            {% empty %}
+                                            <li class="text-muted">Nenhum associado presente registrado</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Membros Ausentes - Acordeão -->
+                {% if ata.membros_ausentes.exists %}
+                <div class="ata-section">
+                    <div class="accordion" id="accordionMembrosAusentes">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingMembrosAusentes">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMembrosAusentes" aria-expanded="false" aria-controls="collapseMembrosAusentes">
+                                    <i class="fas fa-user-times me-2"></i>
+                                    <strong>MEMBROS AUSENTES</strong>
+                                    <span class="badge bg-warning ms-2">{{ ata.membros_ausentes.count }}</span>
+                                </button>
+                            </h2>
+                            <div id="collapseMembrosAusentes" class="accordion-collapse collapse" aria-labelledby="headingMembrosAusentes" data-bs-parent="#accordionMembrosAusentes">
+                                <div class="accordion-body">
+                                    <ul class="membros-list">
+                                        {% for membro in ata.membros_ausentes.all %}
+                                        <li>
+                                            <i class="fas fa-user-times me-2 text-warning"></i>
+                                            {{ membro.associado.nome }}
+                                            <span class="badge bg-secondary">{{ membro.cargo.nome }}</span>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Pauta -->
+                {% if ata.pauta %}
+                <div class="ata-section">
+                    <h3><i class="fas fa-list me-2"></i>PAUTA</h3>
+                    <div class="ata-text-content">
+                        {{ ata.pauta|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Deliberações -->
+                {% if ata.deliberacoes %}
+                <div class="ata-section">
+                    <h3><i class="fas fa-gavel me-2"></i>DELIBERAÇÕES</h3>
+                    <div class="ata-text-content">
+                        {{ ata.deliberacoes|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Conteúdo Completo da Ata (Editor Avançado) -->
+                {% if ata.conteudo_completo %}
+                <div class="ata-section">
+                    <h3><i class="fas fa-file-alt me-2"></i>CONTEÚDO COMPLETO DA ATA</h3>
+                    <div class="ata-text-content" style="background: #f8f9fa; padding: 1.5rem; border-radius: 0.375rem; border: 1px solid #dee2e6;">
+                        {{ ata.conteudo_completo|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- Observações -->
+                {% if ata.observacoes %}
+                <div class="ata-section">
+                    <h3><i class="fas fa-sticky-note me-2"></i>OBSERVAÇÕES</h3>
+                    <div class="ata-text-content">
+                        {{ ata.observacoes|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Arquivo da Ata -->
+                {% if ata.arquivo_ata %}
+                <div class="ata-section">
+                    <h3><i class="fas fa-file-pdf me-2"></i>ARQUIVO DA ATA</h3>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-pdf me-2 text-danger" style="font-size: 1.5rem;"></i>
+                        <div>
+                            <div class="fw-bold">{{ ata.arquivo_ata.name|slice:"12:" }}</div>
+                            <small class="text-muted">
+                                Tamanho: {{ ata.arquivo_ata.size|filesizeformat }}
+                            </small>
+                        </div>
+                        <div class="ms-auto">
+                            <a href="{{ ata.arquivo_ata.url }}" target="_blank" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fas fa-eye me-1"></i>
+                                Visualizar
+                            </a>
+                            <a href="{{ ata.arquivo_ata.url }}" download class="btn btn-outline-success btn-sm">
+                                <i class="fas fa-download me-1"></i>
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Rodapé da Ata -->
+                <div class="ata-section">
+                    <hr>
+                    <p class="text-center text-muted">
+                        <em>Esta ata foi aprovada pelos presentes em {{ ata.data_reuniao|date:"d/m/Y" }}.</em>
+                    </p>
+                    <div class="row mt-3">
+                        <div class="col-md-6 text-center">
+                            <p class="mb-1"><strong>Presidente</strong></p>
+                            <p class="text-muted">{{ ata.presidente.associado.nome }}</p>
+                        </div>
+                        <div class="col-md-6 text-center">
+                            <p class="mb-1"><strong>Secretário</strong></p>
+                            <p class="text-muted">{{ ata.secretario.associado.nome }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações da Ata -->
+            <div class="ata-actions">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar me-1"></i>
+                            Criada em {{ ata.created_at|date:"d/m/Y H:i" }}
+                            {% if ata.updated_at != ata.created_at %}
+                                | Atualizada em {{ ata.updated_at|date:"d/m/Y H:i" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Seleção de Membros -->
+<div class="modal fade" id="selecionarMembrosModal" tabindex="-1" aria-labelledby="selecionarMembrosModalLabel">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selecionarMembrosModalLabel">
+                    <i class="fas fa-users me-2"></i>
+                    Gerenciar Presença dos Membros da Diretoria
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Filtro de busca -->
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="filtroAssociados" placeholder="Buscar membros da diretoria...">
+                </div>
+                
+                <!-- Tabela de Membros da Diretoria -->
+                <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="5%">Foto</th>
+                                        <th width="25%">Nome</th>
+                                        <th width="15%">Posto/Graduação</th>
+                                        <th width="15%">Cargo</th>
+                                        <th width="15%">CPF</th>
+                                        <th width="10%">Status</th>
+                                        <th width="15%">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listaAssociadosDiretoria">
+                                    {% for associado in membros_diretoria_associados %}
+                                    <tr class="associado-item" data-nome="{{ associado.nome|lower }}" data-associado-id="{{ associado.id }}">
+                                        <td>
+                                            {% if associado.foto %}
+                                                <img src="{{ associado.foto.url }}" alt="Foto" class="rounded-circle" width="40" height="40">
+                                            {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                    <strong>{{ associado.nome }}</strong>
+                                        </td>
+                                <td>{{ associado.posto_graduacao|default:"-" }}</td>
+                                        <td>
+                                            {% for membro in membros_diretoria %}
+                                                {% if membro.associado.id == associado.id %}
+                                                    <span class="badge bg-primary">{{ membro.cargo.nome }}</span>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ associado.cpf }}</td>
+                                        <td>
+                                    {% if associado.ativo %}
+                                        <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inativo</span>
+                                    {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-success btn-presenca" 
+                                                        data-associado-id="{{ associado.id }}" 
+                                                data-acao="presente">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    Presente
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+                        </div>
+                    </div>
+                    
+<!-- Modal para Seleção de Associados -->
+<div class="modal fade" id="selecionarAssociadosModal" tabindex="-1" aria-labelledby="selecionarAssociadosModalLabel">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="selecionarAssociadosModalLabel">
+                    <i class="fas fa-user-friends me-2"></i>
+                    Gerenciar Presença dos Associados
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Filtro de busca -->
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="filtroAssociadosComuns" placeholder="Buscar associados...">
+                </div>
+                
+                <!-- Tabela de associados comuns -->
+                <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="5%">Foto</th>
+                                        <th width="25%">Nome</th>
+                                        <th width="15%">Posto/Graduação</th>
+                                        <th width="15%">CPF</th>
+                                        <th width="10%">Status</th>
+                                        <th width="15%">Ações</th>
+                                    </tr>
+                                </thead>
+                        <tbody id="listaAssociadosComuns">
+                                    {% for associado in demais_associados %}
+                                    <tr class="associado-item" data-nome="{{ associado.nome|lower }}" data-associado-id="{{ associado.id }}">
+                                        <td>
+                                            {% if associado.foto %}
+                                                <img src="{{ associado.foto.url }}" alt="Foto" class="rounded-circle" width="40" height="40">
+                                            {% else %}
+                                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-white"></i>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                    <strong>{{ associado.nome }}</strong>
+                                        </td>
+                                <td>{{ associado.posto_graduacao|default:"-" }}</td>
+                                        <td>{{ associado.cpf }}</td>
+                                <td>
+                                    {% if associado.ativo %}
+                                        <span class="badge bg-success">Ativo</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Inativo</span>
+                                    {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-success btn-presenca-associado" 
+                                                        data-acao="presente"
+                                                data-associado-id="{{ associado.id }}">
+                                                    <i class="fas fa-check me-1"></i>
+                                                    Presente
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar funcionalidade de impressão melhorada
+    window.addEventListener('beforeprint', function() {
+        // Ocultar elementos desnecessários na impressão
+        document.querySelectorAll('.btn, .navbar, .sidebar, .ata-actions').forEach(el => {
+            el.style.display = 'none';
+        });
+    });
+    
+    window.addEventListener('afterprint', function() {
+        // Restaurar elementos após impressão
+        document.querySelectorAll('.btn, .navbar, .sidebar, .ata-actions').forEach(el => {
+            el.style.display = '';
+        });
+    });
+
+    // Filtro de associados (apenas membros da diretoria)
+    const filtroAssociados = document.getElementById('filtroAssociados');
+    
+    if (filtroAssociados) {
+        filtroAssociados.addEventListener('input', function() {
+            const termo = this.value.toLowerCase();
+            
+            // Filtrar membros da diretoria
+            const itensDiretoria = document.querySelectorAll('#listaAssociadosDiretoria .associado-item');
+            itensDiretoria.forEach(item => {
+                const nome = item.getAttribute('data-nome');
+                if (nome.includes(termo)) {
+                    item.style.display = 'table-row';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Filtro de associados comuns
+    const filtroAssociadosComuns = document.getElementById('filtroAssociadosComuns');
+    
+    if (filtroAssociadosComuns) {
+        filtroAssociadosComuns.addEventListener('input', function() {
+            const termo = this.value.toLowerCase();
+            
+            // Filtrar associados comuns
+            const itensComuns = document.querySelectorAll('#listaAssociadosComuns .associado-item');
+            itensComuns.forEach(item => {
+                const nome = item.getAttribute('data-nome');
+                if (nome.includes(termo)) {
+                    item.style.display = 'table-row';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Botões de presença
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-presenca')) {
+            const associadoId = e.target.getAttribute('data-associado-id');
+            const acao = e.target.getAttribute('data-acao');
+            
+            if (associadoId && acao) {
+                if (acao === 'presente') {
+                    adicionarMembroPresente(associadoId);
+                } else if (acao === 'ausente') {
+                    removerMembroPresente(associadoId);
+                }
+            }
+        }
+        
+        // Botões de presença dos associados comuns
+        if (e.target.classList.contains('btn-presenca-associado')) {
+            const associadoId = e.target.getAttribute('data-associado-id');
+            const acao = e.target.getAttribute('data-acao');
+            
+            if (associadoId && acao) {
+                if (acao === 'presente') {
+                    adicionarAssociadoPresente(associadoId);
+                }
+            }
+        }
+    });
+
+    // Salvar presença
+    const salvarPresencaBtn = document.getElementById('salvarPresenca');
+    if (salvarPresencaBtn) {
+        salvarPresencaBtn.addEventListener('click', function() {
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('selecionarMembrosModal'));
+            modal.hide();
+            
+            // Recarregar a página para mostrar as alterações
+            location.reload();
+        });
+    }
+
+    // Remover membro da lista
+    document.addEventListener('click', function(e) {
+        // Verificar se clicou no botão de remover membro ou no ícone dentro dele
+        if (e.target.classList.contains('remover-membro') || e.target.closest('.remover-membro')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const button = e.target.classList.contains('remover-membro') ? e.target : e.target.closest('.remover-membro');
+            let associadoId = button.getAttribute('data-associado-id');
+            
+            // Fallback: se não encontrar no botão, procurar no elemento pai (li)
+            if (!associadoId) {
+                const parentLi = button.closest('.membro-item');
+                if (parentLi) {
+                    associadoId = parentLi.getAttribute('data-associado-id');
+                }
+            }
+            
+            // Fallback: se ainda não encontrar, tentar pelo data-membro-id
+            if (!associadoId) {
+                const membroId = button.getAttribute('data-membro-id');
+                if (membroId) {
+                    // Procurar o associado_id correspondente no elemento pai
+                    const parentLi = button.closest('.membro-item');
+                    if (parentLi) {
+                        associadoId = parentLi.getAttribute('data-associado-id');
+                    }
+                }
+            }
+            
+            console.log('Botão de remover membro clicado, associado ID:', associadoId);
+            
+            if (associadoId) {
+                removerMembroPresente(associadoId);
+            } else {
+                console.error('Associado ID não encontrado no botão:', button);
+                console.error('Elemento pai:', button.closest('.membro-item'));
+                alert('Erro: ID do associado não encontrado');
+            }
+        } 
+        // Verificar se clicou no botão de remover associado ou no ícone dentro dele
+        else if (e.target.classList.contains('remover-associado') || e.target.closest('.remover-associado')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const button = e.target.classList.contains('remover-associado') ? e.target : e.target.closest('.remover-associado');
+            let associadoId = button.getAttribute('data-associado-id');
+            
+            // Fallback: se não encontrar no botão, procurar no elemento pai (li)
+            if (!associadoId) {
+                const parentLi = button.closest('.membro-item');
+                if (parentLi) {
+                    associadoId = parentLi.getAttribute('data-associado-id');
+                }
+            }
+            
+            console.log('Botão de remover associado clicado, associado ID:', associadoId);
+            
+            if (associadoId) {
+                removerMembroPresente(associadoId);
+            } else {
+                console.error('Associado ID não encontrado no botão:', button);
+                console.error('Elemento pai:', button.closest('.membro-item'));
+                alert('Erro: ID do associado não encontrado');
+            }
+        }
+    });
+
+    function adicionarMembroPresente(associadoId) {
+        if (!associadoId) {
+            console.error('ID do associado não fornecido');
+            return;
+        }
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            console.error('Token CSRF não encontrado');
+            return;
+        }
+        
+        fetch('{% url "diretoria:ata_detail" ata.pk %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken.value
+            },
+            body: JSON.stringify({
+                'action': 'adicionar_membro_presente',
+                'associado_id': associadoId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualizar lista de membros presentes
+                atualizarListaMembrosPresentes(data.membros_presentes);
+                
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('selecionarMembrosModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Recarregar a página para atualizar as listas dos modais
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } else {
+                alert('Erro ao adicionar membro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao adicionar membro');
+        });
+    }
+
+    function adicionarAssociadoPresente(associadoId) {
+        if (!associadoId) {
+            console.error('ID do associado não fornecido');
+            return;
+        }
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            console.error('Token CSRF não encontrado');
+            return;
+        }
+        
+        fetch('{% url "diretoria:ata_detail" ata.pk %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken.value
+            },
+            body: JSON.stringify({
+                'action': 'adicionar_membro_presente',
+                'associado_id': associadoId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualizar lista de membros presentes
+                atualizarListaMembrosPresentes(data.membros_presentes);
+                
+                // Fechar modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('selecionarAssociadosModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Recarregar a página para atualizar as listas dos modais
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } else {
+                alert('Erro ao adicionar associado: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao adicionar associado');
+        });
+    }
+
+    function removerMembroPresente(associadoId) {
+        if (!associadoId) {
+            alert('Erro: ID do associado não fornecido');
+            return;
+        }
+        
+        // Confirmar remoção
+        if (!confirm('Tem certeza que deseja remover este membro da lista de presentes?')) {
+            return;
+        }
+        
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+        if (!csrfToken) {
+            alert('Erro: Token CSRF não encontrado');
+            return;
+        }
+        
+        // Mostrar indicador de carregamento
+        const loadingIndicator = document.createElement('div');
+        loadingIndicator.innerHTML = '<div class="spinner-border spinner-border-sm me-2" role="status"><span class="visually-hidden">Carregando...</span></div>Removendo...';
+        loadingIndicator.className = 'alert alert-info';
+        document.body.appendChild(loadingIndicator);
+        
+        fetch('{% url "diretoria:ata_detail" ata.pk %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken.value
+            },
+            body: JSON.stringify({
+                'action': 'remover_membro_presente',
+                'associado_id': associadoId
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remover indicador de carregamento
+            document.body.removeChild(loadingIndicator);
+            
+            if (data.success) {
+                // Atualizar lista de membros presentes
+                atualizarListaMembrosPresentes(data.membros_presentes);
+                
+                // Recarregar a página para mostrar o associado de volta na lista
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } else {
+                alert('Erro ao remover membro: ' + (data.message || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            // Remover indicador de carregamento
+            if (document.body.contains(loadingIndicator)) {
+                document.body.removeChild(loadingIndicator);
+            }
+            
+            console.error('Erro na requisição:', error);
+            alert('Erro ao remover membro: ' + error.message);
+        });
+    }
+
+    function atualizarListaMembrosPresentes(membros) {
+        console.log('Atualizando lista de membros presentes:', membros);
+        
+        // Separar membros da diretoria e associados
+        const membrosDiretoria = membros.filter(m => m.tipo === 'membro_diretoria');
+        const associados = membros.filter(m => m.tipo === 'associado');
+        
+        console.log('Membros da diretoria:', membrosDiretoria);
+        console.log('Associados:', associados);
+        
+        // Atualizar lista de membros da diretoria
+        const listaMembros = document.querySelector('#membros-presentes-lista .membros-list');
+        if (listaMembros) {
+            listaMembros.innerHTML = '';
+            
+            if (membrosDiretoria.length === 0) {
+                listaMembros.innerHTML = '<li class="text-muted">Nenhum membro da diretoria presente</li>';
+            } else {
+                membrosDiretoria.forEach(membro => {
+                    console.log('Processando membro da diretoria:', membro);
+                    
+            const li = document.createElement('li');
+            li.className = 'membro-item';
+            li.setAttribute('data-membro-id', membro.id);
+            li.setAttribute('data-associado-id', membro.associado_id);
+                    
+                    console.log('Criado li com data-associado-id:', membro.associado_id);
+                    
+            li.innerHTML = `
+                <i class="fas fa-user-check me-2 text-success"></i>
+                ${membro.associado_nome}
+                <span class="badge bg-secondary">${membro.cargo_nome}</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-2 remover-membro" data-membro-id="${membro.id}" data-associado-id="${membro.associado_id}">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+                    listaMembros.appendChild(li);
+                });
+            }
+        }
+        
+        // Atualizar lista de associados
+        const listaAssociados = document.querySelector('#associados-presentes-lista .membros-list');
+        if (listaAssociados) {
+            listaAssociados.innerHTML = '';
+            
+            if (associados.length === 0) {
+                listaAssociados.innerHTML = '<li class="text-muted">Nenhum associado presente</li>';
+            } else {
+                associados.forEach(associado => {
+                    const li = document.createElement('li');
+                    li.className = 'membro-item';
+                    li.setAttribute('data-associado-id', associado.associado_id);
+                    li.innerHTML = `
+                        <i class="fas fa-user-check me-2 text-info"></i>
+                        ${associado.associado_nome}
+                        <span class="badge bg-primary">Associado</span>
+                        <button type="button" class="btn btn-sm btn-outline-danger ms-2 remover-associado" data-associado-id="${associado.associado_id}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    listaAssociados.appendChild(li);
+                });
+            }
+        }
+    }
+});
+</script>
+{% endblock %} PS C:\projetos\abmepi> & c:/projetos/abmepi/.venv/Scripts/Activate.ps1
+(.venv) PS C:\projetos\abmepi> python manage.py runserver                
+Performing system checks...
+
+Exception in thread django-main-thread:
+Traceback (most recent call last):
+  File "C:\Users\sgter\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1038, in _bootstrap_inner
+    self.run()
+  File "C:\Users\sgter\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 975, in run
+    self._target(*self._args, **self._kwargs)
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\utils\autoreload.py", line 64, in wrapper
+    fn(*args, **kwargs)
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\core\management\commands\runserver.py", line 133, in inner_run
+    self.check(display_num_errors=True)
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\core\management\base.py", line 486, in check
+    all_issues = checks.run_checks(
+                 ^^^^^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\core\checks\registry.py", line 88, in run_checks
+    new_errors = check(app_configs=app_configs, databases=databases)     
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^     
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\core\checks\urls.py", line 14, in check_url_config
+    return check_resolver(resolver)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\core\checks\urls.py", line 24, in check_resolver
+    return check_method()
+           ^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\urls\resolvers.py", line 519, in check
+    for pattern in self.url_patterns:
+                   ^^^^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\urls\resolvers.py", line 738, in url_patterns
+    patterns = getattr(self.urlconf_module, "urlpatterns", self.urlconf_module)
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\utils\functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ^^^^^^^^^^^^^^^^^^^
+  File "C:\projetos\abmepi\.venv\Lib\site-packages\django\urls\resolvers.py", line 731, in urlconf_module
+    return import_module(self.urlconf_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sgter\AppData\Local\Programs\Python\Python311\Lib\importlib\__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import        
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load     
+  File "<frozen importlib._bootstrap>", line 1149, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked      
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "C:\projetos\abmepi\abmepi\urls.py", line 8, in <module>
+    from core.views import DashboardView, login_view, InstitucionalView, logout_view, primeiro_acesso_view
+  File "C:\projetos\abmepi\core\views.py", line 2447, in <module>        
+    class ExPresidenteCreateView(LoginRequiredMixin, CreateView):        
+  File "C:\projetos\abmepi\core\views.py", line 2452, in ExPresidenteCreateView
+    form_class = ExPresidenteForm
+                 ^^^^^^^^^^^^^^^^
+NameError: name 'ExPresidenteForm' is not defined. Did you mean: 'ExPresidente'?
+e 

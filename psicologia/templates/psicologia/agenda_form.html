@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Horário{% else %}Novo Horário{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-calendar-plus text-primary"></i> 
+                    {% if form.instance.pk %}Editar Horário{% else %}Novo Horário{% endif %}
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:agenda_list' %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        {% if form.instance.pk %}Editar horário da agenda{% else %}Cadastrar novo horário{% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.psicologo|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.data|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.hora_inicio|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.hora_fim|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.disponivel|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.observacoes|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> 
+                                    {% if form.instance.pk %}Atualizar{% else %}Cadastrar{% endif %}
+                                </button>
+                                <a href="{% url 'psicologia:agenda_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Informações -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Dicas para Agenda</h6>
+                        <ul class="mb-0">
+                            <li><strong>Psicólogo:</strong> Selecione o profissional</li>
+                            <li><strong>Data:</strong> Escolha a data do horário</li>
+                            <li><strong>Horário:</strong> Defina início e fim</li>
+                            <li><strong>Status:</strong> Marque se está disponível</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante</h6>
+                        <ul class="mb-0">
+                            <li>Verifique disponibilidade do psicólogo</li>
+                            <li>Evite sobreposição de horários</li>
+                            <li>Mantenha agenda atualizada</li>
+                            <li>Registre observações importantes</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading"><i class="fas fa-check-circle"></i> Boas Práticas</h6>
+                        <ul class="mb-0">
+                            <li>Agende com antecedência</li>
+                            <li>Defina horários realistas</li>
+                            <li>Mantenha consistência</li>
+                            <li>Comunique mudanças</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Focar no primeiro campo
+    $('input:first, select:first').focus();
+    
+    // Auto-resize para campos de texto
+    $('textarea').on('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+    
+    // Validação de horários
+    $('#id_hora_fim').on('change', function() {
+        var horaInicio = $('#id_hora_inicio').val();
+        var horaFim = $(this).val();
+        
+        if (horaInicio && horaFim && horaInicio >= horaFim) {
+            alert('A hora de fim deve ser posterior à hora de início.');
+            $(this).val('');
+            $(this).focus();
+        }
+    });
+});
+</script>
+{% endblock %}

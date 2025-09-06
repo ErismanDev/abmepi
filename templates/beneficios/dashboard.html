@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Benefícios{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Início</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Benefícios</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-gift me-2 text-primary"></i>
+                Dashboard de Benefícios
+            </h1>
+            <p class="text-muted mb-0">Gerencie convênios, empresas parceiras e benefícios dos associados</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="{% url 'beneficios:empresa_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Nova Empresa
+            </a>
+            <a href="{% url 'beneficios:convenio_create' %}" class="btn btn-success">
+                <i class="fas fa-handshake me-2"></i>Novo Convênio
+            </a>
+            <a href="{% url 'beneficios:beneficio_create' %}" class="btn btn-info">
+                <i class="fas fa-gift me-2"></i>Novo Benefício
+            </a>
+        </div>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Empresas Parceiras
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_empresas }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-building fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Convênios Ativos
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_convenios }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-handshake fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total de Benefícios
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_beneficios }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-gift fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pendentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ beneficios_pendentes }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="row">
+        <!-- Convênios por Categoria -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Convênios por Categoria</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                             aria-labelledby="dropdownMenuLink">
+                            <div class="dropdown-header">Ações:</div>
+                            <a class="dropdown-item" href="{% url 'beneficios:convenio_list' %}">Ver Todos</a>
+                            <a class="dropdown-item" href="{% url 'beneficios:convenio_create' %}">Novo Convênio</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if convenios_por_categoria %}
+                        <div class="chart-pie pt-4 pb-2">
+                            <canvas id="conveniosPorCategoriaChart"></canvas>
+                        </div>
+                        <div class="mt-4 text-center small">
+                            {% for item in convenios_por_categoria %}
+                                <span class="mr-2">
+                                    <i class="fas fa-circle text-primary"></i> {{ item.categoria|title }}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-chart-pie fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-gray-500">Nenhum convênio cadastrado ainda.</p>
+                            <a href="{% url 'beneficios:convenio_create' %}" class="btn btn-primary btn-sm">
+                                Criar Primeiro Convênio
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Convênios Expirando -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Convênios Expirando</h6>
+                </div>
+                <div class="card-body">
+                    {% if convenios_expirando %}
+                        {% for convenio in convenios_expirando %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-0">{{ convenio.titulo }}</h6>
+                                    <small class="text-muted">
+                                        Expira em {{ convenio.data_fim|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                                <a href="{% url 'beneficios:convenio_detail' convenio.pk %}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    Ver
+                                </a>
+                            </div>
+                        {% endfor %}
+                        <div class="text-center mt-3">
+                            <a href="{% url 'beneficios:convenio_list' %}" class="btn btn-primary btn-sm">
+                                Ver Todos
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                            <p class="text-gray-500 mb-0">Nenhum convênio expirando em breve.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Benefícios Recentes -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Benefícios Recentes</h6>
+                    <a href="{% url 'beneficios:beneficio_list' %}" class="btn btn-primary btn-sm">
+                        Ver Todos
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if beneficios_recentes %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Associado</th>
+                                        <th>Convênio</th>
+                                        <th>Status</th>
+                                        <th>Data Solicitação</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for beneficio in beneficios_recentes %}
+                                        <tr>
+                                            <td>{{ beneficio.associado.nome }}</td>
+                                            <td>{{ beneficio.convenio.titulo }}</td>
+                                            <td>
+                                                <span class="badge bg-{% if beneficio.status == 'aprovado' %}success{% elif beneficio.status == 'pendente' %}warning{% elif beneficio.status == 'rejeitado' %}danger{% else %}secondary{% endif %}">
+                                                    {{ beneficio.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>{{ beneficio.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'beneficios:beneficio_detail' beneficio.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Ver
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-gift fa-3x text-gray-300 mb-3"></i>
+                            <p class="text-gray-500">Nenhum benefício registrado ainda.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações Rápidas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ações Rápidas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'beneficios:empresa_list' %}" class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="fas fa-building fa-2x mb-2"></i>
+                                <span>Empresas Parceiras</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'beneficios:convenio_list' %}" class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="fas fa-handshake fa-2x mb-2"></i>
+                                <span>Convênios</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'beneficios:beneficio_list' %}" class="btn btn-outline-info w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="fas fa-gift fa-2x mb-2"></i>
+                                <span>Benefícios</span>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'beneficios:buscar_convenios' %}" class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center py-4">
+                                <i class="fas fa-search fa-2x mb-2"></i>
+                                <span>Buscar Convênios</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if convenios_por_categoria %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Gráfico de Convênios por Categoria
+    const ctx = document.getElementById('conveniosPorCategoriaChart').getContext('2d');
+    const conveniosPorCategoriaChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for item in convenios_por_categoria %}'{{ item.categoria|title }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for item in convenios_por_categoria %}{{ item.total }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                    '#858796', '#5a5c69', '#2e59d9', '#17a673', '#2c9faf'
+                ],
+                hoverBackgroundColor: [
+                    '#2e59d9', '#17a673', '#2c9faf', '#f4b619', '#e02424',
+                    '#6c757d', '#4a4b52', '#1e3a8a', '#15803d', '#1e40af'
+                ],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 80,
+        },
+    });
+</script>
+{% endif %}
+{% endblock %}

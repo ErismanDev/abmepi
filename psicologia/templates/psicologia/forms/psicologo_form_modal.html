@@ -1,0 +1,459 @@
+{% load static %}
+
+<form id="psicologoForm" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="row">
+        <!-- Dados Pessoais -->
+        <div class="col-md-6">
+            <h6 class="text-primary mb-3">Dados Pessoais</h6>
+            
+            <div class="mb-3">
+                <label for="{{ form.nome_completo.id_for_label }}" class="form-label">{{ form.nome_completo.label }}</label>
+                <input type="text" 
+                       name="{{ form.nome_completo.name }}" 
+                       id="{{ form.nome_completo.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.nome_completo.value %}{{ form.nome_completo.value }}{% endif %}"
+                       placeholder="Nome completo do psicólogo">
+                {% if form.nome_completo.errors %}
+                    <div class="invalid-feedback">{{ form.nome_completo.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.crp.id_for_label }}" class="form-label">{{ form.crp.label }}</label>
+                        <input type="text" 
+                               name="{{ form.crp.name }}" 
+                               id="{{ form.crp.id_for_label }}" 
+                               class="form-control" 
+                               value="{% if form.crp.value %}{{ form.crp.value }}{% endif %}"
+                               placeholder="Número do CRP">
+                        {% if form.crp.errors %}
+                            <div class="invalid-feedback">{{ form.crp.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.uf_crp.id_for_label }}" class="form-label">{{ form.uf_crp.label }}</label>
+                        {{ form.uf_crp }}
+                        {% if form.uf_crp.errors %}
+                            <div class="invalid-feedback">{{ form.uf_crp.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.data_nascimento.id_for_label }}" class="form-label">{{ form.data_nascimento.label }}</label>
+                <input type="date" 
+                       name="{{ form.data_nascimento.name }}" 
+                       id="{{ form.data_nascimento.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.data_nascimento.initial %}{{ form.data_nascimento.initial|date:'Y-m-d' }}{% elif form.data_nascimento.value %}{{ form.data_nascimento.value|date:'Y-m-d' }}{% endif %}">
+                {% if form.data_nascimento.errors %}
+                    <div class="invalid-feedback">{{ form.data_nascimento.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.cpf.id_for_label }}" class="form-label">{{ form.cpf.label }}</label>
+                        <input type="text" 
+                               name="{{ form.cpf.name }}" 
+                               id="{{ form.cpf.id_for_label }}" 
+                               class="form-control" 
+                               value="{% if form.cpf.value %}{{ form.cpf.value }}{% endif %}"
+                               placeholder="000.000.000-00">
+                        {% if form.cpf.errors %}
+                            <div class="invalid-feedback">{{ form.cpf.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="{{ form.rg.id_for_label }}" class="form-label">{{ form.rg.label }}</label>
+                        <input type="text" 
+                               name="{{ form.rg.name }}" 
+                               id="{{ form.rg.id_for_label }}" 
+                               class="form-control" 
+                               value="{% if form.rg.value %}{{ form.rg.value }}{% endif %}"
+                               placeholder="Número do RG">
+                        {% if form.rg.errors %}
+                            <div class="invalid-feedback">{{ form.rg.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.orgao_emissor.id_for_label }}" class="form-label">{{ form.orgao_emissor.label }}</label>
+                <input type="text" 
+                       name="{{ form.orgao_emissor.name }}" 
+                       id="{{ form.orgao_emissor.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.orgao_emissor.value %}{{ form.orgao_emissor.value }}{% endif %}"
+                       placeholder="Órgão emissor do RG">
+                {% if form.orgao_emissor.errors %}
+                    <div class="invalid-feedback">{{ form.orgao_emissor.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Contato -->
+        <div class="col-md-6">
+            <h6 class="text-primary mb-3">Contato</h6>
+            
+            <div class="mb-3">
+                <label for="{{ form.telefone.id_for_label }}" class="form-label">{{ form.telefone.label }}</label>
+                <input type="tel" 
+                       name="{{ form.telefone.name }}" 
+                       id="{{ form.telefone.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.telefone.value %}{{ form.telefone.value }}{% endif %}"
+                       placeholder="(00) 00000-0000">
+                {% if form.telefone.errors %}
+                    <div class="invalid-feedback">{{ form.telefone.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.telefone_secundario.id_for_label }}" class="form-label">{{ form.telefone_secundario.label }}</label>
+                <input type="tel" 
+                       name="{{ form.telefone_secundario.name }}" 
+                       id="{{ form.telefone_secundario.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.telefone_secundario.value %}{{ form.telefone_secundario.value }}{% endif %}"
+                       placeholder="(00) 00000-0000">
+                {% if form.telefone_secundario.errors %}
+                    <div class="invalid-feedback">{{ form.telefone_secundario.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                <input type="email" 
+                       name="{{ form.email.name }}" 
+                       id="{{ form.email.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.email.value %}{{ form.email.value }}{% endif %}"
+                       placeholder="email@exemplo.com">
+                {% if form.email.errors %}
+                    <div class="invalid-feedback">{{ form.email.errors.0 }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.email_secundario.id_for_label }}" class="form-label">{{ form.email_secundario.label }}</label>
+                <input type="email" 
+                       name="{{ form.email_secundario.name }}" 
+                       id="{{ form.email_secundario.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.email_secundario.value %}{{ form.email_secundario.value }}{% endif %}"
+                       placeholder="email2@exemplo.com">
+                {% if form.email_secundario.errors %}
+                    <div class="invalid-feedback">{{ form.email_secundario.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Endereço -->
+    <h6 class="text-primary mb-3 mt-4">Endereço</h6>
+    <div class="row">
+        <div class="col-md-2">
+            <div class="mb-3">
+                <label for="{{ form.cep.id_for_label }}" class="form-label">{{ form.cep.label }}</label>
+                <input type="text" 
+                       name="{{ form.cep.name }}" 
+                       id="{{ form.cep.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.cep.value %}{{ form.cep.value }}{% endif %}"
+                       placeholder="00000-000">
+                {% if form.cep.errors %}
+                    <div class="invalid-feedback">{{ form.cep.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.endereco.id_for_label }}" class="form-label">{{ form.endereco.label }}</label>
+                <input type="text" 
+                       name="{{ form.endereco.name }}" 
+                       id="{{ form.endereco.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.endereco.value %}{{ form.endereco.value }}{% endif %}"
+                       placeholder="Nome da rua, avenida, etc.">
+                {% if form.endereco.errors %}
+                    <div class="invalid-feedback">{{ form.endereco.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="mb-3">
+                <label for="{{ form.numero.id_for_label }}" class="form-label">{{ form.numero.label }}</label>
+                <input type="text" 
+                       name="{{ form.numero.name }}" 
+                       id="{{ form.numero.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.numero.value %}{{ form.numero.value }}{% endif %}"
+                       placeholder="Número">
+                {% if form.numero.errors %}
+                    <div class="invalid-feedback">{{ form.numero.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="mb-3">
+                <label for="{{ form.complemento.id_for_label }}" class="form-label">{{ form.complemento.label }}</label>
+                <input type="text" 
+                       name="{{ form.complemento.name }}" 
+                       id="{{ form.complemento.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.complemento.value %}{{ form.complemento.value }}{% endif %}"
+                       placeholder="Apartamento, sala, etc.">
+                {% if form.complemento.errors %}
+                    <div class="invalid-feedback">{{ form.complemento.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="{{ form.bairro.id_for_label }}" class="form-label">{{ form.bairro.label }}</label>
+                <input type="text" 
+                       name="{{ form.bairro.name }}" 
+                       id="{{ form.bairro.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.bairro.value %}{{ form.bairro.value }}{% endif %}"
+                       placeholder="Nome do bairro">
+                {% if form.bairro.errors %}
+                    <div class="invalid-feedback">{{ form.bairro.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="{{ form.cidade.id_for_label }}" class="form-label">{{ form.cidade.label }}</label>
+                <input type="text" 
+                       name="{{ form.cidade.name }}" 
+                       id="{{ form.cidade.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.cidade.value %}{{ form.cidade.value }}{% endif %}"
+                       placeholder="Nome da cidade">
+                {% if form.cidade.errors %}
+                    <div class="invalid-feedback">{{ form.cidade.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="{{ form.estado.id_for_label }}" class="form-label">{{ form.estado.label }}</label>
+                {{ form.estado }}
+                {% if form.estado.errors %}
+                    <div class="invalid-feedback">{{ form.estado.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dados Profissionais -->
+    <h6 class="text-primary mb-3 mt-4">Dados Profissionais</h6>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.especialidades.id_for_label }}" class="form-label">{{ form.especialidades.label }}</label>
+                <textarea name="{{ form.especialidades.name }}" 
+                          id="{{ form.especialidades.id_for_label }}" 
+                          class="form-control" 
+                          rows="3" 
+                          placeholder="Especialidades do psicólogo...">{% if form.especialidades.value %}{{ form.especialidades.value }}{% endif %}</textarea>
+                {% if form.especialidades.errors %}
+                    <div class="invalid-feedback">{{ form.especialidades.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.areas_atuacao.id_for_label }}" class="form-label">{{ form.areas_atuacao.label }}</label>
+                <textarea name="{{ form.areas_atuacao.name }}" 
+                          id="{{ form.areas_atuacao.id_for_label }}" 
+                          class="form-control" 
+                          rows="3" 
+                          placeholder="Áreas de atuação...">{% if form.areas_atuacao.value %}{{ form.areas_atuacao.value }}{% endif %}</textarea>
+                {% if form.areas_atuacao.errors %}
+                    <div class="invalid-feedback">{{ form.areas_atuacao.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.formacao_academica.id_for_label }}" class="form-label">{{ form.formacao_academica.label }}</label>
+        <textarea name="{{ form.formacao_academica.name }}" 
+                          id="{{ form.formacao_academica.id_for_label }}" 
+                          class="form-control" 
+                          rows="4" 
+                          placeholder="Formação acadêmica...">{% if form.formacao_academica.value %}{{ form.formacao_academica.value }}{% endif %}</textarea>
+        {% if form.formacao_academica.errors %}
+            <div class="invalid-feedback">{{ form.formacao_academica.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.cursos_complementares.id_for_label }}" class="form-label">{{ form.cursos_complementares.label }}</label>
+        <textarea name="{{ form.cursos_complementares.name }}" 
+                          id="{{ form.cursos_complementares.id_for_label }}" 
+                          class="form-control" 
+                          rows="3" 
+                          placeholder="Cursos complementares...">{% if form.cursos_complementares.value %}{{ form.cursos_complementares.value }}{% endif %}</textarea>
+        {% if form.cursos_complementares.errors %}
+            <div class="invalid-feedback">{{ form.cursos_complementares.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.experiencia_profissional.id_for_label }}" class="form-label">{{ form.experiencia_profissional.label }}</label>
+        <textarea name="{{ form.experiencia_profissional.name }}" 
+                          id="{{ form.experiencia_profissional.id_for_label }}" 
+                          class="form-control" 
+                          rows="4" 
+                          placeholder="Experiência profissional...">{% if form.experiencia_profissional.value %}{{ form.experiencia_profissional.value }}{% endif %}</textarea>
+        {% if form.experiencia_profissional.errors %}
+            <div class="invalid-feedback">{{ form.experiencia_profissional.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <!-- Dados de Trabalho -->
+    <h6 class="text-primary mb-3 mt-4">Dados de Trabalho</h6>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.horario_atendimento.id_for_label }}" class="form-label">{{ form.horario_atendimento.label }}</label>
+                <textarea name="{{ form.horario_atendimento.name }}" 
+                          id="{{ form.horario_atendimento.id_for_label }}" 
+                          class="form-control" 
+                          rows="3" 
+                          placeholder="Horários de atendimento...">{% if form.horario_atendimento.value %}{{ form.horario_atendimento.value }}{% endif %}</textarea>
+                {% if form.horario_atendimento.errors %}
+                    <div class="invalid-feedback">{{ form.horario_atendimento.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.valor_consulta.id_for_label }}" class="form-label">{{ form.valor_consulta.label }}</label>
+                <input type="number" 
+                       name="{{ form.valor_consulta.name }}" 
+                       id="{{ form.valor_consulta.id_for_label }}" 
+                       class="form-control" 
+                       step="0.01" 
+                       value="{% if form.valor_consulta.value %}{{ form.valor_consulta.value }}{% endif %}"
+                       placeholder="0.00">
+                {% if form.valor_consulta.errors %}
+                    <div class="invalid-feedback">{{ form.valor_consulta.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" 
+                           name="{{ form.aceita_planos_saude.name }}" 
+                           id="{{ form.aceita_planos_saude.id_for_label }}" 
+                           class="form-check-input"
+                           {% if form.aceita_planos_saude.value %}checked{% endif %}>
+                    <label class="form-check-label" for="{{ form.aceita_planos_saude.id_for_label }}">
+                        {{ form.aceita_planos_saude.label }}
+                    </label>
+                </div>
+                {% if form.aceita_planos_saude.errors %}
+                    <div class="invalid-feedback">{{ form.aceita_planos_saude.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <div class="form-check">
+                    <input type="checkbox" 
+                           name="{{ form.ativo.name }}" 
+                           id="{{ form.ativo.id_for_label }}" 
+                           class="form-check-input"
+                           {% if form.ativo.value %}checked{% endif %}>
+                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                        {{ form.ativo.label }}
+                    </label>
+                </div>
+                {% if form.ativo.errors %}
+                    <div class="invalid-feedback">{{ form.ativo.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.planos_aceitos.id_for_label }}" class="form-label">{{ form.planos_aceitos.label }}</label>
+        <textarea name="{{ form.planos_aceitos.name }}" 
+                  id="{{ form.planos_aceitos.id_for_label }}" 
+                  class="form-control" 
+                  rows="2" 
+                  placeholder="Planos de saúde aceitos...">{% if form.planos_aceitos.value %}{{ form.planos_aceitos.value }}{% endif %}</textarea>
+        {% if form.planos_aceitos.errors %}
+            <div class="invalid-feedback">{{ form.planos_aceitos.errors.0 }}</div>
+        {% endif %}
+    </div>
+    
+    <!-- Documentos -->
+    <h6 class="text-primary mb-3 mt-4">Documentos</h6>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="{{ form.foto.id_for_label }}" class="form-label">{{ form.foto.label }}</label>
+                {{ form.foto }}
+                {% if form.foto.errors %}
+                    <div class="invalid-feedback">{{ form.foto.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="{{ form.curriculo.id_for_label }}" class="form-label">{{ form.curriculo.label }}</label>
+                {{ form.curriculo }}
+                {% if form.curriculo.errors %}
+                    <div class="invalid-feedback">{{ form.curriculo.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="mb-3">
+                <label for="{{ form.documentos_complementares.id_for_label }}" class="form-label">{{ form.documentos_complementares.label }}</label>
+                {{ form.documentos_complementares }}
+                {% if form.documentos_complementares.errors %}
+                    <div class="invalid-feedback">{{ form.documentos_complementares.errors.0 }}</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Observações -->
+    <div class="mb-3">
+        <label for="{{ form.observacoes.id_for_label }}" class="form-label">{{ form.observacoes.label }}</label>
+        <textarea name="{{ form.observacoes.name }}" 
+                  id="{{ form.observacoes.id_for_label }}" 
+                  class="form-control" 
+                  rows="3" 
+                  placeholder="Observações sobre o psicólogo...">{% if form.observacoes.value %}{{ form.observacoes.value }}{% endif %}</textarea>
+        {% if form.observacoes.errors %}
+            <div class="invalid-feedback">{{ form.observacoes.errors.0 }}</div>
+        {% endif %}
+    </div>
+</form>

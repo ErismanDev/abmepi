@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-badge {
+        font-size: 0.8em;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .status-pendente {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+    
+    .btn-approve {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+    }
+    
+    .btn-approve:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+        color: white;
+    }
+    
+    .btn-reject {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    
+    .btn-reject:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+    
+    .btn-pdf {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    
+    .btn-pdf:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-user-clock text-warning"></i>
+                                {{ title }}
+                            </h3>
+                            <p class="text-muted mb-0">{{ subtitle }}</p>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'associados:pre_cadastro_historico' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-history"></i> Histórico
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Filtros de busca -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <form method="get" class="d-flex">
+                                <input type="text" 
+                                       name="search" 
+                                       class="form-control me-2" 
+                                       placeholder="Buscar por nome, CPF ou email..."
+                                       value="{{ search }}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                {% if search %}
+                                <a href="{% url 'associados:pre_cadastro_list' %}" class="btn btn-outline-secondary ms-2">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                                {% endif %}
+                            </form>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <span class="badge bg-warning text-dark">
+                                {{ pre_cadastros|length }} pré-cadastro(s) pendente(s)
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {% if pre_cadastros %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Data Cadastro</th>
+                                    <th>Status</th>
+                                    <th width="200">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pre_cadastro in pre_cadastros %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ pre_cadastro.nome }}</strong>
+                                        {% if pre_cadastro.foto %}
+                                        <img src="{{ pre_cadastro.foto.url }}" 
+                                             class="rounded-circle ms-2" 
+                                             width="30" height="30" 
+                                             alt="Foto">
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ pre_cadastro.cpf }}</td>
+                                    <td>{{ pre_cadastro.email|default:"-" }}</td>
+                                    <td>{{ pre_cadastro.celular|default:"-" }}</td>
+                                    <td>{{ pre_cadastro.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge status-badge status-pendente">
+                                            <i class="fas fa-clock"></i> Pendente
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'associados:pre_cadastro_detail' pre_cadastro.pk %}" 
+                                               class="btn btn-sm btn-outline-info" 
+                                               title="Ver detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'associados:gerar_declaracao_associados_pdf' %}?pre_cadastro_id={{ pre_cadastro.pk }}" 
+                                               class="btn btn-sm btn-pdf" 
+                                               title="Gerar Ficha de Cadastro PDF"
+                                               target="_blank">
+                                                <i class="fas fa-file-pdf"></i>
+                                            </a>
+                                            <a href="{% url 'associados:aprovar_pre_cadastro' pre_cadastro.pk %}" 
+                                               class="btn btn-sm btn-approve" 
+                                               title="Aprovar"
+                                               onclick="return confirm('Tem certeza que deseja aprovar este pré-cadastro?')">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="{% url 'associados:rejeitar_pre_cadastro' pre_cadastro.pk %}" 
+                                               class="btn btn-sm btn-reject" 
+                                               title="Rejeitar">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Paginação -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginação">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-user-clock fa-3x text-muted mb-3"></i>
+                        <h4 class="text-muted">Nenhum pré-cadastro pendente</h4>
+                        <p class="text-muted">Não há pré-cadastros aguardando aprovação no momento.</p>
+                        <a href="{% url 'associados:pre_cadastro_historico' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-history"></i> Ver Histórico
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Confirmação para aprovação
+    document.querySelectorAll('.btn-approve').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            if (!confirm('Tem certeza que deseja aprovar este pré-cadastro? Esta ação não pode ser desfeita.')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock %}

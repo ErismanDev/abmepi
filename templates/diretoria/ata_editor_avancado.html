@@ -1,0 +1,1258 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editor de Ata Avançado{% endblock %}
+
+{% block extra_css %}
+<style>
+    .editor-container {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        min-height: 500px;
+        padding: 20px;
+        background: white;
+    }
+
+    .editor-toolbar {
+        background: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .editor-content {
+        min-height: 400px;
+        padding: 20px;
+        outline: none;
+    }
+    
+    .btn-toolbar {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* Estilos para checkboxes - marcadores pretos */
+    .form-check-input {
+        border-color: #000 !important;
+    }
+    
+    .form-check-input:checked {
+        background-color: #000 !important;
+        border-color: #000 !important;
+    }
+    
+    .form-check-input:focus {
+        border-color: #000 !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+    }
+    
+    .form-check-input:checked:focus {
+        background-color: #000 !important;
+        border-color: #000 !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-file-alt me-2"></i>Editor de Ata Avançado</h2>
+                <div>
+                    <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary me-2">
+                        <i class="fas fa-arrow-left me-1"></i>
+                            Voltar para Lista
+                        </a>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('ataForm').submit()">
+                        <i class="fas fa-save me-1"></i>
+                        Salvar Ata
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <form method="post" id="ataForm">
+                {% csrf_token %}
+                
+                <!-- Campo oculto para conteudo_completo -->
+                <div style="display: none;">
+                    {{ form.conteudo_completo }}
+                </div>
+                
+                <!-- Informações da Ata -->
+                <div class="form-section">
+                    <h5 class="mb-3"><i class="fas fa-info-circle me-2"></i>Informações da Ata</h5>
+                        <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.titulo.id_for_label }}" class="form-label">Título da Reunião *</label>
+                            {{ form.titulo }}
+                            {% if form.titulo.errors %}
+                                <div class="text-danger">{{ form.titulo.errors }}</div>
+                            {% endif %}
+                                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.tipo_reuniao.id_for_label }}" class="form-label">Tipo de Reunião *</label>
+                            {{ form.tipo_reuniao }}
+                            {% if form.tipo_reuniao.errors %}
+                                <div class="text-danger">{{ form.tipo_reuniao.errors }}</div>
+                                            {% endif %}
+                                </div>
+                            </div>
+                        <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.data_reuniao.id_for_label }}" class="form-label">Data e Hora *</label>
+                            {{ form.data_reuniao }}
+                            {% if form.data_reuniao.errors %}
+                                <div class="text-danger">{{ form.data_reuniao.errors }}</div>
+                                        {% endif %}
+                                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.local.id_for_label }}" class="form-label">{{ form.local.label }} *</label>
+                            {{ form.local }}
+                            {% if form.local.errors %}
+                                <div class="text-danger">{{ form.local.errors }}</div>
+                            {% endif %}
+                            </div>
+                                </div>
+                        <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.presidente.id_for_label }}" class="form-label">Presidente *</label>
+                            {{ form.presidente }}
+                            {% if form.presidente.errors %}
+                                <div class="text-danger">{{ form.presidente.errors }}</div>
+                                        {% endif %}
+                                </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.secretario.id_for_label }}" class="form-label">Secretário *</label>
+                            {{ form.secretario }}
+                            {% if form.secretario.errors %}
+                                <div class="text-danger">{{ form.secretario.errors }}</div>
+                                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pauta e Deliberações -->
+                <div class="form-section">
+                    <h5 class="mb-3"><i class="fas fa-list me-2"></i>Pauta e Deliberações</h5>
+                        <div class="mb-3">
+                        <label for="{{ form.pauta.id_for_label }}" class="form-label">Pauta *</label>
+                        {{ form.pauta }}
+                        {% if form.pauta.errors %}
+                            <div class="text-danger">{{ form.pauta.errors }}</div>
+                                {% endif %}
+                        </div>
+                        <div class="mb-3">
+                        <label for="{{ form.deliberacoes.id_for_label }}" class="form-label">Deliberações *</label>
+                        {{ form.deliberacoes }}
+                        {% if form.deliberacoes.errors %}
+                            <div class="text-danger">{{ form.deliberacoes.errors }}</div>
+                                {% endif %}
+                        </div>
+                        <div class="mb-3">
+                        <label for="{{ form.observacoes.id_for_label }}" class="form-label">Observações</label>
+                        {{ form.observacoes }}
+                        {% if form.observacoes.errors %}
+                            <div class="text-danger">{{ form.observacoes.errors }}</div>
+                                {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Editor de Conteúdo -->
+                <div class="form-section">
+                    <h5 class="mb-3"><i class="fas fa-edit me-2"></i>Conteúdo da Ata</h5>
+                        <div class="editor-container">
+                        <div class="editor-toolbar">
+                            <!-- Desfazer e Refazer -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="execCommand('undo')" title="Desfazer (Ctrl+Z)">
+                                    <i class="fas fa-undo"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="execCommand('redo')" title="Refazer (Ctrl+Y)">
+                                    <i class="fas fa-redo"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Fonte e Tamanho -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <select class="form-select form-select-sm" onchange="changeFontFamily(this.value)" title="Família da fonte">
+                                    <option value="">Fonte</option>
+                                    <option value="Arial, sans-serif">Arial</option>
+                                    <option value="Times New Roman, serif">Times New Roman</option>
+                                    <option value="Georgia, serif">Georgia</option>
+                                    <option value="Verdana, sans-serif">Verdana</option>
+                                    <option value="Courier New, monospace">Courier New</option>
+                                    <option value="Helvetica, sans-serif">Helvetica</option>
+                                </select>
+                                <select class="form-select form-select-sm" onchange="changeFontSize(this.value)" title="Tamanho da fonte">
+                                    <option value="">Tamanho</option>
+                                    <option value="8px">8px</option>
+                                    <option value="9px">9px</option>
+                                    <option value="10px">10px</option>
+                                    <option value="11px">11px</option>
+                                    <option value="12px">12px</option>
+                                    <option value="14px">14px</option>
+                                    <option value="16px">16px</option>
+                                    <option value="18px">18px</option>
+                                    <option value="20px">20px</option>
+                                    <option value="24px">24px</option>
+                                    <option value="28px">28px</option>
+                                    <option value="32px">32px</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Formatação de texto -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')" title="Negrito">
+                                        <i class="fas fa-bold"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')" title="Itálico">
+                                        <i class="fas fa-italic"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')" title="Sublinhado">
+                                        <i class="fas fa-underline"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('strikeThrough')" title="Riscado">
+                                        <i class="fas fa-strikethrough"></i>
+                                    </button>
+                                </div>
+                                
+                            <!-- Cores -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <input type="color" class="form-control form-control-sm" id="textColor" onchange="changeTextColor(this.value)" title="Cor do texto" style="width: 40px; height: 31px;">
+                                <input type="color" class="form-control form-control-sm" id="backgroundColor" onchange="changeBackgroundColor(this.value)" title="Cor de fundo" style="width: 40px; height: 31px;">
+                                </div>
+                                
+                                <!-- Alinhamento -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyLeft')" title="Alinhar à esquerda">
+                                        <i class="fas fa-align-left"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyCenter')" title="Centralizar">
+                                        <i class="fas fa-align-center"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyRight')" title="Alinhar à direita">
+                                        <i class="fas fa-align-right"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyFull')" title="Justificar">
+                                        <i class="fas fa-align-justify"></i>
+                                    </button>
+                                </div>
+                                
+                            <!-- Títulos -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <select class="form-select form-select-sm" onchange="formatHeading(this.value)" title="Formato do texto">
+                                    <option value="">Formato</option>
+                                    <option value="h1">Título 1</option>
+                                    <option value="h2">Título 2</option>
+                                    <option value="h3">Título 3</option>
+                                    <option value="h4">Título 4</option>
+                                    <option value="h5">Título 5</option>
+                                    <option value="h6">Título 6</option>
+                                    <option value="p">Parágrafo</option>
+                                    </select>
+                                </div>
+                                
+                            <!-- Listas -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertUnorderedList')" title="Lista com marcadores">
+                                    <i class="fas fa-list-ul"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertOrderedList')" title="Lista numerada">
+                                    <i class="fas fa-list-ol"></i>
+                                    </button>
+                                </div>
+                                
+                            <!-- Elementos -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertTable()" title="Inserir tabela">
+                                        <i class="fas fa-table"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertLink()" title="Inserir link">
+                                    <i class="fas fa-link"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertImage()" title="Inserir imagem">
+                                        <i class="fas fa-image"></i>
+                                    </button>
+                            </div>
+                            
+                            <!-- Modelos -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="showModelos()" title="Procurar modelos">
+                                    <i class="fas fa-search"></i> Modelos
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-success" onclick="saveModelo()" title="Salvar como modelo">
+                                    <i class="fas fa-save"></i> Salvar
+                                    </button>
+                                </div>
+                                
+                            <!-- Ações -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-warning" onclick="clearFormatting()" title="Limpar formatação">
+                                        <i class="fas fa-remove-format"></i>
+                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearContent()" title="Limpar conteúdo">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                            <!-- Visualização -->
+                            <div class="btn-group me-2 mb-2" role="group">
+                                <button type="button" class="btn btn-sm btn-outline-info" onclick="togglePreview()" title="Alternar visualização">
+                                    <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                </div>
+                        <div class="editor-content" id="editorContent" contenteditable="true" data-placeholder="Digite o conteúdo da ata aqui...">
+                                </div>
+                            </div>
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Use os botões da barra de ferramentas para formatar o texto. O conteúdo é salvo automaticamente.
+                    </small>
+                    </div>
+                    
+                <!-- Botões de Ação no final -->
+                <div class="text-center mt-4 mb-4">
+                    <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary btn-lg me-3">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Lista
+                    </a>
+                    <button type="button" class="btn btn-success btn-lg" onclick="document.getElementById('ataForm').submit()">
+                            <i class="fas fa-save me-2"></i>
+                        Salvar Ata
+                        </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Procurar Modelos -->
+<div class="modal fade" id="modelosModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-search me-2"></i>Procurar Modelos de Ata
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <!-- Barra de Filtros -->
+                <div class="bg-light border-bottom p-3">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchModelos" 
+                                       placeholder="Buscar por nome ou descrição..." 
+                                       onkeyup="searchModelos()">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="categoriaFilter" onchange="filterByCategory()">
+                                <option value="">Todas as categorias</option>
+                                <option value="geral">Geral</option>
+                                <option value="ordinaria">Reunião Ordinária</option>
+                                <option value="extraordinaria">Reunião Extraordinária</option>
+                                <option value="emergencia">Emergência</option>
+                                <option value="assembleia">Assembleia</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select class="form-select" id="statusFilter" onchange="filterByStatus()">
+                                <option value="">Todos</option>
+                                <option value="publico">Públicos</option>
+                                <option value="privado">Meus Modelos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-primary w-100" onclick="loadModelos()">
+                                <i class="fas fa-refresh me-1"></i>Atualizar
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="limparFiltros()">
+                                <i class="fas fa-times me-1"></i>Limpar Filtros
+                            </button>
+                            <span class="text-muted small" id="filtrosAtivos"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conteúdo Principal -->
+                <div class="p-3">
+                    <!-- Loading indicator -->
+                    <div id="modelosLoading" class="text-center py-5" style="display: none;">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <h6 class="text-muted">Carregando modelos...</h6>
+                        <p class="text-muted small">Aguarde enquanto buscamos os modelos disponíveis</p>
+                    </div>
+                    
+                    <!-- Lista de modelos -->
+                    <div class="row g-3" id="modelosList">
+                        <!-- Modelos serão carregados aqui -->
+                    </div>
+                    
+                    <!-- Mensagem quando não há modelos -->
+                    <div id="noModelos" class="text-center py-5" style="display: none;">
+                        <div class="mb-4">
+                            <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                        </div>
+                        <h5 class="text-muted mb-2">Nenhum modelo encontrado</h5>
+                        <p class="text-muted mb-4">Tente ajustar os filtros de busca ou criar um novo modelo.</p>
+                        <button class="btn btn-primary" onclick="saveModelo()">
+                            <i class="fas fa-plus me-2"></i>Criar Primeiro Modelo
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between w-100">
+                    <div>
+                        <span class="text-muted small" id="contadorModelos">0 modelos encontrados</span>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Fechar
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="saveModelo()">
+                            <i class="fas fa-plus me-1"></i>Novo Modelo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Salvar Modelo -->
+<div class="modal fade" id="saveModeloModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-save me-2"></i>Salvar como Modelo
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="saveModeloForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                    <div class="mb-3">
+                                <label for="modeloNome" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Nome do Modelo *
+                                </label>
+                                <input type="text" class="form-control" id="modeloNome" 
+                                       placeholder="Digite um nome descritivo para o modelo" required>
+                                <div class="form-text">Escolha um nome que identifique claramente o modelo.</div>
+                    </div>
+                    </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="modeloCategoria" class="form-label">
+                                    <i class="fas fa-folder me-1"></i>Categoria
+                                </label>
+                            <select class="form-select" id="modeloCategoria">
+                                <option value="geral">Geral</option>
+                                <option value="ordinaria">Reunião Ordinária</option>
+                                <option value="extraordinaria">Reunião Extraordinária</option>
+                                <option value="emergencia">Emergência</option>
+                                <option value="assembleia">Assembleia</option>
+                            </select>
+                        </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modeloDescricao" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Descrição
+                        </label>
+                        <textarea class="form-control" id="modeloDescricao" rows="3" 
+                                  placeholder="Descreva brevemente o que este modelo contém..."></textarea>
+                        <div class="form-text">Uma descrição ajuda outros usuários a entenderem quando usar este modelo.</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="modeloPublico">
+                                <label class="form-check-label" for="modeloPublico">
+                                    <i class="fas fa-globe me-1"></i>Modelo Público
+                                </label>
+                                <div class="form-text">Se marcado, outros usuários poderão usar este modelo.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <small>O conteúdo atual do editor será salvo como modelo.</small>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmarSalvarModelo()">
+                    <i class="fas fa-save me-1"></i>Salvar Modelo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const editor = document.getElementById('editorContent');
+    const hiddenField = document.getElementById('id_conteudo_completo_editor');
+    
+    if (!editor || !hiddenField) {
+        console.error('Elementos não encontrados!');
+        console.log('Editor:', editor);
+        console.log('Hidden field:', hiddenField);
+        return;
+    }
+    
+    // Carregar conteúdo inicial se existir
+    if (hiddenField.value) {
+        editor.innerHTML = hiddenField.value;
+        console.log('Conteúdo inicial carregado:', hiddenField.value.length, 'caracteres');
+    }
+    
+    // Função simples de sincronização
+    function syncContent() {
+        const content = editor.innerHTML;
+        hiddenField.value = content;
+        console.log('Sincronizado:', content.length, 'caracteres');
+    }
+    
+    // Sincronizar em tempo real
+    editor.addEventListener('input', syncContent);
+    editor.addEventListener('paste', () => setTimeout(syncContent, 100));
+    editor.addEventListener('keyup', syncContent);
+    
+    // Sincronizar antes do submit
+    document.getElementById('ataForm').addEventListener('submit', function(e) {
+        console.log('=== SUBMIT INICIADO ===');
+        syncContent();
+        
+        // Debug: verificar estado dos campos
+        console.log('Editor content:', editor.innerHTML.substring(0, 100) + '...');
+        console.log('Hidden field value:', hiddenField.value.substring(0, 100) + '...');
+        console.log('Hidden field name:', hiddenField.name);
+        console.log('Hidden field id:', hiddenField.id);
+        
+        // Validar campos obrigatórios
+        const titulo = document.getElementById('id_titulo').value.trim();
+        const tipo = document.getElementById('id_tipo_reuniao').value;
+        const data = document.getElementById('id_data_reuniao').value;
+        const presidente = document.getElementById('id_presidente').value;
+        const secretario = document.getElementById('id_secretario').value;
+        const pauta = document.getElementById('id_pauta').value.trim();
+        const deliberacoes = document.getElementById('id_deliberacoes').value.trim();
+        const local = document.getElementById('id_local').value.trim();
+        
+        console.log('Campos obrigatórios:', {
+            titulo: titulo.length,
+            tipo: tipo.length,
+            data: data.length,
+            presidente: presidente.length,
+            secretario: secretario.length,
+            pauta: pauta.length,
+            deliberacoes: deliberacoes.length,
+            local: local.length,
+            conteudo: hiddenField.value.length
+        });
+        
+        if (!titulo || !tipo || !data || !presidente || !secretario || !pauta || !deliberacoes || !local) {
+            e.preventDefault();
+            alert('Por favor, preencha todas as informações obrigatórias da ata antes de salvar.');
+            return false;
+        }
+        
+        // Verificar se há conteúdo no editor
+        if (!hiddenField.value || hiddenField.value.trim() === '' || hiddenField.value === '<div><br></div>') {
+            e.preventDefault();
+            alert('Por favor, adicione algum conteúdo à ata antes de salvar.');
+            return false;
+        }
+        
+        console.log('✅ Formulário enviado com:', hiddenField.value.length, 'caracteres');
+        console.log('=== SUBMIT FINALIZADO ===');
+        return true;
+    });
+    
+    // Preencher data se vazia
+    const dataReuniao = document.getElementById('id_data_reuniao');
+    if (dataReuniao && !dataReuniao.value) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        dataReuniao.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+    
+    console.log('Editor inicializado com sucesso!');
+});
+
+// Funções de formatação
+function formatText(command) {
+    document.execCommand(command, false, null);
+    document.getElementById('editorContent').focus();
+}
+
+// Funções de fonte
+function execCommand(command, value = null) {
+    const editor = document.getElementById('editorContent');
+    editor.focus();
+    
+    if (value) {
+        document.execCommand(command, false, value);
+    } else {
+        document.execCommand(command, false, null);
+    }
+    
+    // Sincronizar conteúdo após comando
+    setTimeout(() => {
+        const content = editor.innerHTML;
+        const hiddenField = document.getElementById('id_conteudo');
+        if (hiddenField) {
+            hiddenField.value = content;
+        }
+    }, 100);
+}
+
+function changeFontFamily(fontFamily) {
+    if (fontFamily) {
+        document.execCommand('fontName', false, fontFamily);
+    }
+    document.getElementById('editorContent').focus();
+}
+
+function changeFontSize(fontSize) {
+    if (fontSize) {
+        const editor = document.getElementById('editorContent');
+        editor.focus();
+        
+        // Aplicar o tamanho da fonte usando execCommand
+        document.execCommand('fontSize', false, '7');
+        
+        // Aplicar o tamanho real via CSS
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            if (!range.collapsed) {
+                // Há texto selecionado - aplicar estilo ao texto selecionado
+                const span = document.createElement('span');
+                span.style.fontSize = fontSize;
+                
+                try {
+                    range.surroundContents(span);
+                } catch (e) {
+                    // Se não conseguir envolver, inserir o span
+                    range.insertNode(span);
+                }
+            } else {
+                // Nenhum texto selecionado - aplicar ao editor inteiro
+                editor.style.fontSize = fontSize;
+            }
+        }
+        
+        // Sincronizar conteúdo após mudança
+        setTimeout(() => {
+            const content = editor.innerHTML;
+            const hiddenField = document.getElementById('id_conteudo');
+            if (hiddenField) {
+                hiddenField.value = content;
+            }
+        }, 100);
+    }
+}
+
+function changeTextColor(color) {
+    document.execCommand('foreColor', false, color);
+    document.getElementById('editorContent').focus();
+}
+
+function changeBackgroundColor(color) {
+    document.execCommand('backColor', false, color);
+    document.getElementById('editorContent').focus();
+}
+
+function formatHeading(tag) {
+    if (tag) {
+        document.execCommand('formatBlock', false, tag);
+    }
+    document.getElementById('editorContent').focus();
+}
+
+function insertList(type = 'insertUnorderedList') {
+    if (type === 'insertUnorderedList') {
+        const list = '<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>';
+        document.execCommand('insertHTML', false, list);
+    } else {
+        const list = '<ol><li>Item 1</li><li>Item 2</li><li>Item 3</li></ol>';
+        document.execCommand('insertHTML', false, list);
+    }
+    document.getElementById('editorContent').focus();
+}
+
+function insertTable() {
+    const table = `
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Coluna 1</th>
+                    <th>Coluna 2</th>
+                    <th>Coluna 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Dados 1</td>
+                    <td>Dados 2</td>
+                    <td>Dados 3</td>
+                </tr>
+                <tr>
+                    <td>Dados 4</td>
+                    <td>Dados 5</td>
+                    <td>Dados 6</td>
+                </tr>
+            </tbody>
+        </table>
+    `;
+    document.execCommand('insertHTML', false, table);
+    document.getElementById('editorContent').focus();
+}
+
+function insertLink() {
+    const url = prompt('Digite a URL do link:');
+    if (url) {
+        const text = prompt('Digite o texto do link:', url);
+        const link = `<a href="${url}" target="_blank">${text || url}</a>`;
+        document.execCommand('insertHTML', false, link);
+    }
+    document.getElementById('editorContent').focus();
+}
+
+function insertImage() {
+    const url = prompt('Digite a URL da imagem:');
+    if (url) {
+        const alt = prompt('Digite o texto alternativo da imagem:');
+        const img = `<img src="${url}" alt="${alt || ''}" class="img-fluid" style="max-width: 100%;">`;
+        document.execCommand('insertHTML', false, img);
+    }
+    document.getElementById('editorContent').focus();
+}
+
+
+function clearFormatting() {
+    document.execCommand('removeFormat', false, null);
+    document.getElementById('editorContent').focus();
+}
+
+function clearContent() {
+    if (confirm('Tem certeza que deseja limpar todo o conteúdo do editor?')) {
+        document.getElementById('editorContent').innerHTML = '';
+        document.getElementById('editorContent').focus();
+    }
+}
+
+function insertTemplate() {
+    const template = `
+        <h3>ATA DE REUNIÃO</h3>
+        <p><strong>Data:</strong> [Data da reunião]</p>
+        <p><strong>Local:</strong> [Local da reunião]</p>
+        <p><strong>Presidente:</strong> [Nome do presidente]</p>
+        <p><strong>Secretário:</strong> [Nome do secretário]</p>
+        
+        <h4>PAUTA</h4>
+        <ul>
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+                </ul>
+                
+        <h4>DELIBERAÇÕES</h4>
+        <p>[Descreva as deliberações tomadas]</p>
+        
+        <h4>OBSERVAÇÕES</h4>
+                <p>[Observações adicionais]</p>
+                
+        <p><strong>Data de elaboração:</strong> [Data atual]</p>
+        <p><strong>Assinatura do Presidente:</strong> _________________</p>
+        <p><strong>Assinatura do Secretário:</strong> _________________</p>
+    `;
+    document.execCommand('insertHTML', false, template);
+    document.getElementById('editorContent').focus();
+}
+
+// Funções de modelos
+function showModelos() {
+    const modal = new bootstrap.Modal(document.getElementById('modelosModal'));
+    modal.show();
+    loadModelos();
+}
+
+// Funções de filtro e busca
+function searchModelos() {
+    const searchTerm = document.getElementById('searchModelos').value.toLowerCase();
+    const cards = document.querySelectorAll('#modelosList .modelo-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const nome = card.querySelector('.modelo-nome')?.textContent.toLowerCase() || '';
+        const descricao = card.querySelector('.modelo-descricao')?.textContent.toLowerCase() || '';
+        
+        if (nome.includes(searchTerm) || descricao.includes(searchTerm)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    atualizarContador(visibleCount);
+    atualizarFiltrosAtivos();
+}
+
+function filterByCategory() {
+    const categoria = document.getElementById('categoriaFilter').value;
+    const cards = document.querySelectorAll('#modelosList .modelo-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const cardCategoria = card.getAttribute('data-categoria') || '';
+        
+        if (!categoria || cardCategoria === categoria) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    atualizarContador(visibleCount);
+    atualizarFiltrosAtivos();
+}
+
+function filterByStatus() {
+    const status = document.getElementById('statusFilter').value;
+    const cards = document.querySelectorAll('#modelosList .modelo-card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const isPublico = card.getAttribute('data-publico') === 'true';
+        
+        if (!status || 
+            (status === 'publico' && isPublico) || 
+            (status === 'privado' && !isPublico)) {
+            card.style.display = 'block';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    atualizarContador(visibleCount);
+    atualizarFiltrosAtivos();
+}
+
+function aplicarFiltros() {
+    // Aplicar todos os filtros ativos
+    searchModelos();
+    filterByCategory();
+    filterByStatus();
+}
+
+function limparFiltros() {
+    document.getElementById('searchModelos').value = '';
+    document.getElementById('categoriaFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    // Mostrar todos os cards
+    const cards = document.querySelectorAll('#modelosList .modelo-card');
+    cards.forEach(card => {
+        card.style.display = 'block';
+    });
+    
+    atualizarContador(cards.length);
+    atualizarFiltrosAtivos();
+}
+
+function atualizarContador(count) {
+    const contadorDiv = document.getElementById('contadorModelos');
+    contadorDiv.textContent = `${count} modelo${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+}
+
+function atualizarFiltrosAtivos() {
+    const filtrosAtivos = document.getElementById('filtrosAtivos');
+    const filtros = [];
+    
+    const searchTerm = document.getElementById('searchModelos').value;
+    const categoria = document.getElementById('categoriaFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    
+    if (searchTerm) filtros.push(`Busca: "${searchTerm}"`);
+    if (categoria) filtros.push(`Categoria: ${document.getElementById('categoriaFilter').selectedOptions[0].text}`);
+    if (status) filtros.push(`Status: ${document.getElementById('statusFilter').selectedOptions[0].text}`);
+    
+    filtrosAtivos.textContent = filtros.length > 0 ? `Filtros ativos: ${filtros.join(', ')}` : '';
+}
+
+function loadModelos() {
+    const modelosList = document.getElementById('modelosList');
+    const loadingDiv = document.getElementById('modelosLoading');
+    const noModelosDiv = document.getElementById('noModelos');
+    const contadorDiv = document.getElementById('contadorModelos');
+    
+    // Mostrar loading
+    loadingDiv.style.display = 'block';
+    modelosList.innerHTML = '';
+    noModelosDiv.style.display = 'none';
+    contadorDiv.textContent = 'Carregando...';
+    
+    // Carregar modelos reais da API
+    fetch('{% url "diretoria:modelos_ata_list" %}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Extrair modelos do HTML retornado
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const cards = doc.querySelectorAll('.modelo-card');
+            
+            loadingDiv.style.display = 'none';
+            
+            if (cards.length > 0) {
+                modelosList.innerHTML = '';
+                cards.forEach(card => {
+                    // Adicionar funcionalidade de usar modelo
+                    const useButton = card.querySelector('button[onclick*="useModelo"]');
+                    if (useButton) {
+                        useButton.onclick = function() {
+                            const modeloId = this.getAttribute('onclick').match(/\d+/)[0];
+                            useModelo(modeloId);
+                        };
+                    }
+                    modelosList.appendChild(card.cloneNode(true));
+                });
+                
+                // Atualizar contador
+                contadorDiv.textContent = `${cards.length} modelo${cards.length !== 1 ? 's' : ''} encontrado${cards.length !== 1 ? 's' : ''}`;
+                
+                // Aplicar filtros se existirem
+                aplicarFiltros();
+            } else {
+                noModelosDiv.style.display = 'block';
+                contadorDiv.textContent = '0 modelos encontrados';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelos:', error);
+            loadingDiv.style.display = 'none';
+            noModelosDiv.style.display = 'block';
+            contadorDiv.textContent = 'Erro ao carregar';
+            noModelosDiv.innerHTML = `
+                <div class="mb-4">
+                    <i class="fas fa-exclamation-triangle fa-4x text-warning mb-3"></i>
+                </div>
+                <h5 class="text-warning mb-2">Erro ao carregar modelos</h5>
+                <p class="text-muted mb-4">Tente novamente ou verifique sua conexão.</p>
+                <button class="btn btn-primary" onclick="loadModelos()">
+                    <i class="fas fa-refresh me-2"></i>Tentar Novamente
+                </button>
+            `;
+        });
+}
+
+function useModelo(modeloId) {
+    // Mostrar loading no botão
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Carregando...';
+    button.disabled = true;
+    
+    // Buscar modelo real da API
+    fetch(`{% url 'diretoria:api_obter_modelo' modelo_id=0 %}`.replace('0', modeloId))
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Inserir conteúdo no editor
+                const editor = document.getElementById('editorContent');
+                const conteudo = data.conteudo || data.content || '';
+                
+                if (conteudo) {
+                    editor.innerHTML = conteudo;
+                    // Sincronizar com campo oculto
+                    const hiddenField = document.getElementById('id_conteudo_completo_editor');
+                    if (hiddenField) {
+                        hiddenField.value = conteudo;
+                    }
+                    editor.focus();
+                    
+                    // Fechar modal
+                    bootstrap.Modal.getInstance(document.getElementById('modelosModal')).hide();
+                    
+                    // Mostrar notificação de sucesso
+                    showNotification('Modelo aplicado com sucesso!', 'success');
+                } else {
+                    throw new Error('Conteúdo do modelo está vazio');
+                }
+            } else {
+                throw new Error(data.message || 'Erro desconhecido');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelo:', error);
+            showNotification('Erro ao carregar modelo: ' + error.message, 'error');
+        })
+        .finally(() => {
+            // Restaurar botão
+            button.innerHTML = originalText;
+            button.disabled = false;
+        });
+}
+
+function previewModelo(modeloId) {
+    // Implementar visualização do modelo
+    alert('Funcionalidade de visualização será implementada em breve.');
+}
+
+function searchModelos() {
+    const searchTerm = document.getElementById('searchModelos').value.toLowerCase();
+    const cards = document.querySelectorAll('#modelosList .card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const description = card.querySelector('.card-text').textContent.toLowerCase();
+        const parent = card.closest('.col-md-6, .col-lg-4');
+        
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            parent.style.display = 'block';
+            visibleCount++;
+            } else {
+            parent.style.display = 'none';
+        }
+    });
+    
+    // Mostrar mensagem se não há resultados
+    const noModelosDiv = document.getElementById('noModelos');
+    if (visibleCount === 0 && searchTerm) {
+        noModelosDiv.style.display = 'block';
+        noModelosDiv.innerHTML = `
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum modelo encontrado</h5>
+            <p class="text-muted">Tente ajustar os termos de busca.</p>
+        `;
+    } else if (visibleCount === 0) {
+        noModelosDiv.style.display = 'block';
+    } else {
+        noModelosDiv.style.display = 'none';
+    }
+}
+
+function filterByCategory() {
+    const categoria = document.getElementById('categoriaFilter').value;
+    const cards = document.querySelectorAll('#modelosList .card');
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+        const parent = card.closest('.col-md-6, .col-lg-4');
+        const categoriaBadge = card.querySelector('.badge');
+        
+        if (!categoria || !categoriaBadge) {
+            parent.style.display = 'block';
+            visibleCount++;
+        } else {
+            const categoriaText = categoriaBadge.textContent.toLowerCase();
+            const categoriaMap = {
+                'geral': 'geral',
+                'ordinaria': 'ordinária',
+                'extraordinaria': 'extraordinária',
+                'emergencia': 'emergência',
+                'assembleia': 'assembleia'
+            };
+            
+            if (categoriaText.includes(categoriaMap[categoria] || categoria)) {
+                parent.style.display = 'block';
+                visibleCount++;
+            } else {
+                parent.style.display = 'none';
+            }
+        }
+    });
+    
+    // Mostrar mensagem se não há resultados
+    const noModelosDiv = document.getElementById('noModelos');
+    if (visibleCount === 0 && categoria) {
+        noModelosDiv.style.display = 'block';
+        noModelosDiv.innerHTML = `
+            <i class="fas fa-filter fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum modelo nesta categoria</h5>
+            <p class="text-muted">Tente selecionar outra categoria.</p>
+        `;
+    } else if (visibleCount === 0) {
+        noModelosDiv.style.display = 'block';
+            } else {
+        noModelosDiv.style.display = 'none';
+    }
+}
+
+function saveModelo() {
+    const modal = new bootstrap.Modal(document.getElementById('saveModeloModal'));
+    modal.show();
+}
+
+function confirmarSalvarModelo() {
+    const nome = document.getElementById('modeloNome').value.trim();
+    const descricao = document.getElementById('modeloDescricao').value.trim();
+    const categoria = document.getElementById('modeloCategoria').value;
+    const publico = document.getElementById('modeloPublico').checked;
+    
+    // Validações
+    if (!nome) {
+        showNotification('Por favor, digite o nome do modelo.', 'error');
+        document.getElementById('modeloNome').focus();
+        return;
+    }
+    
+    const conteudo = document.getElementById('editorContent').innerHTML;
+    if (!conteudo || conteudo.trim() === '' || conteudo === '<div><br></div>') {
+        showNotification('Por favor, adicione algum conteúdo ao editor antes de salvar como modelo.', 'error');
+        return;
+    }
+    
+    // Mostrar loading no botão
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Salvando...';
+    button.disabled = true;
+    
+    // Salvar modelo real via API
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('descricao', descricao);
+    formData.append('categoria', categoria);
+    formData.append('publico', publico);
+    formData.append('conteudo', conteudo);
+    
+    fetch('{% url "diretoria:api_salvar_modelo" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showNotification('Modelo salvo com sucesso!', 'success');
+            bootstrap.Modal.getInstance(document.getElementById('saveModeloModal')).hide();
+            
+            // Limpar formulário
+            document.getElementById('modeloNome').value = '';
+            document.getElementById('modeloDescricao').value = '';
+            document.getElementById('modeloCategoria').value = 'geral';
+            document.getElementById('modeloPublico').checked = false;
+        } else {
+            throw new Error(data.message || 'Erro desconhecido');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar modelo:', error);
+        showNotification('Erro ao salvar modelo: ' + error.message, 'error');
+    })
+    .finally(() => {
+        // Restaurar botão
+        button.innerHTML = originalText;
+        button.disabled = false;
+    });
+}
+
+function togglePreview() {
+    const editor = document.getElementById('editorContent');
+    const isPreview = editor.style.pointerEvents === 'none';
+    
+    if (isPreview) {
+        editor.style.pointerEvents = 'auto';
+        editor.contentEditable = 'true';
+        editor.style.border = '1px solid #ddd';
+    } else {
+        editor.style.pointerEvents = 'none';
+        editor.contentEditable = 'false';
+        editor.style.border = '2px solid #007bff';
+    }
+}
+
+function showNotification(message, type) {
+    // Remover notificações existentes
+    const existingNotifications = document.querySelectorAll('.notification-toast');
+    existingNotifications.forEach(notification => notification.remove());
+    
+    const notification = document.createElement('div');
+    notification.className = `notification-toast alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px; max-width: 400px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);';
+    
+    const icon = type === 'success' ? 'check-circle' : 'exclamation-triangle';
+    notification.innerHTML = `
+        <i class="fas fa-${icon} me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.classList.remove('show');
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+                }
+            }, 150);
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

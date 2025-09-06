@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Editar Evolução{% else %}Nova Evolução{% endif %} - {{ paciente.associado.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">{% if form.instance.pk %}Editar Evolução{% else %}Nova Evolução{% endif %}</h1>
+                <div>
+                    <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar à Ficha
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">{% if form.instance.pk %}Editar Evolução{% else %}Nova Evolução{% endif %} para {{ paciente.associado.nome }}</h6>
+                </div>
+                <div class="card-body">
+                    <!-- Informações do Paciente -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            {% if paciente.associado.foto %}
+                                <img src="{{ paciente.associado.foto.url }}" alt="Foto de {{ paciente.associado.nome }}" 
+                                     class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                     style="width: 100px; height: 100px;">
+                                    <i class="fas fa-user fa-3x text-white"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <h6 class="text-primary">Informações do Paciente</h6>
+                            <p><strong>Nome:</strong> {{ paciente.associado.nome }}</p>
+                            <p><strong>CPF:</strong> {{ paciente.associado.cpf }}</p>
+                            <p><strong>Psicólogo Responsável:</strong> 
+                                {% if paciente.psicologo_responsavel %}
+                                    {{ paciente.psicologo_responsavel.nome_completo }}
+                                {% else %}
+                                    <span class="text-warning">Não atribuído</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Informações da Evolução (quando editando) -->
+                    {% if form.instance.pk %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informações da Evolução</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Data da Evolução:</strong> {{ form.instance.data_evolucao|date:"d/m/Y H:i" }}</p>
+                                        <p><strong>Sessão:</strong> {{ form.instance.sessao.get_tipo_sessao_display }} - {{ form.instance.sessao.data_hora|date:"d/m/Y H:i" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Psicólogo:</strong> {{ form.instance.sessao.psicologo.nome_completo }}</p>
+                                        <p><strong>Status da Sessão:</strong> {{ form.instance.sessao.get_status_display }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulário da Evolução -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="form-group">
+                            <label for="{{ form.sessao.id_for_label }}">{{ form.sessao.label }}</label>
+                            {{ form.sessao }}
+                            {% if form.sessao.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.sessao.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">Selecione a sessão relacionada a esta evolução</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.conteudo.id_for_label }}">{{ form.conteudo.label }}</label>
+                            {{ form.conteudo }}
+                            {% if form.conteudo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.conteudo.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.observacoes_terapeuta.id_for_label }}">{{ form.observacoes_terapeuta.label }}</label>
+                            {{ form.observacoes_terapeuta }}
+                            {% if form.observacoes_terapeuta.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.observacoes_terapeuta.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.proximos_passos.id_for_label }}">{{ form.proximos_passos.label }}</label>
+                            {{ form.proximos_passos }}
+                            {% if form.proximos_passos.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.proximos_passos.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if form.instance.pk %}Atualizar{% else %}Salvar{% endif %} Evolução
+                            </button>
+                            <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Informações Adicionais -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Últimas Evoluções</h6>
+                </div>
+                <div class="card-body">
+                    {% if paciente.evolucao_set.all %}
+                        <div class="list-group list-group-flush">
+                            {% for evolucao in paciente.evolucao_set.all|slice:":3" %}
+                            <div class="list-group-item px-0">
+                                <small class="text-muted">{{ evolucao.data_evolucao|date:"d/m/Y H:i" }}</small>
+                                <p class="mb-1">{{ evolucao.sessao.get_tipo_sessao_display }}</p>
+                                <p class="mb-0 text-truncate" style="max-width: 200px;">{{ evolucao.conteudo|truncatewords:10 }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhuma evolução anterior.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Dicas</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-info-circle text-info"></i> Descreva detalhadamente o que foi trabalhado na sessão</li>
+                        <li><i class="fas fa-info-circle text-info"></i> Inclua observações sobre o progresso do paciente</li>
+                        <li><i class="fas fa-info-circle text-info"></i> Defina os próximos passos para o tratamento</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

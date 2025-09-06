@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if object %}
+        Editar Serviço {{ object.nome }} - Hotel de Trânsito
+    {% else %}
+        Novo Serviço Adicional - Hotel de Trânsito
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .form-container {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .form-header {
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-header h2 {
+        color: #1e3c72;
+        margin: 0;
+    }
+    
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .form-row .form-group:last-child {
+        margin-bottom: 0;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 0.75rem;
+        font-size: 1rem;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    
+    .invalid-feedback {
+        display: block;
+        width: 100%;
+        margin-top: 0.25rem;
+        font-size: 0.875rem;
+        color: #dc3545;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-cancel {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+    
+    .btn-cancel:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+    
+    .btn-save {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .alert {
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: 1px solid transparent;
+    }
+    
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+    
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+    
+    .alert-warning {
+        color: #856404;
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+    }
+    
+    .alert-info {
+        color: #0c5460;
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .btn-group .btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-container">
+                <div class="form-header">
+                    <h2>
+                        {% if object %}
+                            <i class="fas fa-edit me-2"></i>
+                            Editar Serviço: {{ object.nome }}
+                        {% else %}
+                            <i class="fas fa-plus me-2"></i>
+                            Novo Serviço Adicional
+                        {% endif %}
+                    </h2>
+                    <p class="text-muted mb-0">
+                        {% if object %}
+                            Atualize as informações do serviço adicional
+                        {% else %}
+                            Cadastre um novo serviço adicional oferecido pelo hotel
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Mensagens -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    <!-- Seção de Informações Básicas -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-info-circle me-2"></i>Informações Básicas</h5>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.nome.id_for_label }}">
+                                    {{ form.nome.label }}
+                                    {% if form.nome.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ form.nome }}
+                                {% if form.nome.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.nome.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.nome.help_text %}
+                                    <small class="form-text text-muted">{{ form.nome.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.tipo.id_for_label }}">
+                                    {{ form.tipo.label }}
+                                    {% if form.tipo.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                {{ form.tipo }}
+                                {% if form.tipo.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.tipo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.tipo.help_text %}
+                                    <small class="form-text text-muted">{{ form.tipo.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.descricao.id_for_label }}">
+                                {{ form.descricao.label }}
+                                {% if form.descricao.field.required %}
+                                    <span class="text-danger">*</span>
+                                {% endif %}
+                            </label>
+                            {{ form.descricao }}
+                            {% if form.descricao.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.descricao.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {% if form.descricao.help_text %}
+                                <small class="form-text text-muted">{{ form.descricao.help_text }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Seção de Valores e Status -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-dollar-sign me-2"></i>Valores e Status</h5>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ form.valor.id_for_label }}">
+                                    {{ form.valor.label }}
+                                    {% if form.valor.field.required %}
+                                        <span class="text-danger">*</span>
+                                    {% endif %}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">R$</span>
+                                    {{ form.valor }}
+                                </div>
+                                {% if form.valor.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.valor.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.valor.help_text %}
+                                    <small class="form-text text-muted">{{ form.valor.help_text }}</small>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="{{ form.ativo.id_for_label }}">
+                                    {{ form.ativo.label }}
+                                </label>
+                                <div class="form-check form-switch">
+                                    {{ form.ativo }}
+                                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                        {% if object and object.ativo %}
+                                            Serviço ativo e disponível
+                                        {% else %}
+                                            Serviço inativo e indisponível
+                                        {% endif %}
+                                    </label>
+                                </div>
+                                {% if form.ativo.errors %}
+                                    <div class="invalid-feedback">
+                                        {% for error in form.ativo.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                {% if form.ativo.help_text %}
+                                    <small class="form-text text-muted">{{ form.ativo.help_text }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="btn-group">
+                        <a href="{% url 'hotel_transito:servico_adicional_list' %}" class="btn btn-cancel">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-save">
+                            <i class="fas fa-save me-2"></i>
+                            {% if object %}
+                                Atualizar Serviço
+                            {% else %}
+                                Cadastrar Serviço
+                            {% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validação em tempo real
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('input, select, textarea');
+        
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                validateField(this);
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid')) {
+                    this.classList.remove('is-invalid');
+                    const feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.style.display = 'none';
+                    }
+                }
+            });
+        });
+        
+        function validateField(field) {
+            const value = field.value.trim();
+            const required = field.hasAttribute('required');
+            
+            if (required && !value) {
+                showFieldError(field, 'Este campo é obrigatório.');
+                return false;
+            }
+            
+            // Validação específica para valor
+            if (field.name === 'valor' && value) {
+                const numValue = parseFloat(value);
+                if (isNaN(numValue) || numValue < 0) {
+                    showFieldError(field, 'O valor deve ser um número positivo.');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        function showFieldError(field, message) {
+            field.classList.add('is-invalid');
+            
+            let feedback = field.parentNode.querySelector('.invalid-feedback');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.className = 'invalid-feedback';
+                field.parentNode.appendChild(feedback);
+            }
+            
+            feedback.textContent = message;
+            feedback.style.display = 'block';
+        }
+        
+        // Validação do formulário antes do envio
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            inputs.forEach(input => {
+                if (!validateField(input)) {
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                // Rolar para o primeiro erro
+                const firstError = form.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+        
+        // Atualizar label do switch ativo/inativo
+        const ativoSwitch = document.getElementById('{{ form.ativo.id_for_label }}');
+        if (ativoSwitch) {
+            ativoSwitch.addEventListener('change', function() {
+                const label = this.parentNode.querySelector('.form-check-label');
+                if (this.checked) {
+                    label.textContent = 'Serviço ativo e disponível';
+                } else {
+                    label.textContent = 'Serviço inativo e indisponível';
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
