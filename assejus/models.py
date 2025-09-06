@@ -211,11 +211,17 @@ class Advogado(models.Model):
             try:
                 usuario, senha = self.criar_usuario_sistema()
                 if usuario:
+<<<<<<< HEAD
                     print(f"✅ Usuário criado automaticamente para advogado {self.nome}")
                     print(f"📧 Username: {usuario.username}")
                     print(f"🔑 Senha padrão: {senha}")
             except Exception as e:
                 print(f"❌ Erro ao criar usuário para advogado {self.nome}: {e}")
+=======
+                    pass
+            except Exception as e:
+                pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 
 class AtendimentoJuridico(models.Model):
@@ -512,6 +518,7 @@ class ProcuracaoAdJudicia(models.Model):
         help_text='Deixe em branco para usar o texto padrão. Use as variáveis: {outorgante_nome}, {outorgante_cpf}, {outorgante_cargo}, {outorgante_matricula}, {outorgante_rgpmpi}, {outorgante_endereco}, {outorgante_telefone}, {outorgante_email}, {outorgados_nomes}, {outorgados_oab}, {processo_numero}, {processo_vara}, {data_atual}'
     )
     
+<<<<<<< HEAD
     # Objetivos da procuração
     poderes_gerais = models.TextField(
         blank=True,
@@ -527,6 +534,8 @@ class ProcuracaoAdJudicia(models.Model):
         help_text='Descreva os poderes específicos da procuração'
     )
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     class Meta:
         verbose_name = 'Procuração Ad Judicia'
         verbose_name_plural = 'Procurações Ad Judicia'
@@ -588,14 +597,21 @@ class ProcuracaoAdJudicia(models.Model):
         
         texto_padrao = f"""<b>OUTORGANTE:</b> <b>{outorgante_nome}</b>, brasileiro, casado, natural de {naturalidade}, lotado no cargo de {outorgante_cargo}, matrícula funcional nº {outorgante_matricula}, portador do RGPMPI nº. {outorgante_rgpmpi} e CPF nº {outorgante_cpf}, com endereço eletrônico: {outorgante_email} e contato telefônico: {outorgante_telefone}, residente e domiciliado na {outorgante_endereco}.
 
+<<<<<<< HEAD
 <br/><br/>
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 <b>OUTORGADO(S):</b>"""
         
         # Adicionar dados de cada outorgado individualmente
         for i, advogado in enumerate(outorgados_lista):
             if i > 0:
+<<<<<<< HEAD
                 texto_padrao += "<br/><br/>"
+=======
+                texto_padrao += "\n\n"
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             # Dados do advogado
             advogado_nome = advogado.nome
@@ -606,6 +622,7 @@ class ProcuracaoAdJudicia(models.Model):
             
             texto_padrao += f""" <b>{advogado_nome}</b>, brasileiro, advogado, inscrito na OAB, sob o nº {advogado_oab}, com escritório profissional na {advogado_endereco}, telefone: {advogado_telefone}, e-mail: {advogado_email}."""
 
+<<<<<<< HEAD
         # Adicionar quebra de linha antes dos poderes
         texto_padrao += "<br/><br/>"
         
@@ -639,10 +656,23 @@ class ProcuracaoAdJudicia(models.Model):
                     else:
                         # Se há apenas número do processo específico, usar informações básicas
                         texto_padrao += f"""<b>PODERES ESPECÍFICOS:</b> para defender seus direitos e interesses perante o Processo nº. {processo_numero} que ora tramita na {processo_vara}."""
+=======
+        # Adicionar poderes gerais
+        texto_padrao += """
+
+<b>PODERES GERAIS:</b> poderes, in solidum ou separadamente, para receber citações iniciais, confessar, reconhecer a procedência do(s) pedido(s), renunciar ao(s) direito(s) sobre que se funda(m) a(s) ação(ões), acionar, desistir, transigir, transacionar, passar recibos e dar quitação, em juízo ou extrajudicialmente, sobre o(s) negócio(s) do(s) outorgante(s) no que lhes for incumbido, podendo requerer, alegar, defender todo(s) seu(s) direito(s) e justiça, em quaisquer demandas ou causas cíveis ou criminais, movidas ou por mover contra o(s) outorgante(s), em que seja(m) autor(es) ou réu(s), fazendo citar, oferecer ações, libelos, exceções, embargos, suspeição ou outros quaisquer artigos, contrariar, produzir, inquirir testemunhas, assistir aos termos de inventários e partilhas, assinando termo de inventariante, partilhas amigáveis, concordar com avaliações, cálculos e descrições de bens, ou impugná-los, assinar autos, requerimento, protestos, contra protestos e termos, ainda os de confissão, negação, louvação, desistência, apelar, agravar, ou embargar qualquer sentença ou despacho e seguir destes recursos até maior alçada; fazer extrair sentenças, requerer a execução delas, sequestros, pedir precatórias, tomar posse, vir com embargos de terceiros senhor e possuidor, fazer representações criminais e queixas crimes, enfim, tudo fazer para fiel desempenho deste mandato, no que for de interesse do(s) outorgante(s) mesmo com cláusulas que não estejam expressas neste instrumento, que adota(m) e ratifica(m), para todos os efeitos de direito, inclusive substabelecer."""
+
+        # Adicionar poderes específicos se necessário
+        if self.tipo_poderes in ['especificos', 'ambos'] and (self.processo_especifico or self.numero_processo_especifico):
+            texto_padrao += f"""
+
+<b>PODERES ESPECÍFICOS:</b> para defender seus direitos e interesses perante o Processo nº. {processo_numero} que ora tramita na {processo_vara}."""
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 
         return texto_padrao
     
+<<<<<<< HEAD
     def _limpar_html(self, texto):
         """Limpa e formata HTML para compatibilidade com ReportLab"""
         import re
@@ -666,6 +696,8 @@ class ProcuracaoAdJudicia(models.Model):
         
         return texto
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     @property
     def ultimo_andamento(self):
         """Retorna o último andamento do processo"""
@@ -928,6 +960,7 @@ class RelatorioJuridico(models.Model):
         if self.escopo == 'por_advogado' and self.advogado:
             return f"{self.tipo} - {self.advogado.nome} - {self.periodo_inicio} a {self.periodo_fim}"
         return f"{self.tipo} - {self.periodo_inicio} a {self.periodo_fim}"
+<<<<<<< HEAD
 
 
 class ModeloPoderes(models.Model):
@@ -983,3 +1016,11 @@ class ModeloPoderes(models.Model):
     
     def get_categoria_display(self):
         return dict(self.CATEGORIA_CHOICES).get(self.categoria, self.categoria)
+=======
+    
+    def get_escopo_display(self):
+        """Retorna o nome do escopo do relatório"""
+        if self.escopo == 'por_advogado' and self.advogado:
+            return f"Por Advogado: {self.advogado.nome}"
+        return "Total Geral"
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Completo Modal Advogado</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .test-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .log-container {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-size: 11px;
+        }
+        
+        .status-indicator {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .status-success { background: #d4edda; color: #155724; }
+        .status-error { background: #f8d7da; color: #721c24; }
+        .status-info { background: #d1ecf1; color: #0c5460; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        
+        .debug-info {
+            background: #e9ecef;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .test-button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-bug text-warning"></i>
+            Debug Completo Modal Advogado
+        </h1>
+        
+        <div class="test-section">
+            <h4><i class="fas fa-info-circle text-info"></i> Status do Sistema</h4>
+            <div id="systemStatus" class="status-indicator status-info">
+                Inicializando sistema...
+            </div>
+            
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-primary w-100 test-button" onclick="testOpenAdvogadoModal()">
+                        <i class="fas fa-plus me-2"></i>Abrir Modal
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-success w-100 test-button" onclick="testDirectFetch()">
+                        <i class="fas fa-network-wired me-2"></i>Testar Fetch
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-warning w-100 test-button" onclick="testFormSubmission()">
+                        <i class="fas fa-paper-plane me-2"></i>Testar POST
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-info w-100 test-button" onclick="checkSystemStatus()">
+                        <i class="fas fa-check-circle me-2"></i>Verificar Status
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h4><i class="fas fa-list text-success"></i> Funções Disponíveis</h4>
+            <div id="functionsList" class="mt-3">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Verificando...</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h4><i class="fas fa-terminal text-warning"></i> Log de Atividades</h4>
+            <div id="logContainer" class="log-container">
+                <div class="text-muted">Aguardando ações...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h4><i class="fas fa-code text-secondary"></i> Informações de Debug</h4>
+            <div id="debugInfo" class="debug-info">
+                <div class="text-muted">Informações de debug aparecerão aqui...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h4><i class="fas fa-exclamation-triangle text-danger"></i> Testes de Erro</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-danger w-100 test-button" onclick="testErrorHandling()">
+                        <i class="fas fa-bomb me-2"></i>Testar Tratamento de Erro
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-secondary w-100 test-button" onclick="testCSRF()">
+                        <i class="fas fa-shield-alt me-2"></i>Testar CSRF
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-dark w-100 test-button" onclick="clearLogs()">
+                        <i class="fas fa-trash me-2"></i>Limpar Logs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script de teste -->
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> ${message}`;
+            
+            if (type === 'error') {
+                logEntry.className = 'text-danger';
+            } else if (type === 'success') {
+                logEntry.className = 'text-success';
+            } else if (type === 'warning') {
+                logEntry.className = 'text-warning';
+            }
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            logCount++;
+            
+            // Limitar logs
+            if (logCount > 200) {
+                logContainer.removeChild(logContainer.firstChild);
+                logCount--;
+            }
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('systemStatus');
+            statusEl.textContent = message;
+            statusEl.className = `status-indicator status-${type}`;
+        }
+        
+        function updateDebugInfo(info) {
+            const debugEl = document.getElementById('debugInfo');
+            debugEl.innerHTML = `<pre>${JSON.stringify(info, null, 2)}</pre>`;
+        }
+        
+        function clearLogs() {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.innerHTML = '<div class="text-muted">Logs limpos...</div>';
+            logCount = 0;
+            addLog('🧹 Logs limpos', 'info');
+        }
+        
+        function checkSystemStatus() {
+            addLog('🔍 Verificando status do sistema...', 'info');
+            updateStatus('Verificando sistema...', 'info');
+            
+            // Verificar funções disponíveis
+            const functions = [
+                'openAdvogadoModal',
+                'submitForm',
+                'openFormModal',
+                'getCookie',
+                'makeFieldsEditable'
+            ];
+            
+            let availableCount = 0;
+            const functionsList = document.getElementById('functionsList');
+            let functionsHtml = '<div class="row">';
+            
+            functions.forEach(funcName => {
+                const isAvailable = typeof window[funcName] === 'function';
+                if (isAvailable) availableCount++;
+                
+                functionsHtml += `
+                    <div class="col-md-4 mb-2">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-${isAvailable ? 'check-circle text-success' : 'times-circle text-danger'} me-2"></i>
+                            <span class="${isAvailable ? 'text-success' : 'text-danger'}">${funcName}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            functionsHtml += '</div>';
+            functionsList.innerHTML = functionsHtml;
+            
+            // Atualizar status
+            if (availableCount === functions.length) {
+                updateStatus('✅ Sistema funcionando perfeitamente!', 'success');
+                addLog('✅ Todas as funções estão disponíveis', 'success');
+            } else {
+                updateStatus(`⚠️ Sistema parcialmente funcional (${availableCount}/${functions.length})`, 'warning');
+                addLog(`⚠️ ${functions.length - availableCount} função(ões) não disponível(is)`, 'warning');
+            }
+            
+            // Atualizar debug info
+            updateDebugInfo({
+                functions_available: availableCount,
+                total_functions: functions.length,
+                functions_status: functions.reduce((acc, func) => {
+                    acc[func] = typeof window[func] === 'function';
+                    return acc;
+                }, {}),
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        async function testOpenAdvogadoModal() {
+            addLog('🚀 Testando abertura do modal de advogado...', 'info');
+            updateStatus('Testando modal...', 'info');
+            
+            try {
+                if (typeof window.openAdvogadoModal === 'function') {
+                    addLog('✅ Função openAdvogadoModal encontrada', 'success');
+                    
+                    // Chamar a função
+                    window.openAdvogadoModal();
+                    addLog('✅ openAdvogadoModal executada com sucesso', 'success');
+                    updateStatus('✅ Modal aberto com sucesso!', 'success');
+                    
+                } else {
+                    addLog('❌ Função openAdvogadoModal não está disponível', 'error');
+                    updateStatus('❌ Função não disponível!', 'error');
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erro ao executar openAdvogadoModal: ${error.message}`, 'error');
+                updateStatus('❌ Erro ao executar função!', 'error');
+                console.error('Erro completo:', error);
+            }
+        }
+        
+        async function testDirectFetch() {
+            addLog('🌐 Testando fetch direto para a API...', 'info');
+            updateStatus('Testando API...', 'info');
+            
+            const url = '/assejus/advogados/modal/novo/';
+            addLog(`📡 Fazendo requisição para: ${url}`, 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                addLog(`📥 Resposta recebida: ${response.status} ${response.statusText}`, 'info');
+                addLog(`📥 Content-Type: ${response.headers.get('content-type')}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    addLog('✅ Resposta JSON recebida com sucesso', 'success');
+                    addLog(`📋 Dados: ${JSON.stringify(data, null, 2)}`, 'info');
+                    updateStatus('✅ API funcionando!', 'success');
+                    updateDebugInfo({
+                        response_status: response.status,
+                        content_type: contentType,
+                        data: data,
+                        test_type: 'direct_fetch'
+                    });
+                } else {
+                    const text = await response.text();
+                    addLog('⚠️ Resposta não é JSON', 'warning');
+                    addLog(`📄 Conteúdo (primeiros 200 chars): ${text.substring(0, 200)}`, 'warning');
+                    updateStatus('⚠️ Resposta não é JSON', 'warning');
+                    updateDebugInfo({
+                        response_status: response.status,
+                        content_type: contentType,
+                        content_preview: text.substring(0, 200),
+                        test_type: 'direct_fetch'
+                    });
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erro no fetch: ${error.message}`, 'error');
+                updateStatus('❌ Erro na API!', 'error');
+                updateDebugInfo({
+                    error: error.message,
+                    error_type: error.name,
+                    stack: error.stack,
+                    test_type: 'direct_fetch'
+                });
+            }
+        }
+        
+        async function testFormSubmission() {
+            addLog('📤 Testando envio do formulário...', 'info');
+            updateStatus('Testando envio...', 'info');
+            
+            // Simular dados do formulário
+            const formData = new FormData();
+            formData.append('nome', 'João Silva Teste');
+            formData.append('cpf', '123.456.789-00');
+            formData.append('oab', '123456');
+            formData.append('uf_oab', 'SP');
+            formData.append('email', 'joao.teste@exemplo.com');
+            formData.append('telefone', '(11) 99999-9999');
+            formData.append('endereco', 'Rua Teste, 123');
+            formData.append('cidade', 'São Paulo');
+            formData.append('estado', 'SP');
+            formData.append('cep', '01234-567');
+            formData.append('data_inscricao_oab', '2020-01-01');
+            formData.append('experiencia_anos', '5');
+            formData.append('situacao', 'ativo');
+            
+            const url = '/assejus/advogados/modal/novo/';
+            addLog(`📡 Enviando POST para: ${url}`, 'info');
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                
+                addLog(`📥 Resposta recebida: ${response.status} ${response.statusText}`, 'info');
+                addLog(`📥 Content-Type: ${response.headers.get('content-type')}`, 'info');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    addLog('✅ Resposta JSON recebida com sucesso', 'success');
+                    addLog(`📋 Dados: ${JSON.stringify(data, null, 2)}`, 'info');
+                    updateStatus('✅ Envio testado com sucesso!', 'success');
+                    updateDebugInfo({
+                        response_status: response.status,
+                        content_type: contentType,
+                        data: data,
+                        test_type: 'form_submission'
+                    });
+                } else {
+                    const text = await response.text();
+                    addLog('⚠️ Resposta não é JSON', 'warning');
+                    addLog(`📄 Conteúdo (primeiros 200 chars): ${text.substring(0, 200)}`, 'warning');
+                    updateStatus('⚠️ Resposta não é JSON', 'warning');
+                    updateDebugInfo({
+                        response_status: response.status,
+                        content_type: contentType,
+                        content_preview: text.substring(0, 200),
+                        test_type: 'form_submission'
+                    });
+                }
+                
+            } catch (error) {
+                addLog(`❌ Erro no envio: ${error.message}`, 'error');
+                updateStatus('❌ Erro no envio!', 'error');
+                updateDebugInfo({
+                    error: error.message,
+                    error_type: error.name,
+                    stack: error.stack,
+                    test_type: 'form_submission'
+                });
+            }
+        }
+        
+        async function testErrorHandling() {
+            addLog('💥 Testando tratamento de erros...', 'info');
+            updateStatus('Testando erros...', 'info');
+            
+            try {
+                // Simular um erro
+                const invalidJson = '<!DOCTYPE html><html><body>Erro HTML</body></html>';
+                JSON.parse(invalidJson);
+            } catch (error) {
+                addLog(`✅ Erro capturado corretamente: ${error.message}`, 'success');
+                updateStatus('✅ Tratamento de erro funcionando!', 'success');
+                updateDebugInfo({
+                    error_test: 'passed',
+                    error_message: error.message,
+                    error_type: error.name
+                });
+            }
+        }
+        
+        async function testCSRF() {
+            addLog('🛡️ Testando CSRF token...', 'info');
+            updateStatus('Testando CSRF...', 'info');
+            
+            try {
+                const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (csrfToken) {
+                    addLog('✅ CSRF token encontrado', 'success');
+                    addLog(`🔑 Token: ${csrfToken.value.substring(0, 20)}...`, 'info');
+                    updateStatus('✅ CSRF token OK!', 'success');
+                    updateDebugInfo({
+                        csrf_test: 'passed',
+                        token_length: csrfToken.value.length,
+                        token_preview: csrfToken.value.substring(0, 20)
+                    });
+                } else {
+                    addLog('⚠️ CSRF token não encontrado', 'warning');
+                    updateStatus('⚠️ CSRF token não encontrado', 'warning');
+                    updateDebugInfo({
+                        csrf_test: 'failed',
+                        reason: 'token_not_found'
+                    });
+                }
+            } catch (error) {
+                addLog(`❌ Erro ao testar CSRF: ${error.message}`, 'error');
+                updateStatus('❌ Erro no CSRF!', 'error');
+                updateDebugInfo({
+                    csrf_test: 'error',
+                    error: error.message
+                });
+            }
+        }
+        
+        // Verificar status inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página carregada, verificando sistema...', 'info');
+            setTimeout(checkSystemStatus, 1000);
+        });
+        
+        // Verificar se as funções estão sendo carregadas
+        let checkInterval = setInterval(() => {
+            if (typeof window.openAdvogadoModal === 'function') {
+                addLog('✅ openAdvogadoModal carregada automaticamente', 'success');
+                clearInterval(checkInterval);
+                checkSystemStatus();
+            }
+        }, 500);
+        
+        // Timeout de segurança
+        setTimeout(() => {
+            if (checkInterval) {
+                clearInterval(checkInterval);
+                addLog('⚠️ Timeout: algumas funções podem não ter sido carregadas', 'warning');
+                checkSystemStatus();
+            }
+        }, 10000);
+    </script>
+    
+    <!-- Carregar o arquivo de modais -->
+    <script src="/static/assejus/js/modais.js"></script>
+</body>
+</html>

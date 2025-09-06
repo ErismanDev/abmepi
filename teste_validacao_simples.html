@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Validação Simples</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .form-control.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+            background-color: #fff5f5 !important;
+        }
+        .form-group.has-error .form-label {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+        .invalid-feedback {
+            display: block !important;
+            color: #dc3545 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Teste de Validação Simples</h1>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Formulário de Teste</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="testForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="nome" class="form-label">
+                                            Nome <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="nome" name="nome">
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="email" class="form-label">
+                                            E-mail <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="email">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="estado" class="form-label">
+                                            Estado <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="estado" name="estado">
+                                            <option value="">---------</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="endereco" class="form-label">
+                                            Endereço <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea class="form-control" id="endereco" name="endereco" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Salvar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Console de Debug</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="console-output" class="bg-dark text-light p-3" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            <div>Console de debug...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addLog(message, type = 'info') {
+            const consoleOutput = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> <span class="text-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'}">${message}</span>`;
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        // Lista de campos obrigatórios
+        const requiredFieldNames = ['nome', 'email', 'estado', 'endereco'];
+
+        // Função para validar campo individual
+        function validateField(field) {
+            const fieldName = field.name;
+            const isRequired = requiredFieldNames.includes(fieldName);
+            const isEmpty = !field.value || field.value === '' || field.value === '---------';
+            
+            if (isRequired && isEmpty) {
+                field.classList.add('is-invalid');
+                const formGroup = field.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.add('has-error');
+                }
+                
+                // Criar mensagem de erro
+                createErrorMessage(field, getFieldErrorMessage(field));
+            } else {
+                field.classList.remove('is-invalid');
+                const formGroup = field.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.remove('has-error');
+                }
+                
+                const errorMessage = formGroup ? formGroup.querySelector('.invalid-feedback') : null;
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            }
+        }
+
+        // Função para criar mensagem de erro
+        function createErrorMessage(field, message) {
+            const formGroup = field.closest('.form-group');
+            if (formGroup) {
+                const existingError = formGroup.querySelector('.invalid-feedback');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback d-block text-danger';
+                errorDiv.innerHTML = `<i class="fas fa-times-circle me-1"></i>${message}`;
+                
+                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+            }
+        }
+
+        // Função para obter mensagem de erro
+        function getFieldErrorMessage(field) {
+            const fieldName = field.name;
+            const errorMessages = {
+                'nome': 'Nome é obrigatório.',
+                'email': 'E-mail é obrigatório.',
+                'estado': 'Estado é obrigatório.',
+                'endereco': 'Endereço é obrigatório.'
+            };
+            
+            return errorMessages[fieldName] || 'Campo obrigatório.';
+        }
+
+        // Função para limpar erros
+        function clearPreviousErrors() {
+            document.querySelectorAll('.is-invalid').forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+            
+            document.querySelectorAll('.has-error').forEach(group => {
+                group.classList.remove('has-error');
+            });
+            
+            document.querySelectorAll('.invalid-feedback').forEach(msg => {
+                msg.remove();
+            });
+        }
+
+        // Event listener para o formulário
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            addLog('🔍 Validando formulário...', 'info');
+            
+            clearPreviousErrors();
+            
+            let hasErrors = false;
+            let errorCount = 0;
+            
+            requiredFieldNames.forEach(fieldName => {
+                const field = document.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    const isEmpty = !field.value || field.value === '' || field.value === '---------';
+                    
+                    if (isEmpty) {
+                        addLog(`❌ Campo vazio: ${fieldName}`, 'error');
+                        field.classList.add('is-invalid');
+                        const formGroup = field.closest('.form-group');
+                        if (formGroup) {
+                            formGroup.classList.add('has-error');
+                        }
+                        createErrorMessage(field, getFieldErrorMessage(field));
+                        hasErrors = true;
+                        errorCount++;
+                    }
+                }
+            });
+            
+            if (hasErrors) {
+                addLog(`❌ Formulário com ${errorCount} erro(s)!`, 'error');
+                alert(`Formulário com ${errorCount} erro(s)! Verifique os campos destacados em vermelho.`);
+            } else {
+                addLog('✅ Formulário válido!', 'success');
+                alert('Formulário válido! Todos os campos obrigatórios estão preenchidos.');
+            }
+        });
+
+        // Validação em tempo real
+        document.addEventListener('input', function(e) {
+            validateField(e.target);
+        });
+
+        document.addEventListener('change', function(e) {
+            validateField(e.target);
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página carregada', 'success');
+            addLog('✅ Validação configurada', 'success');
+        });
+    </script>
+</body>
+</html>

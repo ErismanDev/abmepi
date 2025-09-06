@@ -1,0 +1,62 @@
+name: abmepi
+services:
+- name: web
+  source_dir: /
+  github:
+    repo: seu-usuario/seu-repositorio
+    branch: main
+  run_command: gunicorn --bind 0.0.0.0:8080 --workers 3 --timeout 120 abmepi.wsgi:application
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8080
+  routes:
+  - path: /
+  envs:
+  - key: SECRET_KEY
+    value: "#&%6t2x3b7i&8b+5gd@ucxfel1t#z12(+)!idj8@b)91kept%t"
+    type: SECRET
+  - key: DEBUG
+    value: "False"
+  - key: ALLOWED_HOSTS
+    value: "lobster-app-pqkby.ondigitalocean.app,ondigitalocean.app,localhost,127.0.0.1"
+  - key: DIGITALOCEAN_APP_PLATFORM
+    value: "True"
+  - key: SECURE_SSL_REDIRECT
+    value: "False"
+  - key: SESSION_COOKIE_SECURE
+    value: "True"
+  - key: CSRF_COOKIE_SECURE
+    value: "True"
+  - key: EMAIL_HOST
+    value: "smtp.gmail.com"
+  - key: EMAIL_PORT
+    value: "587"
+  - key: EMAIL_USE_TLS
+    value: "True"
+  - key: EMAIL_HOST_USER
+    value: "siteabmepi@gmail.com"
+  - key: EMAIL_HOST_PASSWORD
+    value: "tlvt twcz livv zetu"
+    type: SECRET
+  - key: DEFAULT_FROM_EMAIL
+    value: "siteabmepi@gmail.com"
+  - key: SERVER_EMAIL
+    value: "siteabmepi@gmail.com"
+  - key: DATABASE_URL
+    value: "${db.DATABASE_URL}"
+    type: SECRET
+  health_check:
+    http_path: /health/
+    initial_delay_seconds: 10
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+
+databases:
+- name: db
+  engine: PG
+  version: "15"
+  size: db-s-dev-database
+  num_nodes: 1

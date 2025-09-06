@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teste Menu - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-test me-2"></i>
+                        Teste do Menu Administrativo
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h4>Teste de Funcionamento</h4>
+                    <p>Esta página é para testar se o menu administrativo está funcionando corretamente.</p>
+                    
+                    <div class="alert alert-info">
+                        <h6>Instruções:</h6>
+                        <ol>
+                            <li>Clique no menu "Administrativo" na barra lateral</li>
+                            <li>Verifique se o submenu abre</li>
+                            <li>Teste os links do submenu</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Links de Teste</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'administrativo:dashboard' %}" class="btn btn-primary">
+                                            <i class="fas fa-tachometer-alt me-2"></i>
+                                            Dashboard
+                                        </a>
+                                        <a href="{% url 'administrativo:evento_list' %}" class="btn btn-success">
+                                            <i class="fas fa-calendar me-2"></i>
+                                            Eventos
+                                        </a>
+                                        <a href="{% url 'administrativo:comunicado_list' %}" class="btn btn-info">
+                                            <i class="fas fa-bullhorn me-2"></i>
+                                            Comunicados
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6>Status do Sistema</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            URLs configuradas
+                                            <span class="badge bg-success rounded-pill">✓</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Views implementadas
+                                            <span class="badge bg-success rounded-pill">✓</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Templates criados
+                                            <span class="badge bg-success rounded-pill">✓</span>
+                                        </li>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                                            Menu integrado
+                                            <span class="badge bg-warning rounded-pill">?</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Página de teste carregada');
+    
+    // Teste de funcionalidade do Bootstrap
+    if (typeof bootstrap !== 'undefined') {
+        console.log('Bootstrap carregado com sucesso');
+        
+        // Teste de collapse
+        const adminSubmenu = document.getElementById('adminSubmenu');
+        if (adminSubmenu) {
+            console.log('Menu administrativo encontrado:', adminSubmenu);
+            
+            // Força a abertura do menu
+            const bsCollapse = new bootstrap.Collapse(adminSubmenu, {
+                toggle: true
+            });
+            
+            // Adiciona evento de clique para debug
+            const adminLink = document.querySelector('a[href="#adminSubmenu"]');
+            if (adminLink) {
+                adminLink.addEventListener('click', function(e) {
+                    console.log('Clique no menu administrativo detectado');
+                });
+            }
+        } else {
+            console.error('Menu administrativo não encontrado');
+        }
+    } else {
+        console.error('Bootstrap não está carregado');
+    }
+});
+</script>
+{% endblock %}

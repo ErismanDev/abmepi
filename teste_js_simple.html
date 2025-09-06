@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste JavaScript Simples</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .log-container {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-center mb-4">Teste JavaScript Simples</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <button type="button" class="btn btn-primary btn-lg w-100" onclick="testFunctions()">
+                    Testar Funções
+                </button>
+            </div>
+            <div class="col-md-6">
+                <button type="button" class="btn btn-info btn-lg w-100" onclick="checkConsole()">
+                    Verificar Console
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h4>Log de Atividades</h4>
+            <div id="logContainer" class="log-container">
+                <div class="text-muted">Aguardando ações...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> ${message}`;
+            
+            if (type === 'error') {
+                logEntry.className = 'text-danger';
+            } else if (type === 'success') {
+                logEntry.className = 'text-success';
+            } else if (type === 'warning') {
+                logEntry.className = 'text-warning';
+            }
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function testFunctions() {
+            addLog('🧪 Testando funções disponíveis...', 'info');
+            
+            // Verificar funções
+            const functions = [
+                'openAdvogadoModal',
+                'submitForm',
+                'openFormModal'
+            ];
+            
+            functions.forEach(funcName => {
+                const isAvailable = typeof window[funcName] === 'function';
+                addLog(`${isAvailable ? '✅' : '❌'} ${funcName}: ${isAvailable ? 'disponível' : 'não disponível'}`, isAvailable ? 'success' : 'error');
+            });
+            
+            // Verificar se o arquivo foi carregado
+            addLog(`📁 Script modais.js carregado: ${typeof window.openAdvogadoModal !== 'undefined' ? 'Sim' : 'Não'}`, 'info');
+        }
+        
+        function checkConsole() {
+            addLog('🔍 Verificando console do navegador...', 'info');
+            addLog('💡 Abra o console do navegador (F12) para ver mensagens detalhadas', 'warning');
+            
+            // Tentar executar uma função se disponível
+            if (typeof window.openAdvogadoModal === 'function') {
+                addLog('🚀 Executando openAdvogadoModal...', 'info');
+                try {
+                    window.openAdvogadoModal();
+                    addLog('✅ openAdvogadoModal executada com sucesso', 'success');
+                } catch (error) {
+                    addLog(`❌ Erro ao executar openAdvogadoModal: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('❌ openAdvogadoModal não está disponível', 'error');
+            }
+        }
+        
+        // Verificar quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página carregada', 'success');
+            addLog('⏳ Aguardando carregamento do modais.js...', 'info');
+            
+            // Verificar a cada 500ms se as funções foram carregadas
+            let checkInterval = setInterval(() => {
+                if (typeof window.openAdvogadoModal === 'function') {
+                    addLog('✅ Funções carregadas com sucesso!', 'success');
+                    clearInterval(checkInterval);
+                }
+            }, 500);
+            
+            // Timeout de 10 segundos
+            setTimeout(() => {
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                    addLog('⚠️ Timeout: funções podem não ter sido carregadas', 'warning');
+                }
+            }, 10000);
+        });
+    </script>
+    
+    <!-- Carregar o arquivo de modais -->
+    <script src="/static/assejus/js/modais.js"></script>
+</body>
+</html>

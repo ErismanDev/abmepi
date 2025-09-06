@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal Associado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Teste do Modal de Associados</h1>
+        
+        <button type="button" class="btn btn-primary" onclick="testarModal()">
+            Abrir Modal de Teste
+        </button>
+        
+        <div id="resultado" class="mt-3"></div>
+    </div>
+
+    <script>
+        function testarModal() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<div class="alert alert-info">Testando modal...</div>';
+            
+            // Testar se a função openAssociadoModal existe
+            if (typeof openAssociadoModal === 'function') {
+                resultado.innerHTML += '<div class="alert alert-success">✅ Função openAssociadoModal encontrada</div>';
+                
+                // Testar se a função openFormModal existe
+                if (typeof window.openFormModal === 'function') {
+                    resultado.innerHTML += '<div class="alert alert-success">✅ Função openFormModal encontrada</div>';
+                    
+                    // Testar se o ModalManager existe
+                    if (window.modalManager) {
+                        resultado.innerHTML += '<div class="alert alert-success">✅ ModalManager encontrado</div>';
+                    } else {
+                        resultado.innerHTML += '<div class="alert alert-warning">⚠️ ModalManager não encontrado</div>';
+                    }
+                    
+                    // Testar a chamada da API
+                    fetch('/associados/associados/modal/novo/')
+                        .then(response => {
+                            if (response.ok) {
+                                return response.json();
+                            } else {
+                                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                            }
+                        })
+                        .then(data => {
+                            if (data.form_html) {
+                                resultado.innerHTML += '<div class="alert alert-success">✅ API retornou formulário HTML</div>';
+                                resultado.innerHTML += '<div class="alert alert-info">Tamanho do HTML: ' + data.form_html.length + ' caracteres</div>';
+                            } else {
+                                resultado.innerHTML += '<div class="alert alert-warning">⚠️ API não retornou form_html</div>';
+                                resultado.innerHTML += '<div class="alert alert-info">Dados recebidos: ' + JSON.stringify(data) + '</div>';
+                            }
+                        })
+                        .catch(error => {
+                            resultado.innerHTML += '<div class="alert alert-danger">❌ Erro na API: ' + error.message + '</div>';
+                        });
+                    
+                } else {
+                    resultado.innerHTML += '<div class="alert alert-danger">❌ Função openFormModal não encontrada</div>';
+                }
+                
+            } else {
+                resultado.innerHTML += '<div class="alert alert-danger">❌ Função openAssociadoModal não encontrada</div>';
+            }
+        }
+        
+        // Testar quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '<div class="alert alert-info">Página carregada. Clique no botão para testar.</div>';
+        });
+    </script>
+</body>
+</html>

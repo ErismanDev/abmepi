@@ -43,7 +43,11 @@ from django.conf import settings
 from .models import (
     Advogado, AtendimentoJuridico, DocumentoJuridico, 
     Andamento, ConsultaJuridica, RelatorioJuridico, ProcessoJuridico,
+<<<<<<< HEAD
     ProcuracaoAdJudicia, ModeloPoderes
+=======
+    ProcuracaoAdJudicia
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 )
 from .forms import (
     AdvogadoForm, AtendimentoJuridicoForm,
@@ -146,33 +150,48 @@ def advogado_list(request):
     is_admin_or_superuser = (request.user.tipo_usuario == 'administrador_sistema' or 
                             request.user.is_superuser)
     
+<<<<<<< HEAD
     print(f"🔍 DEBUG: Usuário {request.user.username}")
     print(f"   Tipo: {request.user.tipo_usuario}")
     print(f"   É superuser: {request.user.is_superuser}")
     print(f"   É admin/superuser: {is_admin_or_superuser}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # Se é advogado comum (não admin/superuser), redirecionar para seu perfil
     if request.user.tipo_usuario == 'advogado' and not is_admin_or_superuser:
         try:
             # Buscar o advogado associado ao usuário
             advogado = Advogado.objects.get(user=request.user)
+<<<<<<< HEAD
             print(f"🔒 Usuário advogado {request.user.username} - Redirecionando para próprio perfil: {advogado.nome}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             # Redirecionar para o perfil do advogado
             return redirect('assejus:advogado_detail', pk=advogado.pk)
             
         except Advogado.DoesNotExist:
+<<<<<<< HEAD
             print(f"⚠️ Usuário {request.user.username} é do tipo 'advogado' mas não tem registro na tabela Advogado")
             messages.error(request, 'Usuário advogado não encontrado. Contate o administrador.')
             return redirect('assejus:dashboard')
         except Exception as e:
             print(f"❌ Erro ao buscar advogado para usuário {request.user.username}: {e}")
+=======
+            messages.error(request, 'Usuário advogado não encontrado. Contate o administrador.')
+            return redirect('assejus:dashboard')
+        except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             messages.error(request, f'Erro ao carregar perfil: {str(e)}')
             return redirect('assejus:dashboard')
     else:
         # Admin/Superuser - mostrar lista completa
         advogados = Advogado.objects.all()
+<<<<<<< HEAD
         print(f"🔍 Administrador/Superuser {request.user.username} - Mostrando lista completa de advogados")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # Aplicar filtros se o formulário for válido (apenas para administradores)
     if search_form.is_valid() and is_admin_or_superuser:
@@ -239,7 +258,10 @@ def advogado_create(request):
     """Criar novo advogado"""
     # RESTRIÇÃO: Usuário advogado não pode criar novos advogados
     if request.user.tipo_usuario == 'advogado':
+<<<<<<< HEAD
         print(f"🚫 Acesso negado: Usuário advogado {request.user.username} tentou criar novo advogado")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         messages.error(request, 'Você não tem permissão para criar novos advogados.')
         return redirect('assejus:advogado_list')
     
@@ -294,9 +316,13 @@ def advogado_detail(request, pk):
         return render(request, 'assejus/advogado_detail.html', context)
         
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro na view advogado_detail: {e}")
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
+=======
+        import traceback
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Redirecionar para lista com mensagem de erro
         messages.error(request, f'Erro ao carregar detalhes do advogado: {str(e)}')
@@ -316,16 +342,25 @@ def advogado_update(request, pk):
             
             # Verificar se o advogado a ser editado é o próprio usuário
             if advogado.pk != advogado_usuario.pk:
+<<<<<<< HEAD
                 print(f"🚫 Acesso negado: Usuário advogado {request.user.username} tentou editar cadastro de outro advogado {pk}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 messages.error(request, 'Você não tem permissão para editar este cadastro.')
                 return redirect('assejus:advogado_list')
                 
         except Advogado.DoesNotExist:
+<<<<<<< HEAD
             print(f"⚠️ Usuário {request.user.username} é do tipo 'advogado' mas não tem registro na tabela Advogado")
             messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
             return redirect('assejus:advogado_list')
         except Exception as e:
             print(f"❌ Erro ao verificar permissão do advogado: {e}")
+=======
+            messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
+            return redirect('assejus:advogado_list')
+        except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             messages.error(request, 'Erro ao verificar permissões.')
             return redirect('assejus:advogado_list')
     
@@ -342,6 +377,7 @@ def advogado_update(request, pk):
         form = AdvogadoForm(instance=advogado)
         
         # Debug para verificar os dados carregados
+<<<<<<< HEAD
         print(f"DEBUG: Dados do advogado carregados:")
         print(f"DEBUG: Nome: {advogado.nome}")
         print(f"DEBUG: Data inscrição OAB: {advogado.data_inscricao_oab}")
@@ -365,6 +401,10 @@ def advogado_update(request, pk):
         print(f"DEBUG: Form data_inscricao_oab initial: {form.initial.get('data_inscricao_oab')}")
         print(f"DEBUG: Form uf_oab choices: {form.fields['uf_oab'].choices}")
         print(f"DEBUG: Form estado choices: {form.fields['estado'].choices}")
+=======
+        
+        # Verifica se o formulário foi inicializado corretamente
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     context = {
         'form': form,
@@ -425,17 +465,26 @@ def atendimento_list(request):
         try:
             # Buscar o advogado associado ao usuário
             advogado = Advogado.objects.get(user=request.user)
+<<<<<<< HEAD
             print(f"🔒 Usuário advogado {request.user.username} - Restringindo para atendimentos do advogado {advogado.nome}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             # Filtrar apenas atendimentos onde o advogado é responsável
             atendimentos = atendimentos.filter(advogado_responsavel=advogado)
             
         except Advogado.DoesNotExist:
+<<<<<<< HEAD
             print(f"⚠️ Usuário {request.user.username} é do tipo 'advogado' mas não tem registro na tabela Advogado")
             # Se não encontrar o advogado, não mostrar nenhum atendimento
             atendimentos = AtendimentoJuridico.objects.none()
         except Exception as e:
             print(f"❌ Erro ao buscar advogado para usuário {request.user.username}: {e}")
+=======
+            # Se não encontrar o advogado, não mostrar nenhum atendimento
+            atendimentos = AtendimentoJuridico.objects.none()
+        except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             atendimentos = AtendimentoJuridico.objects.none()
     
     # Aplicar filtros de busca
@@ -552,16 +601,25 @@ def atendimento_update(request, pk):
             
             # Verificar se o atendimento pertence ao advogado
             if atendimento.advogado_responsavel != advogado:
+<<<<<<< HEAD
                 print(f"🚫 Acesso negado: Usuário advogado {request.user.username} tentou editar atendimento {pk} de outro advogado")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 messages.error(request, 'Você não tem permissão para editar este atendimento.')
                 return redirect('assejus:atendimento_list')
                 
         except Advogado.DoesNotExist:
+<<<<<<< HEAD
             print(f"⚠️ Usuário {request.user.username} é do tipo 'advogado' mas não tem registro na tabela Advogado")
             messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
             return redirect('assejus:atendimento_list')
         except Exception as e:
             print(f"❌ Erro ao verificar permissão do advogado: {e}")
+=======
+            messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
+            return redirect('assejus:atendimento_list')
+        except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             messages.error(request, 'Erro ao verificar permissões.')
             return redirect('assejus:atendimento_list')
     
@@ -573,9 +631,14 @@ def atendimento_update(request, pk):
                 try:
                     advogado = Advogado.objects.get(user=request.user)
                     form.instance.advogado_responsavel = advogado
+<<<<<<< HEAD
                     print(f"🔒 Mantendo advogado responsável como {advogado.nome}")
                 except Exception as e:
                     print(f"❌ Erro ao manter advogado responsável: {e}")
+=======
+                except Exception as e:
+                    pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             form.save()
             messages.success(request, 'Atendimento atualizado com sucesso!')
@@ -589,9 +652,14 @@ def atendimento_update(request, pk):
                 advogado = Advogado.objects.get(user=request.user)
                 form.fields['advogado_responsavel'].queryset = Advogado.objects.filter(pk=advogado.pk)
                 form.fields['advogado_responsavel'].widget.attrs['readonly'] = True
+<<<<<<< HEAD
                 print(f"🔒 Campo advogado responsável restrito para {advogado.nome}")
             except Exception as e:
                 print(f"❌ Erro ao restringir campo advogado responsável: {e}")
+=======
+            except Exception as e:
+                pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     context = {
         'form': form,
@@ -616,16 +684,25 @@ def atendimento_finalizar(request, pk):
             
             # Verificar se o atendimento pertence ao advogado
             if atendimento.advogado_responsavel != advogado:
+<<<<<<< HEAD
                 print(f"🚫 Acesso negado: Usuário advogado {request.user.username} tentou finalizar atendimento {pk} de outro advogado")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 messages.error(request, 'Você não tem permissão para finalizar este atendimento.')
                 return redirect('assejus:atendimento_list')
                 
         except Advogado.DoesNotExist:
+<<<<<<< HEAD
             print(f"⚠️ Usuário {request.user.username} é do tipo 'advogado' mas não tem registro na tabela Advogado")
             messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
             return redirect('assejus:atendimento_list')
         except Exception as e:
             print(f"❌ Erro ao verificar permissão do advogado: {e}")
+=======
+            messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
+            return redirect('assejus:atendimento_list')
+        except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             messages.error(request, 'Erro ao verificar permissões.')
             return redirect('assejus:atendimento_list')
     
@@ -664,7 +741,10 @@ def atendimento_delete(request, pk):
             
             # Verificar se o atendimento pertence ao advogado
             if atendimento.advogado_responsavel != advogado:
+<<<<<<< HEAD
                 print(f"🚫 Acesso negado: Usuário advogado {request.user.username} tentou excluir atendimento {pk} de outro advogado")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({
                         'success': False,
@@ -675,7 +755,10 @@ def atendimento_delete(request, pk):
                     return redirect('assejus:atendimento_list')
                 
         except Advogado.DoesNotExist:
+<<<<<<< HEAD
             print(f"⚠️ Usuário {request.user.username} é do tipo 'advogado' mas não tem registro na tabela Advogado")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': False,
@@ -685,7 +768,10 @@ def atendimento_delete(request, pk):
                 messages.error(request, 'Erro de configuração: Usuário advogado não encontrado.')
                 return redirect('assejus:atendimento_list')
         except Exception as e:
+<<<<<<< HEAD
             print(f"❌ Erro ao verificar permissão do advogado: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
                     'success': False,
@@ -862,7 +948,10 @@ def documento_create(request):
                     
             except Exception as e:
                 messages.error(request, f'Erro ao criar documento: {str(e)}')
+<<<<<<< HEAD
                 print(f"❌ Erro ao criar documento: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 import traceback
                 traceback.print_exc()
     else:
@@ -941,7 +1030,10 @@ def documento_update(request, pk):
                 return redirect('assejus:documento_detail', pk=documento.pk)
             except Exception as e:
                 messages.error(request, f'Erro ao atualizar documento: {str(e)}')
+<<<<<<< HEAD
                 print(f"❌ Erro ao atualizar documento: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     else:
         if acao == 'substituir':
             form = DocumentoProcessoReplaceForm(instance=documento)
@@ -978,7 +1070,11 @@ def documento_delete(request, pk):
                 try:
                     documento.arquivo.delete(save=False)
                 except Exception as e:
+<<<<<<< HEAD
                     print(f"⚠️ Erro ao excluir arquivo físico: {e}")
+=======
+                    pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             # Excluir registro do banco
             documento.delete()
@@ -997,7 +1093,10 @@ def documento_delete(request, pk):
                 
         except Exception as e:
             messages.error(request, f'Erro ao excluir documento: {str(e)}')
+<<<<<<< HEAD
             print(f"❌ Erro ao excluir documento: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     context = {
         'documento': documento,
@@ -1022,7 +1121,10 @@ def documento_download(request, pk):
     
     try:
         # Log do download (opcional)
+<<<<<<< HEAD
         print(f"📥 Download: {request.user.username} baixou {documento.titulo}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Preparar resposta de download
         response = HttpResponse(
@@ -1036,7 +1138,10 @@ def documento_download(request, pk):
         
     except Exception as e:
         messages.error(request, f'Erro ao fazer download: {str(e)}')
+<<<<<<< HEAD
         print(f"❌ Erro no download: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return redirect('assejus:documento_detail', pk=pk)
 
 
@@ -1072,7 +1177,10 @@ def documento_view(request, pk):
         
     except Exception as e:
         messages.error(request, f'Erro ao visualizar arquivo: {str(e)}')
+<<<<<<< HEAD
         print(f"❌ Erro na visualização: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return redirect('assejus:documento_detail', pk=pk)
 
 
@@ -1089,11 +1197,14 @@ def documento_upload_ajax(request):
     from core.forms import DocumentoProcessoForm
     from django.http import JsonResponse
     
+<<<<<<< HEAD
     print(f"=== DEBUG: documento_upload_ajax chamada ===")
     print(f"DEBUG: Método: {request.method}")
     print(f"DEBUG: User: {request.user}")
     print(f"DEBUG: POST data: {request.POST}")
     print(f"DEBUG: FILES: {request.FILES}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     if request.method != 'POST':
         return JsonResponse({
@@ -1103,7 +1214,10 @@ def documento_upload_ajax(request):
     
     try:
         processo_id = request.POST.get('processo_id')
+<<<<<<< HEAD
         print(f"DEBUG: Processo ID: {processo_id}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         form = DocumentoProcessoForm(
             request.POST,
@@ -1112,6 +1226,7 @@ def documento_upload_ajax(request):
             usuario=request.user
         )
         
+<<<<<<< HEAD
         print(f"DEBUG: Form is_valid: {form.is_valid()}")
         if not form.is_valid():
             print(f"DEBUG: Form errors: {form.errors}")
@@ -1124,14 +1239,25 @@ def documento_upload_ajax(request):
             print(f"DEBUG: Documento tipo display: {documento.get_tipo_documento_display()}")
             print(f"DEBUG: Documento data_upload: {documento.data_upload}")
             print(f"DEBUG: Documento tamanho: {documento.tamanho_arquivo}")
+=======
+        if not form.is_valid():
+            pass
+        
+        if form.is_valid():
+            documento = form.save()
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             try:
                 url_download = reverse('assejus:documento_download', args=[documento.id])
                 url_view = reverse('assejus:documento_view', args=[documento.id])
+<<<<<<< HEAD
                 print(f"DEBUG: URL download: {url_download}")
                 print(f"DEBUG: URL view: {url_view}")
             except Exception as e:
                 print(f"DEBUG: Erro ao gerar URLs: {e}")
+=======
+            except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 url_download = f"/assejus/documentos/{documento.id}/download/"
                 url_view = f"/assejus/documentos/{documento.id}/visualizar/"
             
@@ -1149,7 +1275,10 @@ def documento_upload_ajax(request):
                     'url_view': url_view,
                 }
             }
+<<<<<<< HEAD
             print(f"DEBUG: Retornando resposta: {response_data}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             return JsonResponse(response_data)
         else:
             # Retornar erros de validação
@@ -1164,7 +1293,10 @@ def documento_upload_ajax(request):
             })
             
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro no upload AJAX: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         import traceback
         traceback.print_exc()
         
@@ -1258,7 +1390,10 @@ def documento_upload_multiplo_ajax(request):
             })
             
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro no upload múltiplo AJAX: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         import traceback
         traceback.print_exc()
         
@@ -1364,7 +1499,10 @@ def documento_list_ajax(request):
         })
         
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro na listagem AJAX: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         import traceback
         traceback.print_exc()
         
@@ -1399,7 +1537,11 @@ def documento_delete_ajax(request, pk):
             try:
                 documento.arquivo.delete(save=False)
             except Exception as e:
+<<<<<<< HEAD
                 print(f"⚠️ Erro ao excluir arquivo físico: {e}")
+=======
+                pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Excluir registro do banco
         documento.delete()
@@ -1415,7 +1557,10 @@ def documento_delete_ajax(request, pk):
             'message': 'Documento não encontrado'
         })
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro na exclusão AJAX: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         import traceback
         traceback.print_exc()
         
@@ -1483,7 +1628,10 @@ def documento_update_ajax(request, pk):
             'message': 'Documento não encontrado'
         })
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro na atualização AJAX: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         import traceback
         traceback.print_exc()
         
@@ -1545,6 +1693,7 @@ def andamento_list(request):
 @login_required
 def andamento_create(request):
     """Criar novo andamento"""
+<<<<<<< HEAD
     print(f"🔍 DEBUG: andamento_create chamada - método: {request.method}")
     print(f"🔍 DEBUG: Parâmetros GET: {request.GET}")
     
@@ -1553,47 +1702,75 @@ def andamento_create(request):
         form = AndamentoForm(request.POST)
         if form.is_valid():
             print(f"🔍 DEBUG: Formulário válido, salvando...")
+=======
+    
+    if request.method == 'POST':
+        form = AndamentoForm(request.POST)
+        if form.is_valid():
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             andamento = form.save(commit=False)
             andamento.usuario_registro = request.user
             andamento.save()
             form.save_m2m()
+<<<<<<< HEAD
             print(f"🔍 DEBUG: Andamento salvo com ID: {andamento.id}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             messages.success(request, 'Andamento criado com sucesso!')
             # Redirecionar para a página do processo ao invés da página do andamento
             return redirect('assejus:processo_detail', pk=andamento.processo.pk)
         else:
+<<<<<<< HEAD
             print(f"🔍 DEBUG: Formulário inválido: {form.errors}")
+=======
+            pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     else:
         # Verificar se há um processo específico na URL
         processo_id = request.GET.get('processo')
         atendimento_id = request.GET.get('atendimento')
         initial_data = {}
         
+<<<<<<< HEAD
         print(f"🔍 DEBUG: Processo ID da URL: {processo_id}")
         print(f"🔍 DEBUG: Atendimento ID da URL: {atendimento_id}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         if processo_id:
             try:
                 processo = ProcessoJuridico.objects.get(pk=processo_id)
                 initial_data['processo'] = processo
+<<<<<<< HEAD
                 print(f"🔍 DEBUG: Processo encontrado: {processo.numero_processo}")
             except ProcessoJuridico.DoesNotExist:
                 print(f"🔍 DEBUG: Processo não encontrado para ID: {processo_id}")
+=======
+            except ProcessoJuridico.DoesNotExist:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 pass
         elif atendimento_id:
             try:
                 atendimento = AtendimentoJuridico.objects.get(pk=atendimento_id)
+<<<<<<< HEAD
                 print(f"🔍 DEBUG: Atendimento encontrado: {atendimento.titulo}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 
                 # Se o atendimento tem número de processo, buscar ou criar o processo correspondente
                 if atendimento.numero_processo:
                     try:
                         # Tentar encontrar um processo existente com o mesmo número
                         processo = ProcessoJuridico.objects.get(numero_processo=atendimento.numero_processo)
+<<<<<<< HEAD
                         print(f"🔍 DEBUG: Processo existente encontrado: {processo.numero_processo}")
                     except ProcessoJuridico.DoesNotExist:
                         # Criar um novo processo baseado no atendimento
                         print(f"🔍 DEBUG: Criando novo processo baseado no atendimento")
+=======
+                    except ProcessoJuridico.DoesNotExist:
+                        # Criar um novo processo baseado no atendimento
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                         processo = ProcessoJuridico.objects.create(
                             numero_processo=atendimento.numero_processo,
                             vara_tribunal=atendimento.vara or 'Não informado',
@@ -1604,6 +1781,7 @@ def andamento_create(request):
                             situacao_atual='andamento',
                             observacoes_gerais=f'Processo criado automaticamente a partir do atendimento: {atendimento.titulo}'
                         )
+<<<<<<< HEAD
                         print(f"🔍 DEBUG: Novo processo criado: {processo.numero_processo}")
                     
                     initial_data['processo'] = processo
@@ -1613,6 +1791,14 @@ def andamento_create(request):
                     
             except AtendimentoJuridico.DoesNotExist:
                 print(f"🔍 DEBUG: Atendimento não encontrado para ID: {atendimento_id}")
+=======
+                    
+                    initial_data['processo'] = processo
+                else:
+                    messages.warning(request, 'Este atendimento não possui número de processo. É necessário criar um processo judicial primeiro.')
+                    
+            except AtendimentoJuridico.DoesNotExist:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 messages.error(request, 'Atendimento não encontrado.')
                 pass
         
@@ -1623,7 +1809,10 @@ def andamento_create(request):
         situacao_atual__in=['andamento', 'suspenso']
     ).order_by('-data_cadastro')
     
+<<<<<<< HEAD
     print(f"🔍 DEBUG: Total de processos encontrados: {processos.count()}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     context = {
         'form': form,
@@ -1632,7 +1821,10 @@ def andamento_create(request):
         'action': 'Criar',
     }
     
+<<<<<<< HEAD
     print(f"🔍 DEBUG: Renderizando template com contexto")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     return render(request, 'assejus/andamento_form.html', context)
 
 
@@ -1751,7 +1943,10 @@ def andamento_delete_ajax(request, pk):
             'message': 'Andamento não encontrado'
         })
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro na exclusão AJAX de andamento: {e}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         import traceback
         traceback.print_exc()
         
@@ -2008,7 +2203,10 @@ def processo_andamentos_pdf(request, pk):
         logo_path = get_logo_path('logo2assejur.png')
         
         if logo_path:
+<<<<<<< HEAD
             print(f"✅ Logo encontrada em: {logo_path}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             # Converter cm para inch (1 inch = 2.54 cm)
             width_cm = 8.61
             height_cm = 2.41
@@ -2017,6 +2215,7 @@ def processo_andamentos_pdf(request, pk):
             logo = Image(logo_path, width=width_inch*inch, height=height_inch*inch)
             logo.hAlign = 'CENTER'
             story.append(logo)
+<<<<<<< HEAD
             story.append(Spacer(1, 10))
         else:
             print("❌ Logo não encontrada.")
@@ -2024,6 +2223,13 @@ def processo_andamentos_pdf(request, pk):
             story.append(Spacer(1, 30))
     except Exception as e:
         print(f"❌ Erro ao carregar logo: {e}")
+=======
+            story.append(Spacer(1, 20))
+        else:
+            # Se a logo não for encontrada, pula o cabeçalho
+            story.append(Spacer(1, 30))
+    except Exception as e:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         # Em caso de erro, pula o cabeçalho
         story.append(Spacer(1, 30))
     
@@ -2726,6 +2932,7 @@ from django.template.loader import render_to_string
 
 def advogado_modal_create(request):
     """View para criar advogado via modal"""
+<<<<<<< HEAD
     print(f"=== DEBUG: advogado_modal_create chamada ===")
     print(f"DEBUG: Método da requisição: {request.method}")
     print(f"DEBUG: Host: {request.get_host()}")
@@ -2739,6 +2946,11 @@ def advogado_modal_create(request):
     # Verificação manual de autenticação
     if not request.user.is_authenticated:
         print("❌ Usuário não autenticado")
+=======
+    
+    # Verificação manual de autenticação
+    if not request.user.is_authenticated:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return JsonResponse({
             'success': False,
             'message': 'Usuário não autenticado',
@@ -2746,12 +2958,18 @@ def advogado_modal_create(request):
         }, status=401)
     
     if request.method == 'POST':
+<<<<<<< HEAD
         print(f"DEBUG: Dados POST recebidos: {request.POST}")
         print(f"DEBUG: FILES: {request.FILES}")
         form = AdvogadoForm(request.POST, request.FILES)
         if form.is_valid():
             advogado = form.save()
             print(f"DEBUG: Advogado salvo com sucesso: {advogado.id}")
+=======
+        form = AdvogadoForm(request.POST, request.FILES)
+        if form.is_valid():
+            advogado = form.save()
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             # Verificar se o usuário foi criado automaticamente
             if advogado.user:
@@ -2776,14 +2994,20 @@ def advogado_modal_create(request):
                     'id': advogado.id
                 })
         else:
+<<<<<<< HEAD
             print(f"DEBUG: Erros de validação: {form.errors}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             return JsonResponse({
                 'success': False,
                 'message': 'Erro na validação do formulário.',
                 'errors': form.errors
             })
     
+<<<<<<< HEAD
     print("DEBUG: Renderizando formulário GET")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     form = AdvogadoForm()
     
     # Usar render_to_string para obter o HTML como string
@@ -2792,8 +3016,11 @@ def advogado_modal_create(request):
         'title': 'Novo Advogado'
     }, request=request)
     
+<<<<<<< HEAD
     print(f"DEBUG: Form HTML gerado com {len(form_html)} caracteres")
     print(f"DEBUG: Retornando JsonResponse com form_html")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     return JsonResponse({
         'success': True,
         'form_html': form_html
@@ -2803,6 +3030,7 @@ def advogado_modal_create(request):
 @login_required
 def advogado_modal_update(request, pk):
     """View para editar advogado via modal"""
+<<<<<<< HEAD
     print(f"DEBUG: advogado_modal_update chamada para PK: {pk}")
     advogado = get_object_or_404(Advogado, pk=pk)
     print(f"DEBUG: Advogado encontrado: {advogado.nome}")
@@ -2813,6 +3041,14 @@ def advogado_modal_update(request, pk):
         if form.is_valid():
             advogado = form.save()
             print(f"DEBUG: Formulário válido, advogado salvo")
+=======
+    advogado = get_object_or_404(Advogado, pk=pk)
+    
+    if request.method == 'POST':
+        form = AdvogadoForm(request.POST, request.FILES, instance=advogado)
+        if form.is_valid():
+            advogado = form.save()
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             return JsonResponse({
                 'success': True,
                 'message': f'Advogado {advogado.nome} atualizado com sucesso!',
@@ -2820,14 +3056,20 @@ def advogado_modal_update(request, pk):
                 'id': advogado.id
             })
         else:
+<<<<<<< HEAD
             print(f"DEBUG: Formulário inválido: {form.errors}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             return JsonResponse({
                 'success': False,
                 'message': 'Erro na validação do formulário.',
                 'errors': form.errors
             })
     
+<<<<<<< HEAD
     print(f"DEBUG: Método GET, renderizando formulário")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     form = AdvogadoForm(instance=advogado)
     
     # Usar render_to_string para obter o HTML como string
@@ -2836,7 +3078,10 @@ def advogado_modal_update(request, pk):
         'title': 'Editar Advogado'
     }, request=request)
     
+<<<<<<< HEAD
     print(f"DEBUG: Form HTML renderizado com sucesso, tamanho: {len(form_html)}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     return JsonResponse({
         'success': True,
         'form_html': form_html
@@ -3026,6 +3271,7 @@ def processo_create(request):
     return render(request, 'assejus/processo_form.html', {'form': form, 'title': 'Novo Processo'})
 
 
+<<<<<<< HEAD
 @login_required
 def buscar_associados_ajax(request):
     """Buscar associados via AJAX para autocomplete"""
@@ -3077,6 +3323,8 @@ def buscar_processos_ajax(request):
     return JsonResponse({'results': results})
 
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 # Views para Procuração Ad Judicia
 @require_user_type(['administrador_sistema', 'advogado', 'atendente_advogado'])
 def procuracao_list(request):
@@ -3262,6 +3510,7 @@ def get_advogado_data(request, advogado_id):
         return JsonResponse({'error': 'Advogado não encontrado'}, status=404)
 
 
+<<<<<<< HEAD
 def limpar_html_para_pdf(html_content):
     """
     Limpa HTML removendo atributos não suportados pelo ReportLab
@@ -3315,6 +3564,8 @@ def limpar_html_para_pdf(html_content):
     return html_content
 
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 @require_user_type(['administrador_sistema', 'advogado', 'atendente_advogado'])
 def procuracao_pdf(request, pk):
     """Gerar PDF da procuração com cabeçalho institucional e rodapé"""
@@ -3424,13 +3675,21 @@ def procuracao_pdf(request, pk):
         fontSize=16,
         textColor=colors.black,
         spaceAfter=15,
+<<<<<<< HEAD
         spaceBefore=5,
+=======
+        spaceBefore=10,
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         alignment=TA_CENTER,
         fontName='Helvetica-Bold'
     )
     
     story.append(Paragraph("<b>P R O C U R A Ç Ã O   A D   J U D I C I A   E T   E X T R A</b>", title_style))
+<<<<<<< HEAD
     story.append(Spacer(1, 15))
+=======
+    story.append(Spacer(1, 20))
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # Texto da procuração
     texto_style = ParagraphStyle(
@@ -3448,6 +3707,7 @@ def procuracao_pdf(request, pk):
     # Obter texto da procuração
     texto_procuracao = procuracao.get_texto_procuracao()
     
+<<<<<<< HEAD
     # Limpar HTML removendo atributos não suportados pelo ReportLab
     texto_procuracao = limpar_html_para_pdf(texto_procuracao)
     
@@ -3457,10 +3717,13 @@ def procuracao_pdf(request, pk):
     texto_procuracao = re.sub(r'\n+', '\n', texto_procuracao)
     texto_procuracao = re.sub(r' +', ' ', texto_procuracao)
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     # Dividir o texto em parágrafos e adicionar
     paragrafos = texto_procuracao.split('\n\n')
     for i, paragrafo in enumerate(paragrafos):
         if paragrafo.strip():
+<<<<<<< HEAD
             # Limpar o parágrafo de caracteres problemáticos
             paragrafo_limpo = paragrafo.strip()
             
@@ -3475,6 +3738,12 @@ def procuracao_pdf(request, pk):
                 story.append(Paragraph(paragrafo_sem_html, texto_style))
                 if i < len(paragrafos) - 1:
                     story.append(Spacer(1, 8))
+=======
+            story.append(Paragraph(paragrafo.strip(), texto_style))
+            # Reduzir espaçamento entre parágrafos
+            if i < len(paragrafos) - 1:
+                story.append(Spacer(1, 8))
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # Adicionar data em português e nome do outorgante centralizados
     story.append(Spacer(1, 20))
@@ -3611,8 +3880,11 @@ def andamento_modal_update(request, pk):
         
     except Exception as e:
         import traceback
+<<<<<<< HEAD
         print(f"Erro na view andamento_modal_update: {e}")
         print(f"Traceback: {traceback.format_exc()}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return JsonResponse({
             'success': False,
             'message': f'Erro interno: {str(e)}'
@@ -3673,8 +3945,11 @@ def consulta_modal_update(request, pk):
         
     except Exception as e:
         import traceback
+<<<<<<< HEAD
         print(f"Erro na view consulta_modal_update: {e}")
         print(f"Traceback: {traceback.format_exc()}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return JsonResponse({
             'success': False,
             'message': f'Erro interno: {str(e)}'
@@ -3735,8 +4010,11 @@ def relatorio_modal_update(request, pk):
         
     except Exception as e:
         import traceback
+<<<<<<< HEAD
         print(f"Erro na view relatorio_modal_update: {e}")
         print(f"Traceback: {traceback.format_exc()}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return JsonResponse({
             'success': False,
             'message': f'Erro interno: {str(e)}'
@@ -3746,6 +4024,7 @@ def relatorio_modal_update(request, pk):
 @require_user_type(['administrador_sistema', 'advogado', 'atendente_advogado'])
 def advogado_detail_modal(request, pk):
     """View para exibir detalhes do advogado via modal"""
+<<<<<<< HEAD
     print(f"=== DEBUG: advogado_detail_modal chamada ===")
     print(f"DEBUG: Método da requisição: {request.method}")
     print(f"DEBUG: User: {request.user}")
@@ -3754,6 +4033,11 @@ def advogado_detail_modal(request, pk):
     try:
         advogado = get_object_or_404(Advogado, pk=pk)
         print(f"DEBUG: Advogado encontrado: {advogado.nome}")
+=======
+    
+    try:
+        advogado = get_object_or_404(Advogado, pk=pk)
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Calcular estatísticas do advogado
         total_casos = AtendimentoJuridico.objects.filter(advogado_responsavel=advogado).count()
@@ -3766,7 +4050,10 @@ def advogado_detail_modal(request, pk):
             status='concluido'
         ).count()
         
+<<<<<<< HEAD
         print(f"DEBUG: Estatísticas calculadas - Total: {total_casos}, Em andamento: {casos_em_andamento}, Concluídos: {casos_concluidos}")
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         context = {
             'advogado': advogado,
@@ -3775,12 +4062,18 @@ def advogado_detail_modal(request, pk):
             'casos_concluidos': casos_concluidos,
         }
         
+<<<<<<< HEAD
         print(f"DEBUG: Context criado com {len(context)} itens")
         
         # Renderizar o template de detalhes completo (incluindo o modal)
         modal_html = render(request, 'assejus/advogado_detail_modal.html', context).content.decode('utf-8')
         print(f"DEBUG: Modal HTML renderizado com {len(modal_html)} caracteres")
         print(f"DEBUG: Primeiros 200 caracteres do HTML: {modal_html[:200]}...")
+=======
+        
+        # Renderizar o template de detalhes completo (incluindo o modal)
+        modal_html = render(request, 'assejus/advogado_detail_modal.html', context).content.decode('utf-8')
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         return JsonResponse({
             'success': True,
@@ -3808,9 +4101,13 @@ def advogado_detail_modal(request, pk):
         })
         
     except Exception as e:
+<<<<<<< HEAD
         print(f"❌ Erro na view advogado_detail_modal: {e}")
         import traceback
         print(f"Traceback: {traceback.format_exc()}")
+=======
+        import traceback
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         return JsonResponse({
             'success': False,
@@ -3823,6 +4120,7 @@ def modal_base(request):
     return render(request, 'assejus/modal_base.html')
 
 
+<<<<<<< HEAD
 # ===== VIEWS PARA MODELOS DE PODERES =====
 
 @login_required
@@ -3990,6 +4288,8 @@ def excluir_modelo_poderes(request, modelo_id):
         return JsonResponse({'success': False, 'message': f'Erro ao excluir modelo: {str(e)}'})
 
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 
 

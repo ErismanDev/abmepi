@@ -68,6 +68,7 @@
 
                             <!-- Número do Processo -->
                             <div class="col-md-6 mb-3">
+<<<<<<< HEAD
                                 <label for="{{ form.numero_processo_nome.id_for_label }}" class="form-label">
                                     <i class="fas fa-file-alt me-1"></i>
                                     Número do Processo <span class="text-danger">*</span>
@@ -86,6 +87,20 @@
                                 {% endif %}
                                 <small class="form-text text-muted" id="help-numero-processo">
                                     Digite o número do processo e selecione da lista de sugestões
+=======
+                                <label for="{{ form.numero_processo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    Número do Processo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.numero_processo }}
+                                {% if form.numero_processo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.numero_processo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted" id="help-numero-processo">
+                                    Para processos judiciais: formato CNJ (0001234-56.2024.8.26.0001)
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                                 </small>
                             </div>
                         </div>
@@ -171,6 +186,7 @@
                         <div class="row">
                             <!-- Parte Cliente -->
                             <div class="col-md-6 mb-3">
+<<<<<<< HEAD
                                 <label for="{{ form.parte_cliente_nome.id_for_label }}" class="form-label">
                                     <i class="fas fa-user me-1"></i>
                                     Parte Cliente <span class="text-danger">*</span>
@@ -190,6 +206,18 @@
                                 <small class="form-text text-muted">
                                     Digite o nome do associado e selecione da lista de sugestões
                                 </small>
+=======
+                                <label for="{{ form.parte_cliente.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Parte Cliente <span class="text-danger">*</span>
+                                </label>
+                                {{ form.parte_cliente }}
+                                {% if form.parte_cliente.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.parte_cliente.errors.0 }}
+                                    </div>
+                                {% endif %}
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                             </div>
 
                             <!-- Parte Contrária -->
@@ -553,6 +581,7 @@ function toggleProcessoFields() {
         }
     }
 }
+<<<<<<< HEAD
 
 // Autocomplete para parte_cliente
 document.addEventListener('DOMContentLoaded', function() {
@@ -731,5 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
         suggestionsProcesso.style.display = 'block';
     }
 });
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 </script>
 {% endblock %}

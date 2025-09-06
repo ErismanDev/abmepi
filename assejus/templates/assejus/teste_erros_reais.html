@@ -1,0 +1,438 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teste de Erros Reais - Modal Advogados ASEJUS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        background-color: #fff5f5 !important;
+    }
+    
+    .form-group.has-error .form-label,
+    .has-error .form-label {
+        color: #dc3545 !important;
+        font-weight: bold !important;
+    }
+    
+    .invalid-feedback {
+        display: block !important;
+        color: #dc3545 !important;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .invalid-feedback i {
+        color: #dc3545;
+    }
+    
+    .alert-danger {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .alert-danger .alert-heading {
+        color: #721c24;
+    }
+    
+    .is-invalid {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    .error-summary {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border: 1px solid #feb2b2;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-bug me-2"></i>Teste de Erros Reais - Modal Advogados</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Este teste simula exatamente o que acontece no modal real dos advogados quando há erros de validação.
+                        Clique no botão abaixo para testar a exibição visual dos erros.
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Testes Disponíveis</h5>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" onclick="openAdvogadoModal()">
+                                    <i class="fas fa-plus me-2"></i>Abrir Modal de Advogado
+                                </button>
+                                <button type="button" class="btn btn-warning" onclick="simulateServerErrors()">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Simular Erros do Servidor
+                                </button>
+                                <button type="button" class="btn btn-info" onclick="clearErrors()">
+                                    <i class="fas fa-eraser me-2"></i>Limpar Erros
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Status</h5>
+                            <div id="statusArea">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Clique em "Abrir Modal de Advogado" para testar
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Advogado (Simulação do Modal Real) -->
+<div class="modal fade" id="advogadoModal" tabindex="-1" aria-labelledby="advogadoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="advogadoModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>Novo Advogado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="advogadoModalBody">
+                <!-- Formulário será inserido aqui -->
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Carregando formulário...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="submitAdvogadoForm()">
+                    <i class="fas fa-save me-2"></i>Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Função para atualizar status
+    function updateStatus(message, type = 'info') {
+        const statusDiv = document.getElementById('statusArea');
+        const alertClass = type === 'error' ? 'alert-danger' : 
+                         type === 'success' ? 'alert-success' : 
+                         type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        statusDiv.innerHTML = `<div class="alert ${alertClass}">
+            <i class="fas fa-${type === 'error' ? 'times-circle' : 
+                               type === 'success' ? 'check-circle' : 
+                               type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+        </div>`;
+    }
+
+    // Função para abrir o modal de advogado
+    function openAdvogadoModal() {
+        updateStatus('Abrindo modal de advogado...', 'info');
+        
+        // Simular carregamento do formulário
+        const modalBody = document.getElementById('advogadoModalBody');
+        modalBody.innerHTML = `
+            <!-- Informações sobre campos obrigatórios -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Campos obrigatórios:</strong> Nome, CPF, OAB, UF OAB, E-mail, Telefone, Endereço, Cidade, Estado, CEP, Data de Inscrição OAB, Anos de Experiência e Situação.
+            </div>
+            
+            <!-- Formulário de Advogado -->
+            <form id="advogadoForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="nome" class="form-label">
+                                Nome <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="nome" name="nome" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="cpf" class="form-label">
+                                CPF <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" value="">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="oab" class="form-label">
+                                OAB <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="oab" name="oab" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="uf_oab" class="form-label">
+                                UF OAB <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="uf_oab" name="uf_oab">
+                                <option value="">---------</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="MG">Minas Gerais</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="endereco" class="form-label">
+                                Endereço <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="endereco" name="endereco" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="data_inscricao_oab" class="form-label">
+                                Data de Inscrição OAB <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="data_inscricao_oab" name="data_inscricao_oab" value="">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="experiencia_anos" class="form-label">
+                                Anos de Experiência <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="experiencia_anos" name="experiencia_anos" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="situacao" class="form-label">
+                                Situação <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="situacao" name="situacao">
+                                <option value="">---------</option>
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                                <option value="suspenso">Suspenso</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        `;
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('advogadoModal'));
+        modal.show();
+        
+        updateStatus('Modal aberto! Formulário carregado. Clique em "Simular Erros do Servidor"', 'success');
+    }
+
+    // Função para simular erros do servidor (exatamente como retornado pelo Django)
+    function simulateServerErrors() {
+        updateStatus('Simulando erros do servidor...', 'warning');
+        
+        // Simular resposta de erro do servidor (exatamente como retornado)
+        const mockErrorResponse = {
+            success: false,
+            message: 'Erro na validação do formulário.',
+            errors: {
+                'cpf': ['Este campo é obrigatório.'],
+                'oab': ['Este campo é obrigatório.'],
+                'uf_oab': ['Este campo é obrigatório.'],
+                'endereco': ['Este campo é obrigatório.'],
+                'data_inscricao_oab': ['Este campo é obrigatório.'],
+                'experiencia_anos': ['Este campo é obrigatório.'],
+                'situacao': ['Este campo é obrigatório.']
+            },
+            error_count: 7,
+            error_summary: 'Formulário com 7 erro(s) de validação'
+        };
+        
+        // Processar erros como se fossem do servidor
+        processValidationErrors(mockErrorResponse);
+        
+        updateStatus('Erros do servidor simulados! Verifique o modal', 'success');
+    }
+
+    // Função para processar erros de validação (simula o que acontece no modal real)
+    function processValidationErrors(errorResponse) {
+        console.log('🔍 Processando erros de validação:', errorResponse);
+        
+        const modalBody = document.getElementById('advogadoModalBody');
+        
+        // Exibir resumo dos erros no topo
+        const errorSummary = document.createElement('div');
+        errorSummary.className = 'alert alert-danger border-danger mb-4';
+        errorSummary.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+                <div>
+                    <h5 class="alert-heading mb-2">
+                        <i class="fas fa-times-circle me-2"></i>Formulário com Erros de Validação
+                    </h5>
+                    <p class="mb-2">${errorResponse.error_summary}</p>
+                    <p class="mb-0 small text-muted">Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+                </div>
+            </div>
+        `;
+        
+        // Inserir no topo do modal
+        modalBody.insertBefore(errorSummary, modalBody.firstChild);
+        
+        // Aplicar estilos de erro aos campos
+        Object.keys(errorResponse.errors).forEach(fieldName => {
+            console.log(`🔍 Processando campo: ${fieldName}`);
+            
+            const field = document.querySelector(`[name="${fieldName}"]`);
+            if (field) {
+                console.log(`✅ Campo encontrado: ${fieldName}`, field);
+                
+                // Adicionar classe de erro
+                field.classList.add('is-invalid');
+                
+                // Adicionar classe de erro ao grupo do campo
+                const formGroup = field.closest('.form-group, .mb-3, .col-md-6, .col-md-4, .col-md-3');
+                if (formGroup) {
+                    formGroup.classList.add('has-error');
+                    console.log(`✅ Grupo do campo marcado com erro:`, formGroup);
+                }
+                
+                // Criar mensagem de erro
+                createFieldErrorMessage(field, errorResponse.errors[fieldName]);
+            } else {
+                console.warn(`⚠️ Campo não encontrado: ${fieldName}`);
+            }
+        });
+        
+        // Rolar para o primeiro campo com erro
+        scrollToFirstError();
+    }
+
+    // Função para criar mensagem de erro para um campo
+    function createFieldErrorMessage(field, errorMessages) {
+        console.log(`🔍 Criando mensagem de erro para campo:`, field.name, errorMessages);
+        
+        // Remover mensagens de erro anteriores
+        const existingError = field.parentNode.querySelector('.invalid-feedback');
+        if (existingError) {
+            existingError.remove();
+            console.log(`✅ Mensagem de erro anterior removida`);
+        }
+        
+        // Criar nova mensagem de erro
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'invalid-feedback d-block text-danger mt-1';
+        
+        if (Array.isArray(errorMessages)) {
+            errorMessages.forEach((error, index) => {
+                const errorItem = document.createElement('div');
+                errorItem.innerHTML = `<i class="fas fa-times-circle me-1"></i>${error}`;
+                errorDiv.appendChild(errorItem);
+            });
+        } else {
+            errorDiv.innerHTML = `<i class="fas fa-times-circle me-1"></i>${errorMessages}`;
+        }
+        
+        // Inserir após o campo
+        const parentNode = field.parentNode;
+        if (parentNode) {
+            parentNode.appendChild(errorDiv);
+            console.log(`✅ Mensagem de erro inserida após campo:`, field.name);
+        } else {
+            console.warn(`⚠️ Não foi possível inserir mensagem de erro para:`, field.name);
+        }
+    }
+
+    // Função para rolar para o primeiro campo com erro
+    function scrollToFirstError() {
+        const firstErrorField = document.querySelector('.is-invalid');
+        if (firstErrorField) {
+            firstErrorField.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            firstErrorField.focus();
+            console.log(`✅ Rolou para o primeiro campo com erro:`, firstErrorField.name);
+        }
+    }
+
+    // Função para limpar erros
+    function clearErrors() {
+        // Remover resumo de erros
+        const errorSummary = document.querySelector('.alert-danger.border-danger');
+        if (errorSummary) {
+            errorSummary.remove();
+        }
+        
+        // Remover classes de erro dos campos
+        document.querySelectorAll('.is-invalid').forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+        
+        // Remover classes de erro dos grupos
+        document.querySelectorAll('.has-error').forEach(group => {
+            group.classList.remove('has-error');
+        });
+        
+        // Remover mensagens de erro
+        document.querySelectorAll('.invalid-feedback').forEach(error => {
+            error.remove();
+        });
+        
+        updateStatus('Erros limpos!', 'success');
+    }
+
+    // Função para submeter o formulário
+    function submitAdvogadoForm() {
+        updateStatus('Submetendo formulário...', 'warning');
+        
+        // Simular envio e retorno de erros
+        setTimeout(() => {
+            simulateServerErrors();
+        }, 1000);
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStatus('Sistema de teste de erros reais carregado!', 'success');
+    });
+</script>
+{% endblock %}

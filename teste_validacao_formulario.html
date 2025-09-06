@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Validação do Formulário</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos para validação de formulários */
+        .form-control.is-invalid,
+        .form-select.is-invalid,
+        .form-check-input.is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .form-control.is-invalid:focus,
+        .form-select.is-invalid:focus,
+        .form-check-input.is-invalid:focus {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+
+        .form-group.has-error .form-control,
+        .form-group.has-error .form-select {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .form-group.has-error .form-label {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+
+        .invalid-feedback {
+            display: block !important;
+            color: #dc3545 !important;
+            font-size: 0.875em !important;
+            margin-top: 0.25rem !important;
+            font-weight: 500 !important;
+        }
+
+        .invalid-feedback i {
+            color: #dc3545 !important;
+            margin-right: 0.25rem !important;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .form-control.is-invalid,
+        .form-select.is-invalid {
+            animation: errorShake 0.5s ease-in-out;
+        }
+
+        .alert-danger.border-danger {
+            border: 2px solid #dc3545 !important;
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Teste de Validação do Formulário</h1>
+        <p class="text-muted">Este é um exemplo de como a validação funciona no formulário de advogados.</p>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Formulário de Teste</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="testForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="nome" class="form-label">
+                                            Nome <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="nome" name="nome" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="cpf" class="form-label">
+                                            CPF <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="cpf" name="cpf" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="email" class="form-label">
+                                            E-mail <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="estado" class="form-label">
+                                            Estado <span class="text-danger">*</span>
+                                        </label>
+                                        <select class="form-select" id="estado" name="estado" required>
+                                            <option value="">---------</option>
+                                            <option value="SP">São Paulo</option>
+                                            <option value="RJ">Rio de Janeiro</option>
+                                            <option value="MG">Minas Gerais</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group mb-3">
+                                        <label for="endereco" class="form-label">
+                                            Endereço <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea class="form-control" id="endereco" name="endereco" rows="3" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="data_inscricao" class="form-label">
+                                            Data de Inscrição <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="date" class="form-control" id="data_inscricao" name="data_inscricao" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label for="experiencia" class="form-label">
+                                            Anos de Experiência <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="number" class="form-control" id="experiencia" name="experiencia" min="0" max="100" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-save me-2"></i>Salvar Formulário
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Instruções de Teste</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol>
+                            <li><strong>Deixe todos os campos vazios</strong> e clique em "Salvar Formulário"</li>
+                            <li><strong>Observe</strong> como os campos ficam circulados em vermelho</li>
+                            <li><strong>Verifique</strong> as mensagens de erro específicas para cada campo</li>
+                            <li><strong>Preencha</strong> alguns campos e veja como os erros são removidos</li>
+                            <li><strong>Teste</strong> a validação em tempo real digitando nos campos</li>
+                        </ol>
+                        
+                        <div class="alert alert-info">
+                            <h6><i class="fas fa-info-circle me-2"></i>Como Funciona:</h6>
+                            <ul class="mb-0">
+                                <li><strong>Campos obrigatórios vazios</strong> ficam com borda vermelha</li>
+                                <li><strong>Mensagens específicas</strong> explicam o que precisa ser corrigido</li>
+                                <li><strong>Validação em tempo real</strong> remove erros ao preencher</li>
+                                <li><strong>Resumo dos erros</strong> aparece no topo do formulário</li>
+                                <li><strong>Scroll automático</strong> para o primeiro campo com erro</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função para limpar erros anteriores
+        function clearPreviousErrors() {
+            document.querySelectorAll('.is-invalid').forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+            
+            document.querySelectorAll('.has-error').forEach(group => {
+                group.classList.remove('has-error');
+            });
+            
+            document.querySelectorAll('.invalid-feedback').forEach(msg => {
+                msg.remove();
+            });
+            
+            const existingSummary = document.querySelector('.alert-danger');
+            if (existingSummary && existingSummary.innerHTML.includes('Formulário com Erros')) {
+                existingSummary.remove();
+            }
+        }
+
+        // Função para criar mensagem de erro para um campo
+        function createErrorMessage(field, message) {
+            const formGroup = field.closest('.form-group');
+            if (formGroup) {
+                const existingError = formGroup.querySelector('.invalid-feedback');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'invalid-feedback d-block text-danger';
+                errorDiv.innerHTML = `<i class="fas fa-times-circle me-1"></i>${message}`;
+                
+                field.parentNode.insertBefore(errorDiv, field.nextSibling);
+            }
+        }
+
+        // Função para obter mensagem de erro específica para cada campo
+        function getFieldErrorMessage(field) {
+            const fieldName = field.name || field.id || '';
+            
+            const errorMessages = {
+                'nome': 'Nome é obrigatório. Digite o nome completo do advogado.',
+                'cpf': 'CPF é obrigatório. Digite um CPF válido no formato XXX.XXX.XXX-XX.',
+                'email': 'E-mail é obrigatório. Digite um endereço de e-mail válido.',
+                'estado': 'Estado é obrigatório. Selecione o estado.',
+                'endereco': 'Endereço é obrigatório. Digite o endereço completo incluindo rua, número e bairro.',
+                'data_inscricao': 'Data de inscrição é obrigatória. Selecione a data de inscrição.',
+                'experiencia': 'Anos de experiência é obrigatório. Digite o número de anos de experiência.'
+            };
+            
+            for (const [key, message] of Object.entries(errorMessages)) {
+                if (fieldName.includes(key)) {
+                    return message;
+                }
+            }
+            
+            return 'Este campo é obrigatório. Por favor, preencha corretamente.';
+        }
+
+        // Função para mostrar resumo dos erros
+        function showErrorSummary(errorCount) {
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'alert alert-danger mt-3 border-danger';
+            errorMessage.innerHTML = `
+                <h6><i class="fas fa-exclamation-triangle me-2"></i>Formulário com Erros</h6>
+                <p>Foram encontrados <strong>${errorCount}</strong> campo(s) obrigatório(s) não preenchido(s).</p>
+                <p>Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+                <ul class="mb-0">
+                    <li>Campos com borda vermelha precisam ser preenchidos</li>
+                    <li>Verifique se todos os campos obrigatórios (marcados com <span class="text-danger">*</span>) estão preenchidos</li>
+                    <li>Selecione opções válidas nos campos de lista</li>
+                </ul>
+            `;
+            
+            const form = document.getElementById('testForm');
+            form.insertBefore(errorMessage, form.firstChild);
+        }
+
+        // Função para rolar para o primeiro campo com erro
+        function scrollToFirstError() {
+            const firstError = document.querySelector('.is-invalid');
+            if (firstError) {
+                firstError.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                setTimeout(() => {
+                    firstError.focus();
+                }, 500);
+            }
+        }
+
+        // Função para validar campo individual em tempo real
+        function validateField(field) {
+            const isRequired = field.hasAttribute('required');
+            const isEmpty = !field.value || field.value === '' || field.value === '---------';
+            
+            if (isRequired && isEmpty) {
+                field.classList.add('is-invalid');
+                const formGroup = field.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.add('has-error');
+                }
+                
+                createErrorMessage(field, getFieldErrorMessage(field));
+            } else {
+                field.classList.remove('is-invalid');
+                const formGroup = field.closest('.form-group');
+                if (formGroup) {
+                    formGroup.classList.remove('has-error');
+                }
+                
+                const errorMessage = formGroup ? formGroup.querySelector('.invalid-feedback') : null;
+                if (errorMessage) {
+                    errorMessage.remove();
+                }
+            }
+        }
+
+        // Event listener para o formulário
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('Formulário sendo validado...');
+            
+            clearPreviousErrors();
+            
+            const requiredFields = document.querySelectorAll('input[required], select[required], textarea[required]');
+            let hasErrors = false;
+            let errorCount = 0;
+            
+            requiredFields.forEach(field => {
+                if (!field.value || field.value === '' || field.value === '---------') {
+                    field.classList.add('is-invalid');
+                    const formGroup = field.closest('.form-group');
+                    if (formGroup) {
+                        formGroup.classList.add('has-error');
+                    }
+                    
+                    createErrorMessage(field, getFieldErrorMessage(field));
+                    
+                    hasErrors = true;
+                    errorCount++;
+                }
+            });
+            
+            if (hasErrors) {
+                console.log('Formulário bloqueado devido a erros de validação');
+                showErrorSummary(errorCount);
+                scrollToFirstError();
+                
+                // Mostrar alerta
+                alert(`Formulário com ${errorCount} erro(s)! Verifique os campos destacados em vermelho.`);
+            } else {
+                console.log('Formulário válido!');
+                alert('Formulário válido! Todos os campos obrigatórios estão preenchidos.');
+            }
+        });
+
+        // Validação em tempo real
+        document.addEventListener('input', function(e) {
+            if (e.target.hasAttribute('required')) {
+                validateField(e.target);
+            }
+        });
+
+        document.addEventListener('change', function(e) {
+            if (e.target.hasAttribute('required')) {
+                validateField(e.target);
+            }
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de teste de validação carregada');
+            console.log('Preencha o formulário e teste a validação!');
+        });
+    </script>
+</body>
+</html>

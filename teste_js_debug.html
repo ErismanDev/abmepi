@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug JavaScript</title>
+    
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        
+        .log-container {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 5px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+        
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+        .warning { color: #ffd43b; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 class="text-center mb-4">Debug JavaScript</h1>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <button type="button" class="btn btn-primary w-100" onclick="testFileLoad()">
+                    Testar Carregamento
+                </button>
+            </div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-info w-100" onclick="checkNetwork()">
+                    Verificar Rede
+                </button>
+            </div>
+            <div class="col-md-4">
+                <button type="button" class="btn btn-warning w-100" onclick="checkConsole()">
+                    Verificar Console
+                </button>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <h4>Log de Debug</h4>
+            <div id="logContainer" class="log-container">
+                <div class="text-muted">Aguardando ações...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> <span class="${type}">${message}</span>`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function testFileLoad() {
+            addLog('🧪 Testando carregamento do arquivo...', 'info');
+            
+            // Verificar se o arquivo foi carregado
+            if (typeof window.openAdvogadoModal !== 'undefined') {
+                addLog('✅ openAdvogadoModal está disponível', 'success');
+            } else {
+                addLog('❌ openAdvogadoModal não está disponível', 'error');
+            }
+            
+            // Verificar outras funções
+            const functions = ['submitForm', 'openFormModal'];
+            functions.forEach(func => {
+                if (typeof window[func] === 'function') {
+                    addLog(`✅ ${func} está disponível`, 'success');
+                } else {
+                    addLog(`❌ ${func} não está disponível`, 'error');
+                }
+            });
+            
+            // Verificar se há erros no console
+            addLog('🔍 Verifique o console do navegador (F12) para erros', 'warning');
+        }
+        
+        function checkNetwork() {
+            addLog('🌐 Verificando rede...', 'info');
+            
+            // Tentar fazer uma requisição para o arquivo
+            fetch('/static/assejus/js/modais_assejus.js')
+                .then(response => {
+                    if (response.ok) {
+                        addLog('✅ Arquivo modais.js acessível via rede', 'success');
+                        addLog(`📊 Status: ${response.status}`, 'info');
+                        addLog(`📊 Tamanho: ${response.headers.get('content-length') || 'N/A'} bytes`, 'info');
+                    } else {
+                        addLog(`❌ Erro ao acessar arquivo: ${response.status}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    addLog(`❌ Erro de rede: ${error.message}`, 'error');
+                });
+        }
+        
+        function checkConsole() {
+            addLog('🔍 Verificando console...', 'info');
+            addLog('💡 Abra o console do navegador (F12) para ver mensagens detalhadas', 'warning');
+            
+            // Tentar executar uma função se disponível
+            if (typeof window.openAdvogadoModal === 'function') {
+                addLog('🚀 Executando openAdvogadoModal...', 'info');
+                try {
+                    window.openAdvogadoModal();
+                    addLog('✅ openAdvogadoModal executada com sucesso', 'success');
+                } catch (error) {
+                    addLog(`❌ Erro ao executar: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('❌ openAdvogadoModal não está disponível', 'error');
+            }
+        }
+        
+        // Verificar quando a página carrega
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página carregada', 'success');
+            addLog('⏳ Aguardando carregamento do modais.js...', 'info');
+            
+            // Verificar a cada 1 segundo se as funções foram carregadas
+            let checkInterval = setInterval(() => {
+                if (typeof window.openAdvogadoModal === 'function') {
+                    addLog('✅ Funções carregadas com sucesso!', 'success');
+                    clearInterval(checkInterval);
+                }
+            }, 1000);
+            
+            // Timeout de 15 segundos
+            setTimeout(() => {
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                    addLog('⚠️ Timeout: funções podem não ter sido carregadas', 'warning');
+                    addLog('🔍 Verifique se o servidor Django está rodando na porta 8000', 'warning');
+                }
+            }, 15000);
+        });
+        
+        // Capturar erros de carregamento de script
+        window.addEventListener('error', function(e) {
+            if (e.target.tagName === 'SCRIPT') {
+                addLog(`❌ Erro ao carregar script: ${e.target.src}`, 'error');
+                addLog(`❌ Erro: ${e.message}`, 'error');
+            }
+        });
+    </script>
+    
+    <!-- Carregar o arquivo de modais -->
+    <script src="/static/assejus/js/modais_assejus.js" onload="addLog('✅ Script modais_assejus.js carregado com sucesso', 'success')" onerror="addLog('❌ Erro ao carregar script modais_assejus.js', 'error')"></script>
+</body>
+</html>

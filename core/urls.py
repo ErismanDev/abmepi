@@ -18,6 +18,7 @@ urlpatterns = [
     path('perfil/', views.perfil_usuario, name='perfil'),
     path('dashboard/stats/', views.dashboard_stats, name='dashboard_stats'),
     path('institucional/editar/', views.InstitucionalConfigEditView.as_view(), name='institucional_edit'),
+<<<<<<< HEAD
     path('test-accordions/', views.test_accordions, name='test_accordions'),
     
     # URLs para gerenciamento de posts do feed
@@ -25,6 +26,12 @@ urlpatterns = [
     path('feed/posts/criar/', views.feed_post_create, name='feed_post_create'),
     path('feed/posts/ajax/', views.feed_posts_list_ajax, name='feed_posts_list_ajax'),
     path('feed/posts/criar/ajax/', views.feed_post_create_ajax, name='feed_post_create_ajax'),
+=======
+    
+    # URLs para gerenciamento de posts do feed
+    path('feed/posts/', views.feed_posts_list_ajax, name='feed_posts_list'),
+    path('feed/posts/criar/', views.feed_post_create_ajax, name='feed_post_create'),
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     path('feed/posts/<int:pk>/atualizar/', views.feed_post_update_ajax, name='feed_post_update'),
     path('feed/posts/<int:pk>/excluir/', views.feed_post_delete_ajax, name='feed_post_delete'),
     
@@ -59,7 +66,10 @@ urlpatterns = [
     
     # URLs públicas para visualização das notícias
     path('noticias-juridicas/', views.assejur_news_public_list, name='assejur_news_public_list'),
+<<<<<<< HEAD
     path('assejur/noticias/<int:noticia_id>/conteudo/', views.assejur_news_content_ajax, name='assejur_news_content_ajax'),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # URL para página de legislação
     path('legislacao/', views.LegislacaoView.as_view(), name='legislacao'),
@@ -74,6 +84,7 @@ urlpatterns = [
     path('emails/enviar/', views.email_batch_send, name='email_batch_send'),
     path('emails/preview/', views.email_batch_preview, name='email_batch_preview'),
     path('emails/historico/', views.email_batch_history, name='email_batch_history'),
+<<<<<<< HEAD
     
     # URLs para galeria de ex-presidentes e história
     path('ex-presidentes/', views.ExPresidentesView.as_view(), name='ex_presidentes'),
@@ -90,4 +101,6 @@ urlpatterns = [
     path('historia/novo/', views.HistoriaAssociacaoCreateView.as_view(), name='historia_create'),
     path('historia/<int:pk>/editar/', views.HistoriaAssociacaoUpdateView.as_view(), name='historia_update'),
     path('historia/<int:pk>/excluir/', views.HistoriaAssociacaoDeleteView.as_view(), name='historia_delete'),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 ]

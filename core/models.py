@@ -721,6 +721,7 @@ class AssejurNews(models.Model):
         verbose_name="Tags (separadas por vírgula)"
     )
     
+<<<<<<< HEAD
     imagem = models.ImageField(
         upload_to='noticias_juridicas/',
         blank=True,
@@ -728,6 +729,8 @@ class AssejurNews(models.Model):
         verbose_name="Imagem da Notícia"
     )
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     autor = models.ForeignKey(
         Usuario,
         on_delete=models.SET_NULL,
@@ -1187,6 +1190,7 @@ class Notificacao(models.Model):
             objeto_id=reserva.id,
             url_acao=f"/hotel-transito/reservas/{reserva.id}/",
             prioridade=2
+<<<<<<< HEAD
         )
 
 
@@ -1326,3 +1330,6 @@ class HistoriaImagem(models.Model):
     
     def __str__(self):
         return f"{self.evento.titulo} - {self.legenda or 'Imagem'}"
+=======
+        )
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

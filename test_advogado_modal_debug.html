@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Modal Advogado</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Debug do Modal de Advogado</h1>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Testes de Debug</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-secondary me-2" onclick="testAdvogadoModalReal()">
+                            Testar View Real
+                        </button>
+                        <button type="button" class="btn btn-warning me-2" onclick="testAdvogadoModalSimple()">
+                            Testar View Simples
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="testOpenAdvogadoModal()">
+                            Testar openAdvogadoModal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Resultados dos Testes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultado" class="alert" style="display: none;"></div>
+                        <div id="console-output" class="bg-dark text-light p-3" style="height: 300px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            <div>Console de debug...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para adicionar log ao console visual
+        function addLog(message, type = 'info') {
+            const consoleOutput = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> <span class="text-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'}">${message}</span>`;
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        // Função para mostrar resultado
+        function showResult(message, type = 'info') {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = message;
+            resultado.className = `alert alert-${type}`;
+            resultado.style.display = 'block';
+        }
+        
+        // Função para testar a view simples
+        function testAdvogadoModalSimple() {
+            addLog('🔧 Testando view simples...', 'info');
+            showResult('Testando view simples...', 'info');
+            
+            const url = '/assejus/advogados/modal/novo/teste-simples/';
+            addLog(`📡 Fazendo requisição para: ${url}`, 'info');
+            
+            fetch(url)
+                .then(response => {
+                    addLog(`📥 Resposta recebida: ${response.status} ${response.statusText}`, 'info');
+                    addLog(`📋 Content-Type: ${response.headers.get('content-type')}`, 'info');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return response.json();
+                })
+                .then(data => {
+                    addLog('✅ JSON recebido com sucesso', 'success');
+                    addLog(`📊 form_html existe: ${!!data.form_html}`, 'info');
+                    addLog(`📏 Tamanho do form_html: ${data.form_html ? data.form_html.length : 'N/A'}`, 'info');
+                    
+                    if (data.form_html) {
+                        addLog('✅ HTML recebido corretamente', 'success');
+                        addLog(`📝 Primeiros 100 caracteres: ${data.form_html.substring(0, 100)}`, 'info');
+                        showResult('View simples funcionando! HTML recebido com sucesso.', 'success');
+                    } else {
+                        addLog('❌ form_html não encontrado na resposta', 'error');
+                        showResult('View simples não retornou form_html!', 'danger');
+                    }
+                })
+                .catch(error => {
+                    addLog(`❌ Erro na view simples: ${error.message}`, 'error');
+                    showResult(`Erro na view simples: ${error.message}`, 'danger');
+                });
+        }
+        
+        // Função para testar a view real
+        function testAdvogadoModalReal() {
+            addLog('🔧 Testando view real...', 'info');
+            showResult('Testando view real...', 'info');
+            
+            const url = '/assejus/advogados/modal/novo/';
+            addLog(`📡 Fazendo requisição para: ${url}`, 'info');
+            
+            fetch(url)
+                .then(response => {
+                    addLog(`📥 Resposta recebida: ${response.status} ${response.statusText}`, 'info');
+                    addLog(`📋 Content-Type: ${response.headers.get('content-type')}`, 'info');
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                    
+                    return response.json();
+                })
+                .then(data => {
+                    addLog('✅ JSON recebido com sucesso', 'success');
+                    addLog(`📊 form_html existe: ${!!data.form_html}`, 'info');
+                    addLog(`📏 Tamanho do form_html: ${data.form_html ? data.form_html.length : 'N/A'}`, 'info');
+                    
+                    if (data.form_html) {
+                        addLog('✅ HTML recebido corretamente', 'success');
+                        addLog(`📝 Primeiros 100 caracteres: ${data.form_html.substring(0, 100)}`, 'info');
+                        showResult('View real funcionando! HTML recebido com sucesso.', 'success');
+                    } else {
+                        addLog('❌ form_html não encontrado na resposta', 'error');
+                        showResult('View real não retornou form_html!', 'danger');
+                    }
+                })
+                .catch(error => {
+                    addLog(`❌ Erro na view real: ${error.message}`, 'error');
+                    showResult(`Erro na view real: ${error.message}`, 'danger');
+                });
+        }
+        
+        // Função para testar openAdvogadoModal
+        function testOpenAdvogadoModal() {
+            addLog('🔧 Testando openAdvogadoModal...', 'info');
+            showResult('Testando openAdvogadoModal...', 'info');
+            
+            if (typeof window.openAdvogadoModal === 'function') {
+                addLog('✅ Função openAdvogadoModal encontrada', 'success');
+                try {
+                    window.openAdvogadoModal();
+                    addLog('✅ openAdvogadoModal executada com sucesso', 'success');
+                    showResult('openAdvogadoModal executada com sucesso!', 'success');
+                } catch (error) {
+                    addLog(`❌ Erro ao executar openAdvogadoModal: ${error.message}`, 'error');
+                    showResult(`Erro ao executar openAdvogadoModal: ${error.message}`, 'danger');
+                }
+            } else {
+                addLog('❌ Função openAdvogadoModal não está disponível', 'error');
+                showResult('Função openAdvogadoModal não está disponível!', 'danger');
+            }
+        }
+        
+        // Interceptar console.log para mostrar no console visual
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addLog(`ℹ️ ${args.join(' ')}`, 'info');
+        };
+        
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addLog(`❌ ${args.join(' ')}`, 'error');
+        };
+        
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página de debug carregada', 'success');
+            addLog('✅ Funções de teste disponíveis', 'success');
+            
+            // Verificar funções disponíveis
+            const functions = [
+                'openAdvogadoModal'
+            ];
+            
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addLog(`✅ ${funcName} disponível`, 'success');
+                } else {
+                    addLog(`❌ ${funcName} não disponível`, 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

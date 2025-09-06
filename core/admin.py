@@ -1,7 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.translation import gettext_lazy as _
+<<<<<<< HEAD
 from .models import Usuario, LogAtividade, ConfiguracaoSistema, InstitucionalConfig, FeedPost, Like, Comentario, AssejurNewsComentario, ExPresidente, HistoriaAssociacao, HistoriaImagem
+=======
+from .models import Usuario, LogAtividade, ConfiguracaoSistema, InstitucionalConfig, FeedPost, Like, Comentario, AssejurNewsComentario
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 from .forms import UsuarioCreationForm, UsuarioChangeForm
 
 
@@ -225,6 +229,7 @@ class ComentarioAdmin(admin.ModelAdmin):
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('post', 'usuario')
+<<<<<<< HEAD
 
 
 @admin.register(ExPresidente)
@@ -323,3 +328,5 @@ class HistoriaImagemAdmin(admin.ModelAdmin):
         return 'Sem imagem'
     imagem_preview.allow_tags = True
     imagem_preview.short_description = 'Preview'
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

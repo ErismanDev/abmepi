@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Sidebar - Debug</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar-container {
+            padding: 0;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            width: 250px;
+            overflow-y: auto;
+        }
+        
+        .sidebar {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .logo-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+        }
+        
+        .sidebar-menu {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .menu-item {
+            margin-bottom: 5px;
+        }
+        
+        .menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .menu-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: rgba(255,255,255,0.5);
+        }
+        
+        .menu-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border-left-color: white;
+        }
+        
+        .menu-link i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        .menu-link span {
+            flex: 1;
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s ease;
+            margin-left: auto;
+        }
+        
+        .menu-toggle.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+        
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background-color: rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+        }
+        
+        .submenu.show {
+            max-height: 500px;
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .submenu * {
+            pointer-events: auto;
+        }
+        
+        .submenu:not(.show) * {
+            pointer-events: none;
+        }
+        
+        .submenu-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px 10px 50px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .submenu-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .submenu-link i {
+            width: 16px;
+            margin-right: 10px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        
+        .debug-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-container">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h4 class="logo-title">TESTE SIDEBAR</h4>
+                <p>Debug Menu Lateral</p>
+            </div>
+            
+            <div class="sidebar-menu">
+                <div class="menu-item">
+                    <a href="#" class="menu-link menu-toggle" data-target="testSubmenu1">
+                        <i class="fas fa-users"></i>
+                        <span>Associados</span>
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                    </a>
+                    <div class="submenu" id="testSubmenu1">
+                        <a href="#" class="submenu-link">
+                            <i class="fas fa-list"></i>
+                            <span>Listar</span>
+                        </a>
+                        <a href="#" class="submenu-link">
+                            <i class="fas fa-plus"></i>
+                            <span>Novo</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <a href="#" class="menu-link menu-toggle" data-target="testSubmenu2">
+                        <i class="fas fa-gavel"></i>
+                        <span>Assejur</span>
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                    </a>
+                    <div class="submenu" id="testSubmenu2">
+                        <a href="#" class="submenu-link">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="#" class="submenu-link">
+                            <i class="fas fa-user-tie"></i>
+                            <span>Advogados</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="menu-item">
+                    <a href="#" class="menu-link">
+                        <i class="fas fa-home"></i>
+                        <span>Link Simples</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </div>
+    
+    <div class="main-content">
+        <div class="debug-panel">
+            <h3>🔧 Painel de Debug - Menu Lateral</h3>
+            <p>Este é um teste para verificar se os submenus estão funcionando corretamente.</p>
+            <div id="debug-info">
+                <p><strong>Status:</strong> <span id="status">Carregando...</span></p>
+                <p><strong>Menu Toggles encontrados:</strong> <span id="toggle-count">0</span></p>
+                <p><strong>Submenus encontrados:</strong> <span id="submenu-count">0</span></p>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h4>📋 Instruções de Teste:</h4>
+            <ol>
+                <li>Clique nos itens "Associados" e "Assejur" para testar os submenus</li>
+                <li>Verifique se os submenus abrem e fecham corretamente</li>
+                <li>Teste se apenas um submenu fica aberto por vez</li>
+                <li>Verifique se os links dos submenus são clicáveis</li>
+                <li>Abra o console do navegador (F12) para ver os logs de debug</li>
+            </ol>
+        </div>
+        
+        <div class="debug-panel">
+            <h4>🖥️ Teste de Responsividade:</h4>
+            <p>Redimensione a janela para testar diferentes breakpoints:</p>
+            <ul>
+                <li><strong>≤767px:</strong> Menu lateral deve ficar oculto</li>
+                <li><strong>768px-991px:</strong> Menu lateral com 200px</li>
+                <li><strong>992px-1199px:</strong> Menu lateral com 220px (notebooks pequenos)</li>
+                <li><strong>1200px-1366px:</strong> Menu lateral com 240px (notebooks médios)</li>
+                <li><strong>≥1367px:</strong> Menu lateral com 280px</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Iniciando teste do sidebar...');
+            
+            // Atualizar informações de debug
+            function updateDebugInfo() {
+                const menuToggles = document.querySelectorAll('.menu-toggle');
+                const submenus = document.querySelectorAll('.submenu');
+                
+                document.getElementById('toggle-count').textContent = menuToggles.length;
+                document.getElementById('submenu-count').textContent = submenus.length;
+                document.getElementById('status').textContent = 'Pronto para teste';
+            }
+            
+            // Função para inicializar submenus
+            function initializeSubmenus() {
+                try {
+                    console.log('🔄 Inicializando controle de submenus...');
+                    
+                    const menuToggles = document.querySelectorAll('.menu-toggle');
+                    console.log('📋 Menu toggles encontrados:', menuToggles.length);
+                    
+                    menuToggles.forEach((toggle, index) => {
+                        const target = toggle.getAttribute('data-target');
+                        const submenu = document.getElementById(target);
+                        
+                        console.log(`🔗 Toggle ${index + 1}:`, {
+                            element: toggle,
+                            target: target,
+                            submenu: submenu
+                        });
+                        
+                        // Remover event listeners anteriores
+                        toggle.removeEventListener('click', handleToggleClick);
+                        
+                        // Adicionar novo event listener
+                        toggle.addEventListener('click', handleToggleClick);
+                    });
+                    
+                    console.log('✅ Controle de submenus inicializado com sucesso');
+                    updateDebugInfo();
+                } catch (error) {
+                    console.error('❌ Erro ao inicializar controle de submenus:', error);
+                    document.getElementById('status').textContent = 'Erro na inicialização';
+                }
+            }
+            
+            function handleToggleClick(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const target = this.getAttribute('data-target');
+                const submenu = document.getElementById(target);
+                
+                console.log('🖱️ Clique no toggle:', {
+                    target: target,
+                    submenu: submenu,
+                    currentActive: this.classList.contains('active')
+                });
+                
+                if (submenu) {
+                    const isActive = this.classList.contains('active');
+                    
+                    // Fechar todos os outros submenus
+                    document.querySelectorAll('.submenu').forEach(menu => {
+                        if (menu.id !== target) {
+                            menu.classList.remove('show');
+                            console.log('🔒 Fechando submenu:', menu.id);
+                        }
+                    });
+                    
+                    // Fechar todos os outros toggles
+                    document.querySelectorAll('.menu-toggle').forEach(tog => {
+                        if (tog !== this) {
+                            tog.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle do submenu atual
+                    if (isActive) {
+                        submenu.classList.remove('show');
+                        this.classList.remove('active');
+                        console.log('🔒 Fechando submenu atual:', target);
+                    } else {
+                        submenu.classList.add('show');
+                        this.classList.add('active');
+                        console.log('🔓 Abrindo submenu:', target);
+                    }
+                } else {
+                    console.warn('⚠️ Submenu não encontrado:', target);
+                }
+            }
+            
+            // Inicializar imediatamente
+            initializeSubmenus();
+            
+            // Reinicializar após um pequeno delay
+            setTimeout(initializeSubmenus, 100);
+            
+            console.log('✅ Teste do sidebar carregado com sucesso!');
+        });
+    </script>
+</body>
+</html>

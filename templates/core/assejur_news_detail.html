@@ -55,6 +55,7 @@
         border-top: 1px solid rgba(255, 255, 255, 0.2);
     }
     
+<<<<<<< HEAD
     .news-actions {
         background: #f8f9fa;
         border-radius: 0;
@@ -70,6 +71,8 @@
         margin-left: 0;
     }
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     .news-content {
         padding: 2rem;
         line-height: 1.8;
@@ -298,6 +301,7 @@
                     </div>
                 </div>
                 
+<<<<<<< HEAD
                 <!-- Informações da Notícia -->
                 <div class="news-actions p-3 bg-light border-bottom">
                     <div class="d-flex justify-content-center align-items-center">
@@ -311,6 +315,8 @@
                     </div>
                 </div>
                 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 <!-- Imagem da Notícia -->
                 {% if noticia.imagem %}
                 <div class="news-image-container">
@@ -328,9 +334,13 @@
                 <!-- Conteúdo da Notícia -->
                 <div class="news-content">
                     {% if noticia.conteudo %}
+<<<<<<< HEAD
                         <div style="white-space: pre-line; font-family: 'Times New Roman', serif; font-size: 14px; line-height: 1.6; color: #333;">
                             {{ noticia.conteudo|striptags }}
                         </div>
+=======
+                        {{ noticia.conteudo|linebreaks }}
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                     {% else %}
                         <p class="text-muted text-center">
                             <i class="fas fa-info-circle fa-2x mb-3"></i><br>

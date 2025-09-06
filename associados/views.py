@@ -23,7 +23,10 @@ from django.conf import settings
 from .forms import PreCadastroAssociadoForm
 from .models import PreCadastroAssociado
 from .pdf_views import gerar_declaracao_associados_pdf, gerar_requerimento_inscricao_pdf
+<<<<<<< HEAD
 from .ficha_cadastro_associado import gerar_ficha_cadastro_associado_pdf
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 
 class AssociadoListView(LoginRequiredMixin, ListView):

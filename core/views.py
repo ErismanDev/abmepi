@@ -5,7 +5,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.views.generic import TemplateView, ListView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+<<<<<<< HEAD
 from django.db.models import Count, Sum, Q, Prefetch, Max
+=======
+from django.db.models import Count, Sum, Q
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 from django.utils import timezone
 from django.http import JsonResponse
 from django.contrib.auth.models import Group
@@ -13,8 +17,13 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+<<<<<<< HEAD
 from .models import Usuario, LogAtividade, ConfiguracaoSistema, InstitucionalConfig, FeedPost, Like, Comentario, AssejurNews, AssejurInformativo, AssejurNewsComentario, Notificacao, ExPresidente, HistoriaAssociacao, HistoriaImagem
 from .forms import LoginForm, UsuarioCreationForm, UsuarioChangeForm, InstitucionalConfigForm, FeedPostForm, AssejurNewsForm, AssejurInformativoForm, ExPresidenteForm, HistoriaAssociacaoForm
+=======
+from .models import Usuario, LogAtividade, ConfiguracaoSistema, InstitucionalConfig, FeedPost, Like, Comentario, AssejurNews, AssejurInformativo, AssejurNewsComentario, Notificacao
+from .forms import LoginForm, UsuarioCreationForm, UsuarioChangeForm, InstitucionalConfigForm, FeedPostForm, AssejurNewsForm, AssejurInformativoForm
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 from .permissions import PermissionRequiredMixin
 from associados.models import Associado
 from financeiro.models import Mensalidade
@@ -57,6 +66,7 @@ class InstitucionalView(TemplateView):
             'mostrar_cta': config.mostrar_cta,
             'meta_description': config.meta_description,
             'meta_keywords': config.meta_keywords,
+<<<<<<< HEAD
             # Serviços prestados aos associados
             'servicos_juridicos': config.servicos_juridicos,
             'servicos_psicologicos': config.servicos_psicologicos,
@@ -69,6 +79,8 @@ class InstitucionalView(TemplateView):
             'servicos_esportivos': config.servicos_esportivos,
             'servicos_culturais': config.servicos_culturais,
             'servicos_hotel_transito': config.servicos_hotel_transito,
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         })
         
         # Estatísticas para exibir na página institucional (se habilitado)
@@ -145,11 +157,14 @@ class InstitucionalView(TemplateView):
         import json
         context['assejur_news_json'] = json.dumps(assejur_news_json)
         
+<<<<<<< HEAD
         # Buscar presidente atual da diretoria
         from diretoria.models import MembroDiretoria
         presidente_atual = MembroDiretoria.get_presidente_atual()
         context['presidente_atual'] = presidente_atual
         
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         return context
 
 
@@ -824,6 +839,7 @@ class InstitucionalConfigEditView(LoginRequiredMixin, UpdateView):
         context['total_informativos'] = AssejurInformativo.objects.count()
         context['noticias_ativas'] = AssejurNews.objects.filter(ativo=True).count()
         
+<<<<<<< HEAD
         # Adicionar estatísticas de ex-presidentes e história
         try:
             context['total_ex_presidentes'] = ExPresidente.objects.count()
@@ -849,6 +865,11 @@ def test_accordions(request):
     return render(request, 'test_accordions.html')
 
 
+=======
+        return context
+
+
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 class FeedPostCreateView(LoginRequiredMixin, CreateView):
     """
     View para criar novos posts do feed
@@ -1166,6 +1187,7 @@ def feed_posts_list_ajax(request):
     return JsonResponse({'posts': posts_data})
 
 
+<<<<<<< HEAD
 @login_required
 def feed_posts_list(request):
     """
@@ -1219,6 +1241,8 @@ def feed_post_create(request):
     return render(request, 'core/feed_post_form.html', context)
 
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 def post_like_ajax(request, post_id):
     """
     View AJAX para curtir/descurtir posts (aberto para todos)
@@ -1817,6 +1841,7 @@ def assejur_news_public_list(request):
     return render(request, 'core/assejur_news_public_list.html', context)
 
 
+<<<<<<< HEAD
 def assejur_news_content_ajax(request, noticia_id):
     """
     View AJAX para retornar o conteúdo completo de uma notícia
@@ -1840,6 +1865,8 @@ def assejur_news_content_ajax(request, noticia_id):
         })
 
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 def post_share_ajax(request, post_id):
     """
     View AJAX para compartilhar posts (aberto para todos)
@@ -2495,6 +2522,7 @@ def email_batch_history(request):
     }
     
     return render(request, 'core/email_batch_history.html', context)
+<<<<<<< HEAD
 
 
 class ExPresidentesView(TemplateView):
@@ -2795,3 +2823,5 @@ class HistoriaAssociacaoListView(LoginRequiredMixin, ListView):
         context['marcos_com_imagens'] = marcos.filter(galeria_imagens__isnull=False).distinct().count()
         
         return context
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

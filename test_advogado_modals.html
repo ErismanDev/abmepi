@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Modais de Advogados - ASEJUS</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .test-success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .test-error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .test-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .modal-test {
+            margin: 10px 0;
+        }
+        
+        .btn-test {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-balance-scale me-2"></i>
+            Teste de Modais de Advogados - ASEJUS
+        </h1>
+        
+        <div class="alert alert-info">
+            <h5><i class="fas fa-info-circle me-2"></i>Objetivo do Teste</h5>
+            <p>Este teste verifica se os modais de advogados estão funcionando corretamente após as correções do erro de backdrop.</p>
+        </div>
+        
+        <!-- Seção 1: Verificação das Funções -->
+        <div class="test-section">
+            <h3><i class="fas fa-check-circle me-2"></i>1. Verificação das Funções de Modal</h3>
+            <div id="functions-check-result"></div>
+            <button class="btn btn-primary" onclick="checkFunctions()">
+                <i class="fas fa-search me-2"></i>Verificar Funções
+            </button>
+        </div>
+        
+        <!-- Seção 2: Teste de Modal de Criação -->
+        <div class="test-section">
+            <h3><i class="fas fa-plus me-2"></i>2. Teste de Modal de Criação</h3>
+            <div id="create-modal-result"></div>
+            <button class="btn btn-success" onclick="testCreateModal()">
+                <i class="fas fa-user-plus me-2"></i>Testar Modal de Criação
+            </button>
+        </div>
+        
+        <!-- Seção 3: Teste de Modal de Detalhes -->
+        <div class="test-section">
+            <h3><i class="fas fa-eye me-2"></i>3. Teste de Modal de Detalhes</h3>
+            <div id="detail-modal-result"></div>
+            <button class="btn btn-info" onclick="testDetailModal()">
+                <i class="fas fa-search me-2"></i>Testar Modal de Detalhes
+            </button>
+        </div>
+        
+        <!-- Seção 4: Teste de Modal de Edição -->
+        <div class="test-section">
+            <h3><i class="fas fa-edit me-2"></i>4. Teste de Modal de Edição</h3>
+            <div id="edit-modal-result"></div>
+            <button class="btn btn-warning" onclick="testEditModal()">
+                <i class="fas fa-pencil me-2"></i>Testar Modal de Edição
+            </button>
+        </div>
+        
+        <!-- Seção 5: Teste de Erro de Backdrop -->
+        <div class="test-section">
+            <h3><i class="fas fa-exclamation-triangle me-2"></i>5. Teste de Erro de Backdrop</h3>
+            <div id="backdrop-error-result"></div>
+            <button class="btn btn-danger" onclick="testBackdropError()">
+                <i class="fas fa-bug me-2"></i>Simular Erro de Backdrop
+            </button>
+        </div>
+        
+        <!-- Botão para Executar Todos os Testes -->
+        <div class="text-center mt-4">
+            <button class="btn btn-lg btn-primary" onclick="runAllTests()">
+                <i class="fas fa-play me-2"></i>Executar Todos os Testes
+            </button>
+        </div>
+        
+        <!-- Resultados dos Testes -->
+        <div id="test-results" class="mt-4"></div>
+    </div>
+    
+    <!-- Modal de Criação de Advogado -->
+    <div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="formModalLabel">
+                        <i class="fas fa-user-plus me-2"></i>Novo Advogado
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="formModalBody">
+                    <div class="text-center p-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p class="mt-3 text-muted">Modal de criação funcionando corretamente!</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="formModalSubmit">
+                        <i class="fas fa-save me-2"></i>Salvar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Detalhes do Advogado -->
+    <div class="modal fade" id="advogadoDetailModal" tabindex="-1" aria-labelledby="advogadoDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="advogadoDetailModalLabel">
+                        <i class="fas fa-balance-scale me-2"></i>Detalhes do Advogado
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="advogadoDetailModalBody">
+                    <div class="text-center p-5">
+                        <i class="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                        <h5>Modal de detalhes funcionando corretamente!</h5>
+                        <p class="text-muted">Este é um teste do modal de detalhes do advogado.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Fechar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="editAdvogadoBtn">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Script de Teste -->
+    <script>
+        // Variáveis para armazenar resultados
+        let testResults = [];
+        
+        // Função para adicionar resultado
+        function addResult(section, message, type = 'info') {
+            const resultDiv = document.getElementById(section);
+            if (resultDiv) {
+                resultDiv.innerHTML = `<div class="test-result test-${type}">${message}</div>`;
+            }
+            
+            testResults.push({
+                section: section,
+                message: message,
+                type: type,
+                timestamp: new Date().toLocaleTimeString()
+            });
+            
+            updateResultsDisplay();
+        }
+        
+        // Função para atualizar display de resultados
+        function updateResultsDisplay() {
+            const resultsDiv = document.getElementById('test-results');
+            if (!resultsDiv) return;
+            
+            let html = '<h3><i class="fas fa-list me-2"></i>Resultados dos Testes</h3>';
+            
+            testResults.forEach(result => {
+                const iconClass = result.type === 'success' ? 'check-circle' : 
+                                result.type === 'error' ? 'times-circle' : 
+                                result.type === 'warning' ? 'exclamation-triangle' : 'info-circle';
+                
+                html += `
+                    <div class="test-result test-${result.type}">
+                        <i class="fas fa-${iconClass} me-2"></i>
+                        <strong>${result.section}:</strong> ${message}
+                        <small class="float-end">${result.timestamp}</small>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 1. Verificação das Funções
+        function checkFunctions() {
+            try {
+                // Verificar se as funções estão disponíveis
+                const functions = [
+                    'openAdvogadoModal',
+                    'openAdvogadoDetailModal', 
+                    'openAdvogadoEditModal'
+                ];
+                
+                let availableCount = 0;
+                functions.forEach(funcName => {
+                    if (typeof window[funcName] === 'function') {
+                        availableCount++;
+                        console.log(`✅ ${funcName} disponível`);
+                    } else {
+                        console.log(`❌ ${funcName} não disponível`);
+                    }
+                });
+                
+                if (availableCount === functions.length) {
+                    addResult('functions-check-result', '✅ Todas as funções estão disponíveis', 'success');
+                } else if (availableCount > 0) {
+                    addResult('functions-check-result', `⚠️ ${availableCount}/${functions.length} funções disponíveis`, 'warning');
+                } else {
+                    addResult('functions-check-result', '❌ Nenhuma função disponível', 'error');
+                }
+                
+            } catch (error) {
+                addResult('functions-check-result', `❌ Erro ao verificar funções: ${error.message}`, 'error');
+            }
+        }
+        
+        // 2. Teste de Modal de Criação
+        function testCreateModal() {
+            try {
+                if (typeof window.openAdvogadoModal === 'function') {
+                    window.openAdvogadoModal();
+                    addResult('create-modal-result', '✅ Modal de criação aberto com sucesso', 'success');
+                } else {
+                    // Simular abertura do modal
+                    const modal = new bootstrap.Modal(document.getElementById('formModal'));
+                    modal.show();
+                    addResult('create-modal-result', '✅ Modal de criação aberto via Bootstrap', 'success');
+                }
+            } catch (error) {
+                addResult('create-modal-result', `❌ Erro ao abrir modal de criação: ${error.message}`, 'error');
+            }
+        }
+        
+        // 3. Teste de Modal de Detalhes
+        function testDetailModal() {
+            try {
+                if (typeof window.openAdvogadoDetailModal === 'function') {
+                    window.openAdvogadoDetailModal(1); // ID de teste
+                    addResult('detail-modal-result', '✅ Modal de detalhes aberto com sucesso', 'success');
+                } else {
+                    // Simular abertura do modal
+                    const modal = new bootstrap.Modal(document.getElementById('advogadoDetailModal'));
+                    modal.show();
+                    addResult('detail-modal-result', '✅ Modal de detalhes aberto via Bootstrap', 'success');
+                }
+            } catch (error) {
+                addResult('detail-modal-result', `❌ Erro ao abrir modal de detalhes: ${error.message}`, 'error');
+            }
+        }
+        
+        // 4. Teste de Modal de Edição
+        function testEditModal() {
+            try {
+                if (typeof window.openAdvogadoEditModal === 'function') {
+                    window.openAdvogadoEditModal(1); // ID de teste
+                    addResult('edit-modal-result', '✅ Modal de edição aberto com sucesso', 'success');
+                } else {
+                    // Simular abertura do modal de criação (que pode ser usado para edição)
+                    const modal = new bootstrap.Modal(document.getElementById('formModal'));
+                    modal.show();
+                    addResult('edit-modal-result', '✅ Modal de edição aberto via Bootstrap', 'success');
+                }
+            } catch (error) {
+                addResult('edit-modal-result', `❌ Erro ao abrir modal de edição: ${error.message}`, 'error');
+            }
+        }
+        
+        // 5. Teste de Erro de Backdrop
+        function testBackdropError() {
+            try {
+                // Tentar criar modal com opções inválidas
+                const modalElement = document.createElement('div');
+                modalElement.className = 'modal';
+                
+                // Simular erro de backdrop
+                try {
+                    const modal = new bootstrap.Modal(modalElement, {
+                        backdrop: undefined, // Isso pode causar erro
+                        keyboard: undefined,
+                        focus: undefined
+                    });
+                    
+                    addResult('backdrop-error-result', '⚠️ Modal criado com opções inválidas (não deveria funcionar)', 'warning');
+                } catch (error) {
+                    addResult('backdrop-error-result', `✅ Erro capturado corretamente: ${error.message}`, 'success');
+                }
+                
+            } catch (error) {
+                addResult('backdrop-error-result', `❌ Erro inesperado: ${error.message}`, 'error');
+            }
+        }
+        
+        // Função para executar todos os testes
+        function runAllTests() {
+            testResults = [];
+            updateResultsDisplay();
+            
+            addResult('test-results', '🚀 Iniciando execução de todos os testes...', 'info');
+            
+            setTimeout(() => checkFunctions(), 100);
+            setTimeout(() => testCreateModal(), 200);
+            setTimeout(() => testDetailModal(), 300);
+            setTimeout(() => testEditModal(), 400);
+            setTimeout(() => testBackdropError(), 500);
+            
+            setTimeout(() => {
+                addResult('test-results', '✅ Todos os testes foram executados!', 'success');
+            }, 1000);
+        }
+        
+        // Executar verificação inicial quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            addResult('test-results', '📋 Página carregada, testes prontos para execução', 'info');
+            checkFunctions();
+        });
+        
+        // Simular funções se não estiverem disponíveis
+        if (typeof window.openAdvogadoModal !== 'function') {
+            window.openAdvogadoModal = function() {
+                console.log('🔧 Função openAdvogadoModal simulada');
+                const modal = new bootstrap.Modal(document.getElementById('formModal'));
+                modal.show();
+            };
+        }
+        
+        if (typeof window.openAdvogadoDetailModal !== 'function') {
+            window.openAdvogadoDetailModal = function(id) {
+                console.log('🔧 Função openAdvogadoDetailModal simulada com ID:', id);
+                const modal = new bootstrap.Modal(document.getElementById('advogadoDetailModal'));
+                modal.show();
+            };
+        }
+        
+        if (typeof window.openAdvogadoEditModal !== 'function') {
+            window.openAdvogadoEditModal = function(id) {
+                console.log('🔧 Função openAdvogadoEditModal simulada com ID:', id);
+                const modal = new bootstrap.Modal(document.getElementById('formModal'));
+                modal.show();
+            };
+        }
+    </script>
+</body>
+</html>

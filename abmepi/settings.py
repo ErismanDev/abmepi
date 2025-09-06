@@ -4,18 +4,31 @@ Django settings for abmepi project.
 
 from pathlib import Path
 import os
+<<<<<<< HEAD
 from decouple import config
+=======
+import dj_database_url
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
+<<<<<<< HEAD
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+=======
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-change-this-in-production')
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 'yes')
+
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 # Application definition
 INSTALLED_APPS = [
@@ -34,7 +47,10 @@ INSTALLED_APPS = [
     'django_tables2',
     'django_bootstrap5',
     'django_extensions',
+<<<<<<< HEAD
     # 'tinymce',  # Comentado temporariamente para debug
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # Local apps
     'core.apps.CoreConfig',
@@ -45,7 +61,10 @@ INSTALLED_APPS = [
     'beneficios.apps.BeneficiosConfig',
     'psicologia.apps.PsicologiaConfig',
     'hotel_transito.apps.HotelTransitoConfig',
+<<<<<<< HEAD
     'diretoria.apps.DiretoriaConfig',
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     'app.apps.AppConfig',
 ]
 
@@ -82,6 +101,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'abmepi.wsgi.application'
 
 # Database
+<<<<<<< HEAD
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -92,6 +112,26 @@ DATABASES = {
         'PORT': config('DB_PORT', default='5432'),
     }
 }
+=======
+# Configuração para DigitalOcean App Platform
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL)
+    }
+else:
+    # Fallback para configuração manual
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'abmepi'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', '11322361'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -203,6 +243,7 @@ os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+<<<<<<< HEAD
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
@@ -210,6 +251,15 @@ EMAIL_HOST_USER = 'siteabmepi@gmail.com'
 EMAIL_HOST_PASSWORD = 'tlvt twcz livv zetu'
 DEFAULT_FROM_EMAIL = 'siteabmepi@gmail.com'
 SERVER_EMAIL = 'siteabmepi@gmail.com'
+=======
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', 'siteabmepi@gmail.com')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', 'tlvt twcz livv zetu')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'siteabmepi@gmail.com')
+SERVER_EMAIL = os.getenv('SERVER_EMAIL', 'siteabmepi@gmail.com')
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 # Configurações de fallback (comentadas - descomente se necessário)
 # EMAIL_HOST = 'smtp.outlook.com'  # Outlook como alternativa
@@ -225,6 +275,7 @@ EMAIL_DAILY_LIMIT = 400  # Limite diário conservador
 EMAIL_FALLBACK_ENABLED = True  # Habilita fila de emails
 ADMIN_EMAILS = ['siteabmepi@gmail.com']  # Emails dos administradores
 
+<<<<<<< HEAD
 # TinyMCE Configuration
 TINYMCE_DEFAULT_CONFIG = {
     'height': 400,
@@ -305,3 +356,23 @@ TINYMCE_DEFAULT_CONFIG = {
     'file_picker_callback': 'function (callback, value, meta) { /* Implementar se necessário */ }',
     'setup': 'function (editor) { editor.on("change", function () { editor.save(); }); }'
 }
+=======
+# Security settings for production
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_REDIRECT_EXEMPT = []
+    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() in ('true', '1', 'yes')
+    SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'True').lower() in ('true', '1', 'yes')
+    CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'True').lower() in ('true', '1', 'yes')
+    X_FRAME_OPTIONS = 'DENY'
+
+# Configurações específicas para DigitalOcean App Platform
+if os.getenv('DIGITALOCEAN_APP_PLATFORM'):
+    # Desabilitar SSL redirect se estiver atrás de um load balancer
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

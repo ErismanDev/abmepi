@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+<<<<<<< HEAD
   db:
     image: postgres:15
     restart: always
@@ -31,6 +32,20 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=db
       - DB_PORT=5432
+=======
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG:-False}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DIGITALOCEAN_APP_PLATFORM=${DIGITALOCEAN_APP_PLATFORM:-True}
+      - SECURE_SSL_REDIRECT=${SECURE_SSL_REDIRECT:-False}
+      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE:-True}
+      - CSRF_COOKIE_SECURE=${CSRF_COOKIE_SECURE:-True}
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
       - EMAIL_HOST=${EMAIL_HOST}
       - EMAIL_PORT=${EMAIL_PORT}
       - EMAIL_USE_TLS=${EMAIL_USE_TLS}
@@ -38,6 +53,7 @@ services:
       - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
       - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
       - SERVER_EMAIL=${SERVER_EMAIL}
+<<<<<<< HEAD
       - ADMIN_EMAIL=${ADMIN_EMAIL}
     volumes:
       - static_volume:/app/staticfiles
@@ -54,6 +70,28 @@ services:
   nginx:
     image: nginx:alpine
     restart: always
+=======
+      - DATABASE_URL=${DATABASE_URL}
+    depends_on:
+      - db
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    restart: unless-stopped
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=${DB_NAME:-abmepi}
+      - POSTGRES_USER=${DB_USER:-postgres}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     ports:
       - "80:80"
       - "443:443"
@@ -61,12 +99,22 @@ services:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+<<<<<<< HEAD
       - ./ssl:/etc/nginx/ssl
     depends_on:
       - web
+=======
+    depends_on:
+      - web
+    restart: unless-stopped
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 volumes:
   postgres_data:
   static_volume:
+<<<<<<< HEAD
   media_volume:
   logs_volume:
+=======
+  media_volume:
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

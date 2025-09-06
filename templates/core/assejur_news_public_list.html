@@ -267,6 +267,7 @@
             color: var(--text-light);
             border: none;
             border-radius: 50%;
+<<<<<<< HEAD
             width: 20px;
             height: 20px;
             display: none;
@@ -276,11 +277,27 @@
             transition: all 0.2s ease;
             font-size: 0.7rem;
             z-index: 10;
+=======
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            font-size: 0.7rem;
+        }
+        
+        .search-clear.visible {
+            opacity: 1;
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         }
         
         .search-clear:hover {
             background: var(--accent-color);
             color: white;
+<<<<<<< HEAD
             transform: translateY(-50%) scale(1.1);
         }
         
@@ -296,6 +313,8 @@
             border-radius: 0.2rem;
             font-weight: 600;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         }
         
 
@@ -1085,7 +1104,11 @@
         }
     </style>
 </head>
+<<<<<<< HEAD
 <body data-news-functions="true">
+=======
+<body>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     <!-- Navigation igual às outras páginas do sistema -->
     <nav class="navbar navbar-expand-lg fixed-top modern-navbar">
         <div class="container">
@@ -1115,6 +1138,7 @@
                             <i class="fas fa-arrow-left me-2"></i>Voltar à Página Principal
                         </a>
                     </li>
+<<<<<<< HEAD
                     {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link modern-link" href="{% url 'core:assejur_news_list' %}">
@@ -1122,6 +1146,8 @@
                         </a>
                     </li>
                     {% endif %}
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 </ul>
             </div>
         </div>
@@ -1138,6 +1164,100 @@
     </section>
 
     <div class="container">
+<<<<<<< HEAD
+=======
+        <!-- Botão de pesquisa flutuante -->
+        <button class="search-toggle" onclick="toggleSearchPanel()" title="Abrir pesquisa avançada">
+            <i class="fas fa-search"></i>
+        </button>
+
+        <!-- Painel de pesquisa lateral -->
+        <div class="search-panel" id="searchPanel">
+            <div class="search-panel-header">
+                <h5>
+                    <i class="fas fa-filter me-2"></i>
+                    Pesquisa Avançada
+                </h5>
+                <button class="search-panel-close" onclick="toggleSearchPanel()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="search-panel-body">
+                <form method="get" id="searchForm">
+                    <div class="search-form-group">
+                        <label for="searchInput">
+                            <i class="fas fa-search me-2 text-primary"></i>Pesquisar
+                        </label>
+                        <input type="text" 
+                               name="search" 
+                               id="searchInput"
+                               class="search-form-control"
+                               placeholder="Digite para buscar notícias..."
+                               value="{{ request.GET.search|default:'' }}">
+                    </div>
+                    
+                    <div class="search-form-group">
+                        <label for="categoria">
+                            <i class="fas fa-tag me-2 text-primary"></i>Categoria
+                        </label>
+                        <select name="categoria" id="categoria" class="search-form-control">
+                            <option value="">Todas as categorias</option>
+                            {% for value, label in categorias %}
+                            <option value="{{ value }}" {% if request.GET.categoria == value %}selected{% endif %}>
+                                {{ label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="search-form-group">
+                        <label for="prioridade">
+                            <i class="fas fa-exclamation-triangle me-2 text-primary"></i>Prioridade
+                        </label>
+                        <select name="prioridade" id="prioridade" class="search-form-control">
+                            <option value="">Todas as prioridades</option>
+                            <option value="baixa" {% if request.GET.prioridade == 'baixa' %}selected{% endif %}>Baixa</option>
+                            <option value="media" {% if request.GET.prioridade == 'media' %}selected{% endif %}>Média</option>
+                            <option value="alta" {% if request.GET.prioridade == 'alta' %}selected{% endif %}>Alta</option>
+                            <option value="urgente" {% if request.GET.prioridade == 'urgente' %}selected{% endif %}>Urgente</option>
+                        </select>
+                    </div>
+                    
+                    <div class="search-form-group">
+                        <label for="data_inicio">
+                            <i class="fas fa-calendar me-2 text-primary"></i>Data Início
+                        </label>
+                        <input type="date" 
+                               name="data_inicio" 
+                               id="data_inicio"
+                               class="search-form-control"
+                               value="{{ request.GET.data_inicio|default:'' }}">
+                    </div>
+                    
+                    <div class="search-form-group">
+                        <label for="data_fim">
+                            <i class="fas fa-calendar me-2 text-primary"></i>Data Fim
+                        </label>
+                        <input type="date" 
+                               name="data_fim" 
+                               id="data_fim"
+                               class="search-form-control"
+                               value="{{ request.GET.data_fim|default:'' }}">
+                    </div>
+                    
+                    <div class="search-form-actions">
+                        <button type="submit" class="btn-search">
+                            <i class="fas fa-search me-2"></i>Pesquisar
+                        </button>
+                        <button type="button" class="btn-reset" onclick="resetSearchForm()">
+                            <i class="fas fa-times me-2"></i>Limpar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
         <!-- Barra de Pesquisa Discreta -->
         <div class="search-section" id="search-section">
@@ -1199,9 +1319,15 @@
                             <span class="featured-category">{{ noticia.get_categoria_display }}</span>
                             <span class="featured-priority">{{ noticia.get_prioridade_display }}</span>
                         </div>
+<<<<<<< HEAD
                                                  <a href="{% url 'core:assejur_news_detail' pk=noticia.id %}" class="btn-featured">
                              <i class="fas fa-arrow-right me-2"></i>Ler Notícia Completa
                          </a>
+=======
+                                                 <button class="btn-featured" type="button" onclick="openFeaturedNewsModal('{{ noticia.titulo|escapejs }}', '{{ noticia.get_categoria_display|escapejs }}', '{{ noticia.get_prioridade_display|escapejs }}', '{{ noticia.data_publicacao|date:"d/m/Y" }}', '{{ noticia.resumo|escapejs }}', '{% if noticia.imagem %}{{ noticia.imagem.url }}{% endif %}')">
+                             <i class="fas fa-arrow-right me-2"></i>Ler Notícia Completa
+                         </button>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                     </div>
                     <div class="col-lg-4">
                         {% if noticia.imagem %}
@@ -1222,7 +1348,11 @@
              <div class="row" id="newsGrid">
                  {% for noticia in noticias %}
                      {% if not forloop.first or not noticia.destaque %}
+<<<<<<< HEAD
                      <div class="col-lg-4 col-md-6 news-item" data-category="{{ noticia.categoria }}" data-title="{{ noticia.titulo|lower }}" data-content="{{ noticia.resumo|lower }}" data-news-id="{{ noticia.id }}">
+=======
+                     <div class="col-lg-4 col-md-6 news-item" data-category="{{ noticia.categoria }}" data-title="{{ noticia.titulo|lower }}" data-content="{{ noticia.resumo|lower }}">
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                          <div class="news-card">
                              {% if noticia.imagem %}
                              <div class="news-image">
@@ -1256,9 +1386,15 @@
                                   </div>
                                   
                                                                      <div class="news-actions">
+<<<<<<< HEAD
                                        <a href="{% url 'core:assejur_news_detail' pk=noticia.id %}" class="btn-read-more">
                                            <i class="fas fa-arrow-right me-2"></i>Ler Notícia Completa
                                        </a>
+=======
+                                       <button class="btn-read-more" type="button">
+                                           <i class="fas fa-arrow-right me-2"></i>Ler Notícia Completa
+                                       </button>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                                    </div>
                               </div>
                          </div>
@@ -1342,7 +1478,11 @@
               
               <div class="old-news-list">
                   {% for noticia in noticias_antigas %}
+<<<<<<< HEAD
                   <div class="old-news-item" data-category="{{ noticia.categoria }}" data-title="{{ noticia.titulo|lower }}" data-content="{{ noticia.resumo|lower }}" data-news-id="{{ noticia.id }}">
+=======
+                  <div class="old-news-item" data-category="{{ noticia.categoria }}" data-title="{{ noticia.titulo|lower }}" data-content="{{ noticia.resumo|lower }}">
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                       <div class="old-news-content">
                           <div class="old-news-info">
                               <div class="old-news-meta">
@@ -1359,9 +1499,15 @@
                               <p class="old-news-excerpt">{{ noticia.resumo|truncatechars:150 }}</p>
                           </div>
                           <div class="old-news-actions">
+<<<<<<< HEAD
                               <a href="{% url 'core:assejur_news_detail' pk=noticia.id %}" class="btn-old-news-read">
                                   <i class="fas fa-book-open me-2"></i>Ler Notícia
                               </a>
+=======
+                              <button class="btn-old-news-read" type="button">
+                                  <i class="fas fa-book-open me-2"></i>Ler Notícia
+                              </button>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                           </div>
                       </div>
                   </div>
@@ -1484,6 +1630,7 @@
              </div>
          </div>
          
+<<<<<<< HEAD
         <!-- Bootstrap 5 JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         
@@ -1579,6 +1726,13 @@
         
        <script>
             document.addEventListener('DOMContentLoaded', function() {
+=======
+         <!-- Bootstrap 5 JS -->
+         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+         
+         <script>
+         document.addEventListener('DOMContentLoaded', function() {
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
              // Navbar scroll effect
              const navbar = document.querySelector('.modern-navbar');
              window.addEventListener('scroll', function() {
@@ -1589,6 +1743,7 @@
                  }
              });
              
+<<<<<<< HEAD
              
             const searchInput = document.getElementById('searchInput');
             const newsItems = document.querySelectorAll('.news-item, .old-news-item');
@@ -1676,10 +1831,48 @@
                     }
                 }
             }
+=======
+             // Funções para o painel de pesquisa lateral
+             window.toggleSearchPanel = function() {
+                 const panel = document.getElementById('searchPanel');
+                 panel.classList.toggle('active');
+             }
+             
+             window.resetSearchForm = function() {
+                 document.getElementById('searchForm').reset();
+                 // Redirecionar para a página sem parâmetros
+                 window.location.href = window.location.pathname;
+             }
+             
+             const searchInput = document.getElementById('searchInput');
+             const newsItems = document.querySelectorAll('.news-item');
+             
+             // Função de pesquisa
+             function filterNews() {
+                 const searchTerm = searchInput.value.toLowerCase();
+                 
+                 newsItems.forEach(item => {
+                     const title = item.dataset.title;
+                     const content = item.dataset.content;
+                     const category = item.dataset.category;
+                     
+                     const matchesSearch = title.includes(searchTerm) || 
+                                         content.includes(searchTerm) || 
+                                         category.includes(searchTerm);
+                     
+                     if (matchesSearch) {
+                         item.style.display = 'block';
+                     } else {
+                         item.style.display = 'none';
+                     }
+                 });
+             }
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
              
              // Event listener para pesquisa em tempo real
              searchInput.addEventListener('input', filterNews);
              
+<<<<<<< HEAD
             // Pesquisa ao pressionar Enter
             searchInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
@@ -1711,6 +1904,18 @@
              
             // Função para abrir modal com notícia completa (escopo global)
             window.openNewsModal = function(newsData) {
+=======
+             // Pesquisa ao pressionar Enter
+             searchInput.addEventListener('keypress', function(e) {
+                 if (e.key === 'Enter') {
+                     e.preventDefault();
+                     filterNews();
+                 }
+             });
+             
+             // Função para abrir modal com notícia completa
+             function openNewsModal(newsData) {
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                  const modal = new bootstrap.Modal(document.getElementById('newsModal'));
                  const modalBody = document.getElementById('newsModalBody');
                  const modalTitle = document.getElementById('newsModalLabel');
@@ -1718,6 +1923,7 @@
                  // Atualizar título do modal
                  modalTitle.innerHTML = `<i class="fas fa-newspaper me-2"></i>${newsData.title}`;
                  
+<<<<<<< HEAD
                  // Buscar conteúdo completo nos dados JSON se tivermos o ID da notícia
                  if (newsData.id && newsData.id !== 'null' && newsData.id !== 'undefined') {
                      console.log('DEBUG: Buscando conteúdo para notícia ID:', newsData.id);
@@ -1739,6 +1945,8 @@
              
              // Função para mostrar o conteúdo do modal
              function showModalContent(modal, modalBody, newsData) {
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                  // Construir conteúdo do modal
                  let modalContent = `
                      <div class="news-modal-content">
@@ -1768,9 +1976,13 @@
                                  <p class="lead text-muted">${newsData.excerpt}</p>
                              </div>
                              <div class="news-modal-content-text">
+<<<<<<< HEAD
                                  <div class="news-content-full">
                                      ${newsData.content}
                                  </div>
+=======
+                                 ${newsData.content}
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                              </div>
                          </div>
                      </div>
@@ -1791,7 +2003,62 @@
                  return colors[priority] || 'secondary';
              }
              
+<<<<<<< HEAD
             // Os botões "Ler Notícia Completa" agora redirecionam diretamente para a página de detalhes
+=======
+             // Função para abrir modal da notícia em destaque
+             function openFeaturedNewsModal(title, category, priority, date, excerpt, image) {
+                 const newsData = {
+                     title: title,
+                     category: category,
+                     priority: priority.toLowerCase(),
+                     date: date,
+                     excerpt: excerpt,
+                     image: image || null,
+                     content: excerpt + ' Esta é uma notícia em destaque da ABMEPI com informações importantes sobre questões jurídicas relevantes para os associados.'
+                 };
+                 openNewsModal(newsData);
+             }
+             
+                           // Adicionar event listeners para botões "Ler Notícia Completa"
+              document.addEventListener('click', function(e) {
+                  if (e.target.closest('.btn-read-more')) {
+                      e.preventDefault();
+                      const newsCard = e.target.closest('.news-item');
+                      const newsData = {
+                          title: newsCard.querySelector('.news-title a').textContent,
+                          category: newsCard.querySelector('.news-category').textContent,
+                          priority: newsCard.querySelector('.news-priority').textContent.toLowerCase(),
+                          date: newsCard.querySelector('.news-date').textContent.trim(),
+                          excerpt: newsCard.querySelector('.news-excerpt').textContent,
+                          image: newsCard.querySelector('.news-image img')?.src || null,
+                          content: newsCard.querySelector('.news-excerpt').textContent + ' ' + 
+                                   (newsCard.querySelector('.news-excerpt').textContent.length > 100 ? 
+                                    'Esta notícia contém informações importantes sobre questões jurídicas relevantes para os associados da ABMEPI. Para obter mais detalhes ou esclarecimentos sobre este assunto, entre em contato com nossa equipe de assessoria jurídica.' : '')
+                      };
+                      
+                      openNewsModal(newsData);
+                  }
+                  
+                  // Event listener para botões "Ler Notícia" das notícias antigas
+                  if (e.target.closest('.btn-old-news-read')) {
+                      e.preventDefault();
+                      const oldNewsItem = e.target.closest('.old-news-item');
+                      const newsData = {
+                          title: oldNewsItem.querySelector('.old-news-title').textContent,
+                          category: oldNewsItem.querySelector('.old-news-category').textContent,
+                          priority: oldNewsItem.querySelector('.old-news-priority').textContent.toLowerCase(),
+                          date: oldNewsItem.querySelector('.old-news-date').textContent.trim(),
+                          excerpt: oldNewsItem.querySelector('.old-news-excerpt').textContent,
+                          image: null, // Notícias antigas não têm imagem
+                          content: oldNewsItem.querySelector('.old-news-excerpt').textContent + ' ' + 
+                                   'Esta é uma notícia do arquivo histórico da ABMEPI. Para informações mais detalhadas sobre esta notícia, entre em contato com nossa equipe ou consulte os registros oficiais da associação.'
+                      };
+                      
+                      openNewsModal(newsData);
+                  }
+              });
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
              
              // Event listener para botão de compartilhamento
              document.getElementById('shareNewsBtn').addEventListener('click', function() {

@@ -633,6 +633,7 @@
         
         .navbar .nav-link .badge {
             color: #fff !important;
+<<<<<<< HEAD
         }
         
         /* Estilos específicos para o cronômetro */
@@ -648,6 +649,27 @@
             vertical-align: middle !important;
             background-color: #ffc107 !important;
             color: #000 !important;
+=======
+            font-size: 0.5rem !important;
+            padding: 0 !important;
+            border-radius: 50% !important;
+            width: 1rem !important;
+            height: 1rem !important;
+            min-width: 1rem !important;
+            min-height: 1rem !important;
+            max-width: 1rem !important;
+            max-height: 1rem !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            line-height: 1 !important;
+            position: absolute !important;
+            top: -5px !important;
+            right: -5px !important;
+            background-color: #dc3545 !important;
+            border: 2px solid #fff !important;
+            z-index: 10 !important;
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             box-sizing: border-box !important;
         }
         
@@ -926,6 +948,7 @@
                 opacity: 1;
             }
         }
+<<<<<<< HEAD
         
         /* Estilos globais para checkboxes - marcadores pretos */
         .form-check-input {
@@ -958,6 +981,8 @@
             border-color: #000 !important;
             box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
         }
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     </style>
     {% block extra_css %}
     <!-- CSS Principal -->
@@ -1169,6 +1194,7 @@
                         </div>
                         {% endif %}
                         
+<<<<<<< HEAD
                         <!-- Módulo Diretoria - Apenas para administradores e advogados -->
                         {% if user_tipo == 'administrador_sistema' or user_tipo == 'advogado' %}
                         <div class="menu-item">
@@ -1204,6 +1230,8 @@
                         </div>
                         {% endif %}
                         
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                         <!-- Módulo Recursos - Apenas para administradores e atendentes gerais -->
                         {% if user_tipo == 'administrador_sistema' or user_tipo == 'atendente_geral' %}
                         <div class="menu-item">
@@ -1394,10 +1422,17 @@
                         <!-- Menu de funcionalidades -->
                         <div class="navbar-nav me-3">
                             <!-- Cronômetro de Sessão -->
+<<<<<<< HEAD
                             <div class="nav-item me-3">
                                 <div class="nav-link d-flex align-items-center">
                                     <i class="fas fa-clock me-2 text-warning" style="font-size: 1.1rem;"></i>
                                     <span class="badge bg-warning text-dark px-3 py-2" id="sessionTimer" style="font-size: 1rem; font-weight: 600; border-radius: 6px; display: inline-block; min-width: 60px; text-align: center;">30:00</span>
+=======
+                            <div class="nav-item">
+                                <div class="nav-link d-flex align-items-center">
+                                    <i class="fas fa-clock me-1 text-warning"></i>
+                                    <span class="badge bg-warning text-dark ms-2" id="sessionTimer">30:00</span>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                                 </div>
                             </div>
                             
@@ -1653,7 +1688,11 @@
                 try {
                     const adminSubmenu = document.getElementById('adminSubmenu');
                     if (adminSubmenu && !adminSubmenu.classList.contains('show')) {
+<<<<<<< HEAD
                         console.log('Inicializando menu...');
+=======
+                        console.log('Aplicando fallback JavaScript para o menu...');
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                         
                         // Adicionar funcionalidade manual de toggle
                         const adminLink = document.querySelector('a[href="#adminSubmenu"]');
@@ -1717,8 +1756,11 @@
                         } else {
                             timerDisplay.className = 'badge bg-success text-white ms-2';
                         }
+<<<<<<< HEAD
                     } else {
                         console.warn('⚠️ Elemento sessionTimer não encontrado durante atualização');
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                     }
                     
                     sessionTimeLeft--;
@@ -1797,6 +1839,7 @@
             }
             
             // Iniciar cronômetro
+<<<<<<< HEAD
             function initializeSessionTimer() {
                 try {
                     // Verificar se o elemento do timer existe
@@ -1860,6 +1903,42 @@
                 }
             }, 2000);
             
+=======
+            try {
+                sessionTimer = setInterval(updateSessionTimer, 1000);
+                
+                // Resetar timer em atividade do usuário
+                const userActivityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+                userActivityEvents.forEach(event => {
+                    try {
+                        document.addEventListener(event, resetSessionTimer, true);
+                    } catch (error) {
+                        console.warn('⚠️ Erro ao adicionar evento de atividade:', event, error);
+                    }
+                });
+                
+                // Resetar timer ao focar na janela
+                try {
+                    window.addEventListener('focus', resetSessionTimer);
+                } catch (error) {
+                    console.warn('⚠️ Erro ao adicionar evento de foco:', error);
+                }
+                
+                // Resetar timer ao voltar para a aba
+                try {
+                    document.addEventListener('visibilitychange', function() {
+                        if (!document.hidden) {
+                            resetSessionTimer();
+                        }
+                    });
+                } catch (error) {
+                    console.warn('⚠️ Erro ao adicionar evento de visibilidade:', error);
+                }
+            } catch (error) {
+                console.warn('⚠️ Erro ao inicializar timer de sessão:', error);
+            }
+            
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             // Sistema de notificações
             try {
                 const notificationBadge = document.getElementById('notificationBadge');

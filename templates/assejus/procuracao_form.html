@@ -4,6 +4,7 @@
     {% if procuracao %}Editar{% else %}Nova{% endif %} Procuração Ad Judicia - ASSEJUS
 {% endblock %}
 
+<<<<<<< HEAD
 {% block extra_css %}
 <style>
     .editor-container {
@@ -73,6 +74,8 @@
 </style>
 {% endblock %}
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 {% block content %}
 <div class="container-fluid">
     <div class="row">
@@ -122,6 +125,7 @@
                         <div class="row">
                             <!-- Outorgante -->
                             <div class="col-md-6 mb-3">
+<<<<<<< HEAD
                                 <label for="{{ form.outorgante_nome.id_for_label }}" class="form-label">
                                     <i class="fas fa-user me-1"></i>
                                     Outorgante (Associado) <span class="text-danger">*</span>
@@ -141,6 +145,18 @@
                                 <small class="form-text text-muted">
                                     Digite o nome do associado e selecione da lista de sugestões
                                 </small>
+=======
+                                <label for="{{ form.outorgante.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Outorgante (Associado) <span class="text-danger">*</span>
+                                </label>
+                                {{ form.outorgante }}
+                                {% if form.outorgante.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.outorgante.errors.0 }}
+                                    </div>
+                                {% endif %}
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                             </div>
 
                             <!-- Tipo de Poderes -->
@@ -314,6 +330,7 @@
                             </div>
                         </div>
 
+<<<<<<< HEAD
                         <!-- Poderes da Procuração -->
                         <div class="row">
                             <div class="col-md-6 mb-3">
@@ -581,6 +598,8 @@
                             </div>
                         </div>
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                         <!-- Texto Personalizado -->
                         <div class="row">
                             <div class="col-12 mb-3">
@@ -588,6 +607,7 @@
                                     <i class="fas fa-edit me-1"></i>
                                     Texto Personalizado da Procuração
                                 </label>
+<<<<<<< HEAD
                                 
                                 <!-- Editor Avançado -->
                                 <div class="editor-container">
@@ -721,6 +741,9 @@
                                     {{ form.texto_personalizado }}
                                 </div>
                                 
+=======
+                                {{ form.texto_personalizado }}
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                                 {% if form.texto_personalizado.errors %}
                                     <div class="invalid-feedback d-block">
                                         {{ form.texto_personalizado.errors.0 }}
@@ -776,6 +799,7 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 
 <!-- Modal de Procurar Modelos - Poderes Gerais -->
 <div class="modal fade" id="modelosPoderesGeraisModal" tabindex="-1">
@@ -1121,6 +1145,8 @@
         </div>
     </div>
 </div>
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 {% endblock %}
 
 {% block extra_js %}
@@ -1167,7 +1193,12 @@ function toggleProcessoEspecifico() {
 
 // Função para preencher dados do outorgante automaticamente
 function preencherDadosOutorgante() {
+<<<<<<< HEAD
     const associadoId = document.getElementById('id_outorgante').value;
+=======
+    const associadoSelect = document.getElementById('{{ form.outorgante.id_for_label }}');
+    const associadoId = associadoSelect.value;
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     if (associadoId) {
         // Fazer requisição AJAX para buscar dados do associado
@@ -1316,6 +1347,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
 });
+<<<<<<< HEAD
 
 // Autocomplete para outorgante
 document.addEventListener('DOMContentLoaded', function() {
@@ -2466,5 +2498,7 @@ function useModeloPoderes(modeloId, tipo) {
             alert('Erro ao carregar modelo');
         });
 }
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 </script>
 {% endblock %}

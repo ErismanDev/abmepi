@@ -496,6 +496,7 @@ class AtendimentoJuridicoForm(forms.ModelForm):
 
 
 class ProcessoJuridicoForm(forms.ModelForm):
+<<<<<<< HEAD
     # Campo personalizado para parte_cliente com autocomplete
     parte_cliente_nome = forms.CharField(
         max_length=200,
@@ -522,6 +523,8 @@ class ProcessoJuridicoForm(forms.ModelForm):
         label='Número do Processo'
     )
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     class Meta:
         model = ProcessoJuridico
         fields = [
@@ -535,7 +538,15 @@ class ProcessoJuridicoForm(forms.ModelForm):
                 'class': 'form-select',
                 'onchange': 'toggleProcessoFields()'
             }),
+<<<<<<< HEAD
             'numero_processo': forms.HiddenInput(),  # Campo oculto para armazenar o ID
+=======
+            'numero_processo': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '0001234-56.2024.8.26.0001',
+                'id': 'id_numero_processo'
+            }),
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             'vara_tribunal': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Ex: 1ª Vara Cível de São Paulo'
@@ -546,7 +557,11 @@ class ProcessoJuridicoForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Ex: 1º Batalhão de Polícia Militar'
             }),
+<<<<<<< HEAD
             'parte_cliente': forms.HiddenInput(),  # Campo oculto para armazenar o ID
+=======
+            'parte_cliente': forms.Select(attrs={'class': 'form-select'}),
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             'parte_contraria': forms.TextInput(attrs={
                 'class': 'form-control',
                 'id': 'id_parte_contraria'
@@ -564,6 +579,7 @@ class ProcessoJuridicoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+<<<<<<< HEAD
         # Se estiver editando, preencher os campos de nome
         if self.instance and self.instance.pk:
             if self.instance.parte_cliente:
@@ -571,6 +587,8 @@ class ProcessoJuridicoForm(forms.ModelForm):
             if self.instance.numero_processo:
                 self.fields['numero_processo_nome'].initial = str(self.instance.numero_processo)
         
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         # Filtrar advogados responsáveis (usuários com tipo 'advogado')
         self.fields['advogado_responsavel'].queryset = User.objects.filter(
             tipo_usuario='advogado'
@@ -618,6 +636,7 @@ class ProcessoJuridicoForm(forms.ModelForm):
         tipo_acao = cleaned_data.get('tipo_acao')
         tipo_processo_administrativo = cleaned_data.get('tipo_processo_administrativo')
         unidade_militar_apuracao = cleaned_data.get('unidade_militar_apuracao')
+<<<<<<< HEAD
         parte_cliente_nome = cleaned_data.get('parte_cliente_nome')
         parte_cliente_id = cleaned_data.get('parte_cliente')
         numero_processo_nome = cleaned_data.get('numero_processo_nome')
@@ -651,6 +670,8 @@ class ProcessoJuridicoForm(forms.ModelForm):
                 self.add_error('numero_processo_nome', 'Múltiplos processos encontrados. Selecione da lista de sugestões.')
         elif not numero_processo_id and not numero_processo_nome:
             self.add_error('numero_processo_nome', 'Digite o número do processo.')
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Validações para processos judiciais
         if tipo_processo == 'judicial':
@@ -744,9 +765,14 @@ class DocumentoJuridicoForm(forms.ModelForm):
                 self.fields['processo'].queryset = ProcessoJuridico.objects.filter(pk=processo_id)
                 self.fields['processo'].initial = processo_id
                 self.processo_info = processo
+<<<<<<< HEAD
                 print(f"✅ Processo pré-selecionado: {processo.numero_processo}")
             except ProcessoJuridico.DoesNotExist:
                 print(f"❌ Processo com ID {processo_id} não encontrado")
+=======
+            except ProcessoJuridico.DoesNotExist:
+                pass
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Se atendimento_id foi fornecido, filtrar processos relacionados
         elif atendimento_id:
@@ -886,6 +912,7 @@ class RelatorioJuridicoForm(forms.ModelForm):
 
 
 class ProcuracaoAdJudiciaForm(forms.ModelForm):
+<<<<<<< HEAD
     # Campo personalizado para outorgante com autocomplete
     outorgante_nome = forms.CharField(
         max_length=200,
@@ -899,15 +926,27 @@ class ProcuracaoAdJudiciaForm(forms.ModelForm):
         label='Nome do Outorgante'
     )
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     class Meta:
         model = ProcuracaoAdJudicia
         fields = [
             'outorgante', 'outorgados', 'tipo_poderes', 'processo_especifico',
             'numero_processo_especifico', 'cargo_militar', 'matricula_funcional', 'rgpmpi', 'endereco_completo',
+<<<<<<< HEAD
             'telefone_contato', 'email_contato', 'texto_personalizado', 'poderes_gerais', 'poderes_especificos', 'observacoes'
         ]
         widgets = {
             'outorgante': forms.HiddenInput(),  # Campo oculto para armazenar o ID
+=======
+            'telefone_contato', 'email_contato', 'texto_personalizado', 'observacoes'
+        ]
+        widgets = {
+            'outorgante': forms.Select(attrs={
+                'class': 'form-select',
+                'onchange': 'preencherDadosOutorgante()'
+            }),
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             'outorgados': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}),
             'tipo_poderes': forms.Select(attrs={
                 'class': 'form-select',
@@ -955,6 +994,7 @@ class ProcuracaoAdJudiciaForm(forms.ModelForm):
                 'rows': 20,
                 'placeholder': 'Deixe em branco para usar o texto padrão. Use as variáveis disponíveis.'
             }),
+<<<<<<< HEAD
             'poderes_gerais': forms.Textarea(attrs={
                 'class': 'form-control editor-texto',
                 'id': 'id_poderes_gerais',
@@ -967,6 +1007,8 @@ class ProcuracaoAdJudiciaForm(forms.ModelForm):
                 'rows': 8,
                 'placeholder': 'Descreva os poderes específicos da procuração...'
             }),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             'observacoes': forms.Textarea(attrs={
                 'class': 'form-control',
                 'rows': 3,
@@ -977,10 +1019,13 @@ class ProcuracaoAdJudiciaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
+<<<<<<< HEAD
         # Se estiver editando, preencher o campo de nome
         if self.instance and self.instance.pk and self.instance.outorgante:
             self.fields['outorgante_nome'].initial = str(self.instance.outorgante)
         
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         # Filtrar associados ativos
         try:
             from associados.models import Associado
@@ -1002,6 +1047,7 @@ class ProcuracaoAdJudiciaForm(forms.ModelForm):
         processo_especifico = cleaned_data.get('processo_especifico')
         numero_processo_especifico = cleaned_data.get('numero_processo_especifico')
         outorgados = cleaned_data.get('outorgados')
+<<<<<<< HEAD
         outorgante_nome = cleaned_data.get('outorgante_nome')
         outorgante_id = cleaned_data.get('outorgante')
         
@@ -1018,6 +1064,8 @@ class ProcuracaoAdJudiciaForm(forms.ModelForm):
                 self.add_error('outorgante_nome', 'Múltiplos associados encontrados. Selecione da lista de sugestões.')
         elif not outorgante_id:
             self.add_error('outorgante_nome', 'Selecione um associado.')
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         
         # Validação: pelo menos um advogado deve ser selecionado
         if not outorgados:

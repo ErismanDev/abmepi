@@ -553,6 +553,7 @@ class InstitucionalConfigForm(forms.ModelForm):
             'ativo': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             }),
+<<<<<<< HEAD
             # Widgets para campos de serviços
             'servicos_juridicos': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
@@ -599,13 +600,19 @@ class InstitucionalConfigForm(forms.ModelForm):
             'mostrar_cta': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             }),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Adicionar classes CSS para campos específicos
         for field_name, field in self.fields.items():
+<<<<<<< HEAD
             if field_name in ['ativo', 'mostrar_estatisticas', 'mostrar_servicos', 'mostrar_sobre', 'mostrar_cta'] or field_name.startswith('servicos_'):
+=======
+            if field_name == 'ativo':
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 field.widget.attrs.update({'class': 'form-check-input'})
             elif field_name in ['cor_primaria', 'cor_secundaria']:
                 field.widget.attrs.update({'class': 'form-control'})
@@ -667,6 +674,7 @@ class FeedPostForm(forms.ModelForm):
                 field.widget.attrs.update({'class': 'form-select'})
             else:
                 field.widget.attrs.update({'class': 'form-control'})
+<<<<<<< HEAD
     
     def clean_titulo(self):
         titulo = self.cleaned_data.get('titulo')
@@ -685,6 +693,8 @@ class FeedPostForm(forms.ModelForm):
         if not autor or len(autor.strip()) == 0:
             raise forms.ValidationError('O autor é obrigatório.')
         return autor.strip()
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 
 class AssejurNewsForm(forms.ModelForm):
@@ -695,7 +705,11 @@ class AssejurNewsForm(forms.ModelForm):
         model = AssejurNews
         fields = [
             'titulo', 'resumo', 'conteudo', 'categoria', 'icone', 'prioridade', 
+<<<<<<< HEAD
             'link_externo', 'tags', 'imagem', 'ativo', 'destaque'
+=======
+            'link_externo', 'tags', 'ativo', 'destaque'
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         ]
         widgets = {
             'titulo': forms.TextInput(attrs={
@@ -729,10 +743,13 @@ class AssejurNewsForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Tags separadas por vírgula'
             }),
+<<<<<<< HEAD
             'imagem': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': 'image/*'
             }),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             'destaque': forms.CheckboxInput(attrs={
                 'class': 'form-check-input'
             }),
@@ -937,6 +954,7 @@ def generate_secure_password(length=8):
 
 
 # =============================================================================
+<<<<<<< HEAD
 # FORMULÁRIOS PARA ATAS DE REUNIÃO - EDITOR AVANÇADO
 # =============================================================================
 
@@ -1186,6 +1204,8 @@ class AtaReuniaoSearchForm(forms.Form):
 
 
 # =============================================================================
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 # FORMULÁRIOS PARA DOCUMENTOS DE PROCESSOS JURÍDICOS
 # =============================================================================
 
@@ -1545,6 +1565,7 @@ class DocumentoProcessoReplaceForm(forms.ModelForm):
             return form_doc._validar_arquivo(arquivo)
         return arquivo
 
+<<<<<<< HEAD
 
 class ExPresidenteForm(forms.ModelForm):
     """
@@ -1701,3 +1722,5 @@ class HistoriaAssociacaoForm(forms.ModelForm):
         return None
 
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

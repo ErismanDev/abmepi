@@ -28,7 +28,10 @@ urlpatterns = [
     path('exportar/', views.exportar_associados, name='exportar_associados'),
     path('declaracao-pdf/', views.gerar_declaracao_associados_pdf, name='gerar_declaracao_associados_pdf'),
     path('requerimento-inscricao-pdf/', views.gerar_requerimento_inscricao_pdf, name='gerar_requerimento_inscricao_pdf'),
+<<<<<<< HEAD
     path('ficha-cadastro/<int:associado_id>/', views.gerar_ficha_cadastro_associado_pdf, name='gerar_ficha_cadastro_associado_pdf'),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     
     # Documentos
     path('<int:associado_id>/documentos/novo/', views.documento_create, name='documento_create'),

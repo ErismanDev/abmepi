@@ -143,17 +143,29 @@ staticfiles/
 # Environment variables
 .env
 .env.local
+<<<<<<< HEAD
 .env.production
 .env.staging
 
 # IDE
+=======
+.env.development
+.env.test
+.env.production
+
+# IDE files
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
+<<<<<<< HEAD
 # OS
+=======
+# OS generated files
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 .DS_Store
 .DS_Store?
 ._*
@@ -163,14 +175,27 @@ ehthumbs.db
 Thumbs.db
 
 # Backup files
+<<<<<<< HEAD
 *.backup
 *.bak
 *.tmp
 
+=======
+*.bak
+*.backup
+*.tmp
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 # Logs
 logs/
 *.log
 
+<<<<<<< HEAD
 # SSL certificates
 ssl/
 *.pem
@@ -195,12 +220,20 @@ teste_*.py
 
 # Node modules (if using any frontend build tools)
 node_modules/
+=======
+# Node modules (if using any frontend build tools)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 
 # Coverage reports
 htmlcov/
 .coverage
 .coverage.*
 
+<<<<<<< HEAD
 # Pytest
 .pytest_cache/
 
@@ -307,3 +340,15 @@ postgres_data/
 static_volume/
 media_volume/
 logs_volume/
+=======
+# Test cache
+.pytest_cache/
+.tox/
+
+# Documentation builds
+docs/_build/
+
+# Temporary files
+*.tmp
+*.temp
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070

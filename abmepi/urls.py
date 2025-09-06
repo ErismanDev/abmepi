@@ -33,9 +33,13 @@ urlpatterns = [
     path('beneficios/', include('beneficios.urls')),
     path('psicologia/', include('psicologia.urls')),
     path('hotel-transito/', include('hotel_transito.urls')),
+<<<<<<< HEAD
     path('diretoria/', include('diretoria.urls')),
     path('app/', include('app.urls')),
     # path('tinymce/', include('tinymce.urls')),  # Comentado temporariamente
+=======
+    path('app/', include('app.urls')),
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 ]
 
 if settings.DEBUG:

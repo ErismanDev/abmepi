@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Botão Salvar</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Debug - Botão Salvar</h1>
+        <p class="text-muted">Testando o botão salvar passo a passo</p>
+        
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Testes</h5>
+                    </div>
+                    <div class="card-body">
+                        <button type="button" class="btn btn-primary" onclick="testarSalvar()">
+                            <i class="fas fa-play me-2"></i>Testar Salvar
+                        </button>
+                        <button type="button" class="btn btn-secondary ms-2" onclick="testarValidacao()">
+                            <i class="fas fa-check me-2"></i>Testar Validação
+                        </button>
+                        <button type="button" class="btn btn-info ms-2" onclick="testarFetch()">
+                            <i class="fas fa-globe me-2"></i>Testar Fetch
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Console de Debug</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="console-output" class="bg-dark text-light p-3" style="height: 400px; overflow-y: auto; font-family: monospace; font-size: 12px;">
+                            <div>Console de debug...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Função para adicionar log ao console visual
+        function addLog(message, type = 'info') {
+            const consoleOutput = document.getElementById('console-output');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.innerHTML = `<span class="text-muted">[${timestamp}]</span> <span class="text-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'}">${message}</span>`;
+            consoleOutput.appendChild(logEntry);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        // Função para testar a validação
+        function testarValidacao() {
+            addLog('🔧 Testando validação...', 'info');
+            
+            // Simular dados do formulário
+            const dados = {
+                nome: 'João Silva',
+                cpf: '123.456.789-00',
+                oab: '123456',
+                uf_oab: 'SP',
+                email: 'joao@teste.com',
+                telefone: '(11) 9999-9999',
+                endereco: 'Rua Teste, 123',
+                cidade: 'São Paulo',
+                estado: 'SP',
+                cep: '01234-567',
+                data_inscricao_oab: '2023-01-01',
+                experiencia_anos: '5',
+                situacao: 'ativo',
+                ativo: 'on'
+            };
+            
+            addLog(`📝 Dados simulados: ${JSON.stringify(dados, null, 2)}`, 'info');
+            
+            // Verificar se todos os campos obrigatórios estão preenchidos
+            const camposObrigatorios = ['nome', 'cpf', 'oab', 'uf_oab', 'email', 'telefone', 'endereco', 'cidade', 'estado', 'cep', 'data_inscricao_oab', 'experiencia_anos', 'situacao'];
+            let todosPreenchidos = true;
+            
+            camposObrigatorios.forEach(campo => {
+                if (!dados[campo]) {
+                    addLog(`❌ Campo obrigatório vazio: ${campo}`, 'error');
+                    todosPreenchidos = false;
+                }
+            });
+            
+            if (todosPreenchidos) {
+                addLog('✅ Todos os campos obrigatórios estão preenchidos', 'success');
+            } else {
+                addLog('❌ Alguns campos obrigatórios estão vazios', 'error');
+            }
+            
+            return todosPreenchidos;
+        }
+        
+        // Função para testar o fetch
+        function testarFetch() {
+            addLog('🔧 Testando fetch...', 'info');
+            
+            const url = '/assejus/advogados/modal/novo/teste-post/';
+            addLog(`📡 URL: ${url}`, 'info');
+            
+            // Criar FormData com dados de teste
+            const formData = new FormData();
+            formData.append('nome', 'João Silva');
+            formData.append('cpf', '123.456.789-00');
+            formData.append('oab', '123456');
+            formData.append('uf_oab', 'SP');
+            formData.append('email', 'joao@teste.com');
+            formData.append('telefone', '(11) 9999-9999');
+            formData.append('endereco', 'Rua Teste, 123');
+            formData.append('cidade', 'São Paulo');
+            formData.append('estado', 'SP');
+            formData.append('cep', '01234-567');
+            formData.append('data_inscricao_oab', '2023-01-01');
+            formData.append('experiencia_anos', '5');
+            formData.append('situacao', 'ativo');
+            formData.append('ativo', 'on');
+            
+            addLog('📤 Enviando requisição POST...', 'info');
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                addLog(`📥 Resposta recebida: ${response.status} ${response.statusText}`, 'info');
+                addLog(`📋 Content-Type: ${response.headers.get('content-type')}`, 'info');
+                return response.json();
+            })
+            .then(data => {
+                addLog('✅ JSON recebido com sucesso', 'success');
+                addLog(`📊 Resposta: ${JSON.stringify(data, null, 2)}`, 'info');
+                
+                if (data.success) {
+                    addLog('🎉 Advogado salvo com sucesso!', 'success');
+                } else {
+                    addLog('❌ Erro na validação', 'error');
+                    if (data.errors) {
+                        addLog(`📝 Erros: ${JSON.stringify(data.errors, null, 2)}`, 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                addLog(`❌ Erro no fetch: ${error.message}`, 'error');
+                addLog(`🔍 Stack: ${error.stack}`, 'error');
+            });
+        }
+        
+        // Função para testar o salvar completo
+        function testarSalvar() {
+            addLog('🔧 Testando salvar completo...', 'info');
+            
+            // Primeiro testar validação
+            if (!testarValidacao()) {
+                addLog('❌ Validação falhou, abortando teste', 'error');
+                return;
+            }
+            
+            addLog('✅ Validação passou, testando fetch...', 'success');
+            
+            // Depois testar fetch
+            setTimeout(() => {
+                testarFetch();
+            }, 1000);
+        }
+        
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🚀 Página de debug carregada', 'success');
+            addLog('✅ Funções de teste disponíveis', 'success');
+            addLog('💡 Clique em "Testar Salvar" para executar o teste completo', 'info');
+        });
+    </script>
+</body>
+</html>

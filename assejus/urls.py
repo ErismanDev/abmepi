@@ -34,10 +34,13 @@ urlpatterns = [
     path('processos/<int:pk>/editar/', views.processo_edit, name='processo_edit'),
     path('processos/<int:pk>/andamentos-pdf/', views.processo_andamentos_pdf, name='processo_andamentos_pdf'),
     
+<<<<<<< HEAD
     # AJAX para autocomplete
     path('ajax/buscar-associados/', views.buscar_associados_ajax, name='buscar_associados_ajax'),
     path('ajax/buscar-processos/', views.buscar_processos_ajax, name='buscar_processos_ajax'),
     
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     # Andamentos (acessíveis apenas através dos processos)
     path('andamentos/novo/', views.andamento_create, name='andamento_create'),
     path('andamentos/<int:pk>/', views.andamento_detail, name='andamento_detail'),
@@ -138,10 +141,13 @@ urlpatterns = [
 
     # URLs para modais
     path('modal-base/', views.modal_base, name='modal_base'),
+<<<<<<< HEAD
     
     # URLs para modelos de poderes
     path('modelos-poderes/<str:tipo>/', views.listar_modelos_poderes, name='modelos_poderes_list'),
     path('api/salvar-modelo-poderes/', views.salvar_modelo_poderes, name='api_salvar_modelo_poderes'),
     path('api/obter-modelo-poderes/<int:modelo_id>/', views.obter_modelo_poderes, name='api_obter_modelo_poderes'),
     path('api/excluir-modelo-poderes/<int:modelo_id>/', views.excluir_modelo_poderes, name='excluir_modelo_poderes'),
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 ]

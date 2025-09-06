@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teste de Integração - Modal Base + Erros ASEJUS{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        background-color: #fff5f5 !important;
+    }
+    
+    .form-group.has-error .form-label,
+    .has-error .form-label {
+        color: #dc3545 !important;
+        font-weight: bold !important;
+    }
+    
+    .invalid-feedback {
+        display: block !important;
+        color: #dc3545 !important;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .invalid-feedback i {
+        color: #dc3545;
+    }
+    
+    .alert-danger {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .alert-danger .alert-heading {
+        color: #721c24;
+    }
+    
+    .is-invalid {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4><i class="fas fa-cogs me-2"></i>Teste de Integração - Modal Base + Sistema de Erros</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Este teste verifica se a integração entre o modal base e o sistema de exibição de erros está funcionando.
+                        Clique no botão abaixo para testar.
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Testes Disponíveis</h5>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" onclick="openTestModal()">
+                                    <i class="fas fa-plus me-2"></i>Abrir Modal de Teste
+                                </button>
+                                <button type="button" class="btn btn-warning" onclick="testErrorIntegration()">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Testar Integração de Erros
+                                </button>
+                                <button type="button" class="btn btn-info" onclick="checkModalStructure()">
+                                    <i class="fas fa-search me-2"></i>Verificar Estrutura do Modal
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Status</h5>
+                            <div id="statusArea">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Clique em "Abrir Modal de Teste" para começar
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Teste (Usando o Modal Base) -->
+<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="formModalLabel">
+                    <i class="fas fa-user-plus me-2"></i>Teste de Integração - Modal Base
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="formModalBody">
+                <!-- Conteúdo será inserido aqui -->
+                <div class="text-center p-5">
+                    <p class="text-muted">Modal de teste carregado...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="formModalSubmit">
+                    <i class="fas fa-save me-2"></i>Testar Integração
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Função para atualizar status
+    function updateStatus(message, type = 'info') {
+        const statusDiv = document.getElementById('statusArea');
+        const alertClass = type === 'error' ? 'alert-danger' : 
+                         type === 'success' ? 'alert-success' : 
+                         type === 'warning' ? 'alert-warning' : 'alert-info';
+        
+        statusDiv.innerHTML = `<div class="alert ${alertClass}">
+            <i class="fas fa-${type === 'error' ? 'times-circle' : 
+                               type === 'success' ? 'check-circle' : 
+                               type === 'warning' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+            ${message}
+        </div>`;
+    }
+
+    // Função para abrir o modal de teste
+    function openTestModal() {
+        updateStatus('Abrindo modal de teste...', 'info');
+        
+        // Carregar formulário de teste
+        const modalBody = document.getElementById('formModalBody');
+        modalBody.innerHTML = `
+            <!-- Informações sobre campos obrigatórios -->
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                <strong>Campos obrigatórios:</strong> Nome, CPF, OAB, UF OAB, E-mail, Telefone, Endereço, Cidade, Estado, CEP, Data de Inscrição OAB, Anos de Experiência e Situação.
+            </div>
+            
+            <!-- Formulário de Teste -->
+            <form id="testForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="nome" class="form-label">
+                                Nome <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="nome" name="nome" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="cpf" class="form-label">
+                                CPF <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" value="">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="oab" class="form-label">
+                                OAB <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="oab" name="oab" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="uf_oab" class="form-label">
+                                UF OAB <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="uf_oab" name="uf_oab">
+                                <option value="">---------</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="MG">Minas Gerais</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="endereco" class="form-label">
+                                Endereço <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" class="form-control" id="endereco" name="endereco" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="data_inscricao_oab" class="form-label">
+                                Data de Inscrição OAB <span class="text-danger">*</span>
+                            </label>
+                            <input type="date" class="form-control" id="data_inscricao_oab" name="data_inscricao_oab" value="">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="experiencia_anos" class="form-label">
+                                Anos de Experiência <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" class="form-control" id="experiencia_anos" name="experiencia_anos" value="">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label for="situacao" class="form-label">
+                                Situação <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="situacao" name="situacao">
+                                <option value="">---------</option>
+                                <option value="ativo">Ativo</option>
+                                <option value="inativo">Inativo</option>
+                                <option value="suspenso">Suspenso</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        `;
+        
+        // Abrir modal
+        const modal = new bootstrap.Modal(document.getElementById('formModal'));
+        modal.show();
+        
+        updateStatus('Modal aberto! Formulário carregado. Clique em "Testar Integração"', 'success');
+    }
+
+    // Função para testar a integração de erros
+    function testErrorIntegration() {
+        updateStatus('Testando integração de erros...', 'warning');
+        
+        // Simular resposta de erro do servidor (exatamente como retornado pelo Django)
+        const mockErrorResponse = {
+            success: false,
+            message: 'Erro na validação do formulário.',
+            errors: {
+                'cpf': ['Este campo é obrigatório.'],
+                'oab': ['Este campo é obrigatório.'],
+                'uf_oab': ['Este campo é obrigatório.'],
+                'endereco': ['Este campo é obrigatório.'],
+                'data_inscricao_oab': ['Este campo é obrigatório.'],
+                'experiencia_anos': ['Este campo é obrigatório.'],
+                'situacao': ['Este campo é obrigatório.']
+            },
+            error_count: 7,
+            error_summary: 'Formulário com 7 erro(s) de validação'
+        };
+        
+        // Simular o que acontece no modal base quando há erros
+        console.log('🔍 Simulando resposta de erro do servidor:', mockErrorResponse);
+        
+        // Verificar se o modal body existe
+        const modalBody = document.getElementById('formModalBody');
+        if (!modalBody) {
+            console.error('❌ Modal body não encontrado');
+            updateStatus('Erro: Modal body não encontrado', 'error');
+            return;
+        }
+        
+        // Simular o processo de exibição de erros
+        if (mockErrorResponse.errors && Object.keys(mockErrorResponse.errors).length > 0) {
+            console.log('🔍 Chamando showErrorSummaryInModal...');
+            
+            // Verificar se a função existe
+            if (typeof showErrorSummaryInModal === 'function') {
+                showErrorSummaryInModal(mockErrorResponse.errors, mockErrorResponse.error_count, mockErrorResponse.error_summary);
+            } else {
+                console.error('❌ Função showErrorSummaryInModal não encontrada');
+                updateStatus('Erro: Função showErrorSummaryInModal não encontrada', 'error');
+                return;
+            }
+        }
+        
+        // Aplicar estilos de erro aos campos
+        setTimeout(() => {
+            console.log('🔍 Chamando applyErrorStylesToFields...');
+            
+            if (typeof applyErrorStylesToFields === 'function') {
+                applyErrorStylesToFields(mockErrorResponse.errors);
+            } else {
+                console.error('❌ Função applyErrorStylesToFields não encontrada');
+                updateStatus('Erro: Função applyErrorStylesToFields não encontrada', 'error');
+                return;
+            }
+            
+            // Rolar para o primeiro campo com erro
+            console.log('🔍 Chamando scrollToFirstError...');
+            
+            if (typeof scrollToFirstError === 'function') {
+                scrollToFirstError();
+            } else {
+                console.error('❌ Função scrollToFirstError não encontrada');
+                updateStatus('Erro: Função scrollToFirstError não encontrada', 'error');
+                return;
+            }
+        }, 100);
+        
+        updateStatus('Teste de integração executado! Verifique o console e o modal', 'success');
+    }
+
+    // Função para verificar a estrutura do modal
+    function checkModalStructure() {
+        const modalBody = document.getElementById('formModalBody');
+        if (!modalBody) {
+            updateStatus('❌ Modal body não encontrado', 'error');
+            return;
+        }
+        
+        const info = {
+            'Modal body encontrado': !!modalBody,
+            'HTML length': modalBody.innerHTML?.length || 0,
+            'Children count': modalBody.children?.length || 0,
+            'Form encontrado': !!modalBody.querySelector('form'),
+            'Campos encontrados': modalBody.querySelectorAll('input, select, textarea').length
+        };
+        
+        console.log('🔍 Estrutura do modal:', info);
+        
+        let statusHtml = '<h6>Estrutura do Modal:</h6><ul>';
+        Object.entries(info).forEach(([key, value]) => {
+            statusHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+        });
+        statusHtml += '</ul>';
+        
+        updateStatus(statusHtml, 'info');
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        updateStatus('Sistema de teste de integração carregado!', 'success');
+        
+        // Verificar se as funções do modal base estão disponíveis
+        console.log('🔍 Verificando funções do modal base:');
+        console.log('  - showErrorSummaryInModal:', typeof showErrorSummaryInModal);
+        console.log('  - applyErrorStylesToFields:', typeof applyErrorStylesToFields);
+        console.log('  - createFieldErrorMessage:', typeof createFieldErrorMessage);
+        console.log('  - scrollToFirstError:', typeof scrollToFirstError);
+    });
+</script>
+{% endblock %}

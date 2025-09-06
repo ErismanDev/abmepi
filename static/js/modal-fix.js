@@ -556,6 +556,7 @@ function setupErrorInterception() {
             // Tentar preservar as funções de modal
             setTimeout(preserveModalFunctions, 100);
         }
+<<<<<<< HEAD
         
         // Verificar se é erro de openFeaturedNewsModal não definida
         if (event.message && event.message.includes('openFeaturedNewsModal is not defined')) {
@@ -567,6 +568,8 @@ function setupErrorInterception() {
             // Tentar preservar as funções de modal de notícias
             setTimeout(preserveNewsModalFunctions, 100);
         }
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
     });
     
     console.log('✅ Interceptação de erros configurada');
@@ -611,6 +614,7 @@ function preserveModalFunctions() {
     }
 }
 
+<<<<<<< HEAD
 // Função para garantir que funções de modal de notícias não sejam perdidas
 function preserveNewsModalFunctions() {
     console.log('🔧 Preservando funções de modal de notícias...');
@@ -684,6 +688,8 @@ function preserveNewsModalFunctions() {
     }
 }
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
 // Função principal de inicialização
 function initializeModalFixes() {
     console.log('🚀 Inicializando correções de modal...');
@@ -707,9 +713,12 @@ function initializeModalFixes() {
         // Preservar funções de modal
         setTimeout(preserveModalFunctions, 500);
         
+<<<<<<< HEAD
         // Preservar funções de modal de notícias
         setTimeout(preserveNewsModalFunctions, 500);
         
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         console.log('✅ Correções de modal inicializadas com sucesso');
     } else {
         console.warn('⚠️ Não foi possível aplicar correções de modal');

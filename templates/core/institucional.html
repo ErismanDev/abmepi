@@ -349,8 +349,11 @@
                 height: auto;
             }
             
+<<<<<<< HEAD
         }
             
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             .brand-logo {
                 width: 45px;
                 height: 45px;
@@ -1728,6 +1731,7 @@
             transform: scale(1.05);
         }
         
+<<<<<<< HEAD
         /* Estilos para imagens do carrossel de notícias */
         .news-image {
             margin-bottom: 1rem;
@@ -1765,6 +1769,8 @@
             opacity: 0.7;
         }
         
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
         .news-meta {
             display: flex;
             justify-content: space-between;
@@ -4161,6 +4167,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
+<<<<<<< HEAD
                         <a class="nav-link modern-link" href="#comunidade">
                             <i class="fas fa-users me-2"></i>Comunidade
                         </a>
@@ -4174,6 +4181,11 @@
                         <a class="nav-link modern-link" href="{% url 'core:historia_associacao' %}">
                             <i class="fas fa-history me-2"></i>Nossa História
                         </a>
+=======
+                                                    <a class="nav-link modern-link" href="#comunidade">
+                                <i class="fas fa-users me-2"></i>
+                            </a>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                     </li>
                     <li class="nav-item">
                         <a class="nav-link modern-link" href="#contato">
@@ -4207,6 +4219,7 @@
             </div>
             
             <div class="sidebar-content">
+<<<<<<< HEAD
                 <!-- Galeria de Ex-Presidentes (movido para o início) -->
                 <div class="sidebar-item ex-presidents">
                     <!-- Presidente Atual -->
@@ -4240,6 +4253,8 @@
                     </div>
                 </div>
                 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 <!-- Seja Associado -->
                 <div class="sidebar-item membership">
                     <div class="sidebar-icon">
@@ -4401,6 +4416,7 @@
                     </div>
                 </div>
                 
+<<<<<<< HEAD
                 
                 <!-- História da Associação -->
                 <div class="sidebar-item history">
@@ -4417,6 +4433,43 @@
                     </div>
                 </div>
                 
+=======
+                <!-- Redes Sociais -->
+                <div class="sidebar-item social-media">
+                    <div class="sidebar-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <div class="sidebar-text">
+                        <h5>Siga a ABMEPI nas redes sociais</h5>
+                        <p>Fique por dentro das novidades e eventos</p>
+                        <div class="social-buttons">
+                            {% if facebook_url %}
+                            <a href="{{ facebook_url }}" target="_blank" class="social-btn facebook" title="Facebook">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            {% endif %}
+                            {% if instagram_url %}
+                            <a href="{{ instagram_url }}" target="_blank" class="social-btn instagram" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            {% endif %}
+                            {% if linkedin_url %}
+                            <a href="{{ linkedin_url }}" target="_blank" class="social-btn linkedin" title="LinkedIn">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            {% endif %}
+                            {% if youtube_url %}
+                            <a href="{{ youtube_url }}" target="_blank" class="social-btn youtube" title="YouTube">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+
+                
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 <!-- Contato Rápido -->
                 <div class="sidebar-item contact">
                     <div class="sidebar-icon">
@@ -4821,7 +4874,10 @@
                     margin-top: 1rem;
                 }
                 
+<<<<<<< HEAD
                 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 .hotel-phone {
                     display: flex;
                     align-items: center;
@@ -5602,6 +5658,7 @@
                                                 <!-- Título Principal -->
                                                 <h2 class="article-headline">{{ noticia.titulo }}</h2>
                                                 
+<<<<<<< HEAD
                                                 <!-- Imagem da Notícia -->
                                                 {% if noticia.imagem %}
                                                 <div class="article-image">
@@ -5616,6 +5673,8 @@
                                                 </div>
                                                 {% endif %}
                                                 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                                                 <!-- Lead do Artigo -->
                                                 <div class="article-lead">
                                                     {% if noticia.resumo %}
@@ -5700,6 +5759,7 @@
                                                 hyphens: auto;
                                             }
                                             
+<<<<<<< HEAD
                                             .article-image {
                                                 margin: 1rem 0;
                                                 text-align: center;
@@ -5717,6 +5777,8 @@
                                                 font-style: italic;
                                             }
                                             
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                                             .article-lead {
                                                 margin-bottom: 1.5rem;
                                             }
@@ -6355,6 +6417,7 @@
             .post-image {
                 position: relative;
                 width: 100%;
+<<<<<<< HEAD
                 min-height: 300px;
                 max-height: 500px;
                 overflow: hidden;
@@ -6410,12 +6473,23 @@
             
             .post-image:hover::before {
                 opacity: 1;
+=======
+                height: 400px;
+                overflow: hidden;
+            }
+            
+            .post-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             }
             
             .brand-overlay {
                 position: absolute;
                 top: 1rem;
                 left: 1rem;
+<<<<<<< HEAD
                 background: rgba(0,0,0,0.8);
                 color: white;
                 padding: 0.5rem 1rem;
@@ -6480,6 +6554,15 @@
             .post-image:hover::after {
                 opacity: 1;
             }
+=======
+                background: rgba(0,0,0,0.7);
+                color: white;
+                                padding: 0.3rem 0.6rem;
+                                border-radius: 15px;
+                                font-size: 0.8rem;
+                                font-weight: 600;
+                            }
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                             
                             /* Área de Interação */
                             .post-interactions {
@@ -8108,6 +8191,7 @@
             }
             newsItem.setAttribute('data-news-id', news.id);
             
+<<<<<<< HEAD
             // Construir HTML da imagem
             const imageHtml = news.imagem ? 
                 `<div class="news-image">
@@ -8117,6 +8201,8 @@
                     <i class="${news.icone} fa-3x"></i>
                 </div>`;
 
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             newsItem.innerHTML = `
                 <div class="news-header">
                     <i class="${news.icone}"></i>
@@ -8132,12 +8218,19 @@
                         </div>
                     ` : ''}
                 </div>
+<<<<<<< HEAD
                 ${imageHtml}
+=======
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 <h4 class="news-title">${news.titulo}</h4>
                 <p class="news-excerpt">${news.resumo}</p>
                 <div class="news-meta">
                     <span class="news-date">${formatDateForDisplay(news.data)}</span>
+<<<<<<< HEAD
                     <span class="news-link" style="cursor: pointer;" onclick="showNewsModal(${news.id}, '${news.titulo}', '${news.categoria}', '${formatDateForDisplay(news.data)}', '${news.conteudo || news.resumo}', '${news.link || ''}', '${news.imagem || ''}')">Ler mais</span>
+=======
+                    <span class="news-link" style="cursor: pointer;" onclick="showNewsModal(${news.id}, '${news.titulo}', '${news.categoria}', '${formatDateForDisplay(news.data)}', '${news.conteudo || news.resumo}', '${news.link || ''}')">Ler mais</span>
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
                 </div>
             `;
             
@@ -8627,6 +8720,139 @@
             
             // ===== FUNÇÕES PARA MODAL DE NOTÍCIAS =====
             
+<<<<<<< HEAD
+=======
+            // Carrossel Instagram
+            document.addEventListener('DOMContentLoaded', function() {
+                const instagramCarousel = document.getElementById('instagramCarousel');
+                const prevInstagramBtn = document.getElementById('prevInstagramBtn');
+                const nextInstagramBtn = document.getElementById('nextInstagramBtn');
+                const instagramIndicators = document.querySelectorAll('.instagram-indicator-btn');
+                
+                if (!instagramCarousel) return;
+                
+                let currentInstagramSlide = 0;
+                const totalInstagramSlides = document.querySelectorAll('.instagram-post').length;
+                
+                function updateInstagramCarousel() {
+                    // Esconder todos os posts
+                    document.querySelectorAll('.instagram-post').forEach((post, index) => {
+                        post.classList.remove('active');
+                    });
+                    
+                    // Mostrar apenas o post ativo
+                    const activePost = document.querySelectorAll('.instagram-post')[currentInstagramSlide];
+                    if (activePost) {
+                        activePost.classList.add('active');
+                    }
+                    
+                    // Atualizar indicadores
+                    instagramIndicators.forEach((indicator, index) => {
+                        indicator.classList.toggle('active', index === currentInstagramSlide);
+                    });
+                    
+                    // Atualizar estado dos botões
+                    if (prevInstagramBtn) {
+                        prevInstagramBtn.disabled = currentInstagramSlide === 0;
+                    }
+                    if (nextInstagramBtn) {
+                        nextInstagramBtn.disabled = currentInstagramSlide === totalInstagramSlides - 1;
+                    }
+                }
+                
+                function goToInstagramSlide(slideIndex) {
+                    if (slideIndex >= 0 && slideIndex < totalInstagramSlides) {
+                        currentInstagramSlide = slideIndex;
+                        updateInstagramCarousel();
+                    }
+                }
+                
+                // Event listeners para os botões de navegação
+                if (prevInstagramBtn) {
+                    prevInstagramBtn.addEventListener('click', () => {
+                        if (currentInstagramSlide > 0) {
+                            currentInstagramSlide--;
+                            updateInstagramCarousel();
+                        }
+                    });
+                }
+                
+                if (nextInstagramBtn) {
+                    nextInstagramBtn.addEventListener('click', () => {
+                        if (currentInstagramSlide < totalInstagramSlides - 1) {
+                            currentInstagramSlide++;
+                            updateInstagramCarousel();
+                        }
+                    });
+                }
+                
+                // Event listeners para os indicadores
+                instagramIndicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => {
+                        goToInstagramSlide(index);
+                    });
+                });
+                
+                // Navegação por teclado
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft' && currentInstagramSlide > 0) {
+                        currentInstagramSlide--;
+                        updateInstagramCarousel();
+                    } else if (e.key === 'ArrowRight' && currentInstagramSlide < totalInstagramSlides - 1) {
+                        currentInstagramSlide++;
+                        updateInstagramCarousel();
+                    }
+                });
+                
+                // Suporte para touch/swipe em dispositivos móveis
+                let touchStartX = 0;
+                let touchEndX = 0;
+                let isDragging = false;
+                
+                instagramCarousel.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                    isDragging = true;
+                });
+                
+                instagramCarousel.addEventListener('touchmove', (e) => {
+                    if (isDragging) {
+                        e.preventDefault();
+                    }
+                });
+                
+                instagramCarousel.addEventListener('touchend', (e) => {
+                    if (isDragging) {
+                        touchEndX = e.changedTouches[0].screenX;
+                        handleInstagramSwipe();
+                        isDragging = false;
+                    }
+                });
+                
+                function handleInstagramSwipe() {
+                    const swipeThreshold = 50;
+                    const diff = touchStartX - touchEndX;
+                    
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            // Swipe para esquerda - próximo slide
+                            if (currentInstagramSlide < totalInstagramSlides - 1) {
+                                currentInstagramSlide++;
+                                updateInstagramCarousel();
+                            }
+                        } else {
+                            // Swipe para direita - slide anterior
+                            if (currentInstagramSlide > 0) {
+                                currentInstagramSlide--;
+                                updateInstagramCarousel();
+                            }
+                        }
+                    }
+                }
+                
+                // Inicializar carrossel Instagram
+                updateInstagramCarousel();
+            });
+>>>>>>> c00fe10f4bf493986d435556591fabb7aae9e070
             
             // Função para carregar notícia no modal
             function loadNewsInModal(newsId) {

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teste Simples - ASEJUS{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4><i class="fas fa-check-circle me-2"></i>Teste Simples Funcionando!</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-success">
+                        ✅ Se você está vendo esta mensagem, o template base está funcionando corretamente!
+                    </p>
+                    <p class="text-muted">
+                        Agora você pode acessar o teste completo de erros no modal.
+                    </p>
+                    <a href="{% url 'assejus:teste_erros_modal' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-2"></i>Ir para Teste de Erros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
