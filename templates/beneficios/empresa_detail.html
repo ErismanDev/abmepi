@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Empresa - {{ empresa.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:empresa_list' %}">Empresas</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ empresa.nome }}</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">{{ empresa.nome }}</h1>
+            <p class="text-muted mb-0">{{ empresa.cidade }}, {{ empresa.estado }}</p>
+        </div>
+        <div class="btn-group" role="group">
+            <a href="{% url 'beneficios:empresa_update' empresa.pk %}" class="btn btn-primary">
+                <i class="fas fa-edit me-2"></i>Editar
+            </a>
+            <a href="{% url 'beneficios:empresa_delete' empresa.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Excluir
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações principais -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informações da Empresa
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nome Fantasia:</label>
+                            <p class="mb-0">{{ empresa.nome }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Razão Social:</label>
+                            <p class="mb-0">{{ empresa.razao_social|default:"Não informado" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">CNPJ:</label>
+                            <p class="mb-0">{{ empresa.cnpj|default:"Não informado" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Inscrição Estadual:</label>
+                            <p class="mb-0">{{ empresa.inscricao_estadual|default:"Não informado" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Cidade:</label>
+                            <p class="mb-0">{{ empresa.cidade }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Estado:</label>
+                            <p class="mb-0">{{ empresa.estado }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Telefone:</label>
+                            <p class="mb-0">{{ empresa.telefone|default:"Não informado" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Email:</label>
+                            <p class="mb-0">{{ empresa.email|default:"Não informado" }}</p>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">Endereço:</label>
+                            <p class="mb-0">{{ empresa.endereco|default:"Não informado" }}</p>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label fw-bold">Descrição:</label>
+                            <p class="mb-0">{{ empresa.descricao|linebreaks|default:"Sem descrição" }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Status:</label>
+                            <span class="badge bg-{{ empresa.ativo|yesno:'success,danger' }}">
+                                {{ empresa.ativo|yesno:'Ativo,Inativo' }}
+                            </span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Data de Cadastro:</label>
+                            <p class="mb-0">{{ empresa.data_cadastro|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Convênios da Empresa -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-handshake me-2"></i>
+                        Convênios Ativos
+                    </h5>
+                    <a href="{% url 'beneficios:convenio_create' %}?empresa={{ empresa.pk }}" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus me-2"></i>Novo Convênio
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if convenios %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Convênio</th>
+                                        <th>Categoria</th>
+                                        <th>Validade</th>
+                                        <th>Desconto</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for convenio in convenios %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'beneficios:convenio_detail' convenio.pk %}" class="text-decoration-none">
+                                                {{ convenio.titulo }}
+                                            </a>
+                                        </td>
+                                        <td>{{ convenio.categoria }}</td>
+                                        <td>{{ convenio.data_fim|date:"d/m/Y"|default:"Indefinida" }}</td>
+                                        <td>{{ convenio.desconto }}</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'beneficios:convenio_detail' convenio.pk %}" 
+                                                   class="btn btn-outline-primary" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'beneficios:convenio_update' convenio.pk %}" 
+                                                   class="btn btn-outline-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-handshake fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Nenhum convênio ativo encontrado para esta empresa.</p>
+                            <a href="{% url 'beneficios:convenio_create' %}?empresa={{ empresa.pk }}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Criar Primeiro Convênio
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com informações adicionais -->
+        <div class="col-lg-4">
+            <!-- Estatísticas -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Estatísticas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h4 class="text-primary mb-1">{{ convenios.count }}</h4>
+                                <small class="text-muted">Convênios</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h4 class="text-success mb-1">
+                                {{ convenios|dictsort:"ativo"|length }}
+                            </h4>
+                            <small class="text-muted">Ativos</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações rápidas -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'beneficios:convenio_create' %}?empresa={{ empresa.pk }}" class="btn btn-success">
+                            <i class="fas fa-handshake me-2"></i>Novo Convênio
+                        </a>
+                        <a href="{% url 'beneficios:empresa_update' empresa.pk %}" class="btn btn-primary">
+                            <i class="fas fa-edit me-2"></i>Editar Empresa
+                        </a>
+                        <a href="{% url 'beneficios:empresa_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

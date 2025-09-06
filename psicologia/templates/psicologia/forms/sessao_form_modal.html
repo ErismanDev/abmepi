@@ -1,0 +1,104 @@
+{% load static %}
+
+<form id="sessaoForm" method="post">
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.paciente.id_for_label }}" class="form-label">{{ form.paciente.label }}</label>
+                {{ form.paciente }}
+                {% if form.paciente.errors %}
+                    <div class="invalid-feedback">{{ form.paciente.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Paciente que participará da sessão</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.psicologo.id_for_label }}" class="form-label">{{ form.psicologo.label }}</label>
+                {{ form.psicologo }}
+                {% if form.psicologo.errors %}
+                    <div class="invalid-feedback">{{ form.psicologo.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Psicólogo responsável pela sessão</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.data_hora.id_for_label }}" class="form-label">{{ form.data_hora.label }}</label>
+                <input type="datetime-local" 
+                       name="{{ form.data_hora.name }}" 
+                       id="{{ form.data_hora.id_for_label }}" 
+                       class="form-control" 
+                       value="{% if form.data_hora.value %}{{ form.data_hora.value|date:'Y-m-d\TH:i' }}{% endif %}"
+                       required>
+                {% if form.data_hora.errors %}
+                    <div class="invalid-feedback">{{ form.data_hora.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Data e hora da sessão</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.duracao.id_for_label }}" class="form-label">{{ form.duracao.label }}</label>
+                {{ form.duracao }}
+                {% if form.duracao.errors %}
+                    <div class="invalid-feedback">{{ form.duracao.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Duração em minutos (30-120)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.tipo_sessao.id_for_label }}" class="form-label">{{ form.tipo_sessao.label }}</label>
+                {{ form.tipo_sessao }}
+                {% if form.tipo_sessao.errors %}
+                    <div class="invalid-feedback">{{ form.tipo_sessao.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Tipo de sessão a ser realizada</div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                    <div class="invalid-feedback">{{ form.status.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Status atual da sessão</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.valor.id_for_label }}" class="form-label">{{ form.valor.label }}</label>
+                {{ form.valor }}
+                {% if form.valor.errors %}
+                    <div class="invalid-feedback">{{ form.valor.errors.0 }}</div>
+                {% endif %}
+                <div class="form-text">Valor da sessão (opcional)</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-3">
+        <label for="{{ form.observacoes.id_for_label }}" class="form-label">{{ form.observacoes.label }}</label>
+        {{ form.observacoes }}
+        {% if form.observacoes.errors %}
+            <div class="invalid-feedback">{{ form.observacoes.errors.0 }}</div>
+        {% endif %}
+        <div class="form-text">Observações sobre a sessão, objetivos, etc.</div>
+    </div>
+</form>

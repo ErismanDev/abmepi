@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        font-size: 0.9rem;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .status-toggle {
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .status-toggle:hover {
+        transform: scale(1.1);
+    }
+    
+    .filters-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .filters-card .form-control,
+    .filters-card .form-select {
+        border: none;
+        border-radius: 0.5rem;
+    }
+    
+    .filters-card .form-label {
+        color: white;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header da Página -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <h2 class="mb-2">{{ title }}</h2>
+                    <p class="text-muted mb-0">{{ subtitle }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card filters-card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label for="categoria" class="form-label">
+                                <i class="fas fa-tag me-2"></i>Categoria
+                            </label>
+                            <select name="categoria" id="categoria" class="form-select">
+                                <option value="">Todas as categorias</option>
+                                {% for value, label in categorias %}
+                                <option value="{{ value }}" {% if request.GET.categoria == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="prioridade" class="form-label">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Prioridade
+                            </label>
+                            <select name="prioridade" id="prioridade" class="form-select">
+                                <option value="">Todas as prioridades</option>
+                                {% for value, label in prioridades %}
+                                <option value="{{ value }}" {% if request.GET.prioridade == value %}selected{% endif %}>
+                                    {{ label }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="ativo" class="form-label">
+                                <i class="fas fa-toggle-on me-2"></i>Status
+                            </label>
+                            <select name="ativo" id="ativo" class="form-select">
+                                <option value="">Todos os status</option>
+                                <option value="true" {% if request.GET.ativo == 'true' %}selected{% endif %}>Ativo</option>
+                                <option value="false" {% if request.GET.ativo == 'false' %}selected{% endif %}>Inativo</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-light me-2">
+                                <i class="fas fa-search me-2"></i>Filtrar
+                            </button>
+                            <a href="{% url 'core:assejur_news_list' %}" class="btn btn-outline-light">
+                                <i class="fas fa-times me-2"></i>Limpar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ações -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">
+                                <i class="fas fa-newspaper me-2 text-primary"></i>Notícias Jurídicas
+                            </h5>
+                            <p class="text-muted mb-0">Total: {{ noticias.count }} notícias</p>
+                        </div>
+                        <div>
+                            <a href="{% url 'core:assejur_news_create' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-2"></i>Nova Notícia
+                            </a>
+                            <a href="{% url 'core:institucional_edit' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i>Voltar ao Institucional
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Notícias -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if noticias %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th style="width: 80px;">Imagem</th>
+                                    <th style="width: 50px;">Ícone</th>
+                                    <th style="width: 150px;">Categoria</th>
+                                    <th style="width: 200px;">Título</th>
+                                    <th style="width: 250px;">Resumo</th>
+                                    <th style="width: 100px;">Prioridade</th>
+                                    <th style="width: 100px;">Status</th>
+                                    <th style="width: 120px;">Data</th>
+                                    <th style="width: 150px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for noticia in noticias %}
+                                <tr>
+                                    <td>
+                                        {% if noticia.imagem %}
+                                        <img src="{{ noticia.imagem.url }}" alt="{{ noticia.titulo }}" class="img-thumbnail" style="width: 60px; height: 45px; object-fit: cover;">
+                                        {% else %}
+                                        <div class="text-center text-muted" style="width: 60px; height: 45px; background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 0.25rem; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-image fa-lg"></i>
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <i class="{{ noticia.icone }} fa-2x text-primary"></i>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ noticia.get_categoria_display }}</span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ noticia.titulo }}</strong>
+                                        {% if noticia.destaque %}
+                                        <span class="badge bg-warning ms-2">
+                                            <i class="fas fa-star"></i> Destaque
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ noticia.resumo|truncatechars:100 }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{{ noticia.get_prioridade_color }}">
+                                            {{ noticia.get_prioridade_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="status-toggle" 
+                                              onclick="toggleStatus({{ noticia.id }}, '{{ noticia.ativo|yesno:'true,false' }}')"
+                                              title="Clique para alterar status">
+                                            {% if noticia.ativo %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle"></i> Ativo
+                                            </span>
+                                            {% else %}
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times-circle"></i> Inativo
+                                            </span>
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ noticia.data_publicacao|date:"d/m/Y" }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'core:assejur_news_update' noticia.pk %}" 
+                                               class="btn btn-sm btn-outline-primary" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'core:assejur_news_delete' noticia.pk %}" 
+                                               class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginação das notícias" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.prioridade %}&prioridade={{ request.GET.prioridade }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.prioridade %}&prioridade={{ request.GET.prioridade }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.prioridade %}&prioridade={{ request.GET.prioridade }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.prioridade %}&prioridade={{ request.GET.prioridade }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-newspaper fa-4x text-muted mb-4"></i>
+                        <h5 class="text-muted">Nenhuma notícia encontrada</h5>
+                        <p class="text-muted">Crie a primeira notícia da assessoria jurídica.</p>
+                        <a href="{% url 'core:assejur_news_create' %}" class="btn btn-success">
+                            <i class="fas fa-plus me-2"></i>Criar Primeira Notícia
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleStatus(noticiaId, currentStatus) {
+    const newStatus = currentStatus === 'true' ? 'false' : 'true';
+    const statusText = newStatus === 'true' ? 'ativar' : 'desativar';
+    
+    if (confirm(`Deseja realmente ${statusText} esta notícia?`)) {
+        fetch(`/core/assejur/noticias/${noticiaId}/toggle-status/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Recarregar a página para mostrar as mudanças
+                location.reload();
+            } else {
+                alert('Erro ao alterar status: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao alterar status da notícia');
+        });
+    }
+}
+
+// Auto-submit dos filtros quando alterados
+document.addEventListener('DOMContentLoaded', function() {
+    const filterSelects = document.querySelectorAll('#categoria, #prioridade, #ativo');
+    filterSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+    });
+});
+</script>
+{% endblock %}

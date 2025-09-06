@@ -1,0 +1,1507 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+{% block title %}Lista de Associados - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/modais.css' %}">
+<link rel="stylesheet" href="{% static 'associados/css/error-styles.css' %}">
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Estilos para campos com erro */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+}
+
+/* Estilos para alertas de erro */
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.alert-danger .alert-heading {
+    color: #721c24;
+}
+
+/* Animação para campos com erro */
+.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Estilo para botões de ação */
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para o resumo de erros */
+.error-summary {
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    border: 1px solid #feb2b2;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Estilos para pesquisa moderna */
+.search-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.search-toggle {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 20px rgba(13, 110, 253, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(13, 110, 253, 0.4);
+    color: white;
+}
+
+.search-toggle i {
+    font-size: 1.25rem;
+}
+
+.search-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1001;
+    overflow-y: auto;
+}
+
+.search-panel.active {
+    right: 0;
+}
+
+.search-panel-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-panel-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.search-panel-header h5 i {
+    margin-right: 0.75rem;
+}
+
+.search-panel-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.search-panel-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.search-panel-body {
+    padding: 2rem;
+}
+
+.search-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.search-form-group label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.search-form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+}
+
+.search-form-control:focus {
+    outline: none;
+    border-color: #0d6efd;
+    background: white;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.search-form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    background: #f8f9fa;
+    cursor: pointer;
+}
+
+.search-form-select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    background: white;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.search-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.search-btn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.search-btn-primary {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+}
+
+.search-btn-primary:hover {
+    background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(13, 110, 253, 0.3);
+}
+
+.search-btn-outline {
+    background: transparent;
+    color: #6c757d;
+    border: 2px solid #6c757d;
+}
+
+.search-btn-outline:hover {
+    background: #6c757d;
+    color: white;
+}
+
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.search-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .search-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .search-toggle {
+        top: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .search-toggle i {
+        font-size: 1rem;
+    }
+}
+
+/* Animações */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-users me-2"></i>
+        Lista de Associados
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-primary" onclick="openAssociadoModal()">
+                <i class="fas fa-plus me-1"></i>
+                Novo Associado
+            </button>
+        </div>
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="fas fa-download me-1"></i>
+                Exportar
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'associados:exportar_associados' %}">
+                    <i class="fas fa-file-csv me-2"></i>CSV
+                </a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Botão de pesquisa flutuante -->
+<button class="search-toggle" onclick="toggleSearchPanel()" title="Abrir pesquisa avançada">
+    <i class="fas fa-search"></i>
+</button>
+
+<!-- Painel de pesquisa lateral -->
+<div class="search-panel" id="searchPanel">
+    <div class="search-panel-header">
+        <h5>
+            <i class="fas fa-filter me-2"></i>
+            Pesquisa Avançada
+        </h5>
+        <button class="search-panel-close" onclick="toggleSearchPanel()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="search-panel-body">
+        <form method="get" id="searchForm">
+            <div class="search-form-group">
+                <label for="{{ search_form.nome.id_for_label }}">
+                    <i class="fas fa-user me-2 text-primary"></i>Nome
+                </label>
+                <input type="text" 
+                       name="{{ search_form.nome.name }}" 
+                       id="{{ search_form.nome.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="Digite o nome do associado"
+                       value="{{ search_form.nome.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.cpf.id_for_label }}">
+                    <i class="fas fa-id-card me-2 text-primary"></i>CPF
+                </label>
+                <input type="text" 
+                       name="{{ search_form.cpf.name }}" 
+                       id="{{ search_form.cpf.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="XXX.XXX.XXX-XX"
+                       value="{{ search_form.cpf.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.matricula_militar.id_for_label }}">
+                    <i class="fas fa-id-badge me-2 text-primary"></i>Matrícula Militar
+                </label>
+                <input type="text" 
+                       name="{{ search_form.matricula_militar.name }}" 
+                       id="{{ search_form.matricula_militar.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="Digite a matrícula"
+                       value="{{ search_form.matricula_militar.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.situacao.id_for_label }}">
+                    <i class="fas fa-clipboard-check me-2 text-primary"></i>Situação
+                </label>
+                <select name="{{ search_form.situacao.name }}" 
+                        id="{{ search_form.situacao.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.situacao.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.situacao.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.estado.id_for_label }}">
+                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Estado
+                </label>
+                <select name="{{ search_form.estado.name }}" 
+                        id="{{ search_form.estado.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.estado.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.estado.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.tipo_socio.id_for_label }}">
+                    <i class="fas fa-users me-2 text-primary"></i>Tipo de Sócio
+                </label>
+                <select name="{{ search_form.tipo_socio.name }}" 
+                        id="{{ search_form.tipo_socio.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.tipo_socio.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.tipo_socio.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.tipo_profissional.id_for_label }}">
+                    <i class="fas fa-shield-alt me-2 text-primary"></i>Tipo de Profissional
+                </label>
+                <select name="{{ search_form.tipo_profissional.name }}" 
+                        id="{{ search_form.tipo_profissional.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.tipo_profissional.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.tipo_profissional.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.ativo.id_for_label }}">
+                    <i class="fas fa-toggle-on me-2 text-primary"></i>Status
+                </label>
+                <select name="{{ search_form.ativo.name }}" 
+                        id="{{ search_form.ativo.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.ativo.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.ativo.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.nome_pai.id_for_label }}">
+                    <i class="fas fa-male me-2 text-primary"></i>Nome do Pai
+                </label>
+                <input type="text" 
+                       name="{{ search_form.nome_pai.name }}" 
+                       id="{{ search_form.nome_pai.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="Digite o nome do pai"
+                       value="{{ search_form.nome_pai.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.nome_mae.id_for_label }}">
+                    <i class="fas fa-female me-2 text-primary"></i>Nome da Mãe
+                </label>
+                <input type="text" 
+                       name="{{ search_form.nome_mae.name }}" 
+                       id="{{ search_form.nome_mae.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="Digite o nome da mãe"
+                       value="{{ search_form.nome_mae.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.tipo_documento.id_for_label }}">
+                    <i class="fas fa-id-card-alt me-2 text-primary"></i>Tipo de Documento
+                </label>
+                <select name="{{ search_form.tipo_documento.name }}" 
+                        id="{{ search_form.tipo_documento.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.tipo_documento.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.tipo_documento.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-actions">
+                <button type="submit" class="search-btn search-btn-primary">
+                    <i class="fas fa-search"></i>
+                    Buscar
+                </button>
+                <a href="{% url 'associados:associado_list' %}" class="search-btn search-btn-outline">
+                    <i class="fas fa-times"></i>
+                    Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Overlay para fechar o painel -->
+<div class="search-overlay" id="searchOverlay" onclick="toggleSearchPanel()"></div>
+
+<!-- Indicador de pesquisa ativa -->
+{% if request.GET.nome or request.GET.cpf or request.GET.matricula_militar or request.GET.situacao or request.GET.estado or request.GET.tipo_socio or request.GET.tipo_profissional or request.GET.ativo %}
+<div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-info-circle me-2"></i>
+        <div>
+            <strong>Pesquisa ativa:</strong> 
+            {% if request.GET.nome %}<span class="badge bg-primary me-1">Nome: {{ request.GET.nome }}</span>{% endif %}
+            {% if request.GET.cpf %}<span class="badge bg-primary me-1">CPF: {{ request.GET.cpf }}</span>{% endif %}
+            {% if request.GET.matricula_militar %}<span class="badge bg-primary me-1">Matrícula: {{ request.GET.matricula_militar }}</span>{% endif %}
+            {% if request.GET.situacao %}<span class="badge bg-primary me-1">Situação: {{ request.GET.situacao }}</span>{% endif %}
+            {% if request.GET.estado %}<span class="badge bg-primary me-1">Estado: {{ request.GET.estado }}</span>{% endif %}
+            {% if request.GET.tipo_socio %}<span class="badge bg-primary me-1">Tipo: {{ request.GET.tipo_socio }}</span>{% endif %}
+            {% if request.GET.tipo_profissional %}<span class="badge bg-primary me-1">Profissional: {{ request.GET.tipo_profissional }}</span>{% endif %}
+            {% if request.GET.ativo %}<span class="badge bg-primary me-1">Status: {% if request.GET.ativo == 'true' %}Ativo{% else %}Inativo{% endif %}</span>{% endif %}
+        </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}
+
+<!-- Estatísticas -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total de Associados
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ total_associados }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Associados Ativos
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ associados_ativos }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Associados Inativos
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ associados_inativos }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Estados Representados
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ associados_por_estado|length }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-map-marker-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de associados -->
+<div class="table-container">
+    <div class="table-header">
+        <h5>
+            <i class="fas fa-list me-2"></i>
+            Associados Encontrados
+        </h5>
+        <div class="header-actions">
+            <span class="text-muted">
+                {{ page_obj.start_index }}-{{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+            </span>
+        </div>
+    </div>
+        {% if associados %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Matrícula Militar</th>
+                        <th>Situação</th>
+                        <th>Estado</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for associado in associados %}
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if associado.foto %}
+                                    <img src="{{ associado.foto.url }}" alt="Foto" class="avatar-rectangular me-3">
+                                {% else %}
+                                    <div class="avatar-placeholder me-3">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold">{{ associado.nome }}</div>
+                                    <small class="text-muted">{{ associado.get_posto_graduacao_display }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ associado.cpf }}</td>
+                        <td>{{ associado.matricula_militar }}</td>
+                        <td>
+                            <span class="badge bg-{% if associado.situacao == 'ativo' %}success{% elif associado.situacao == 'reserva' %}info{% elif associado.situacao == 'reformado' %}warning{% else %}secondary{% endif %}">
+                                {{ associado.get_situacao_display }}
+                            </span>
+                        </td>
+                        <td>{{ associado.estado }}</td>
+                        <td>
+                            {% if associado.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'associados:associado_detail' associado.pk %}" class="btn btn-sm btn-outline-primary" title="Ver Detalhes Completos">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Editar" onclick="openAssociadoEditModal({{ associado.pk }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <a href="{% url 'financeiro:mensalidade_associado_list' associado.pk %}" class="btn btn-sm btn-outline-info" title="Recebíveis">
+                                    <i class="fas fa-credit-card"></i>
+                                </a>
+                                <a href="{% url 'associados:gerar_declaracao_associados_pdf' %}?associado_id={{ associado.pk }}" class="btn btn-sm btn-outline-success" title="Gerar Declaração PDF" target="_blank">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                                <a href="{% url 'associados:gerar_ficha_cadastro_associado_pdf' associado.pk %}" class="btn btn-sm btn-outline-danger" title="Gerar Ficha de Cadastro PDF" target="_blank">
+                                    <i class="fas fa-id-card"></i>
+                                </a>
+                                <a href="{% url 'associados:associado_delete' associado.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if is_paginated %}
+        <div class="pagination-container">
+            <nav aria-label="Paginação">
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}{% if request.GET.matricula_militar %}&matricula_militar={{ request.GET.matricula_militar }}{% endif %}{% if request.GET.situacao %}&situacao={{ request.GET.situacao }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}{% if request.GET.matricula_militar %}&matricula_militar={{ request.GET.matricula_militar }}{% endif %}{% if request.GET.situacao %}&situacao={{ request.GET.situacao }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}{% if request.GET.matricula_militar %}&matricula_militar={{ request.GET.matricula_militar }}{% endif %}{% if request.GET.situacao %}&situacao={{ request.GET.situacao }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}{% if request.GET.matricula_militar %}&matricula_militar={{ request.GET.matricula_militar }}{% endif %}{% if request.GET.situacao %}&situacao={{ request.GET.situacao }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.nome %}&nome={{ request.GET.nome }}{% endif %}{% if request.GET.cpf %}&cpf={{ request.GET.cpf }}{% endif %}{% if request.GET.matricula_militar %}&matricula_militar={{ request.GET.matricula_militar }}{% endif %}{% if request.GET.situacao %}&situacao={{ request.GET.situacao }}{% endif %}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="table-info">
+            <div class="info-text">
+                <i class="fas fa-users"></i>
+                <span>Nenhum associado encontrado</span>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn btn-primary" onclick="openAssociadoModal()">
+                    <i class="fas fa-plus me-1"></i>
+                    Cadastrar Primeiro Associado
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'associados/js/modais.js' %}"></script>
+<script>
+// Função para abrir modal de edição usando Bootstrap diretamente
+function openAssociadoEditModal(associadoId) {
+    console.log('Abrindo modal para associado:', associadoId);
+    
+    // Fazer requisição para obter o formulário
+    fetch(`/associados/associados/modal/${associadoId}/editar/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.form_html) {
+                // Criar modal dinamicamente
+                const modalId = 'editModal_' + associadoId;
+                const modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="${modalId}Label">
+                                        <i class="fas fa-edit me-2"></i>Editar Associado
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${data.form_html}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </button>
+                                    <button type="submit" form="associadoForm" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remover modal anterior se existir
+                const existingModal = document.getElementById(modalId);
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Adicionar novo modal ao body
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Configurar envio do formulário
+                const form = document.getElementById('associadoForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        submitAssociadoForm(form, associadoId, modalId);
+                    });
+                }
+                
+                // Abrir modal
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                
+            } else {
+                throw new Error('Formulário não recebido do servidor');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao abrir modal:', error);
+            alert('Erro ao abrir modal: ' + error.message);
+        });
+}
+
+// Função para enviar formulário
+function submitAssociadoForm(form, associadoId, modalId) {
+    const formData = new FormData(form);
+    
+    fetch(`/associados/associados/modal/${associadoId}/editar/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Sucesso - fechar modal e recarregar página
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+            
+            // Mostrar mensagem de sucesso
+            alert(data.message || 'Associado atualizado com sucesso!');
+            
+            // Recarregar página se necessário
+            if (data.reload) {
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } else {
+            // Erro de validação - aplicar visualização de erros
+            if (data.errors && Object.keys(data.errors).length > 0) {
+                console.log('❌ Erros de validação detectados:', data.errors);
+                
+                // Exibir resumo dos erros no topo do modal
+                showErrorSummaryInModal(data.errors, Object.keys(data.errors).length, data.message);
+                
+                // Aplicar estilos de erro aos campos
+                setTimeout(() => {
+                    applyErrorStylesToFields(data.errors);
+                    scrollToFirstError();
+                }, 100);
+            } else {
+                alert(data.message || 'Erro na validação do formulário.');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        alert('Erro ao enviar formulário: ' + error.message);
+    });
+}
+
+// Função para alternar a visibilidade do painel de pesquisa
+function toggleSearchPanel() {
+    const searchPanel = document.getElementById('searchPanel');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchToggle = document.querySelector('.search-toggle');
+
+    if (searchPanel.classList.contains('active')) {
+        searchPanel.classList.remove('active');
+        searchOverlay.classList.remove('active');
+        searchToggle.classList.remove('active'); // Remove a classe de ativo do botão
+    } else {
+        searchPanel.classList.add('active');
+        searchOverlay.classList.add('active');
+        searchToggle.classList.add('active'); // Adiciona a classe de ativo ao botão
+    }
+}
+
+// Verificar se Bootstrap está disponível
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Verificando sistema de modais...');
+    console.log('Bootstrap disponível:', typeof bootstrap);
+    
+    // Inicializar funcionalidades da pesquisa
+    initializeSearchFeatures();
+    
+    // Configurar envio de formulários via AJAX
+    setupFormSubmission();
+});
+
+/**
+ * Configurar envio de formulários via AJAX
+ */
+function setupFormSubmission() {
+    // Interceptar envio de formulários de associado
+    document.addEventListener('submit', function(e) {
+        if (e.target.id === 'associadoForm') {
+            e.preventDefault();
+            console.log('📝 Formulário de associado submetido via AJAX');
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const modal = form.closest('.modal');
+            const modalId = modal ? modal.id : null;
+            
+            // Determinar URL baseada no modal
+            let url;
+            if (modalId && modalId.startsWith('editModal_')) {
+                const associadoId = modalId.replace('editModal_', '');
+                url = `/associados/associados/modal/${associadoId}/editar/`;
+                console.log('🔧 Modal de edição detectado, ID:', associadoId);
+            } else {
+                url = '/associados/associados/modal/novo/';
+                console.log('🔧 Modal de criação detectado');
+            }
+            
+            console.log('📡 Enviando para:', url);
+            console.log('🔍 Modal ID:', modalId);
+            console.log('🔍 Formulário:', form);
+            console.log('🔍 Dados do formulário:', Object.fromEntries(formData));
+            
+            // Enviar formulário via AJAX
+            fetch(url, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Resposta recebida:', data);
+                
+                if (data.success) {
+                    // Sucesso - mostrar mensagem e fechar modal
+                    showSuccessMessage(data.message || 'Operação realizada com sucesso!');
+                    
+                    // Fechar modal
+                    if (modal) {
+                        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                        if (bootstrapModal) {
+                            bootstrapModal.hide();
+                        }
+                    }
+                    
+                    // Recarregar página após um pequeno delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                    
+                } else {
+                    // Erro - mostrar mensagem de erro
+                    showErrorMessage(data.message || 'Erro ao processar formulário');
+                    
+                    // Aplicar erros de validação se houver
+                    if (data.errors) {
+                        handleValidationErrors(data.errors);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erro ao enviar formulário:', error);
+                showErrorMessage('Erro de conexão. Tente novamente.');
+            });
+        }
+    });
+}
+
+/**
+ * Mostrar mensagem de sucesso
+ */
+function showSuccessMessage(message) {
+    // Remover mensagens anteriores
+    removeMessages();
+    
+    // Criar mensagem de sucesso
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    successDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    successDiv.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (successDiv.parentNode) {
+            successDiv.remove();
+        }
+    }, 5000);
+}
+
+/**
+ * Mostrar mensagem de erro
+ */
+function showErrorMessage(message) {
+    // Remover mensagens anteriores
+    removeMessages();
+    
+    // Criar mensagem de erro
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    errorDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(errorDiv);
+    
+    // Auto-remover após 8 segundos
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 8000);
+}
+
+/**
+ * Remover mensagens existentes
+ */
+function removeMessages() {
+    document.querySelectorAll('.alert.position-fixed').forEach(alert => {
+        alert.remove();
+    });
+}
+
+/**
+ * Tratar erros de validação
+ */
+function handleValidationErrors(errors) {
+    console.log('❌ Processando erros de validação:', errors);
+    
+    // Exibir resumo dos erros no topo do modal
+    showErrorSummaryInModal(errors, Object.keys(errors).length);
+    
+    // Aplicar estilos de erro aos campos
+    setTimeout(() => {
+        applyErrorStylesToFields(errors);
+        scrollToFirstError();
+    }, 100);
+}
+
+/**
+ * Exibir resumo de erros no topo do modal
+ */
+function showErrorSummaryInModal(errors, errorCount) {
+    console.log('🔍 showErrorSummaryInModal chamada com:', { errors, errorCount });
+    
+    // Encontrar o modal atual
+    const modal = document.querySelector('.modal.show');
+    if (!modal) {
+        console.warn('⚠️ Modal não encontrado');
+        return;
+    }
+    
+    const modalBody = modal.querySelector('.modal-body');
+    if (!modalBody) {
+        console.warn('⚠️ Modal body não encontrado');
+        return;
+    }
+    
+    // Remover alertas de erro anteriores
+    const existingAlerts = modalBody.querySelectorAll('.alert-danger.border-danger');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    // Criar alerta de erro estilizado
+    const errorAlert = document.createElement('div');
+    errorAlert.className = 'alert alert-danger border-danger mb-4';
+    errorAlert.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+            <div>
+                <h5 class="alert-heading mb-2">
+                    <i class="fas fa-times-circle me-2"></i>Formulário com Erros de Validação
+                </h5>
+                <p class="mb-2">Foram encontrados ${errorCount} erro(s) no formulário.</p>
+                <p class="mb-0 small text-muted">Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+            </div>
+        </div>
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" aria-label="Fechar" onclick="this.parentElement.remove()"></button>
+    `;
+    errorAlert.style.position = 'relative';
+    
+    // Inserir no topo do modal
+    modalBody.insertBefore(errorAlert, modalBody.firstChild);
+    console.log('✅ Resumo de erros inserido no modal');
+}
+
+/**
+ * Aplicar estilos de erro aos campos
+ */
+function applyErrorStylesToFields(errors) {
+    if (!errors) {
+        console.warn('⚠️ Nenhum erro fornecido para applyErrorStylesToFields');
+        return;
+    }
+    
+    console.log('🔍 Aplicando estilos de erro para:', errors);
+    console.log('🔍 Total de campos com erro:', Object.keys(errors).length);
+    
+    let camposProcessados = 0;
+    let camposComErro = 0;
+    
+    Object.keys(errors).forEach(fieldName => {
+        console.log(`🔍 Procurando campo: ${fieldName}`);
+        
+        // Tentar diferentes seletores para encontrar o campo
+        let field = document.querySelector(`[name="${fieldName}"]`);
+        
+        if (!field) {
+            // Tentar por ID
+            field = document.getElementById(fieldName);
+        }
+        
+        if (!field) {
+            // Tentar por nome com diferentes variações
+            field = document.querySelector(`input[name="${fieldName}"], select[name="${fieldName}"], textarea[name="${fieldName}"]`);
+        }
+        
+        if (field) {
+            console.log(`✅ Campo encontrado: ${fieldName}`, field);
+            camposComErro++;
+            
+            // Adicionar classe de erro
+            field.classList.add('is-invalid');
+            
+            // Adicionar classe de erro ao grupo do campo
+            const formGroup = field.closest('.form-group, .mb-3, .col-md-6, .col-md-4, .col-md-3');
+            if (formGroup) {
+                formGroup.classList.add('has-error');
+                console.log(`✅ Grupo do campo marcado com erro:`, formGroup);
+            }
+            
+            // Criar mensagem de erro abaixo do campo
+            createFieldErrorMessage(field, errors[fieldName]);
+        } else {
+            console.warn(`⚠️ Campo não encontrado: ${fieldName}`);
+        }
+        
+        camposProcessados++;
+    });
+    
+    console.log(`📊 Resumo: ${camposProcessados} campos processados, ${camposComErro} campos com erro aplicado`);
+}
+
+/**
+ * Criar mensagem de erro para um campo específico
+ */
+function createFieldErrorMessage(field, errorMessages) {
+    if (!field || !errorMessages) return;
+    
+    // Remover mensagens de erro anteriores
+    const existingError = field.parentNode.querySelector('.invalid-feedback');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Criar nova mensagem de erro
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'invalid-feedback d-block';
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle me-1"></i>
+        ${Array.isArray(errorMessages) ? errorMessages.join(', ') : errorMessages}
+    `;
+    
+    // Inserir após o campo
+    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    console.log(`✅ Mensagem de erro criada para ${field.name}:`, errorMessages);
+}
+
+/**
+ * Rolar para o primeiro campo com erro
+ */
+function scrollToFirstError() {
+    const firstErrorField = document.querySelector('.is-invalid');
+    if (firstErrorField) {
+        firstErrorField.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        console.log('✅ Rolado para o primeiro campo com erro');
+    } else {
+        console.warn('⚠️ Nenhum campo com erro encontrado para rolar');
+    }
+}
+
+// Inicializar funcionalidades da pesquisa
+function initializeSearchFeatures() {
+    // Adicionar listeners para pesquisa em tempo real
+    const searchInputs = document.querySelectorAll('.search-form-control');
+    const searchSelects = document.querySelectorAll('.search-form-select');
+    
+    // Função para aplicar pesquisa em tempo real
+    function applyRealTimeSearch() {
+        const form = document.getElementById('searchForm');
+        const formData = new FormData(form);
+        const searchParams = new URLSearchParams();
+        
+        // Adicionar apenas campos preenchidos
+        for (let [key, value] of formData.entries()) {
+            if (value && value.trim() !== '') {
+                searchParams.append(key, value);
+            }
+        }
+        
+        // Redirecionar com os parâmetros de pesquisa
+        if (searchParams.toString()) {
+            window.location.href = `${window.location.pathname}?${searchParams.toString()}`;
+        } else {
+            window.location.href = window.location.pathname;
+        }
+    }
+    
+    // Adicionar debounce para pesquisa em tempo real
+    let searchTimeout;
+    function debouncedSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(applyRealTimeSearch, 1000);
+    }
+    
+    // Listeners para campos de texto
+    searchInputs.forEach(input => {
+        input.addEventListener('input', debouncedSearch);
+    });
+    
+    // Listeners para campos select
+    searchSelects.forEach(select => {
+        select.addEventListener('change', applyRealTimeSearch);
+    });
+    
+    // Adicionar atalhos de teclado
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K para abrir pesquisa
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            toggleSearchPanel();
+        }
+        
+        // ESC para fechar pesquisa
+        if (e.key === 'Escape') {
+            const searchPanel = document.getElementById('searchPanel');
+            if (searchPanel.classList.contains('active')) {
+                toggleSearchPanel();
+            }
+        }
+    });
+    
+    // Adicionar indicador visual para pesquisa ativa
+    updateSearchIndicator();
+}
+
+// Atualizar indicador de pesquisa ativa
+function updateSearchIndicator() {
+    const searchToggle = document.querySelector('.search-toggle');
+    const hasActiveSearch = document.querySelector('.alert-info');
+    
+    if (hasActiveSearch) {
+        searchToggle.innerHTML = '<i class="fas fa-filter"></i>';
+        searchToggle.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+        searchToggle.title = 'Pesquisa ativa - Clique para ajustar filtros';
+    } else {
+        searchToggle.innerHTML = '<i class="fas fa-search"></i>';
+        searchToggle.style.background = 'linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%)';
+        searchToggle.title = 'Abrir pesquisa avançada';
+    }
+}
+
+// Função para limpar todos os filtros
+function clearAllFilters() {
+    const form = document.getElementById('searchForm');
+    const inputs = form.querySelectorAll('input[type="text"]');
+    const selects = form.querySelectorAll('select');
+    
+    // Limpar campos de texto
+    inputs.forEach(input => {
+        input.value = '';
+    });
+    
+    // Resetar selects para primeira opção
+    selects.forEach(select => {
+        select.selectedIndex = 0;
+    });
+    
+    // Redirecionar para lista limpa
+    window.location.href = window.location.pathname;
+}
+
+// ============================================================================
+// FUNÇÕES DE VISUALIZAÇÃO DE ERROS PARA MODAIS
+// ============================================================================
+
+// Função para exibir resumo de erros no topo do modal
+function showErrorSummaryInModal(errors, errorCount, errorSummary) {
+    console.log('🔍 showErrorSummaryInModal chamada com:', { errors, errorCount, errorSummary });
+    
+    // Encontrar o modal atual
+    const modal = document.querySelector('.modal.show');
+    if (!modal) {
+        console.warn('⚠️ Modal não encontrado');
+        return;
+    }
+    
+    const modalBody = modal.querySelector('.modal-body');
+    if (!modalBody) {
+        console.warn('⚠️ Modal body não encontrado');
+        return;
+    }
+    
+    // Remover alertas de erro anteriores
+    const existingAlerts = modalBody.querySelectorAll('.alert-danger.border-danger');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    // Criar alerta de erro estilizado
+    const errorAlert = document.createElement('div');
+    errorAlert.className = 'alert alert-danger border-danger mb-4';
+    errorAlert.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+            <div>
+                <h5 class="alert-heading mb-2">
+                    <i class="fas fa-times-circle me-2"></i>Formulário com Erros de Validação
+                </h5>
+                <p class="mb-2">${errorSummary || `Foram encontrados ${errorCount} erro(s) no formulário.`}</p>
+                <p class="mb-0 small text-muted">Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+            </div>
+        </div>
+    `;
+    
+    // Inserir no topo do modal
+    modalBody.insertBefore(errorAlert, modalBody.firstChild);
+    console.log('✅ Resumo de erros inserido no modal');
+    
+    // Adicionar botão para fechar o alerta
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close position-absolute top-0 end-0 m-3';
+    closeButton.setAttribute('aria-label', 'Fechar');
+    closeButton.onclick = () => errorAlert.remove();
+    errorAlert.style.position = 'relative';
+    errorAlert.appendChild(closeButton);
+}
+
+// Função para aplicar estilos de erro aos campos
+function applyErrorStylesToFields(errors) {
+    if (!errors) {
+        console.warn('⚠️ Nenhum erro fornecido para applyErrorStylesToFields');
+        return;
+    }
+    
+    console.log('🔍 Aplicando estilos de erro para:', errors);
+    console.log('🔍 Total de campos com erro:', Object.keys(errors).length);
+    
+    let camposProcessados = 0;
+    let camposComErro = 0;
+    
+    Object.keys(errors).forEach(fieldName => {
+        console.log(`🔍 Procurando campo: ${fieldName}`);
+        
+        // Tentar diferentes seletores para encontrar o campo
+        let field = document.querySelector(`[name="${fieldName}"]`);
+        
+        if (!field) {
+            // Tentar por ID
+            field = document.getElementById(fieldName);
+        }
+        
+        if (!field) {
+            // Tentar por nome com diferentes variações
+            field = document.querySelector(`input[name="${fieldName}"], select[name="${fieldName}"], textarea[name="${fieldName}"]`);
+        }
+        
+        if (field) {
+            console.log(`✅ Campo encontrado: ${fieldName}`, field);
+            camposComErro++;
+            
+            // Adicionar classe de erro
+            field.classList.add('is-invalid');
+            
+            // Adicionar classe de erro ao grupo do campo
+            const formGroup = field.closest('.form-group, .mb-3, .col-md-6, .col-md-4, .col-md-3');
+            if (formGroup) {
+                formGroup.classList.add('has-error');
+                console.log(`✅ Grupo do campo marcado com erro:`, formGroup);
+            }
+            
+            // Criar mensagem de erro abaixo do campo
+            createFieldErrorMessage(field, errors[fieldName]);
+        } else {
+            console.warn(`⚠️ Campo não encontrado: ${fieldName}`);
+        }
+        
+        camposProcessados++;
+    });
+    
+    console.log(`📊 Resumo: ${camposProcessados} campos processados, ${camposComErro} campos com erro aplicado`);
+}
+
+// Função para criar mensagem de erro para um campo específico
+function createFieldErrorMessage(field, errorMessages) {
+    if (!field || !errorMessages) return;
+    
+    // Remover mensagens de erro anteriores
+    const existingError = field.parentNode.querySelector('.invalid-feedback');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Criar nova mensagem de erro
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'invalid-feedback';
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle me-1"></i>
+        ${Array.isArray(errorMessages) ? errorMessages.join(', ') : errorMessages}
+    `;
+    
+    // Inserir após o campo
+    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    console.log(`✅ Mensagem de erro criada para ${field.name}:`, errorMessages);
+}
+
+// Função para rolar para o primeiro campo com erro
+function scrollToFirstError() {
+    const firstErrorField = document.querySelector('.is-invalid');
+    if (firstErrorField) {
+        firstErrorField.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        console.log('✅ Rolado para o primeiro campo com erro');
+    } else {
+        console.warn('⚠️ Nenhum campo com erro encontrado para rolar');
+    }
+}
+</script>
+{% endblock %}

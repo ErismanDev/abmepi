@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Meu Perfil - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .profile-avatar i {
+        font-size: 3rem;
+        color: white;
+    }
+    
+    .info-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .password-section {
+        border-left: 4px solid #28a745;
+        background-color: #f8f9fa;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #17a2b8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header do Perfil -->
+<div class="profile-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-3 text-center">
+                <div class="profile-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <h1 class="h2 mb-2">{{ user.get_full_name }}</h1>
+                <p class="lead mb-2">{{ user.get_tipo_usuario_display }}</p>
+                <div class="row">
+                    <div class="col-md-4">
+                        <small class="text-light">
+                            <i class="fas fa-envelope me-2"></i>
+                            {{ user.email }}
+                        </small>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-light">
+                            <i class="fas fa-calendar me-2"></i>
+                            Membro desde {{ user.date_joined|date:"d/m/Y" }}
+                        </small>
+                    </div>
+                    <div class="col-md-4">
+                        <small class="text-light">
+                            <i class="fas fa-clock me-2"></i>
+                            {% if user.ultimo_acesso %}
+                                Último acesso: {{ user.ultimo_acesso|date:"d/m/Y H:i" }}
+                            {% else %}
+                                Primeiro acesso
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Mensagem Informativa -->
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Informação:</strong> Após atualizar seu perfil ou alterar sua senha, você será redirecionado automaticamente para o dashboard apropriado para o seu tipo de usuário.
+    </div>
+
+    <div class="row">
+        <!-- Formulário de Perfil -->
+        <div class="col-lg-8">
+            <div class="card info-card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-edit me-2"></i>
+                        Editar Perfil
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Informações Básicas -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.first_name|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.last_name|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.username|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.email|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.tipo_usuario|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.ativo|as_crispy_field }}
+                            </div>
+                        </div>
+                        
+                        <!-- Seção de Senha -->
+                        <div class="password-section p-3 rounded mb-4">
+                            <h6 class="text-success mb-3">
+                                <i class="fas fa-lock me-2"></i>
+                                Alterar Senha (Opcional)
+                            </h6>
+                            
+                            <!-- Informações da Senha Atual (para Administradores) -->
+                            {% if user.tipo_usuario == 'administrador_sistema' %}
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    {{ form.senha_atual_info|as_crispy_field }}
+                                </div>
+                            </div>
+                            
+                            <!-- Aviso sobre visualização da senha -->
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Visualização da Senha:</strong> Sua senha atual é visível e expira em 24 horas por segurança.
+                                <br><small class="text-muted">Após a expiração, ela não será mais visível para administradores.</small>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <strong>Alteração de Senha (Opcional):</strong> Os campos de senha estão em branco. 
+                                <strong>Preencha apenas se desejar alterar a senha, ou deixe em branco para manter a senha atual.</strong>
+                            </div>
+                            
+                            <!-- Opção para gerar nova senha automática -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    {{ form.gerar_nova_senha|as_crispy_field }}
+                                </div>
+                            </div>
+                            
+                            <!-- Campos de senha (inicialmente ocultos) -->
+                            <div id="password-fields" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        {{ form.password1|as_crispy_field }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form.password2|as_crispy_field }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões de Ação -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'core:usuario_dashboard' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>
+                                Voltar ao Dashboard
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>
+                                Atualizar Perfil
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Painel Lateral -->
+        <div class="col-lg-4">
+            <!-- Card de Status -->
+            <div class="card info-card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Status da Conta
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        {% if user.ativo %}
+                            <div class="bg-success rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-check fa-2x text-white"></i>
+                            </div>
+                            <h6 class="text-success mt-2">Conta Ativa</h6>
+                        {% else %}
+                            <div class="bg-danger rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-times fa-2x text-white"></i>
+                            </div>
+                            <h6 class="text-danger mt-2">Conta Inativa</h6>
+                        {% endif %}
+                    </div>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-user-tag me-2 text-muted"></i>
+                            <strong>Tipo:</strong> {{ user.get_tipo_usuario_display }}
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-calendar-alt me-2 text-muted"></i>
+                            <strong>Cadastro:</strong> {{ user.date_joined|date:"d/m/Y" }}
+                        </li>
+                        {% if user.ultimo_acesso %}
+                        <li class="mb-2">
+                            <i class="fas fa-clock me-2 text-muted"></i>
+                            <strong>Último Acesso:</strong> {{ user.ultimo_acesso|date:"d/m/Y H:i" }}
+                        </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            <i class="fas fa-shield-alt me-2 text-muted"></i>
+                            <strong>Permissões:</strong> {{ user.get_all_permissions|length }} permissões
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Card de Ações Rápidas -->
+            <div class="card info-card">
+                <div class="card-header bg-light">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Ações Rápidas
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'core:usuario_dashboard' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-tachometer-alt me-2"></i>
+                            Meu Dashboard
+                        </a>
+                        <a href="{% url 'core:logout' %}" class="btn btn-outline-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Sair do Sistema
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Função para controlar campos de senha na edição
+    window.togglePasswordFields = function() {
+        var checkbox = document.getElementById('id_gerar_nova_senha');
+        var passwordFields = document.getElementById('password-fields');
+        
+        if (checkbox && passwordFields) {
+            if (checkbox.checked) {
+                passwordFields.style.display = 'block';
+                
+                // Gerar senha automaticamente
+                var password1Field = document.getElementById('id_password1');
+                var password2Field = document.getElementById('id_password2');
+                
+                if (password1Field && password2Field) {
+                    // Gerar senha única
+                    var senha = gerarSenhaUnica();
+                    password1Field.value = senha;
+                    password2Field.value = senha;
+                    
+                    // Mostrar mensagem
+                    mostrarMensagemSucesso('Nova senha gerada automaticamente: ' + senha);
+                }
+            } else {
+                passwordFields.style.display = 'none';
+                
+                // Limpar campos
+                var password1Field = document.getElementById('id_password1');
+                var password2Field = document.getElementById('id_password2');
+                
+                if (password1Field) password1Field.value = '';
+                if (password2Field) password2Field.value = '';
+            }
+        }
+    };
+    
+    // Função para gerar senha única (mesma lógica do backend)
+    function gerarSenhaUnica() {
+        var letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+        var senha = '';
+        
+        // Garantir pelo menos 2 de cada tipo
+        senha += 'AB'; // 2 maiúsculas
+        senha += 'ab'; // 2 minúsculas
+        senha += '12'; // 2 números
+        senha += '!@'; // 2 especiais
+        
+        // Adicionar mais caracteres aleatórios
+        for (var i = 0; i < 4; i++) {
+            senha += letras.charAt(Math.floor(Math.random() * letras.length));
+        }
+        
+        // Embaralhar a senha
+        return senha.split('').sort(function() { return 0.5 - Math.random(); }).join('');
+    }
+    
+    // Função para mostrar mensagem de sucesso
+    function mostrarMensagemSucesso(mensagem) {
+        // Remover mensagens anteriores
+        $('.alert-success').remove();
+        
+        var alertHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                       '<i class="fas fa-check-circle me-2"></i>' + mensagem +
+                       '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                       '</div>';
+        
+        // Inserir mensagem no topo do formulário
+        $('.card:first').before(alertHtml);
+        
+        // Auto-remover após 5 segundos
+        setTimeout(function() {
+            $('.alert-success').fadeOut();
+        }, 5000);
+    }
+</script>
+{% endblock %}

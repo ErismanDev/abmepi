@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if resolucao %}Editar{% else %}Nova{% endif %} Resolução - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        {% if resolucao %}Editar{% else %}Nova{% endif %} Resolução
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if resolucao %}
+                            Editando: <strong>{{ resolucao.numero_resolucao }} - {{ resolucao.titulo }}</strong>
+                        {% else %}
+                            Crie uma nova resolução da diretoria
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:resolucao_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados da Resolução
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Número da Resolução -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.numero.id_for_label }}" class="form-label">
+                                    <i class="fas fa-hashtag me-1"></i>
+                                    Número da Resolução <span class="text-danger">*</span>
+                                </label>
+                                {{ form.numero }}
+                                {% if form.numero.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.numero.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Número único da resolução
+                                </small>
+                            </div>
+
+                            <!-- Status -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">
+                                    <i class="fas fa-flag me-1"></i>
+                                    Status <span class="text-danger">*</span>
+                                </label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.status.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Ata de Reunião -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.ata_reuniao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Ata de Reunião
+                                </label>
+                                {{ form.ata_reuniao }}
+                                {% if form.ata_reuniao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.ata_reuniao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Ata relacionada à resolução (opcional)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Título -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>
+                                    Título da Resolução <span class="text-danger">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.titulo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Ementa -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.ementa.id_for_label }}" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>
+                                    Ementa <span class="text-danger">*</span>
+                                </label>
+                                {{ form.ementa }}
+                                {% if form.ementa.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.ementa.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Resumo da resolução
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Texto Integral -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.texto_integral.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-text me-1"></i>
+                                    Texto Integral <span class="text-danger">*</span>
+                                </label>
+                                {{ form.texto_integral }}
+                                {% if form.texto_integral.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.texto_integral.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Texto completo da resolução
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Data de Resolução -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.data_resolucao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data de Resolução <span class="text-danger">*</span>
+                                </label>
+                                {{ form.data_resolucao }}
+                                {% if form.data_resolucao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_resolucao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Data de Publicação -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.data_publicacao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data de Publicação
+                                </label>
+                                {{ form.data_publicacao }}
+                                {% if form.data_publicacao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_publicacao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Data de Vigência -->
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.data_vigencia.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data de Vigência
+                                </label>
+                                {{ form.data_vigencia }}
+                                {% if form.data_vigencia.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_vigencia.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Arquivo da Resolução -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.arquivo_resolucao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-upload me-1"></i>
+                                    Arquivo da Resolução
+                                </label>
+                                {{ form.arquivo_resolucao }}
+                                {% if form.arquivo_resolucao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.arquivo_resolucao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Upload do arquivo PDF da resolução (opcional)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    Observações
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{% url 'diretoria:resolucao_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if resolucao %}Atualizar Resolução{% else %}Criar Resolução{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

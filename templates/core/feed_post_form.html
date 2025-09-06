@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        border-bottom: none;
+        font-weight: 600;
+    }
+    
+    .form-label {
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-check-input:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .image-preview {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 0.5rem;
+        margin-top: 10px;
+    }
+    
+    .main-content {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <main class="col-12 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div class="flex-grow-1">
+                <h1 class="h2 text-primary mb-2">
+                    <i class="fas fa-plus me-2"></i>{{ title }}
+                </h1>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle me-2"></i>{{ subtitle }}
+                </p>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0 flex-shrink-0">
+                <a href="{% url 'core:feed_posts_list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-edit me-2"></i>Dados do Post
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="feed-post-form" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="{{ form.titulo.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-heading me-1"></i>Título do Post *
+                                        </label>
+                                        {{ form.titulo }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Título principal do post
+                                        </div>
+                                        {% if form.titulo.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.titulo.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.tipo_post.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-tag me-1"></i>Tipo do Post *
+                                        </label>
+                                        {{ form.tipo_post }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Tipo de conteúdo do post
+                                        </div>
+                                        {% if form.tipo_post.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.tipo_post.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.autor.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-user me-1"></i>Autor do Post *
+                                        </label>
+                                        {{ form.autor }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Nome do autor do post
+                                        </div>
+                                        {% if form.autor.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.autor.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.ordem_exibicao.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-sort-numeric-up me-1"></i>Ordem de Exibição
+                                        </label>
+                                        {{ form.ordem_exibicao }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Ordem de exibição (menor = primeiro)
+                                        </div>
+                                        {% if form.ordem_exibicao.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.ordem_exibicao.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.conteudo.id_for_label }}" class="form-label fw-bold">
+                                    <i class="fas fa-paragraph me-1"></i>Conteúdo do Post *
+                                </label>
+                                {{ form.conteudo }}
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>Conteúdo principal do post
+                                </div>
+                                {% if form.conteudo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.conteudo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.imagem.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-image me-1"></i>Imagem do Post
+                                        </label>
+                                        {{ form.imagem }}
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Imagem opcional para o post
+                                        </div>
+                                        {% if form.imagem.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.imagem.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                        <div id="imagePreview" class="mt-2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.ativo }}
+                                            <label class="form-check-label fw-bold" for="{{ form.ativo.id_for_label }}">
+                                                <i class="fas fa-eye me-1"></i>Post Ativo
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Post será exibido no feed
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.destaque }}
+                                            <label class="form-check-label fw-bold" for="{{ form.destaque.id_for_label }}">
+                                                <i class="fas fa-star me-1"></i>Post em Destaque
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Post aparecerá em destaque
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            {{ form.permitir_comentarios }}
+                                            <label class="form-check-label fw-bold" for="{{ form.permitir_comentarios.id_for_label }}">
+                                                <i class="fas fa-comments me-1"></i>Permitir Comentários
+                                            </label>
+                                        </div>
+                                        <div class="form-text">
+                                            <i class="fas fa-info-circle me-1"></i>Usuários podem comentar
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'core:feed_posts_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>Salvar Post
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Validação do formulário
+    $('#feed-post-form').on('submit', function(e) {
+        if (!this.checkValidity()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        this.classList.add('was-validated');
+    });
+    
+    // Preview da imagem
+    $('#id_imagem').on('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#imagePreview').html(`
+                    <img src="${e.target.result}" class="image-preview" alt="Preview">
+                `);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            $('#imagePreview').empty();
+        }
+    });
+    
+    // Feedback visual para campos com conteúdo
+    $('.form-control, .form-select').on('input change', function() {
+        if ($(this).val()) {
+            $(this).addClass('has-content');
+        } else {
+            $(this).removeClass('has-content');
+        }
+    });
+    
+    // Foco nos campos
+    $('.form-control, .form-select').on('focus', function() {
+        $(this).addClass('focused');
+    }).on('blur', function() {
+        $(this).removeClass('focused');
+    });
+});
+</script>
+{% endblock %}

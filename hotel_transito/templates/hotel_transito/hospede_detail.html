@@ -1,0 +1,501 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ hospede.nome_completo }} - Detalhes do Hóspede{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .actions-bar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+        color: #212529;
+        border: none;
+    }
+    
+    .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: #212529;
+        text-decoration: none;
+    }
+    
+    .btn-delete {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        color: white;
+        border: none;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .info-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .info-card h3 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .info-value {
+        color: #6c757d;
+        text-align: right;
+    }
+    
+    .tipo-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .tipo-associado {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .tipo-nao-associado {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-ativo {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-inativo {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .history-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .history-section h3 {
+        color: #667eea;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .history-item {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid #667eea;
+    }
+    
+    .history-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .history-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .history-title {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .history-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .history-details {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .no-history {
+        text-align: center;
+        padding: 2rem;
+        color: #6c757d;
+    }
+    
+    .no-history i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="page-header">
+        <h1><i class="fas fa-user me-3"></i>{{ hospede.nome_completo }}</h1>
+        <p>Detalhes completos do hóspede</p>
+    </div>
+
+    <!-- Barra de Ações -->
+    <div class="actions-bar">
+        <div>
+            <a href="{% url 'hotel_transito:hospede_list' %}" class="btn-action btn-back">
+                <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+            </a>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'hotel_transito:hospede_update' hospede.pk %}" class="btn-action btn-edit">
+                <i class="fas fa-edit me-2"></i>Editar
+            </a>
+            <a href="{% url 'hotel_transito:hospede_delete' hospede.pk %}" class="btn-action btn-delete">
+                <i class="fas fa-trash me-2"></i>Excluir
+            </a>
+        </div>
+    </div>
+
+    <!-- Informações do Hóspede -->
+    <div class="info-cards">
+        <!-- Informações Pessoais -->
+        <div class="info-card">
+            <h3><i class="fas fa-user me-2"></i>Informações Pessoais</h3>
+            {% if hospede.associado and hospede.associado.foto %}
+            <div class="info-item text-center mb-3">
+                <img src="{{ hospede.associado.foto.url }}" alt="{{ hospede.nome_completo }}" 
+                     class="avatar-rectangular" style="width: 80px; height: 100px;">
+                <div class="mt-2">
+                    <small class="text-muted">Foto do associado</small>
+                </div>
+            </div>
+            {% elif hospede.foto %}
+            <div class="info-item text-center mb-3">
+                <img src="{{ hospede.foto.url }}" alt="{{ hospede.nome_completo }}" 
+                     class="avatar-rectangular" style="width: 80px; height: 100px;">
+                <div class="mt-2">
+                    <small class="text-muted">Foto do hóspede</small>
+                </div>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">Nome Completo:</span>
+                <span class="info-value">{{ hospede.nome_completo }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Tipo:</span>
+                <span class="info-value">
+                    <span class="tipo-badge tipo-{{ hospede.tipo_hospede }}">
+                        {{ hospede.get_tipo_hospede_display }}
+                    </span>
+                </span>
+            </div>
+            {% if hospede.associado %}
+            <div class="info-item">
+                <span class="info-label">Matrícula:</span>
+                <span class="info-value">{{ hospede.associado.matricula }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.data_nascimento %}
+            <div class="info-item">
+                <span class="info-label">Data de Nascimento:</span>
+                <span class="info-value">{{ hospede.data_nascimento|date:"d/m/Y" }}</span>
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <span class="info-label">Status:</span>
+                <span class="info-value">
+                    <span class="status-badge status-{% if hospede.ativo %}ativo{% else %}inativo{% endif %}">
+                        {% if hospede.ativo %}Ativo{% else %}Inativo{% endif %}
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Documentos -->
+        <div class="info-card">
+            <h3><i class="fas fa-id-card me-2"></i>Documentos</h3>
+            <div class="info-item">
+                <span class="info-label">Tipo de Documento:</span>
+                <span class="info-value">{{ hospede.get_tipo_documento_display }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Número:</span>
+                <span class="info-value">{{ hospede.numero_documento }}</span>
+            </div>
+            {% if hospede.orgao_emissor %}
+            <div class="info-item">
+                <span class="info-label">Órgão Emissor:</span>
+                <span class="info-value">{{ hospede.orgao_emissor }}/{{ hospede.uf_emissor }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Contato -->
+        <div class="info-card">
+            <h3><i class="fas fa-phone me-2"></i>Contato</h3>
+            {% if hospede.telefone %}
+            <div class="info-item">
+                <span class="info-label">Telefone:</span>
+                <span class="info-value">{{ hospede.telefone }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.telefone_secundario %}
+            <div class="info-item">
+                <span class="info-label">Telefone Secundário:</span>
+                <span class="info-value">{{ hospede.telefone_secundario }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.email %}
+            <div class="info-item">
+                <span class="info-label">E-mail:</span>
+                <span class="info-value">{{ hospede.email }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Endereço -->
+        <div class="info-card">
+            <h3><i class="fas fa-map-marker-alt me-2"></i>Endereço</h3>
+            {% if hospede.cep %}
+            <div class="info-item">
+                <span class="info-label">CEP:</span>
+                <span class="info-value">{{ hospede.cep }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.endereco %}
+            <div class="info-item">
+                <span class="info-label">Endereço:</span>
+                <span class="info-value">{{ hospede.endereco }}, {{ hospede.numero }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.complemento %}
+            <div class="info-item">
+                <span class="info-label">Complemento:</span>
+                <span class="info-value">{{ hospede.complemento }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.bairro %}
+            <div class="info-item">
+                <span class="info-label">Bairro:</span>
+                <span class="info-value">{{ hospede.bairro }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.cidade %}
+            <div class="info-item">
+                <span class="info-label">Cidade/Estado:</span>
+                <span class="info-value">{{ hospede.cidade }}/{{ hospede.estado }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Informações Profissionais -->
+        {% if hospede.profissao or hospede.empresa %}
+        <div class="info-card">
+            <h3><i class="fas fa-briefcase me-2"></i>Informações Profissionais</h3>
+            {% if hospede.profissao %}
+            <div class="info-item">
+                <span class="info-label">Profissão:</span>
+                <span class="info-value">{{ hospede.profissao }}</span>
+            </div>
+            {% endif %}
+            {% if hospede.empresa %}
+            <div class="info-item">
+                <span class="info-label">Empresa:</span>
+                <span class="info-value">{{ hospede.empresa }}</span>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Informações do Sistema -->
+        <div class="info-card">
+            <h3><i class="fas fa-cog me-2"></i>Informações do Sistema</h3>
+            <div class="info-item">
+                <span class="info-label">Data de Cadastro:</span>
+                <span class="info-value">{{ hospede.data_cadastro|date:"d/m/Y H:i" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Última Atualização:</span>
+                <span class="info-value">{{ hospede.data_atualizacao|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Observações -->
+    {% if hospede.observacoes %}
+    <div class="info-card">
+        <h3><i class="fas fa-sticky-note me-2"></i>Observações</h3>
+        <p class="mb-0">{{ hospede.observacoes }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Histórico de Reservas -->
+    <div class="history-section">
+        <h3><i class="fas fa-calendar-check me-2"></i>Histórico de Reservas</h3>
+        {% if reservas %}
+            {% for reserva in reservas %}
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-title">Reserva {{ reserva.codigo_reserva }}</span>
+                    <span class="history-date">{{ reserva.data_reserva|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="history-details">
+                    <strong>Quarto:</strong> {{ reserva.quarto.numero }} ({{ reserva.quarto.get_tipo_display }})<br>
+                    <strong>Período:</strong> {{ reserva.data_entrada|date:"d/m/Y" }} a {{ reserva.data_saida|date:"d/m/Y" }}<br>
+                    <strong>Status:</strong> {{ reserva.get_status_display }}<br>
+                    <strong>Valor Total:</strong> R$ {{ reserva.valor_total|floatformat:2 }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-history">
+                <i class="fas fa-calendar-times"></i>
+                <h5>Nenhuma reserva encontrada</h5>
+                <p>Este hóspede ainda não possui reservas no sistema.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Histórico de Hospedagens -->
+    <div class="history-section">
+        <h3><i class="fas fa-bed me-2"></i>Histórico de Hospedagens</h3>
+        {% if hospedagens %}
+            {% for hospedagem in hospedagens %}
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-title">Hospedagem #{{ hospedagem.id }}</span>
+                    <span class="history-date">{{ hospedagem.data_cadastro|date:"d/m/Y H:i" }}</span>
+                </div>
+                <div class="history-details">
+                    <strong>Quarto:</strong> {{ hospedagem.quarto.numero }}<br>
+                    <strong>Entrada:</strong> {{ hospedagem.data_entrada_real|date:"d/m/Y H:i" }}<br>
+                    <strong>Saída:</strong> {{ hospedagem.data_saida_real|date:"d/m/Y H:i" }}<br>
+                    <strong>Status:</strong> {{ hospedagem.get_status_display }}<br>
+                    <strong>Valor Total:</strong> R$ {{ hospedagem.valor_total_real|floatformat:2 }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-history">
+                <i class="fas fa-bed"></i>
+                <h5>Nenhuma hospedagem encontrada</h5>
+                <p>Este hóspede ainda não possui hospedagens registradas no sistema.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Confirmação para exclusão
+        $('.btn-delete').on('click', function(e) {
+            if (!confirm('Tem certeza que deseja excluir este hóspede? Esta ação não pode ser desfeita.')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Tooltips
+        $('[title]').tooltip();
+    });
+</script>
+{% endblock %}

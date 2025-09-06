@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'administrativo:dashboard' %}">Administrativo</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'administrativo:evento_list' %}">Eventos</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ action }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        {{ title }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if evento %}
+                            Edite as informações do evento
+                        {% else %}
+                            Crie um novo evento para a associação
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Formulário -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Dados do Evento
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post" novalidate enctype="multipart/form-data">
+                                {% csrf_token %}
+                                
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label for="{{ form.titulo.id_for_label }}" class="form-label">Título *</label>
+                                        {{ form.titulo }}
+                                        {% if form.titulo.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.titulo.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="id_tipo" class="form-label">Tipo *</label>
+                                        <select name="tipo" id="id_tipo" class="form-control" required>
+                                            <option value="">---------</option>
+                                            <option value="reuniao">Reunião</option>
+                                            <option value="palestra">Palestra</option>
+                                            <option value="workshop">Workshop</option>
+                                            <option value="congresso">Congresso</option>
+                                            <option value="seminario">Seminário</option>
+                                            <option value="treinamento">Treinamento</option>
+                                            <option value="outro">Outro</option>
+                                        </select>
+                                        {% if form.tipo.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.tipo.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.data_inicio.id_for_label }}" class="form-label">Data início *</label>
+                                        {{ form.data_inicio }}
+                                        {% if form.data_inicio.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.data_inicio.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.data_fim.id_for_label }}" class="form-label">Data fim *</label>
+                                        {{ form.data_fim }}
+                                        {% if form.data_fim.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.data_fim.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.local.id_for_label }}" class="form-label">Local *</label>
+                                        {{ form.local }}
+                                        {% if form.local.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.local.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="id_status" class="form-label">Status *</label>
+                                        <select name="status" id="id_status" class="form-control" required>
+                                            <option value="">---------</option>
+                                            <option value="agendado">Agendado</option>
+                                            <option value="em_andamento">Em Andamento</option>
+                                            <option value="concluido">Concluído</option>
+                                            <option value="cancelado">Cancelado</option>
+                                            <option value="adiado">Adiado</option>
+                                        </select>
+                                        {% if form.status.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.status.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.capacidade_maxima.id_for_label }}" class="form-label">Capacidade máxima</label>
+                                        {{ form.capacidade_maxima }}
+                                        {% if form.capacidade_maxima.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.capacidade_maxima.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.valor_inscricao.id_for_label }}" class="form-label">Valor inscrição *</label>
+                                        {{ form.valor_inscricao }}
+                                        {% if form.valor_inscricao.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.valor_inscricao.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.responsavel.id_for_label }}" class="form-label">Responsável</label>
+                                        {{ form.responsavel }}
+                                        {% if form.responsavel.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.responsavel.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.ativo.id_for_label }}" class="form-label">Ativo</label>
+                                        {{ form.ativo }}
+                                        {% if form.ativo.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.ativo.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição *</label>
+                                        {{ form.descricao }}
+                                        {% if form.descricao.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.descricao.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label for="{{ form.endereco.id_for_label }}" class="form-label">Endereço</label>
+                                        {{ form.endereco }}
+                                        {% if form.endereco.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.endereco.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.imagem.id_for_label }}" class="form-label">Imagem</label>
+                                        {{ form.imagem }}
+                                        {% if form.imagem.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.imagem.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.arquivos_anexados.id_for_label }}" class="form-label">Arquivos anexados</label>
+                                        {{ form.arquivos_anexados }}
+                                        {% if form.arquivos_anexados.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.arquivos_anexados.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12 mb-3">
+                                        <label for="{{ form.observacoes.id_for_label }}" class="form-label">Observações</label>
+                                        {{ form.observacoes }}
+                                        {% if form.observacoes.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ form.observacoes.errors.0 }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="{% url 'administrativo:evento_list' %}" class="btn btn-secondary">
+                                                <i class="fas fa-times me-2"></i>
+                                                Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save me-2"></i>
+                                                {{ action }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informações auxiliares -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações Auxiliares
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    Dicas para eventos
+                                </h6>
+                                <ul class="mb-0">
+                                    <li>Use títulos claros e objetivos</li>
+                                    <li>Defina datas e horários precisos</li>
+                                    <li>Informe o local e endereço completo</li>
+                                    <li>Estabeleça a capacidade máxima se aplicável</li>
+                                    <li>Defina o valor da inscrição (0,00 para gratuito)</li>
+                                    <li>Selecione o responsável pelo evento</li>
+                                    <li>Adicione uma descrição detalhada</li>
+                                    <li>Inclua observações importantes</li>
+                                </ul>
+                            </div>
+                            
+                            {% if evento %}
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-history me-2"></i>
+                                        Histórico
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted small mb-2">
+                                        <strong>Criado em:</strong><br>
+                                        {{ evento.data_criacao|date:"d/m/Y H:i" }}
+                                    </p>
+                                    
+                                    {% if evento.usuario_responsavel %}
+                                    <p class="text-muted small mb-2">
+                                        <strong>Usuário responsável:</strong><br>
+                                        {{ evento.usuario_responsavel.username }}
+                                    </p>
+                                    {% endif %}
+                                    
+                                    <div class="d-grid gap-2">
+                                        <a href="{% url 'administrativo:evento_detail' pk=evento.pk %}" 
+                                           class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-eye me-2"></i>
+                                            Ver Detalhes
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-preenchimento da data atual se não estiver definida
+    document.addEventListener('DOMContentLoaded', function() {
+        const dataInicioField = document.getElementById('id_data_inicio');
+        const dataFimField = document.getElementById('id_data_fim');
+        
+        if (dataInicioField && !dataInicioField.value) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            dataInicioField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+        
+        if (dataFimField && !dataFimField.value) {
+            const now = new Date();
+            now.setHours(now.getHours() + 2); // 2 horas depois
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            dataFimField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
+    });
+</script>
+{% endblock %}

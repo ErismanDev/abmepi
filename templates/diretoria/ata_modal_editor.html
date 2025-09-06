@@ -1,0 +1,201 @@
+<!-- Modal Editor de Ata - Estilo SEI Puro -->
+<div class="modal fade" id="ataEditorModal" tabindex="-1" aria-labelledby="ataEditorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="ataEditorModalLabel">
+                    <i class="fas fa-file-alt me-2"></i>
+                    <span id="modal-title">Editor de Ata</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <form id="ataForm" method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    <input type="hidden" id="ata-id" name="ata_id" value="">
+                    
+                    <!-- Barra de Ferramentas -->
+                    <div class="bg-light p-2 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-outline-secondary" onclick="inserirDataAtual()">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    Data
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" onclick="inserirHoraAtual()">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Hora
+                                </button>
+                                <button type="button" class="btn btn-outline-info" onclick="previsualizarAta()">
+                                    <i class="fas fa-eye me-1"></i>
+                                    Visualizar
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="limparEditor()">
+                                    <i class="fas fa-eraser me-1"></i>
+                                    Limpar
+                                </button>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Digite todo o conteúdo da ata no editor abaixo
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editor Principal -->
+                    <div class="p-0">
+                        <textarea id="conteudo_completo" name="conteudo_completo" 
+                                  class="form-control editor-texto" 
+                                  placeholder="Digite aqui o conteúdo completo da ata...
+
+Exemplo de estrutura:
+ATA DE REUNIÃO ORDINÁRIA Nº 001/2025
+
+Aos 04 de setembro de 2025, às 14:00 horas, na sede da ABMEPI, reuniram-se os membros da Diretoria para deliberar sobre os assuntos da pauta.
+
+PRESENTES:
+- Presidente: [Nome do Presidente]
+- Secretário: [Nome do Secretário]
+- Membros: [Lista de membros presentes]
+
+AUSENTES:
+- [Lista de membros ausentes]
+
+PAUTA:
+1. Abertura da reunião
+2. Leitura e aprovação da ata anterior
+3. Assuntos gerais
+4. Encerramento
+
+DELIBERAÇÕES:
+[Descrever as decisões tomadas]
+
+OBSERVAÇÕES:
+[Observações adicionais]
+
+A ata foi lida, aprovada e assinada pelos presentes.
+
+Teresina, 04 de setembro de 2025.
+
+_________________________        _________________________
+Presidente                        Secretário" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="salvarRascunho()">
+                    <i class="fas fa-save me-2"></i>
+                    Salvar Rascunho
+                </button>
+                <button type="button" class="btn btn-success" onclick="salvarAta()">
+                    <i class="fas fa-check me-2"></i>
+                    <span id="btn-salvar-texto">Salvar Ata</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilo do editor de texto puro - Estilo SEI */
+.editor-texto {
+    border: none !important;
+    border-radius: 0 !important;
+    resize: none !important;
+    height: calc(100vh - 200px) !important;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+    padding: 20px !important;
+    background-color: #ffffff !important;
+    color: #333333 !important;
+    white-space: pre-wrap !important;
+    word-wrap: break-word !important;
+    overflow-y: auto !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.editor-texto:focus {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Estilo do modal fullscreen */
+.modal-fullscreen {
+    width: 100vw;
+    max-width: none;
+    height: 100vh;
+    margin: 0;
+}
+
+.modal-fullscreen .modal-content {
+    height: 100vh;
+    border: 0;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-fullscreen .modal-body {
+    flex: 1;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Estilo dos botões de ação */
+.btn-group .btn {
+    border-radius: 0.25rem;
+    margin-right: 0.25rem;
+    font-size: 0.875rem;
+}
+
+/* Estilo do cabeçalho */
+.bg-light {
+    background-color: #f8f9fa !important;
+    border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* Estilo do footer */
+.modal-footer {
+    border-top: 1px solid #dee2e6 !important;
+    background-color: #f8f9fa !important;
+    padding: 10px 20px !important;
+}
+
+/* Estilo do header */
+.modal-header {
+    border-bottom: 1px solid #dee2e6 !important;
+    padding: 10px 20px !important;
+}
+
+/* Estilo do placeholder */
+.editor-texto::placeholder {
+    color: #6c757d !important;
+    font-style: italic !important;
+    font-size: 13px !important;
+}
+
+/* Scrollbar personalizada */
+.editor-texto::-webkit-scrollbar {
+    width: 8px;
+}
+
+.editor-texto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.editor-texto::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.editor-texto::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+</style>

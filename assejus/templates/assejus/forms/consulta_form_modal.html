@@ -1,0 +1,317 @@
+{% load static %}
+
+<form id="consultaForm" method="post" class="modal-form">
+    {% csrf_token %}
+    
+    <!-- Informações da Consulta -->
+    <div class="row">
+        <div class="col-md-8">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-question-circle me-2"></i>Informações da Consulta
+            </h6>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.associado.id_for_label }}" class="form-label">
+                            {{ form.associado.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.associado }}
+                        {% if form.associado.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.associado.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="{{ form.tipo.id_for_label }}" class="form-label">
+                            {{ form.tipo.label }} <span class="text-danger">*</span>
+                        </label>
+                        {{ form.tipo }}
+                        {% if form.tipo.errors %}
+                            <div class="invalid-feedback d-block">
+                                {{ form.tipo.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.pergunta.id_for_label }}" class="form-label">
+                    {{ form.pergunta.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.pergunta }}
+                {% if form.pergunta.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.pergunta.errors.0 }}
+                    </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Descreva sua dúvida ou questão jurídica de forma clara e detalhada
+                </small>
+            </div>
+        </div>
+        
+        <!-- Status e Prioridade -->
+        <div class="col-md-4">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-chart-line me-2"></i>Status e Prioridade
+            </h6>
+            
+            <div class="form-group">
+                <label for="{{ form.status.id_for_label }}" class="form-label">
+                    {{ form.status.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.status.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.prioridade.id_for_label }}" class="form-label">
+                    {{ form.prioridade.label }} <span class="text-danger">*</span>
+                </label>
+                {{ form.prioridade }}
+                {% if form.prioridade.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.prioridade.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <div class="form-check">
+                    {{ form.resolvida }}
+                    <label class="form-check-label" for="{{ form.resolvida.id_for_label }}">
+                        {{ form.resolvida.label }}
+                    </label>
+                </div>
+                {% if form.resolvida.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.resolvida.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Responsabilidade -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-user-tie me-2"></i>Responsabilidade
+            </h6>
+            
+            <div class="form-group">
+                <label for="{{ form.advogado_responsavel.id_for_label }}" class="form-label">
+                    {{ form.advogado_responsavel.label }}
+                </label>
+                {{ form.advogado_responsavel }}
+                {% if form.advogado_responsavel.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.advogado_responsavel.errors.0 }}
+                    </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Advogado responsável por responder a consulta
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resposta -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-comment-dots me-2"></i>Resposta
+            </h6>
+            
+            <div class="form-group">
+                <label for="{{ form.resposta.id_for_label }}" class="form-label">
+                    {{ form.resposta.label }}
+                </label>
+                {{ form.resposta }}
+                {% if form.resposta.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.resposta.errors.0 }}
+                    </div>
+                {% endif %}
+                <small class="form-text text-muted">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Resposta jurídica à consulta (preenchida pelo advogado responsável)
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Templates de Consulta -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h6 class="text-primary mb-3">
+                <i class="fas fa-magic me-2"></i>Templates de Consulta
+            </h6>
+            
+            <div class="row">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="usarTemplate('trabalhista')">
+                        <i class="fas fa-briefcase me-1"></i>Trabalhista
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="usarTemplate('previdenciaria')">
+                        <i class="fas fa-piggy-bank me-1"></i>Previdenciária
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="usarTemplate('civil')">
+                        <i class="fas fa-balance-scale me-1"></i>Civil
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-outline-primary btn-sm w-100 mb-2" onclick="usarTemplate('contrato')">
+                        <i class="fas fa-file-contract me-1"></i>Contrato
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botões de ação -->
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>
+            {% if form.instance.pk %}Atualizar{% else %}Salvar{% endif %}
+        </button>
+    </div>
+</form>
+
+<script>
+// Templates de consulta
+const templates = {
+    trabalhista: {
+        pergunta: 'Gostaria de esclarecimentos sobre direitos trabalhistas.\n\nSituação:\n- Tipo de contrato: \n- Tempo de serviço: \n- Motivo da demissão: \n- Questão específica: '
+    },
+    previdenciaria: {
+        pergunta: 'Preciso de orientação sobre benefícios previdenciários.\n\nInformações:\n- Idade: \n- Tempo de contribuição: \n- Tipo de benefício desejado: \n- Situação atual: '
+    },
+    civil: {
+        pergunta: 'Tenho dúvida sobre processo civil.\n\nDetalhes:\n- Tipo de ação: \n- Valor da causa: \n- Prazo: \n- Questão específica: '
+    },
+    contrato: {
+        pergunta: 'Gostaria de análise de contrato.\n\nInformações:\n- Tipo de contrato: \n- Partes envolvidas: \n- Valor: \n- Cláusulas questionáveis: '
+    }
+};
+
+function usarTemplate(tipo) {
+    const template = templates[tipo];
+    if (template) {
+        const perguntaField = document.getElementById('{{ form.pergunta.id_for_label }}');
+        
+        if (perguntaField) {
+            perguntaField.value = template.pergunta;
+            perguntaField.focus();
+            
+            // Posicionar cursor no final
+            const len = perguntaField.value.length;
+            perguntaField.setSelectionRange(len, len);
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('consultaForm');
+    if (form) {
+        // Atualizar status baseado na prioridade
+        const prioridadeField = form.querySelector('select[name="prioridade"]');
+        const statusField = form.querySelector('select[name="status"]');
+        
+        if (prioridadeField && statusField) {
+            prioridadeField.addEventListener('change', function() {
+                const prioridade = this.value;
+                
+                // Se prioridade for alta ou urgente, sugerir status "em_analise"
+                if (prioridade === 'alta' || prioridade === 'urgente') {
+                    if (statusField.value === 'pendente') {
+                        statusField.value = 'em_analise';
+                    }
+                }
+            });
+        }
+        
+        // Marcar como resolvida quando status for "respondida"
+        const resolvidaField = form.querySelector('input[name="resolvida"]');
+        
+        if (statusField && resolvidaField) {
+            statusField.addEventListener('change', function() {
+                if (this.value === 'respondida') {
+                    resolvidaField.checked = true;
+                } else if (this.value === 'pendente') {
+                    resolvidaField.checked = false;
+                }
+            });
+        }
+        
+        // Auto-completar tipo baseado na pergunta
+        const tipoField = form.querySelector('select[name="tipo"]');
+        
+        if (perguntaField && tipoField) {
+            perguntaField.addEventListener('input', function() {
+                const pergunta = this.value.toLowerCase();
+                
+                if (pergunta.includes('trabalho') || pergunta.includes('demissão') || pergunta.includes('fgts')) {
+                    tipoField.value = 'orientacao_trabalhista';
+                } else if (pergunta.includes('aposentadoria') || pergunta.includes('benefício') || pergunta.includes('inss')) {
+                    tipoField.value = 'orientacao_previdenciaria';
+                } else if (pergunta.includes('contrato') || pergunta.includes('cláusula') || pergunta.includes('obrigação')) {
+                    tipoField.value = 'analise_documento';
+                } else if (pergunta.includes('processo') || pergunta.includes('ação') || pergunta.includes('juiz')) {
+                    tipoField.value = 'consulta_processo';
+                }
+            });
+        }
+        
+        // Validação de campos obrigatórios
+        if (perguntaField) {
+            perguntaField.addEventListener('input', function() {
+                if (this.value.trim().length < 30) {
+                    this.classList.add('is-invalid');
+                    let feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (!feedback) {
+                        feedback = document.createElement('div');
+                        feedback.className = 'invalid-feedback d-block';
+                        feedback.textContent = 'A pergunta deve ter pelo menos 30 caracteres para melhor compreensão.';
+                        this.parentNode.appendChild(feedback);
+                    }
+                } else {
+                    this.classList.remove('is-invalid');
+                    const feedback = this.parentNode.querySelector('.invalid-feedback');
+                    if (feedback) {
+                        feedback.remove();
+                    }
+                }
+            });
+        }
+        
+        // Atualizar campo resolvida baseado no status
+        if (statusField) {
+            statusField.addEventListener('change', function() {
+                if (this.value === 'respondida' && resolvidaField) {
+                    resolvidaField.checked = true;
+                }
+            });
+        }
+    }
+});
+</script>

@@ -1,0 +1,488 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reservas - Hotel de Trânsito{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .page-header h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    
+    .page-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+    
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+    }
+    
+    .stat-card h3 {
+        color: #667eea;
+        font-size: 2rem;
+        margin: 0;
+        font-weight: bold;
+    }
+    
+    .stat-card p {
+        color: #6c757d;
+        margin: 0.5rem 0 0 0;
+        font-size: 0.9rem;
+    }
+    
+    .actions-bar {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .search-filters {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    
+    .search-filters select,
+    .search-filters input {
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-new {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-new:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .reserva-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .table {
+        margin: 0;
+    }
+    
+    .table th {
+        background: #f8f9fa;
+        border: none;
+        padding: 1rem;
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .table td {
+        padding: 1rem;
+        border: none;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: middle;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-pendente {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-confirmada {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-cancelada {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-finalizada {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    
+    .reserva-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .reserva-codigo {
+        font-weight: 600;
+        color: #495057;
+        font-size: 1.1rem;
+    }
+    
+    .reserva-dates {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .reserva-hospede {
+        font-weight: 600;
+        color: #495057;
+    }
+    
+    .reserva-quarto {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .reserva-valor {
+        font-weight: 600;
+        color: #28a745;
+        font-size: 1.1rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .pagination-container {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center;
+    }
+    
+    .no-reservas {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    
+    .no-reservas i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+    
+    .date-filter-group {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .date-filter-group input {
+        width: 140px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="page-header">
+        <h1><i class="fas fa-calendar-check me-3"></i>Reservas</h1>
+        <p>Gerencie as reservas do hotel de trânsito</p>
+    </div>
+
+    <!-- Cards de Estatísticas -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ total_reservas }}</h3>
+            <p>Total de Reservas</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ reservas_pendentes }}</h3>
+            <p>Pendentes</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ reservas_confirmadas }}</h3>
+            <p>Confirmadas</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ reservas_finalizadas }}</h3>
+            <p>Finalizadas</p>
+        </div>
+    </div>
+
+    <!-- Barra de Ações e Filtros -->
+    <div class="actions-bar">
+        <div class="search-filters">
+            <form method="get" class="d-flex gap-2">
+                <select name="status" class="form-select form-select-sm">
+                    <option value="">Todos os Status</option>
+                    <option value="pendente" {% if request.GET.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="confirmada" {% if request.GET.status == 'confirmada' %}selected{% endif %}>Confirmada</option>
+                    <option value="cancelada" {% if request.GET.status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+                    <option value="finalizada" {% if request.GET.status == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                </select>
+                <div class="date-filter-group">
+                    <input type="date" name="data_entrada" class="form-control form-control-sm" placeholder="Data Entrada" value="{{ request.GET.data_entrada }}">
+                    <span class="text-muted">até</span>
+                    <input type="date" name="data_saida" class="form-control form-control-sm" placeholder="Data Saída" value="{{ request.GET.data_saida }}">
+                </div>
+                <button type="submit" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-search me-1"></i>Filtrar
+                </button>
+                {% if request.GET %}
+                <a href="{% url 'hotel_transito:reserva_list' %}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-times me-1"></i>Limpar
+                </a>
+                {% endif %}
+            </form>
+        </div>
+        <a href="{% url 'hotel_transito:reserva_create' %}" class="btn-new">
+            <i class="fas fa-plus me-2"></i>Nova Reserva
+        </a>
+    </div>
+
+    <!-- Tabela de Reservas -->
+    <div class="table-container">
+        {% if reservas %}
+        <div class="table-header">
+            <h5>
+                <i class="fas fa-calendar-check me-2"></i>
+                Reservas
+            </h5>
+            <div class="header-actions">
+                <span class="text-muted">
+                    {{ page_obj.start_index|default:1 }}-{{ page_obj.end_index|default:reservas|length }} de {{ page_obj.paginator.count|default:reservas|length }}
+                </span>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Hóspede</th>
+                    <th>Quarto</th>
+                    <th>Período</th>
+                    <th>Status</th>
+                    <th>Valor Total</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                <tr>
+                    <td>
+                        <div class="reserva-info">
+                            <div class="reserva-codigo">{{ reserva.codigo_reserva }}</div>
+                            <div class="reserva-dates">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ reserva.data_reserva|date:"d/m/Y H:i" }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="reserva-info">
+                            <div class="reserva-hospede">{{ reserva.hospede.nome_completo }}</div>
+                            <div class="reserva-quarto">
+                                <i class="fas fa-user me-1"></i>
+                                {{ reserva.hospede.get_tipo_hospede_display }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="reserva-info">
+                            <div class="reserva-quarto">
+                                <strong>{{ reserva.quarto.numero }}</strong>
+                            </div>
+                            <div class="reserva-quarto">
+                                {{ reserva.quarto.get_tipo_display }} - {{ reserva.quarto.capacidade }} pessoa{{ reserva.quarto.capacidade|pluralize:"s" }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="reserva-info">
+                            <div class="reserva-dates">
+                                <strong>Entrada:</strong> {{ reserva.data_entrada|date:"d/m/Y" }} às {{ reserva.hora_entrada|time:"H:i" }}
+                            </div>
+                            <div class="reserva-dates">
+                                <strong>Saída:</strong> {{ reserva.data_saida|date:"d/m/Y" }} às {{ reserva.hora_saida|time:"H:i" }}
+                            </div>
+                            <div class="reserva-dates">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ reserva.quantidade_diarias }} diária{{ reserva.quantidade_diarias|pluralize:"s" }}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ reserva.status }}">
+                            {{ reserva.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="reserva-valor">
+                            R$ {{ reserva.valor_total|floatformat:2 }}
+                        </div>
+                        <div class="reserva-quarto">
+                            R$ {{ reserva.valor_diaria|floatformat:2 }}/diária
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'hotel_transito:reserva_detail' reserva.pk %}" class="btn btn-outline-info btn-sm" title="Ver Detalhes">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'hotel_transito:reserva_update' reserva.pk %}" class="btn btn-outline-warning btn-sm" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'hotel_transito:reserva_delete' reserva.pk %}" class="btn btn-outline-danger btn-sm" title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="table-info">
+            <div class="info-text">
+                <i class="fas fa-calendar-times"></i>
+                <span>Nenhuma reserva encontrada</span>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'hotel_transito:reserva_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Criar Primeira Reserva
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+    <!-- Paginação -->
+    {% if is_paginated %}
+    <div class="pagination-container">
+        <nav aria-label="Paginação das reservas">
+            <ul class="pagination mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_entrada %}&data_entrada={{ request.GET.data_entrada }}{% endif %}{% if request.GET.data_saida %}&data_saida={{ request.GET.data_saida }}{% endif %}">
+                        <i class="fas fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_entrada %}&data_entrada={{ request.GET.data_entrada }}{% endif %}{% if request.GET.data_saida %}&data_saida={{ request.GET.data_saida }}{% endif %}">
+                        <i class="fas fa-angle-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_entrada %}&data_entrada={{ request.GET.data_entrada }}{% endif %}{% if request.GET.data_saida %}&data_saida={{ request.GET.data_saida }}{% endif %}">
+                        <i class="fas fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_entrada %}&data_entrada={{ request.GET.data_entrada }}{% endif %}{% if request.GET.data_saida %}&data_saida={{ request.GET.data_saida }}{% endif %}">
+                        <i class="fas fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Auto-submit do formulário quando os filtros mudarem
+        $('select[name="status"]').on('change', function() {
+            $(this).closest('form').submit();
+        });
+        
+        // Confirmação para exclusão
+        $('.btn-outline-danger').on('click', function(e) {
+            if (!confirm('Tem certeza que deseja excluir esta reserva? Esta ação não pode ser desfeita.')) {
+                e.preventDefault();
+            }
+        });
+        
+        // Tooltips
+        $('[title]').tooltip();
+        
+        // Formatação das datas nos filtros
+        $('input[type="date"]').on('change', function() {
+            // Aguardar um pouco antes de submeter para permitir que o usuário preencha ambas as datas
+            setTimeout(function() {
+                if ($('input[name="data_entrada"]').val() && $('input[name="data_saida"]').val()) {
+                    $('form').submit();
+                }
+            }, 500);
+        });
+    });
+</script>
+{% endblock %}

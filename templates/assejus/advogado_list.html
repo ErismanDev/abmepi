@@ -1,0 +1,567 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Advogados - ASEJUS{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos para pesquisa moderna */
+.search-container {
+    position: relative;
+    margin-bottom: 2rem;
+}
+
+.search-toggle {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    z-index: 1000;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 20px rgba(13, 110, 253, 0.3);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-toggle:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(13, 110, 253, 0.4);
+    color: white;
+}
+
+.search-toggle i {
+    font-size: 1.25rem;
+}
+
+.search-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1001;
+    overflow-y: auto;
+}
+
+.search-panel.active {
+    right: 0;
+}
+
+.search-panel-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: white;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-panel-header h5 {
+    margin: 0;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.search-panel-header h5 i {
+    margin-right: 0.75rem;
+}
+
+.search-panel-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.search-panel-close:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.search-panel-body {
+    padding: 2rem;
+}
+
+.search-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.search-form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+}
+
+.search-form-control,
+.search-form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-form-control:focus,
+.search-form-select:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.search-form-actions {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.search-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.search-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (max-width: 768px) {
+    .search-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .search-toggle {
+        top: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Token CSRF para formulários AJAX -->
+{% csrf_token %}
+
+<!-- Incluir template base de modais ANTES do conteúdo principal -->
+{% include 'assejus/modal_base.html' %}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1 class="h2">
+            <i class="fas fa-balance-scale me-2"></i>
+            Advogados
+        </h1>
+        {% if is_advogado_restricted %}
+            <p class="text-muted mb-0">
+                <i class="fas fa-user-lock me-2 text-warning"></i>
+                <strong>Acesso Restrito:</strong> Você está visualizando apenas seu próprio cadastro.
+            </p>
+        {% else %}
+            <p class="text-muted mb-0">
+                Gerencie todos os advogados da associação
+            </p>
+        {% endif %}
+    </div>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        {% if not is_advogado_restricted %}
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-primary" id="novoAdvogadoBtn">
+                    <i class="fas fa-plus me-1"></i>
+                    Novo Advogado
+                </button>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Botão de pesquisa flutuante -->
+<button class="search-toggle" onclick="toggleSearchPanel()" title="Abrir pesquisa avançada">
+    <i class="fas fa-search"></i>
+</button>
+
+<!-- Painel de pesquisa lateral -->
+<div class="search-panel" id="searchPanel">
+    <div class="search-panel-header">
+        <h5>
+            <i class="fas fa-filter me-2"></i>
+            Pesquisa Avançada
+        </h5>
+        <button class="search-panel-close" onclick="toggleSearchPanel()">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <div class="search-panel-body">
+        <form method="get" id="searchForm">
+            <div class="search-form-group">
+                <label for="{{ search_form.nome.id_for_label }}">
+                    <i class="fas fa-user me-2 text-primary"></i>Nome
+                </label>
+                <input type="text" 
+                       name="{{ search_form.nome.name }}" 
+                       id="{{ search_form.nome.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="Digite o nome do advogado"
+                       value="{{ search_form.nome.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.cpf.id_for_label }}">
+                    <i class="fas fa-id-card me-2 text-primary"></i>CPF
+                </label>
+                <input type="text" 
+                       name="{{ search_form.cpf.name }}" 
+                       id="{{ search_form.cpf.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="XXX.XXX.XXX-XX"
+                       value="{{ search_form.cpf.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.oab.id_for_label }}">
+                    <i class="fas fa-balance-scale me-2 text-primary"></i>OAB
+                </label>
+                <input type="text" 
+                       name="{{ search_form.oab.name }}" 
+                       id="{{ search_form.oab.id_for_label }}"
+                       class="search-form-control"
+                       placeholder="Digite o número OAB"
+                       value="{{ search_form.oab.value|default:'' }}">
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.uf_oab.id_for_label }}">
+                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>UF OAB
+                </label>
+                <select name="{{ search_form.uf_oab.name }}" 
+                        id="{{ search_form.uf_oab.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.uf_oab.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.uf_oab.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.situacao.id_for_label }}">
+                    <i class="fas fa-clipboard-check me-2 text-primary"></i>Situação
+                </label>
+                <select name="{{ search_form.situacao.name }}" 
+                        id="{{ search_form.situacao.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.situacao.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.situacao.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.estado.id_for_label }}">
+                    <i class="fas fa-map me-2 text-primary"></i>Estado
+                </label>
+                <select name="{{ search_form.estado.name }}" 
+                        id="{{ search_form.estado.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.estado.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.estado.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-group">
+                <label for="{{ search_form.ativo.id_for_label }}">
+                    <i class="fas fa-toggle-on me-2 text-primary"></i>Status
+                </label>
+                <select name="{{ search_form.ativo.name }}" 
+                        id="{{ search_form.ativo.id_for_label }}"
+                        class="search-form-select">
+                    {% for choice in search_form.ativo.field.choices %}
+                        <option value="{{ choice.0 }}" {% if choice.0 == search_form.ativo.value %}selected{% endif %}>
+                            {{ choice.1 }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="search-form-actions">
+                <button type="submit" class="btn btn-primary w-100 mb-2">
+                    <i class="fas fa-search me-2"></i>Pesquisar
+                </button>
+                <a href="{% url 'assejus:advogado_list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-times me-2"></i>Limpar Filtros
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Overlay para fechar o painel -->
+<div class="search-overlay" id="searchOverlay" onclick="toggleSearchPanel()"></div>
+
+<!-- Lista de Advogados -->
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list me-2"></i>
+            Lista de Advogados
+        </h6>
+    </div>
+    <div class="card-body">
+        {% if advogados and advogados|length > 0 %}
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Foto</th>
+                        <th>Nome</th>
+                        <th>OAB</th>
+                        <th>UF</th>
+                        <th>Especialidades</th>
+                        <th>Contato</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for advogado in advogados %}
+                    <tr>
+                        <td>
+                            {% if advogado.foto %}
+                                <img src="{{ advogado.foto.url }}" alt="{{ advogado.nome }}" 
+                                     class="avatar-rectangular">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong>{{ advogado.nome }}</strong>
+                        </td>
+                        <td>{{ advogado.oab }}</td>
+                        <td>{{ advogado.uf_oab }}</td>
+                        <td>
+                            {% if advogado.especialidades %}
+                                <span class="badge bg-primary me-1">{{ advogado.especialidades }}</span>
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="small">
+                                <div><i class="fas fa-envelope me-1"></i>{{ advogado.email }}</div>
+                                <div><i class="fas fa-phone me-1"></i>{{ advogado.telefone }}</div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if advogado.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'assejus:advogado_detail' advogado.pk %}" class="btn btn-sm btn-outline-primary" title="Ver Detalhes Completos">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-warning" title="Editar" onclick="openAdvogadoEditModal({{ advogado.pk }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <a href="{% url 'assejus:advogado_delete' advogado.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginação -->
+        {% if is_paginated %}
+        <nav aria-label="Paginação">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <i class="fas fa-angle-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                            <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-balance-scale fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Nenhum advogado encontrado</h5>
+            <p class="text-muted">
+                {% if search_form.nome.value or search_form.cpf.value or search_form.oab.value or search_form.uf_oab.value or search_form.situacao.value or search_form.estado.value or search_form.ativo.value %}
+                    Os filtros aplicados não retornaram resultados.
+                {% else %}
+                    Não há advogados cadastrados no sistema.
+                {% endif %}
+            </p>
+            <button type="button" class="btn btn-primary" id="cadastrarAdvogadoBtn">
+                <i class="fas fa-plus me-1"></i>
+                Cadastrar Primeiro Advogado
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Scripts específicos da página -->
+<!-- Novo sistema de modais ASEJUS -->
+<script src="{% static 'assejus/js/modais_assejus.js' %}"></script>
+<script>
+// Função para alternar a visibilidade do painel de pesquisa
+function toggleSearchPanel() {
+    const searchPanel = document.getElementById('searchPanel');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchToggle = document.querySelector('.search-toggle');
+
+    if (searchPanel.classList.contains('active')) {
+        searchPanel.classList.remove('active');
+        searchOverlay.classList.remove('active');
+        searchToggle.classList.remove('active');
+    } else {
+        searchPanel.classList.add('active');
+        searchOverlay.classList.add('active');
+        searchToggle.classList.add('active');
+    }
+}
+
+// Configuração simplificada dos botões
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== CONFIGURAÇÃO DOS BOTÕES ===');
+    
+    // Botão Novo Advogado
+    const novoAdvogadoBtn = document.getElementById('novoAdvogadoBtn');
+    if (novoAdvogadoBtn) {
+        novoAdvogadoBtn.onclick = function() {
+            console.log('🔘 Botão Novo Advogado clicado');
+            if (typeof openAdvogadoModal === 'function') {
+                openAdvogadoModal();
+            } else {
+                console.error('❌ openAdvogadoModal não disponível');
+                alert('Erro: Função não disponível. Recarregue a página.');
+            }
+        };
+        console.log('✅ Botão Novo Advogado configurado');
+    }
+    
+    // Botão cadastrar primeiro advogado
+    const cadastrarAdvogadoBtn = document.getElementById('cadastrarAdvogadoBtn');
+    if (cadastrarAdvogadoBtn) {
+        cadastrarAdvogadoBtn.onclick = function() {
+            console.log('🔘 Botão Cadastrar Primeiro Advogado clicado');
+            if (typeof openAdvogadoModal === 'function') {
+                openAdvogadoModal();
+            } else {
+                console.error('❌ openAdvogadoModal não disponível');
+                alert('Erro: Função não disponível. Recarregue a página.');
+            }
+        };
+        console.log('✅ Botão Cadastrar Primeiro Advogado configurado');
+    }
+    
+    // Configurar botões de detalhes e edição
+    document.querySelectorAll('[onclick*="openAdvogadoDetailModal"]').forEach(btn => {
+        const advogadoId = btn.getAttribute('data-advogado-id') || btn.getAttribute('onclick').match(/\d+/)?.[0];
+        if (advogadoId) {
+            btn.onclick = function() {
+                if (typeof openAdvogadoDetailModal === 'function') {
+                    openAdvogadoDetailModal(advogadoId);
+                } else {
+                    alert('Função não disponível. Recarregue a página.');
+                }
+            };
+        }
+    });
+    
+    // Configurar botões de edição
+    document.querySelectorAll('[onclick*="openAdvogadoEditModal"]').forEach(btn => {
+        const advogadoId = btn.getAttribute('data-advogado-id') || btn.getAttribute('onclick').match(/\d+/)?.[0];
+        if (advogadoId) {
+            btn.onclick = function() {
+                if (typeof openAdvogadoEditModal === 'function') {
+                    openAdvogadoEditModal(advogadoId);
+                } else {
+                    alert('Função não disponível. Recarregue a página.');
+                }
+            };
+        }
+    });
+    
+    console.log('✅ Todos os botões configurados');
+});
+</script>
+{% endblock %}

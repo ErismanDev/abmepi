@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .card-header {
+        border-bottom: none;
+        font-weight: 600;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .table {
+        border-radius: 0.5rem;
+        overflow: hidden;
+        font-size: 0.9rem;
+    }
+    
+    .table thead th {
+        background-color: #f8f9fa;
+        border-bottom: 2px solid #dee2e6;
+        font-weight: 600;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    
+    .table tbody td {
+        vertical-align: middle;
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .table-responsive {
+        border-radius: 0.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        overflow-x: auto;
+        overflow-y: visible;
+    }
+    
+    .btn-group-sm {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .btn-group-sm .btn {
+        flex: 1;
+        min-width: 40px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .table tbody td:first-child img,
+    .table tbody td:first-child div {
+        width: 40px !important;
+        height: 40px !important;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .modal-content {
+        border-radius: 1rem;
+        border: none;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+    }
+    
+    .modal-header {
+        border-bottom: 1px solid #dee2e6;
+        border-radius: 1rem 1rem 0 0;
+    }
+    
+    .alert {
+        border-radius: 0.5rem;
+        border: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <main class="col-12 px-md-4">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div class="flex-grow-1">
+                <h1 class="h2 text-primary mb-2">
+                    <i class="fas fa-share-alt me-2"></i>{{ title }}
+                </h1>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-info-circle me-2"></i>{{ subtitle }}
+                </p>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0 flex-shrink-0">
+                <a href="{% url 'core:feed_post_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Novo Post
+                </a>
+                <a href="{% url 'core:institucional_edit' %}" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar
+                </a>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Posts do Feed Social
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        {% if posts %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Imagem</th>
+                                            <th>Título</th>
+                                            <th>Tipo</th>
+                                            <th>Autor</th>
+                                            <th>Status</th>
+                                            <th>Destaque</th>
+                                            <th>Data</th>
+                                            <th>Interações</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for post in posts %}
+                                        <tr>
+                                            <td>
+                                                {% if post.imagem %}
+                                                    <img src="{{ post.imagem.url }}" alt="{{ post.titulo }}" class="img-thumbnail">
+                                                {% else %}
+                                                    <div class="bg-light d-flex align-items-center justify-content-center">
+                                                        <i class="fas fa-image text-muted"></i>
+                                                    </div>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <strong>{{ post.titulo }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ post.conteudo|truncatechars:100 }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ post.get_tipo_post_display }}</span>
+                                            </td>
+                                            <td>{{ post.autor }}</td>
+                                            <td>
+                                                {% if post.ativo %}
+                                                    <span class="badge bg-success">Ativo</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Inativo</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if post.destaque %}
+                                                    <span class="badge bg-warning">Destaque</span>
+                                                {% else %}
+                                                    <span class="badge bg-light text-dark">Normal</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {{ post.data_publicacao|date:"d/m/Y H:i" }}
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-heart text-danger"></i> {{ post.likes }} |
+                                                    <i class="fas fa-comment text-info"></i> {{ post.comentarios }} |
+                                                    <i class="fas fa-share text-success"></i> {{ post.compartilhamentos }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="editarPost({{ post.id }})">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-danger" onclick="excluirPost({{ post.id }}, '{{ post.titulo }}')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-share-alt fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Nenhum post encontrado</h5>
+                                <p class="text-muted">Comece criando seu primeiro post do feed social.</p>
+                                <a href="{% url 'core:feed_post_create' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>Criar Primeiro Post
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o post <strong id="postTitle"></strong>?</p>
+                <p class="text-muted">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Excluir</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function editarPost(postId) {
+    // Implementar edição do post
+    console.log('Editar post:', postId);
+    // Por enquanto, redirecionar para a página de edição
+    window.location.href = `/core/feed/posts/${postId}/atualizar/`;
+}
+
+function excluirPost(postId, postTitle) {
+    document.getElementById('postTitle').textContent = postTitle;
+    document.getElementById('confirmDeleteBtn').onclick = function() {
+        // Fazer requisição AJAX para excluir
+        fetch(`/core/feed/posts/${postId}/excluir/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao excluir post: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao excluir post');
+        });
+    };
+    
+    // Mostrar modal
+    new bootstrap.Modal(document.getElementById('confirmDeleteModal')).show();
+}
+
+$(document).ready(function() {
+    // Adicionar token CSRF aos formulários
+    $('form').prepend('{% csrf_token %}');
+});
+</script>
+{% endblock %}

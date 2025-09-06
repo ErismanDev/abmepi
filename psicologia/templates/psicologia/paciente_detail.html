@@ -1,0 +1,1707 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ paciente.associado.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">{{ paciente.associado.nome }}</h1>
+                <div>
+                    <button type="button" class="btn btn-warning shadow-sm" onclick="editarPaciente()">
+                        <i class="fas fa-edit fa-sm text-white-50"></i> Editar
+                    </button>
+                    <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Informações principais -->
+        <div class="col-lg-9">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações do Paciente</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            {% if paciente.associado.foto %}
+                                <img src="{{ paciente.associado.foto.url }}" alt="Foto de {{ paciente.associado.nome }}" 
+                                     class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                     style="width: 150px; height: 150px;">
+                                    <i class="fas fa-user fa-4x text-white"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Nome:</strong><br>{{ paciente.associado.nome }}</p>
+                                    <p><strong>CPF:</strong><br>{{ paciente.associado.cpf }}</p>
+                                    <p><strong>Psicólogo Responsável:</strong> 
+                                        {% if paciente.psicologo_responsavel %}
+                                            <span class="badge bg-primary text-white fw-bold">
+                                                {{ paciente.psicologo_responsavel.nome_completo }}
+                                            </span>
+                                            {% if user.tipo_usuario == 'psicologo' and user.psicologo == paciente.psicologo_responsavel %}
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-warning btn-sm btn-transferir-paciente" 
+                                                            data-paciente-id="{{ paciente.pk }}" 
+                                                            data-paciente-nome="{{ paciente.associado.nome }}" 
+                                                            data-psicologo-atual="{{ paciente.psicologo_responsavel.nome_completo }}">
+                                                        <i class="fas fa-exchange-alt"></i> Transferir Paciente
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="text-muted">Não atribuído</span>
+                                            {% if user.tipo_usuario in 'administrador_sistema,atendente_psicologo' %}
+                                                <div class="mt-2">
+                                                    <button type="button" class="btn btn-success btn-sm btn-transferir-paciente" 
+                                                            data-paciente-id="{{ paciente.pk }}" 
+                                                            data-paciente-nome="{{ paciente.associado.nome }}" 
+                                                            data-psicologo-atual="Nenhum">
+                                                        <i class="fas fa-user-plus"></i> Atribuir Psicólogo
+                                                    </button>
+                                                </div>
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Status:</strong> 
+                                        {% if paciente.ativo %}
+                                            <span class="badge bg-success text-white fw-bold">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger text-white fw-bold">Inativo</span>
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Primeira Consulta:</strong><br>
+                                        {% if paciente.data_primeira_consulta %}
+                                            {{ paciente.data_primeira_consulta|date:"d/m/Y" }}
+                                        {% else %}
+                                            <span class="text-muted">Não registrada</span>
+                                        {% endif %}
+                                    </p>
+                                    <p><strong>Data de Cadastro:</strong><br>{{ paciente.data_cadastro|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if paciente.observacoes_iniciais %}
+                    <div class="row">
+                        <div class="col-12">
+                            <p><strong>Observações Iniciais:</strong></p>
+                            <p>{{ paciente.observacoes_iniciais }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Ficha do Paciente -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Ficha do Paciente</h6>
+                </div>
+                <div class="card-body">
+                    <!-- Abas para organizar o conteúdo -->
+                    <ul class="nav nav-tabs" id="fichaTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="sessoes-tab" data-bs-toggle="tab" data-bs-target="#sessoes" type="button" role="tab" aria-controls="sessoes" aria-selected="true">
+                                <i class="fas fa-calendar-alt"></i> Sessões
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="evolucoes-tab" data-bs-toggle="tab" data-bs-target="#evolucoes" type="button" role="tab" aria-controls="evolucoes" aria-selected="false">
+                                <i class="fas fa-chart-line"></i> Evoluções
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="prontuario-tab" data-bs-toggle="tab" data-bs-target="#prontuario" type="button" role="tab" aria-controls="prontuario" aria-selected="false">
+                                <i class="fas fa-file-medical"></i> Prontuário
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="documentos-tab" data-bs-toggle="tab" data-bs-target="#documentos" type="button" role="tab" aria-controls="documentos" aria-selected="false">
+                                <i class="fas fa-file-alt"></i> Documentos
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Conteúdo das abas -->
+                    <div class="tab-content" id="fichaTabsContent">
+                        <!-- Aba Sessões -->
+                        <div class="tab-pane fade show active" id="sessoes" role="tabpanel" aria-labelledby="sessoes-tab">
+                            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                                <h6 class="mb-0">Histórico de Sessões</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="abrirModalSessao()">
+                                    <i class="fas fa-plus"></i> Nova Sessão
+                                </button>
+                            </div>
+                            {% if sessoes %}
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Data/Hora</th>
+                                                <th>Psicólogo</th>
+                                                <th>Tipo</th>
+                                                <th>Status</th>
+                                                <th>Duração</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                                                                         {% for sessao in sessoes %}
+                                             <tr>
+                                                 <td>{{ sessao.data_hora|date:"d/m/Y H:i" }}</td>
+                                                 <td>
+                                                     {{ sessao.psicologo.nome_completo }}
+                                                     {% if sessao.psicologo == paciente.psicologo_responsavel %}
+                                                         <span class="badge bg-primary ms-1">Atual</span>
+                                                     {% endif %}
+                                                 </td>
+                                                 <td>
+                                                     <span class="badge bg-info">{{ sessao.get_tipo_sessao_display }}</span>
+                                                 </td>
+                                                 <td>
+                                                     {% if sessao.status == 'agendada' %}
+                                                         <span class="badge bg-warning">{{ sessao.get_status_display }}</span>
+                                                     {% elif sessao.status == 'confirmada' %}
+                                                         <span class="badge bg-info">{{ sessao.get_status_display }}</span>
+                                                     {% elif sessao.status == 'realizada' %}
+                                                         <span class="badge bg-success">{{ sessao.get_status_display }}</span>
+                                                     {% elif sessao.status == 'cancelada' %}
+                                                         <span class="badge bg-danger">{{ sessao.get_status_display }}</span>
+                                                     {% else %}
+                                                         <span class="badge bg-secondary">{{ sessao.get_status_display }}</span>
+                                                     {% endif %}
+                                                 </td>
+                                                 <td>{{ sessao.duracao }} min</td>
+                                                 <td>
+                                                     {% if sessao.status != 'realizada' and sessao.psicologo == paciente.psicologo_responsavel %}
+                                                         <button type="button" class="btn btn-sm btn-warning btn-editar-sessao" data-sessao-id="{{ sessao.pk }}">
+                                                             <i class="fas fa-edit"></i>
+                                                         </button>
+                                                         <button type="button" class="btn btn-sm btn-danger btn-excluir-sessao" data-sessao-id="{{ sessao.pk }}">
+                                                             <i class="fas fa-trash"></i>
+                                                         </button>
+                                                     {% endif %}
+                                                     {% if sessao.status != 'realizada' and sessao.status != 'cancelada' and sessao.psicologo == paciente.psicologo_responsavel %}
+                                                         <button type="button" class="btn btn-sm btn-success" 
+                                                                 data-bs-toggle="modal" 
+                                                                 data-bs-target="#finalizarSessaoModal{{ sessao.pk }}"
+                                                                 title="Finalizar Sessão">
+                                                             <i class="fas fa-check"></i>
+                                                         </button>
+                                                     {% endif %}
+                                                 </td>
+                                             </tr>
+                                             {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-calendar-times fa-2x text-gray-300 mb-2"></i>
+                                    <p class="text-muted">Nenhuma sessão encontrada.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Aba Evoluções -->
+                        <div class="tab-pane fade" id="evolucoes" role="tabpanel" aria-labelledby="evolucoes-tab">
+                            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                                <h6 class="mb-0">Evoluções Clínicas</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="abrirModalEvolucao()">
+                                    <i class="fas fa-plus"></i> Nova Evolução
+                                </button>
+                            </div>
+                            {% if evolucoes %}
+                                <div class="list-group">
+                                                                         {% for evolucao in evolucoes %}
+                                     <div class="list-group-item">
+                                         <div class="d-flex w-100 justify-content-between">
+                                             <h6 class="mb-1">
+                                                 {{ evolucao.sessao.data_hora|date:"d/m/Y H:i" }} - {{ evolucao.sessao.psicologo.nome_completo }}
+                                                 {% if evolucao.sessao.psicologo == paciente.psicologo_responsavel %}
+                                                     <span class="badge bg-primary ms-1">Atual</span>
+                                                 {% endif %}
+                                             </h6>
+                                             <small class="text-muted">{{ evolucao.data_evolucao|date:"d/m/Y" }}</small>
+                                         </div>
+                                         <p class="mb-1">{{ evolucao.conteudo|truncatewords:30 }}</p>
+                                         {% if evolucao.observacoes_terapeuta %}
+                                             <small class="text-muted"><strong>Observações:</strong> {{ evolucao.observacoes_terapeuta|truncatewords:20 }}</small>
+                                         {% endif %}
+                                         <div class="mt-2">
+                                                                                                          {% if evolucao.sessao.psicologo == paciente.psicologo_responsavel %}
+                                                                 <button type="button" class="btn btn-sm btn-warning btn-editar-evolucao" data-evolucao-id="{{ evolucao.pk }}">
+                                                                     <i class="fas fa-edit"></i> Editar
+                                                                 </button>
+                                                                 <button type="button" class="btn btn-sm btn-danger btn-excluir-evolucao" data-evolucao-id="{{ evolucao.pk }}">
+                                                                     <i class="fas fa-trash"></i> Excluir
+                                                                 </button>
+                                                             {% endif %}
+                                         </div>
+                                     </div>
+                                     {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-chart-line fa-2x text-gray-300 mb-2"></i>
+                                    <p class="text-muted">Nenhuma evolução encontrada.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                                                 <!-- Aba Prontuário -->
+                         <div class="tab-pane fade" id="prontuario" role="tabpanel" aria-labelledby="prontuario-tab">
+                             <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                                 <h6 class="mb-0">Prontuário Eletrônico</h6>
+                                 {% if prontuario %}
+                                     <button type="button" class="btn btn-sm btn-warning" onclick="abrirModalProntuario()">
+                                         <i class="fas fa-edit"></i> Editar Prontuário
+                                     </button>
+                                 {% else %}
+                                     <button type="button" class="btn btn-sm btn-primary" onclick="abrirModalProntuario()">
+                                         <i class="fas fa-plus"></i> Criar Prontuário
+                                     </button>
+                                 {% endif %}
+                             </div>
+                             {% if prontuario %}
+                                 <div class="row">
+                                     <div class="col-md-6">
+                                         <h6 class="text-primary">Queixa Principal</h6>
+                                         <p class="border rounded p-3 bg-light">{{ prontuario.queixa_principal }}</p>
+                                         
+                                         {% if prontuario.historico_familiar %}
+                                             <h6 class="text-primary">Histórico Familiar</h6>
+                                             <p class="border rounded p-3 bg-light">{{ prontuario.historico_familiar }}</p>
+                                         {% endif %}
+                                     </div>
+                                     <div class="col-md-6">
+                                         {% if prontuario.hipotese_diagnostica %}
+                                             <h6 class="text-primary">Hipótese Diagnóstica</h6>
+                                             <p class="border rounded p-3 bg-light">{{ prontuario.hipotese_diagnostica }}</p>
+                                         {% endif %}
+                                         
+                                         {% if prontuario.plano_terapeutico %}
+                                             <h6 class="text-primary">Plano Terapêutico</h6>
+                                             <p class="border rounded p-3 bg-light">{{ prontuario.plano_terapeutico }}</p>
+                                         {% endif %}
+                                     </div>
+                                 </div>
+                             {% else %}
+                                 <div class="text-center py-4">
+                                     <i class="fas fa-file-medical fa-2x text-gray-300 mb-2"></i>
+                                     <p class="text-muted">Nenhum prontuário encontrado.</p>
+                                     <p class="text-muted">Clique no botão acima para criar o prontuário do paciente.</p>
+                                 </div>
+                             {% endif %}
+                         </div>
+
+                        <!-- Aba Documentos -->
+                        <div class="tab-pane fade" id="documentos" role="tabpanel" aria-labelledby="documentos-tab">
+                            <div class="d-flex justify-content-between align-items-center mt-3 mb-3">
+                                <h6 class="mb-0">Documentos do Paciente</h6>
+                                <button type="button" class="btn btn-sm btn-primary" onclick="abrirModalDocumento()">
+                                    <i class="fas fa-plus"></i> Novo Documento
+                                </button>
+                            </div>
+                            {% if documentos %}
+                                <div class="list-group">
+                                                                         {% for documento in documentos %}
+                                     <div class="list-group-item">
+                                         <div class="d-flex w-100 justify-content-between">
+                                             <h6 class="mb-1">
+                                                 {{ documento.titulo }}
+                                                 {% if documento.psicologo == paciente.psicologo_responsavel %}
+                                                     <span class="badge bg-primary ms-1">Atual</span>
+                                                 {% endif %}
+                                             </h6>
+                                             <span class="badge bg-secondary">{{ documento.get_tipo_display }}</span>
+                                         </div>
+                                         <small class="text-muted">
+                                             Criado por: {{ documento.psicologo.nome_completo }} em {{ documento.data_criacao|date:"d/m/Y H:i" }}
+                                         </small>
+                                         <div class="mt-2">
+                                             <button type="button" class="btn btn-sm btn-info me-1 btn-visualizar-documento" data-documento-id="{{ documento.pk }}">
+                                                 <i class="fas fa-eye"></i> Visualizar
+                                             </button>
+                                             {% if documento.psicologo == paciente.psicologo_responsavel %}
+                                                 <button type="button" class="btn btn-sm btn-warning me-1 btn-editar-documento" data-documento-id="{{ documento.pk }}">
+                                                     <i class="fas fa-edit"></i> Editar
+                                                 </button>
+                                                 <button type="button" class="btn btn-sm btn-danger btn-excluir-documento" data-documento-id="{{ documento.pk }}">
+                                                     <i class="fas fa-trash"></i> Excluir
+                                                 </button>
+                                             {% endif %}
+                                         </div>
+                                     </div>
+                                     {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-file-alt fa-2x text-gray-300 mb-2"></i>
+                                    <p class="text-muted">Nenhum documento encontrado.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Estatísticas -->
+        <div class="col-lg-3">
+            <!-- Estatísticas Rápidas -->
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Estatísticas</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-primary mb-0">{{ sessoes.count }}</h4>
+                                <small class="text-muted">Sessões</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-info mb-0">{{ evolucoes.count }}</h4>
+                                <small class="text-muted">Evoluções</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center mt-2">
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-success mb-0">{{ documentos.count }}</h4>
+                                <small class="text-muted">Documentos</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-2">
+                                <h4 class="text-warning mb-0">{% if prontuario %}1{% else %}0{% endif %}</h4>
+                                <small class="text-muted">Prontuário</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modais para Finalizar Sessões -->
+{% for sessao in sessoes %}
+    {% if sessao.status != 'realizada' and sessao.status != 'cancelada' %}
+        <div class="modal fade" id="finalizarSessaoModal{{ sessao.pk }}" tabindex="-1" aria-labelledby="finalizarSessaoModalLabel{{ sessao.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="finalizarSessaoModalLabel{{ sessao.pk }}">
+                            Finalizar Sessão - {{ sessao.data_hora|date:"d/m/Y H:i" }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="post" action="{% url 'psicologia:finalizar_sessao' paciente.pk sessao.pk %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="status{{ sessao.pk }}" class="form-label">Status da Sessão:</label>
+                                <select class="form-select" id="status{{ sessao.pk }}" name="status" required>
+                                    <option value="">Selecione o status...</option>
+                                    <option value="realizada">Realizada</option>
+                                    <option value="confirmada">Confirmada</option>
+                                    <option value="cancelada">Cancelada</option>
+                                    <option value="remarcada">Remarcada</option>
+                                    <option value="ausente">Ausente</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="observacoes{{ sessao.pk }}" class="form-label">Observações (opcional):</label>
+                                <textarea class="form-control" id="observacoes{{ sessao.pk }}" name="observacoes" rows="3" 
+                                          placeholder="Adicione observações sobre a sessão..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-check"></i> Atualizar Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+
+<!-- Modal do Prontuário -->
+<div class="modal fade" id="modalProntuario" tabindex="-1" aria-labelledby="modalProntuarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                                 <h5 class="modal-title" id="modalProntuarioLabel">
+                     <i class="fas fa-file-medical"></i> {% if prontuario %}Editar{% else %}Criar{% endif %} Prontuário Eletrônico - {{ paciente.associado.nome }}
+                 </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                         <form method="post" action="{% if prontuario %}{% url 'psicologia:prontuario_from_paciente_update' paciente.pk prontuario.pk %}{% else %}{% url 'psicologia:prontuario_from_paciente_create' paciente.pk %}{% endif %}" id="formProntuario">
+                 {% csrf_token %}
+                 <div class="modal-body">
+                        <div class="row">
+                                                         <!-- Informações do Paciente (Somente Leitura) -->
+                             <div class="col-12 mb-4">
+                                 <h6 class="border-bottom pb-2">
+                                     <i class="fas fa-user"></i> Informações do Paciente
+                                 </h6>
+                                 <div class="row">
+                                     <div class="col-md-6">
+                                         <p><strong>Nome:</strong> {{ paciente.associado.nome }}</p>
+                                         <p><strong>CPF:</strong> {{ paciente.associado.cpf }}</p>
+                                         <p><strong>Data de Nascimento:</strong> 
+                                             {% if paciente.associado.data_nascimento %}
+                                                 {{ paciente.associado.data_nascimento|date:"d/m/Y" }}
+                                             {% else %}
+                                                 <span class="text-muted">Não informado</span>
+                                             {% endif %}
+                                         </p>
+                                     </div>
+                                     <div class="col-md-6">
+                                         <p><strong>Psicólogo Responsável:</strong><br>
+                                             {% if paciente.psicologo_responsavel %}
+                                                 {{ paciente.psicologo_responsavel.nome_completo }}<br>
+                                                 <small class="text-muted">CRP: {{ paciente.psicologo_responsavel.crp }}</small><br>
+                                                 <small class="text-muted">{{ paciente.psicologo_responsavel.especialidades|default:"Especialidade não especificada" }}</small>
+                                             {% else %}
+                                                 <span class="text-muted">Não atribuído</span>
+                                             {% endif %}
+                                         </p>
+                                     </div>
+                                 </div>
+                             </div>
+
+                            <!-- Seção 1: Queixa e Motivo da Consulta -->
+                            <div class="col-12 mb-4">
+                                <h6 class="border-bottom pb-2">
+                                    <i class="fas fa-comment-medical"></i> Queixa e Motivo da Consulta
+                                </h6>
+                                
+                                                                 <!-- Queixa Principal -->
+                                 <div class="mb-3">
+                                     <label for="queixa_principal" class="form-label"><strong>Queixa Principal *</strong></label>
+                                     <textarea class="form-control" id="queixa_principal" name="queixa_principal" rows="4" required>{% if prontuario %}{{ prontuario.queixa_principal|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Queixas Secundárias -->
+                                 <div class="mb-3">
+                                     <label for="queixas_secundarias" class="form-label"><strong>Queixas Secundárias</strong></label>
+                                     <textarea class="form-control" id="queixas_secundarias" name="queixas_secundarias" rows="3">{% if prontuario %}{{ prontuario.queixas_secundarias|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Expectativas do Tratamento -->
+                                 <div class="mb-3">
+                                     <label for="expectativas_tratamento" class="form-label"><strong>Expectativas do Tratamento</strong></label>
+                                     <textarea class="form-control" id="expectativas_tratamento" name="expectativas_tratamento" rows="3">{% if prontuario %}{{ prontuario.expectativas_tratamento|default:"" }}{% endif %}</textarea>
+                                 </div>
+                            </div>
+
+                            <!-- Seção 2: Histórico Clínico -->
+                            <div class="col-12 mb-4">
+                                <h6 class="border-bottom pb-2">
+                                    <i class="fas fa-history"></i> Histórico Clínico
+                                </h6>
+                                
+                                                                 <!-- Histórico Familiar -->
+                                 <div class="mb-3">
+                                     <label for="historico_familiar" class="form-label"><strong>Histórico Familiar</strong></label>
+                                     <textarea class="form-control" id="historico_familiar" name="historico_familiar" rows="3">{% if prontuario %}{{ prontuario.historico_familiar|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Histórico Pessoal -->
+                                 <div class="mb-3">
+                                     <label for="historico_pessoal" class="form-label"><strong>Histórico Pessoal</strong></label>
+                                     <textarea class="form-control" id="historico_pessoal" name="historico_pessoal" rows="3">{% if prontuario %}{{ prontuario.historico_pessoal|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Histórico Médico -->
+                                 <div class="mb-3">
+                                     <label for="historico_medico" class="form-label"><strong>Histórico Médico</strong></label>
+                                     <textarea class="form-control" id="historico_medico" name="historico_medico" rows="3">{% if prontuario %}{{ prontuario.historico_medico|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Histórico Psicológico -->
+                                 <div class="mb-3">
+                                     <label for="historico_psicologico" class="form-label"><strong>Histórico Psicológico</strong></label>
+                                     <textarea class="form-control" id="historico_psicologico" name="historico_psicologico" rows="3">{% if prontuario %}{{ prontuario.historico_psicologico|default:"" }}{% endif %}</textarea>
+                                 </div>
+                            </div>
+
+                            <!-- Seção 3: Avaliação Psicológica -->
+                            <div class="col-12 mb-4">
+                                <h6 class="border-bottom pb-2">
+                                    <i class="fas fa-brain"></i> Avaliação Psicológica
+                                </h6>
+                                
+                                                                 <!-- Hipótese Diagnóstica -->
+                                 <div class="mb-3">
+                                     <label for="hipotese_diagnostica" class="form-label"><strong>Hipótese Diagnóstica</strong></label>
+                                     <textarea class="form-control" id="hipotese_diagnostica" name="hipotese_diagnostica" rows="3">{% if prontuario %}{{ prontuario.hipotese_diagnostica|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Sintomas Principais -->
+                                 <div class="mb-3">
+                                     <label for="sintomas_principais" class="form-label"><strong>Sintomas Principais</strong></label>
+                                     <textarea class="form-control" id="sintomas_principais" name="sintomas_principais" rows="3">{% if prontuario %}{{ prontuario.sintomas_principais|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Fatores Estressores -->
+                                 <div class="mb-3">
+                                     <label for="fatores_estressores" class="form-label"><strong>Fatores Estressores</strong></label>
+                                     <textarea class="form-control" id="fatores_estressores" name="fatores_estressores" rows="3">{% if prontuario %}{{ prontuario.fatores_estressores|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Recursos de Coping -->
+                                 <div class="mb-3">
+                                     <label for="recursos_coping" class="form-label"><strong>Recursos de Coping</strong></label>
+                                     <textarea class="form-control" id="recursos_coping" name="recursos_coping" rows="3">{% if prontuario %}{{ prontuario.recursos_coping|default:"" }}{% endif %}</textarea>
+                                 </div>
+                            </div>
+
+                            <!-- Seção 4: Plano Terapêutico -->
+                            <div class="col-12 mb-4">
+                                <h6 class="border-bottom pb-2">
+                                    <i class="fas fa-clipboard-list"></i> Plano Terapêutico
+                                </h6>
+                                
+                                                                 <!-- Plano Terapêutico -->
+                                 <div class="mb-3">
+                                     <label for="plano_terapeutico" class="form-label"><strong>Plano Terapêutico</strong></label>
+                                     <textarea class="form-control" id="plano_terapeutico" name="plano_terapeutico" rows="3">{% if prontuario %}{{ prontuario.plano_terapeutico|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Objetivos do Tratamento -->
+                                 <div class="mb-3">
+                                     <label for="objetivos_tratamento" class="form-label"><strong>Objetivos do Tratamento</strong></label>
+                                     <textarea class="form-control" id="objetivos_tratamento" name="objetivos_tratamento" rows="3">{% if prontuario %}{{ prontuario.objetivos_tratamento|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Técnicas de Intervenção -->
+                                 <div class="mb-3">
+                                     <label for="tecnicas_intervencao" class="form-label"><strong>Técnicas de Intervenção</strong></label>
+                                     <textarea class="form-control" id="tecnicas_intervencao" name="tecnicas_intervencao" rows="3">{% if prontuario %}{{ prontuario.tecnicas_intervencao|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Prazo Estimado -->
+                                 <div class="mb-3">
+                                     <label for="prazo_estimado" class="form-label"><strong>Prazo Estimado</strong></label>
+                                     <textarea class="form-control" id="prazo_estimado" name="prazo_estimado" rows="2">{% if prontuario %}{{ prontuario.prazo_estimado|default:"" }}{% endif %}</textarea>
+                                 </div>
+                            </div>
+
+                            <!-- Seção 5: Observações e Considerações -->
+                            <div class="col-12 mb-4">
+                                <h6 class="border-bottom pb-2">
+                                    <i class="fas fa-sticky-note"></i> Observações e Considerações
+                                </h6>
+                                
+                                                                 <!-- Observações Gerais -->
+                                 <div class="mb-3">
+                                     <label for="observacoes_gerais" class="form-label"><strong>Observações Gerais</strong></label>
+                                     <textarea class="form-control" id="observacoes_gerais" name="observacoes_gerais" rows="3">{% if prontuario %}{{ prontuario.observacoes_gerais|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Considerações Especiais -->
+                                 <div class="mb-3">
+                                     <label for="consideracoes_especiais" class="form-label"><strong>Considerações Especiais</strong></label>
+                                     <textarea class="form-control" id="consideracoes_especiais" name="consideracoes_especiais" rows="3">{% if prontuario %}{{ prontuario.consideracoes_especiais|default:"" }}{% endif %}</textarea>
+                                 </div>
+
+                                 <!-- Recomendações -->
+                                 <div class="mb-3">
+                                     <label for="recomendacoes" class="form-label"><strong>Recomendações</strong></label>
+                                     <textarea class="form-control" id="recomendacoes" name="recomendacoes" rows="3">{% if prontuario %}{{ prontuario.recomendacoes|default:"" }}{% endif %}</textarea>
+                                 </div>
+                            </div>
+
+                                                         <!-- Metadados (Somente Leitura) -->
+                             {% if prontuario %}
+                             <div class="col-12 mb-4">
+                                 <h6 class="border-bottom pb-2">
+                                     <i class="fas fa-calendar"></i> Informações do Prontuário
+                                 </h6>
+                                 <div class="row">
+                                     <div class="col-md-6">
+                                         <p><strong>Data de Criação:</strong><br>
+                                             {{ prontuario.data_criacao|date:"d/m/Y H:i" }}</p>
+                                     </div>
+                                     <div class="col-md-6">
+                                         <p><strong>Última Atualização:</strong><br>
+                                             {{ prontuario.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                                     </div>
+                                 </div>
+                             </div>
+                             {% endif %}
+                        </div>
+                </div>
+                                 <div class="modal-footer">
+                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                     <button type="submit" class="btn btn-success">
+                         <i class="fas fa-save"></i> {% if prontuario %}Salvar Alterações{% else %}Criar Prontuário{% endif %}
+                     </button>
+                 </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Sessões -->
+<div class="modal fade" id="modalSessao" tabindex="-1" aria-labelledby="modalSessaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalSessaoLabel">
+                    <i class="fas fa-calendar-alt"></i> <span id="tituloSessao">Nova Sessão</span> - {{ paciente.associado.nome }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formSessao">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="data_hora" class="form-label"><strong>Data e Hora *</strong></label>
+                                <input type="datetime-local" class="form-control" id="data_hora" name="data_hora" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipo_sessao" class="form-label"><strong>Tipo de Sessão *</strong></label>
+                                <select class="form-select" id="tipo_sessao" name="tipo_sessao" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="terapia">Terapia</option>
+                                    <option value="avaliacao">Avaliação</option>
+                                    <option value="retorno">Retorno</option>
+                                    <option value="consulta">Consulta</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="duracao" class="form-label"><strong>Duração (minutos) *</strong></label>
+                                <input type="number" class="form-control" id="duracao" name="duracao" value="50" min="15" max="180" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="status" class="form-label"><strong>Status *</strong></label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="agendada">Agendada</option>
+                                    <option value="confirmada">Confirmada</option>
+                                    <option value="realizada">Realizada</option>
+                                    <option value="cancelada">Cancelada</option>
+                                    <option value="remarcada">Remarcada</option>
+                                    <option value="ausente">Ausente</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacoes" class="form-label"><strong>Observações</strong></label>
+                        <textarea class="form-control" id="observacoes" name="observacoes" rows="3" placeholder="Observações sobre a sessão..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> <span id="botaoSessao">Criar Sessão</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Evoluções -->
+<div class="modal fade" id="modalEvolucao" tabindex="-1" aria-labelledby="modalEvolucaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEvolucaoLabel">
+                    <i class="fas fa-chart-line"></i> <span id="tituloEvolucao">Nova Evolução</span> - {{ paciente.associado.nome }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formEvolucao">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="sessao" class="form-label"><strong>Sessão *</strong></label>
+                        <select class="form-select" id="sessao" name="sessao" required>
+                            <option value="">Selecione uma sessão...</option>
+                            {% for sessao in sessoes %}
+                                <option value="{{ sessao.pk }}">{{ sessao.data_hora|date:"d/m/Y H:i" }} - {{ sessao.get_tipo_sessao_display }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="conteudo" class="form-label"><strong>Conteúdo da Evolução *</strong></label>
+                        <textarea class="form-control" id="conteudo" name="conteudo" rows="6" required placeholder="Descreva a evolução do paciente..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="observacoes_terapeuta" class="form-label"><strong>Observações do Terapeuta</strong></label>
+                        <textarea class="form-control" id="observacoes_terapeuta" name="observacoes_terapeuta" rows="3" placeholder="Observações adicionais..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> <span id="botaoEvolucao">Criar Evolução</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Pacientes -->
+<div class="modal fade" id="modalPaciente" tabindex="-1" aria-labelledby="modalPacienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalPacienteLabel">
+                    <i class="fas fa-user"></i> <span id="tituloPaciente">Editar Paciente</span> - {{ paciente.associado.nome }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formPaciente" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <!-- Informações do Paciente -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-info-circle"></i> Informações do Paciente
+                            </h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Tipo</strong></label>
+                                <input type="text" class="form-control" value="{% if paciente.associado.dependentes.exists %}Dependente{% else %}Associado{% endif %}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Nome Completo</strong></label>
+                                <input type="text" class="form-control" value="{{ paciente.associado.nome }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong>CPF</strong></label>
+                                <input type="text" class="form-control" value="{{ paciente.associado.cpf }}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Data de Nascimento</strong></label>
+                                <input type="text" class="form-control" value="{{ paciente.associado.data_nascimento|date:'d/m/Y' }}" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Sexo</strong></label>
+                                <input type="text" class="form-control" value="{{ paciente.associado.get_sexo_display }}" readonly>
+                            </div>
+                            {% if paciente.associado.dependentes.exists %}
+                            <div class="mb-3">
+                                <label class="form-label"><strong>Parentesco</strong></label>
+                                <input type="text" class="form-control" value="{{ paciente.associado.dependentes.first.get_parentesco_display }}" readonly>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+
+                    <!-- Dados Clínicos -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="border-bottom pb-2">
+                                <i class="fas fa-stethoscope"></i> Dados Clínicos
+                            </h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="data_primeira_consulta" class="form-label"><strong>Data da Primeira Consulta</strong></label>
+                                <input type="date" class="form-control" id="data_primeira_consulta" name="data_primeira_consulta" value="{{ paciente.data_primeira_consulta|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="psicologo_responsavel" class="form-label"><strong>Psicólogo Responsável</strong></label>
+                                <select class="form-select" id="psicologo_responsavel" name="psicologo_responsavel">
+                                    <option value="">Selecione um psicólogo...</option>
+                                    {% for psicologo in psicologos %}
+                                        <option value="{{ psicologo.pk }}" {% if paciente.psicologo_responsavel == psicologo %}selected{% endif %}>
+                                            {{ psicologo.nome_completo }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="observacoes_iniciais" class="form-label"><strong>Observações Iniciais</strong></label>
+                                <textarea class="form-control" id="observacoes_iniciais" name="observacoes_iniciais" rows="4" placeholder="Observações iniciais sobre o paciente...">{{ paciente.observacoes_iniciais }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> <span id="botaoPaciente">Salvar Alterações</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Documentos -->
+<div class="modal fade" id="modalDocumento" tabindex="-1" aria-labelledby="modalDocumentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDocumentoLabel">
+                    <i class="fas fa-file-alt"></i> <span id="tituloDocumento">Novo Documento</span> - {{ paciente.associado.nome }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formDocumento" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label"><strong>Título *</strong></label>
+                                <input type="text" class="form-control" id="titulo" name="titulo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tipo" class="form-label"><strong>Tipo de Documento *</strong></label>
+                                <select class="form-select" id="tipo" name="tipo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="relatorio">Relatório</option>
+                                    <option value="avaliacao">Avaliação</option>
+                                    <option value="laudo">Laudo</option>
+                                    <option value="atestado">Atestado</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="arquivo" class="form-label"><strong>Arquivo</strong></label>
+                                <input type="file" class="form-control" id="arquivo" name="arquivo" accept=".pdf,.doc,.docx,.txt">
+                            </div>
+                            <div class="mb-3">
+                                <label for="data_criacao" class="form-label"><strong>Data de Criação</strong></label>
+                                <input type="date" class="form-control" id="data_criacao" name="data_criacao" value="{{ hoje|date:'Y-m-d' }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label"><strong>Descrição</strong></label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="4" placeholder="Descrição do documento..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> <span id="botaoDocumento">Criar Documento</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Visualizar Documento -->
+<div class="modal fade" id="modalVisualizarDocumento" tabindex="-1" aria-labelledby="modalVisualizarDocumentoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalVisualizarDocumentoLabel">
+                    <i class="fas fa-file-alt"></i> Detalhes do Documento
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="conteudoModalDocumento">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Carregando dados do documento...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                <a href="#" id="btnVisualizarArquivo" class="btn btn-primary" target="_blank" style="display: none;">
+                    <i class="fas fa-external-link-alt"></i> Abrir Arquivo
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar Sessão -->
+<div class="modal fade" id="modalEditarSessao" tabindex="-1" aria-labelledby="modalEditarSessaoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalEditarSessaoLabel">
+                    <i class="fas fa-calendar-alt"></i> Editar Sessão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="conteudoModalSessao">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-2">Carregando dados da sessão...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarSessao">
+                    <i class="fas fa-save"></i> Salvar Alterações
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Transferir Paciente -->
+<div class="modal fade" id="modalTransferirPaciente" tabindex="-1" aria-labelledby="modalTransferirPacienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTransferirPacienteLabel">
+                    <i class="fas fa-exchange-alt"></i> Transferir Paciente
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" id="formTransferirPaciente">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informações da Transferência</h6>
+                        <p class="mb-0">
+                            <strong>Paciente:</strong> <span id="transferir_nome_paciente"></span><br>
+                            <strong>Psicólogo Atual:</strong> <span id="transferir_psicologo_atual"></span>
+                        </p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="novo_psicologo" class="form-label"><strong>Novo Psicólogo *</strong></label>
+                                <select name="novo_psicologo" id="novo_psicologo" class="form-select" required>
+                                    <option value="">Selecione um psicólogo...</option>
+                                    {% for psicologo in psicologos %}
+                                        <option value="{{ psicologo.pk }}" data-psicologo-id="{{ psicologo.pk }}">{{ psicologo.nome_completo }} (CRP: {{ psicologo.crp }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="motivo_transferencia" class="form-label"><strong>Motivo da Transferência *</strong></label>
+                                <textarea name="motivo_transferencia" id="motivo_transferencia" class="form-control" rows="3" required 
+                                          placeholder="Descreva o motivo da transferência..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="observacoes" class="form-label"><strong>Observações</strong></label>
+                                <textarea name="observacoes" id="observacoes" class="form-control" rows="3" 
+                                          placeholder="Observações adicionais sobre a transferência..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante</h6>
+                        <ul class="mb-0">
+                            <li>A transferência é irreversível</li>
+                            <li>O histórico será preservado</li>
+                            <li>Notifique o novo psicólogo</li>
+                            <li>Informe o paciente sobre a mudança</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-exchange-alt"></i> Confirmar Transferência
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function abrirModalProntuario() {
+    const modal = new bootstrap.Modal(document.getElementById('modalProntuario'));
+    modal.show();
+}
+
+// Funções para Pacientes
+function editarPaciente() {
+    document.getElementById('tituloPaciente').textContent = 'Editar Paciente';
+    document.getElementById('botaoPaciente').textContent = 'Salvar Alterações';
+    document.getElementById('formPaciente').action = "{% url 'psicologia:paciente_update' paciente.pk %}";
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalPaciente'));
+    modal.show();
+}
+
+// Funções para Sessões
+function abrirModalSessao() {
+    document.getElementById('tituloSessao').textContent = 'Nova Sessão';
+    document.getElementById('botaoSessao').textContent = 'Criar Sessão';
+    document.getElementById('formSessao').action = "{% url 'psicologia:sessao_from_paciente_create' paciente.pk %}";
+    document.getElementById('formSessao').reset();
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalSessao'));
+    modal.show();
+}
+
+function editarSessao(sessaoId) {
+    // Abrir modal de edição
+    const modal = new bootstrap.Modal(document.getElementById('modalEditarSessao'));
+    modal.show();
+    
+    // Resetar conteúdo e mostrar loading
+    const conteudoModal = document.getElementById('conteudoModalSessao');
+    
+    conteudoModal.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando dados da sessão...</p>
+        </div>
+    `;
+    
+    // Buscar dados da sessão via AJAX
+    fetch(`/psicologia/sessoes/${sessaoId}/dados-json/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Dados da sessão recebidos:', data);
+            if (data.success) {
+                const sessao = data.sessao;
+                console.log('Data/Hora da sessão:', sessao.data_hora);
+                conteudoModal.innerHTML = `
+                    <form id="formEditarSessao">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_paciente" class="form-label"><strong>Paciente</strong></label>
+                                    <input type="text" class="form-control" value="${sessao.paciente_nome}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_psicologo" class="form-label"><strong>Psicólogo</strong></label>
+                                    <input type="text" class="form-control" value="${sessao.psicologo_nome}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_data_hora" class="form-label"><strong>Data e Hora *</strong></label>
+                                    <input type="datetime-local" class="form-control" id="edit_data_hora" value="${sessao.data_hora}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_duracao" class="form-label"><strong>Duração (minutos) *</strong></label>
+                                    <input type="number" class="form-control" id="edit_duracao" value="${sessao.duracao}" min="15" max="180" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_tipo_sessao" class="form-label"><strong>Tipo de Sessão *</strong></label>
+                                    <select class="form-select" id="edit_tipo_sessao" required>
+                                        <option value="individual" ${sessao.tipo_sessao === 'individual' ? 'selected' : ''}>Individual</option>
+                                        <option value="casal" ${sessao.tipo_sessao === 'casal' ? 'selected' : ''}>Casal</option>
+                                        <option value="familia" ${sessao.tipo_sessao === 'familia' ? 'selected' : ''}>Família</option>
+                                        <option value="grupo" ${sessao.tipo_sessao === 'grupo' ? 'selected' : ''}>Grupo</option>
+                                        <option value="avaliacao" ${sessao.tipo_sessao === 'avaliacao' ? 'selected' : ''}>Avaliação</option>
+                                        <option value="retorno" ${sessao.tipo_sessao === 'retorno' ? 'selected' : ''}>Retorno</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_status" class="form-label"><strong>Status *</strong></label>
+                                    <select class="form-select" id="edit_status" required>
+                                        <option value="agendada" ${sessao.status === 'agendada' ? 'selected' : ''}>Agendada</option>
+                                        <option value="confirmada" ${sessao.status === 'confirmada' ? 'selected' : ''}>Confirmada</option>
+                                        <option value="realizada" ${sessao.status === 'realizada' ? 'selected' : ''}>Realizada</option>
+                                        <option value="cancelada" ${sessao.status === 'cancelada' ? 'selected' : ''}>Cancelada</option>
+                                        <option value="remarcada" ${sessao.status === 'remarcada' ? 'selected' : ''}>Remarcada</option>
+                                        <option value="ausente" ${sessao.status === 'ausente' ? 'selected' : ''}>Ausente</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_valor" class="form-label"><strong>Valor (R$) *</strong></label>
+                                    <input type="number" class="form-control" id="edit_valor" value="${sessao.valor}" min="0" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Campo reservado para futuras expansões -->
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3">
+                                    <label for="edit_observacoes" class="form-label"><strong>Observações</strong></label>
+                                    <textarea class="form-control" id="edit_observacoes" rows="3" placeholder="Observações sobre a sessão...">${sessao.observacoes}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" id="edit_sessao_id" value="${sessao.id}">
+                    </form>
+                `;
+                
+                // Configurar evento de submit
+                document.getElementById('btnSalvarSessao').onclick = function() {
+                    salvarSessaoEditada(sessaoId);
+                };
+            } else {
+                conteudoModal.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> ${data.message}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro ao carregar dados da sessão:', error);
+            conteudoModal.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> Erro ao carregar dados da sessão. Tente novamente.
+                </div>
+            `;
+        });
+}
+
+function salvarSessaoEditada(sessaoId) {
+    // Coletar dados do formulário
+    const formData = new FormData();
+    formData.append('data_hora', document.getElementById('edit_data_hora').value);
+    formData.append('duracao', document.getElementById('edit_duracao').value);
+    formData.append('tipo_sessao', document.getElementById('edit_tipo_sessao').value);
+    formData.append('status', document.getElementById('edit_status').value);
+    formData.append('valor', document.getElementById('edit_valor').value);
+    formData.append('observacoes', document.getElementById('edit_observacoes').value);
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+    
+    // Desabilitar botão durante o envio
+    const btnSalvar = document.getElementById('btnSalvarSessao');
+    const textoOriginal = btnSalvar.innerHTML;
+    btnSalvar.disabled = true;
+    btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+    
+    // Enviar dados via AJAX
+    fetch(`/psicologia/pacientes/{{ paciente.pk }}/sessoes/${sessaoId}/editar/`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(html => {
+        // Verificar se a resposta contém mensagem de sucesso
+        if (html.includes('Sessão atualizada com sucesso') || html.includes('success')) {
+            // Fechar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditarSessao'));
+            modal.hide();
+            
+            // Mostrar mensagem de sucesso
+            mostrarMensagem('Sessão atualizada com sucesso!', 'success');
+            
+            // Recarregar a página para mostrar as alterações
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            // Se não foi sucesso, mostrar o HTML da resposta (pode conter erros de validação)
+            const conteudoModal = document.getElementById('conteudoModalSessao');
+            conteudoModal.innerHTML = html;
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erro ao salvar sessão:', error);
+        mostrarMensagem('Erro ao salvar sessão. Tente novamente.', 'error');
+        
+        // Reabilitar botão
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = textoOriginal;
+    });
+}
+
+function excluirSessao(sessaoId) {
+    if (confirm('Tem certeza que deseja excluir esta sessão?')) {
+        window.location.href = `/psicologia/pacientes/{{ paciente.pk }}/sessoes/${sessaoId}/excluir/`;
+    }
+}
+
+// Funções para Evoluções
+function abrirModalEvolucao() {
+    document.getElementById('tituloEvolucao').textContent = 'Nova Evolução';
+    document.getElementById('botaoEvolucao').textContent = 'Criar Evolução';
+    document.getElementById('formEvolucao').action = "{% url 'psicologia:evolucao_from_paciente_create' paciente.pk %}";
+    document.getElementById('formEvolucao').reset();
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEvolucao'));
+    modal.show();
+}
+
+function editarEvolucao(evolucaoId) {
+    // Aqui você pode carregar os dados da evolução para edição
+    document.getElementById('tituloEvolucao').textContent = 'Editar Evolução';
+    document.getElementById('botaoEvolucao').textContent = 'Salvar Alterações';
+    document.getElementById('formEvolucao').action = `/psicologia/pacientes/{{ paciente.pk }}/evolucoes/${evolucaoId}/editar/`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEvolucao'));
+    modal.show();
+}
+
+function excluirEvolucao(evolucaoId) {
+    if (confirm('Tem certeza que deseja excluir esta evolução?')) {
+        window.location.href = `/psicologia/pacientes/{{ paciente.pk }}/evolucoes/${evolucaoId}/excluir/`;
+    }
+}
+
+// Funções para Documentos
+function abrirModalDocumento() {
+    document.getElementById('tituloDocumento').textContent = 'Novo Documento';
+    document.getElementById('botaoDocumento').textContent = 'Criar Documento';
+    document.getElementById('formDocumento').action = "{% url 'psicologia:documento_from_paciente_create' paciente.pk %}";
+    document.getElementById('formDocumento').reset();
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalDocumento'));
+    modal.show();
+}
+
+function editarDocumento(documentoId) {
+    // Aqui você pode carregar os dados do documento para edição
+    document.getElementById('tituloDocumento').textContent = 'Editar Documento';
+    document.getElementById('botaoDocumento').textContent = 'Salvar Alterações';
+    document.getElementById('formDocumento').action = `/psicologia/pacientes/{{ paciente.pk }}/documentos/${documentoId}/editar/`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalDocumento'));
+    modal.show();
+}
+
+function excluirDocumento(documentoId) {
+    if (confirm('Tem certeza que deseja excluir este documento?')) {
+        window.location.href = `/psicologia/pacientes/{{ paciente.pk }}/documentos/${documentoId}/excluir/`;
+    }
+}
+
+function visualizarDocumento(documentoId) {
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalVisualizarDocumento'));
+    modal.show();
+    
+    // Resetar conteúdo e mostrar loading
+    const conteudoModal = document.getElementById('conteudoModalDocumento');
+    const btnVisualizarArquivo = document.getElementById('btnVisualizarArquivo');
+    
+    conteudoModal.innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando dados do documento...</p>
+        </div>
+    `;
+    btnVisualizarArquivo.style.display = 'none';
+    
+    // Buscar dados do documento via AJAX
+    fetch(`/psicologia/documentos/${documentoId}/dados-json/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                const documento = data.documento;
+                
+                // Construir conteúdo do modal
+                conteudoModal.innerHTML = `
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3"><i class="fas fa-info-circle"></i> Informações Básicas</h6>
+                            <p><strong>Título:</strong><br>${documento.titulo}</p>
+                            <p><strong>Tipo:</strong><br><span class="badge bg-secondary">${documento.tipo_display}</span></p>
+                            <p><strong>Data de Criação:</strong><br>${documento.data_criacao}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary mb-3"><i class="fas fa-user"></i> Responsáveis</h6>
+                            <p><strong>Paciente:</strong><br>${documento.paciente_nome}</p>
+                            <p><strong>Psicólogo:</strong><br>${documento.psicologo_nome}</p>
+                            ${documento.arquivo_nome ? `
+                                <p><strong>Arquivo:</strong><br>
+                                    <i class="fas fa-file"></i> ${documento.arquivo_nome}
+                                    ${documento.arquivo_tamanho ? `<small class="text-muted d-block">${documento.arquivo_tamanho}</small>` : ''}
+                                </p>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ${documento.descricao ? `
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6 class="text-primary mb-3"><i class="fas fa-align-left"></i> Descrição</h6>
+                                <div class="border rounded p-3 bg-light">
+                                    ${documento.descricao.replace(/\n/g, '<br>')}
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+                `;
+                
+                // Configurar botão de visualizar arquivo
+                if (documento.arquivo_url) {
+                    btnVisualizarArquivo.href = documento.arquivo_url;
+                    btnVisualizarArquivo.style.display = 'inline-block';
+                }
+            } else {
+                conteudoModal.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        ${data.message || 'Erro ao carregar dados do documento.'}
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados do documento:', error);
+            conteudoModal.innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Erro ao carregar dados do documento. Tente novamente.
+                </div>
+            `;
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar se há hash na URL para ativar a aba correspondente
+    const hash = window.location.hash;
+    if (hash) {
+        const targetTab = document.querySelector(`[data-bs-target="${hash}"]`);
+        if (targetTab) {
+            // Remover active de todas as abas
+            document.querySelectorAll('.nav-link').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            
+            // Ativar a aba correspondente
+            targetTab.classList.add('active');
+            targetTab.setAttribute('aria-selected', 'true');
+            
+            // Ativar o conteúdo da aba
+            const targetPane = document.querySelector(hash);
+            if (targetPane) {
+                targetPane.classList.add('show', 'active');
+            }
+        }
+    }
+    
+    // Atualizar URL quando uma aba for clicada
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const target = this.getAttribute('data-bs-target');
+            if (target) {
+                window.location.hash = target;
+            }
+        });
+    });
+});
+
+// Função para mostrar mensagens
+function mostrarMensagem(mensagem, tipo = 'success') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${tipo === 'success' ? 'success' : 'danger'} alert-dismissible fade show`;
+    alertDiv.style.position = 'fixed';
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.style.minWidth = '300px';
+    alertDiv.innerHTML = `
+        ${mensagem}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    document.body.appendChild(alertDiv);
+    
+    // Auto remover após 5 segundos
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Função para abrir modal de transferência
+function abrirModalTransferirPaciente(pacienteId, pacienteNome, psicologoAtual) {
+    console.log('Abrindo modal de transferência para paciente:', pacienteId);
+    
+    // Armazenar o ID do paciente no formulário para uso posterior
+    document.getElementById('formTransferirPaciente').dataset.pacienteId = pacienteId;
+    document.getElementById('transferir_nome_paciente').textContent = pacienteNome;
+    document.getElementById('transferir_psicologo_atual').textContent = psicologoAtual;
+    
+    // Resetar formulário
+    document.getElementById('formTransferirPaciente').reset();
+    
+    // Filtrar psicólogos para remover o atual da lista
+    const selectPsicologo = document.getElementById('novo_psicologo');
+    const options = selectPsicologo.querySelectorAll('option[data-psicologo-id]');
+    
+    // Primeiro, mostrar todas as opções
+    options.forEach(option => {
+        option.style.display = '';
+    });
+    
+    // Encontrar e esconder o psicólogo atual
+    // Buscar pelo nome do psicólogo atual nas opções
+    if (psicologoAtual !== 'Nenhum') {
+        options.forEach(option => {
+            if (option.textContent.includes(psicologoAtual)) {
+                option.style.display = 'none';
+            }
+        });
+    }
+    
+    // Verificar se há psicólogos disponíveis
+    const optionsVisiveis = Array.from(options).filter(opt => opt.style.display !== 'none');
+    if (optionsVisiveis.length === 0) {
+        alert('Não há outros psicólogos disponíveis para transferência.');
+        return;
+    }
+    
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById('modalTransferirPaciente'));
+    modal.show();
+    
+    console.log('Modal de transferência aberto com sucesso!');
+}
+
+// Função para submeter o formulário de transferência via AJAX
+function submeterFormularioTransferir(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    
+    // Validação no frontend
+    const motivoTransf = formData.get('motivo_transferencia').trim();
+    if (motivoTransf.length < 3) {
+        mostrarMensagem('O motivo da transferência deve ter pelo menos 3 caracteres.', 'error');
+        return;
+    }
+    
+    const novoPsicologo = formData.get('novo_psicologo');
+    if (!novoPsicologo) {
+        mostrarMensagem('Selecione um psicólogo para transferir o paciente.', 'error');
+        return;
+    }
+    
+    // Desabilitar botão e mostrar loading
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Transferindo...';
+    
+    const pacienteId = form.dataset.pacienteId;
+    console.log('Enviando formulário de transferência para:', `/psicologia/pacientes/${pacienteId}/transferir-modal/`);
+    console.log('Dados do formulário:', Object.fromEntries(formData));
+    
+    fetch(`/psicologia/pacientes/${pacienteId}/transferir-modal/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        console.log('Resposta recebida:', response);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Dados recebidos:', data);
+        
+        if (data.success) {
+            // Sucesso
+            console.log('✅ Transferência realizada com sucesso!');
+            mostrarMensagem(data.message, 'success');
+            
+            // Fechar modal
+            const modalElement = document.getElementById('modalTransferirPaciente');
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                } else {
+                    const newModal = new bootstrap.Modal(modalElement);
+                    newModal.hide();
+                }
+            }
+            
+            // Recarregar a página para mostrar as mudanças
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            // Erro
+            console.log('❌ Erro na transferência!');
+            mostrarMensagem(data.message, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('❌ Erro capturado na transferência:', error);
+        mostrarMensagem('Erro ao processar a transferência. Tente novamente.', 'error');
+    })
+    .finally(() => {
+        // Reabilitar botão
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalText;
+    });
+}
+
+// Adicionar event listeners para os botões de transferir
+document.addEventListener('DOMContentLoaded', function() {
+    const botoesTransferir = document.querySelectorAll('.btn-transferir-paciente');
+    botoesTransferir.forEach(function(botao) {
+        botao.addEventListener('click', function() {
+            const pacienteId = this.dataset.pacienteId;
+            const pacienteNome = this.dataset.pacienteNome;
+            const psicologoAtual = this.dataset.psicologoAtual;
+            
+            abrirModalTransferirPaciente(pacienteId, pacienteNome, psicologoAtual);
+        });
+    });
+    
+    // Adicionar evento de submit ao formulário de transferência
+    const formTransferir = document.getElementById('formTransferirPaciente');
+    if (formTransferir) {
+        formTransferir.addEventListener('submit', submeterFormularioTransferir);
+    }
+    
+    // Event listeners para botões de sessão
+    document.querySelectorAll('.btn-editar-sessao').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sessaoId = this.dataset.sessaoId;
+            editarSessao(sessaoId);
+        });
+    });
+    
+    document.querySelectorAll('.btn-excluir-sessao').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const sessaoId = this.dataset.sessaoId;
+            excluirSessao(sessaoId);
+        });
+    });
+    
+    // Event listeners para botões de evolução
+    document.querySelectorAll('.btn-editar-evolucao').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const evolucaoId = this.dataset.evolucaoId;
+            editarEvolucao(evolucaoId);
+        });
+    });
+    
+    document.querySelectorAll('.btn-excluir-evolucao').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const evolucaoId = this.dataset.evolucaoId;
+            excluirEvolucao(evolucaoId);
+        });
+    });
+    
+    // Event listeners para botões de documento
+    document.querySelectorAll('.btn-visualizar-documento').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const documentoId = this.dataset.documentoId;
+            visualizarDocumento(documentoId);
+        });
+    });
+    
+    document.querySelectorAll('.btn-editar-documento').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const documentoId = this.dataset.documentoId;
+            editarDocumento(documentoId);
+        });
+    });
+    
+    document.querySelectorAll('.btn-excluir-documento').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const documentoId = this.dataset.documentoId;
+            excluirDocumento(documentoId);
+        });
+    });
+});
+</script>
+{% endblock %}

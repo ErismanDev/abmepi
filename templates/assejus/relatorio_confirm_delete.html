@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Relatório - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:relatorio_list' %}">Relatórios</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:relatorio_detail' pk=relatorio.pk %}">{{ relatorio.titulo|truncatechars:50 }}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Excluir</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-trash me-2 text-danger"></i>
+                        Excluir Relatório
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Confirme a exclusão deste relatório jurídico
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:relatorio_detail' pk=relatorio.pk %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar aos Detalhes
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Confirmação de Exclusão
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Atenção!
+                                </h6>
+                                <p class="mb-0">
+                                    Você está prestes a excluir permanentemente este relatório jurídico. 
+                                    Esta ação não pode ser desfeita.
+                                </p>
+                            </div>
+
+                            <h6 class="text-muted mb-3">Dados do Relatório a ser Excluído:</h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Título</h6>
+                                    <p class="mb-3">{{ relatorio.titulo }}</p>
+                                    
+                                    <h6 class="text-muted mb-2">Tipo</h6>
+                                    <p class="mb-3">
+                                        <span class="badge bg-info">
+                                            {{ relatorio.tipo|title }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Data de Geração</h6>
+                                    <p class="mb-3">
+                                        <span class="badge bg-secondary">
+                                            {{ relatorio.data_geracao|date:"d/m/Y H:i" }}
+                                        </span>
+                                    </p>
+                                    
+                                    <h6 class="text-muted mb-2">Status</h6>
+                                    <p class="mb-3">
+                                        {% if relatorio.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            {% if relatorio.descricao %}
+                            <h6 class="text-muted mb-2">Descrição</h6>
+                            <div class="border rounded p-3 bg-light mb-4">
+                                {{ relatorio.descricao|linebreaks }}
+                            </div>
+                            {% endif %}
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'assejus:relatorio_detail' pk=relatorio.pk %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash me-2"></i>
+                                        Confirmar Exclusão
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informações auxiliares -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-user me-2"></i>
+                                Usuário Responsável
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if relatorio.usuario_geracao %}
+                                <h6 class="text-muted mb-2">Usuário</h6>
+                                <p class="mb-3">
+                                    <span class="badge bg-primary">
+                                        {{ relatorio.usuario_geracao.username }}
+                                    </span>
+                                </p>
+                                
+                                <h6 class="text-muted mb-2">Nome Completo</h6>
+                                <p class="mb-3">
+                                    {% if relatorio.usuario_geracao.first_name or relatorio.usuario_geracao.last_name %}
+                                        {{ relatorio.usuario_geracao.first_name }} {{ relatorio.usuario_geracao.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </p>
+                                
+                                <h6 class="text-muted mb-2">Email</h6>
+                                <p class="mb-3">
+                                    {% if relatorio.usuario_geracao.email %}
+                                        <a href="mailto:{{ relatorio.usuario_geracao.email }}" class="text-decoration-none">
+                                            {{ relatorio.usuario_geracao.email }}
+                                        </a>
+                                    {% else %}
+                                        <span class="text-muted">Não informado</span>
+                                    {% endif %}
+                                </p>
+                            {% else %}
+                                <p class="text-muted">Usuário não informado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Impacto da Exclusão
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">O que será perdido:</h6>
+                            <ul class="text-muted small">
+                                <li>Dados do relatório</li>
+                                <li>Data e hora de geração</li>
+                                <li>Descrição e conteúdo</li>
+                                <li>Usuário responsável</li>
+                                <li>Histórico de criação</li>
+                            </ul>
+                            
+                            <h6 class="text-muted mb-2">Alternativas:</h6>
+                            <ul class="text-muted small">
+                                <li>Editar o relatório</li>
+                                <li>Marcar como inativo</li>
+                                <li>Arquivar temporariamente</li>
+                                <li>Fazer backup antes de excluir</li>
+                            </ul>
+                            
+                            <div class="alert alert-info mt-3" role="alert">
+                                <small>
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    <strong>Dica:</strong> Considere editar o relatório ao invés de excluí-lo 
+                                    para manter o histórico completo da associação.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

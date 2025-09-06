@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Debug - {% if form.instance.pk %}Editar Advogado{% else %}Novo Advogado{% endif %} - ASEJUS
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-bug me-2"></i>
+        Debug - {% if form.instance.pk %}Editar Advogado{% else %}Novo Advogado{% endif %}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'assejus:advogado_list' %}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-bug me-2"></i>
+                    Informações de Debug
+                </h6>
+            </div>
+            <div class="card-body">
+                <h5>Dados do Advogado:</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nome:</strong> {{ advogado.nome }}</p>
+                        <p><strong>CPF:</strong> {{ advogado.cpf }}</p>
+                        <p><strong>OAB:</strong> {{ advogado.oab }}</p>
+                        <p><strong>UF OAB:</strong> {{ advogado.uf_oab }}</p>
+                        <p><strong>Estado:</strong> {{ advogado.estado }}</p>
+                        <p><strong>Data Inscrição OAB:</strong> {{ advogado.data_inscricao_oab }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> {{ advogado.email }}</p>
+                        <p><strong>Telefone:</strong> {{ advogado.telefone }}</p>
+                        <p><strong>Celular:</strong> {{ advogado.celular }}</p>
+                        <p><strong>Endereço:</strong> {{ advogado.endereco }}</p>
+                        <p><strong>Cidade:</strong> {{ advogado.cidade }}</p>
+                        <p><strong>CEP:</strong> {{ advogado.cep }}</p>
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Formulário - Campo UF OAB:</h5>
+                <div class="border p-3 mb-3">
+                    <p><strong>Label:</strong> {{ form.uf_oab.label }}</p>
+                    <p><strong>Widget:</strong> {{ form.uf_oab.field.widget }}</p>
+                    <p><strong>Choices:</strong></p>
+                    <ul>
+                    {% for choice in form.uf_oab.field.choices %}
+                        <li>{{ choice.0 }} - {{ choice.1 }}</li>
+                    {% endfor %}
+                    </ul>
+                    <p><strong>Valor Atual:</strong> {{ form.uf_oab.value }}</p>
+                    <p><strong>HTML Renderizado:</strong></p>
+                    <div class="border p-2 bg-light">
+                        {{ form.uf_oab }}
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Formulário - Campo Estado:</h5>
+                <div class="border p-3 mb-3">
+                    <p><strong>Label:</strong> {{ form.estado.label }}</p>
+                    <p><strong>Widget:</strong> {{ form.estado.field.widget }}</p>
+                    <p><strong>Choices:</strong></p>
+                    <ul>
+                    {% for choice in form.estado.field.choices %}
+                        <li>{{ choice.0 }} - {{ choice.1 }}</li>
+                    {% endfor %}
+                    </ul>
+                    <p><strong>Valor Atual:</strong> {{ form.estado.value }}</p>
+                    <p><strong>HTML Renderizado:</strong></p>
+                    <div class="border p-2 bg-light">
+                        {{ form.estado }}
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Formulário - Campo Data Inscrição OAB:</h5>
+                <div class="border p-3 mb-3">
+                    <p><strong>Label:</strong> {{ form.data_inscricao_oab.label }}</p>
+                    <p><strong>Widget:</strong> {{ form.data_inscricao_oab.field.widget }}</p>
+                    <p><strong>Valor Atual:</strong> {{ form.data_inscricao_oab.value }}</p>
+                    <p><strong>HTML Renderizado:</strong></p>
+                    <div class="border p-2 bg-light">
+                        {{ form.data_inscricao_oab }}
+                    </div>
+                </div>
+                
+                <h5 class="mt-4">Todos os Campos do Formulário:</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Campo</th>
+                                <th>Label</th>
+                                <th>Widget</th>
+                                <th>Valor</th>
+                                <th>Choices</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for field_name, field in form.fields.items %}
+                        <tr>
+                            <td><strong>{{ field_name }}</strong></td>
+                            <td>{{ field.label }}</td>
+                            <td>{{ field.widget }}</td>
+                            <td>{{ form|get_field_value:field_name }}</td>
+                            <td>
+                                {% if field.choices %}
+                                    <ul class="list-unstyled mb-0">
+                                    {% for choice in field.choices %}
+                                        <li>{{ choice.0 }} - {{ choice.1 }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

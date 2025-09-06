@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Modelo - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+                    
+                    <p class="mb-3">Tem certeza que deseja excluir o modelo de ata:</p>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ object.nome }}</h6>
+                            <p class="card-text text-muted small mb-2">
+                                {{ object.descricao|truncatechars:100|default:"Sem descrição" }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-secondary">{{ object.get_categoria_display }}</span>
+                                <span class="badge bg-info">{{ object.get_tipo_conteudo_display }}</span>
+                                <span class="badge bg-success">{{ object.vezes_usado }}x usado</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if object.vezes_usado > 0 %}
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Este modelo foi usado {{ object.vezes_usado }} vez(es). A exclusão não afetará as atas já criadas.
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'diretoria:modelo_unificado_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>
+                                Sim, Excluir
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

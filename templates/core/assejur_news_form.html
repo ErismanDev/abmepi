@@ -1,0 +1,2149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    
+    .form-label {
+        color: #495057;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 0.5rem;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+    
+    .form-check-input:checked {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    
+    .logo-container {
+        padding: 1rem 0;
+        margin-bottom: 1rem;
+    }
+    
+    .logo-circular {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .associacao-text {
+        color: white;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-top: 0.5rem;
+    }
+    
+    .main-content {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .icon-preview {
+        font-size: 2rem;
+        color: #007bff;
+        margin-top: 0.5rem;
+    }
+    
+    .priority-badge {
+        font-size: 0.75rem;
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .form-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-section h6 {
+        color: #495057;
+        border-bottom: 2px solid #dee2e6;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Editor SEI - Estilo ATA */
+    .sei-editor {
+        background: #f5f5f5;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .sei-toolbar {
+        background: #ecf0f1;
+        border-bottom: 1px solid #bdc3c7;
+        padding: 8px;
+    }
+    
+    .sei-toolbar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+    
+    .sei-toolbar-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .sei-toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 12px;
+        padding: 4px 8px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 6px;
+        border: 1px solid rgba(189, 195, 199, 0.3);
+    }
+    
+    .sei-toolbar-btn {
+        background: #fff;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #2c3e50;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        margin: 2px;
+        font-weight: 500;
+    }
+    
+    .sei-toolbar-btn:hover {
+        background: #3498db;
+        color: white;
+        border-color: #2980b9;
+    }
+    
+    .sei-toolbar-btn.active {
+        background: #e74c3c;
+        color: white;
+        border-color: #c0392b;
+    }
+    
+    .sei-editor-container {
+        background: white;
+        min-height: 400px;
+        position: relative;
+    }
+    
+    .sei-editor-content {
+        min-height: 400px;
+        padding: 20px;
+        outline: none;
+        font-family: 'Times New Roman', serif;
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #2c3e50;
+        background: white;
+    }
+    
+    .sei-editor-content:empty:before {
+        content: attr(data-placeholder);
+        color: #95a5a6;
+        font-style: italic;
+        pointer-events: none;
+    }
+    
+    .sei-editor-content:focus {
+        outline: none;
+    }
+    
+    .sei-separator {
+        width: 2px;
+        height: 24px;
+        background: #bdc3c7;
+        margin: 0 8px;
+        border-radius: 1px;
+    }
+    
+    .sei-logo {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 14px;
+        padding: 0 8px;
+    }
+    
+    .sei-zoom-select,
+    .sei-style-select,
+    .sei-font-family,
+    .sei-font-size {
+        background: #fff;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        padding: 6px 10px;
+        font-size: 12px;
+        color: #2c3e50;
+        margin: 2px;
+        height: 36px;
+    }
+    
+    .sei-zoom-select,
+    .sei-style-select {
+        min-width: 60px;
+    }
+    
+    .sei-font-family {
+        min-width: 120px;
+    }
+    
+    .sei-font-size {
+        min-width: 70px;
+    }
+    
+    .sei-editor {
+        background: #f5f5f5;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .sei-toolbar {
+        background: #ecf0f1;
+        border-bottom: 1px solid #bdc3c7;
+        padding: 8px;
+    }
+    
+    .sei-toolbar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 4px;
+    }
+    
+    .sei-toolbar-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .sei-toolbar-group {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-right: 12px;
+        padding: 4px 8px;
+        background: rgba(255, 255, 255, 0.5);
+        border-radius: 6px;
+        border: 1px solid rgba(189, 195, 199, 0.3);
+    }
+    
+    .sei-toolbar-btn {
+        background: #fff;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        color: #2c3e50;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        margin: 2px;
+        font-weight: 500;
+    }
+    
+    .sei-toolbar-btn:hover {
+        background: #3498db;
+        color: white;
+        border-color: #2980b9;
+    }
+    
+    .sei-toolbar-btn.active {
+        background: #e74c3c;
+        color: white;
+        border-color: #c0392b;
+    }
+    
+    .sei-separator {
+        width: 2px;
+        height: 24px;
+        background: #bdc3c7;
+        margin: 0 8px;
+        border-radius: 1px;
+    }
+    
+    .sei-logo {
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 14px;
+        padding: 0 8px;
+    }
+    
+    .sei-zoom-select,
+    .sei-style-select,
+    .sei-font-family,
+    .sei-font-size {
+        background: #fff;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        padding: 6px 10px;
+        font-size: 12px;
+        color: #2c3e50;
+        margin: 2px;
+        height: 36px;
+    }
+    
+    .sei-zoom-select,
+    .sei-style-select {
+        min-width: 60px;
+    }
+    
+    .sei-font-family {
+        min-width: 120px;
+    }
+    
+    .sei-font-size {
+        min-width: 70px;
+    }
+    
+    .sei-editor-container {
+        background: white;
+        min-height: 400px;
+        position: relative;
+    }
+    
+    .sei-editor-content {
+        min-height: 400px;
+        padding: 20px;
+        outline: none;
+        font-family: 'Times New Roman', serif;
+        font-size: 12pt;
+        line-height: 1.5;
+        color: #2c3e50;
+        background: white;
+    }
+    
+    .sei-editor-content:empty:before {
+        content: attr(data-placeholder);
+        color: #95a5a6;
+        font-style: italic;
+        pointer-events: none;
+    }
+    
+    .sei-editor-content:focus {
+        outline: none;
+    }
+    
+    .sei-editor-content h1, .sei-editor-content h2, .sei-editor-content h3,
+    .sei-editor-content h4, .sei-editor-content h5, .sei-editor-content h6 {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .sei-editor-content p {
+        margin-bottom: 0.75rem;
+        text-align: justify;
+    }
+    
+    .sei-editor-content ul, .sei-editor-content ol {
+        margin-bottom: 0.75rem;
+        padding-left: 1.5rem;
+    }
+    
+    .sei-editor-content li {
+        margin-bottom: 0.25rem;
+    }
+    
+    .sei-editor-content strong {
+        font-weight: bold;
+    }
+    
+    .sei-editor-content em {
+        font-style: italic;
+    }
+    
+    .sei-editor-content u {
+        text-decoration: underline;
+    }
+    
+    .sei-editor-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        border: 1px solid #bdc3c7;
+    }
+    
+    .sei-editor-content th,
+    .sei-editor-content td {
+        border: 1px solid #bdc3c7;
+        padding: 8px;
+        text-align: left;
+    }
+    
+    .sei-editor-content th {
+        background: #ecf0f1;
+        font-weight: bold;
+    }
+    
+    .sei-editor-content hr {
+        border: none;
+        border-top: 1px solid #bdc3c7;
+        margin: 1.5rem 0;
+    }
+    
+    /* Responsividade */
+    @media (max-width: 768px) {
+        .sei-toolbar-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 4px;
+        }
+        
+        .sei-toolbar-group {
+            margin-bottom: 4px;
+            justify-content: flex-start;
+        }
+        
+        .sei-editor-content {
+            padding: 15px;
+            font-size: 11pt;
+        }
+        
+        .sei-toolbar-btn {
+            font-size: 11px;
+            padding: 4px 6px;
+            min-width: 24px;
+            height: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header da Página -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="logo-container me-3">
+                            <img src="{% static 'Logo_abmepi.png' %}" alt="Logo ABMEPI" class="logo-circular">
+                        </div>
+                        <div>
+                            <h1 class="associacao-text mb-0">ABMEPI</h1>
+                            <p class="text-muted mb-0">Associação de Bombeiros e Policiais Militares</p>
+                        </div>
+                    </div>
+                    <h2 class="mb-2">{{ title }}</h2>
+                    <p class="text-muted mb-0">{{ subtitle }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulário -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Seção: Informações Básicas -->
+                        <div class="form-section">
+                            <h6>
+                                <i class="fas fa-info-circle me-2 text-primary"></i>Informações Básicas
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                            <i class="fas fa-heading me-1"></i>{{ form.titulo.label }}
+                                        </label>
+                                        {{ form.titulo }}
+                                        {% if form.titulo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.titulo.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">{{ form.titulo.help_text|default:"" }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.categoria.id_for_label }}" class="form-label">
+                                            <i class="fas fa-tag me-1"></i>{{ form.categoria.label }}
+                                        </label>
+                                        {{ form.categoria }}
+                                        {% if form.categoria.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.categoria.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="{{ form.resumo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>{{ form.resumo.label }}
+                                </label>
+                                {{ form.resumo }}
+                                {% if form.resumo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.resumo.errors %}
+                                    {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.resumo.help_text|default:"" }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Seção: Imagem da Notícia -->
+                        <div class="form-section">
+                            <h6>
+                                <i class="fas fa-image me-2 text-primary"></i>Imagem da Notícia
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label for="{{ form.imagem.id_for_label }}" class="form-label">
+                                            <i class="fas fa-upload me-1"></i>{{ form.imagem.label }}
+                                        </label>
+                                        {{ form.imagem }}
+                                        {% if form.imagem.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.imagem.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 5MB</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.imagem_legenda.id_for_label }}" class="form-label">
+                                            <i class="fas fa-comment me-1"></i>{{ form.imagem_legenda.label }}
+                                        </label>
+                                        {{ form.imagem_legenda }}
+                                        {% if form.imagem_legenda.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.imagem_legenda.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Descrição da imagem (opcional)</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview da imagem atual (se existir) -->
+                            {% if form.instance.imagem %}
+                            <div class="mb-3">
+                                <label class="form-label">Imagem Atual:</label>
+                                <div class="current-image-preview">
+                                    <img src="{{ form.instance.imagem.url }}" alt="Imagem atual" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                    <p class="text-muted mt-2">
+                                        <small>Imagem atual: {{ form.instance.imagem.name }}</small>
+                                    </p>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Seção: Conteúdo -->
+                        <div class="form-section">
+                            <h6>
+                                <i class="fas fa-file-text me-2 text-primary"></i>Conteúdo da Notícia
+                            </h6>
+                            <div class="mb-3">
+                                <label for="id_conteudo" class="form-label">
+                                    <i class="fas fa-file-text me-1"></i>Conteúdo Completo
+                                </label>
+                                
+                                <!-- Editor de Texto Rico - Estilo ATA -->
+                                <div class="sei-editor">
+                                    <div class="sei-toolbar">
+                                        <!-- Primeira Linha da Toolbar -->
+                                        <div class="sei-toolbar-row">
+                                            <!-- Desfazer e Refazer -->
+                                            <div class="sei-toolbar-group">
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('undo')" title="Desfazer (Ctrl+Z)">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('redo')" title="Refazer (Ctrl+Y)">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                            </div>
+                                            
+                                            <!-- Fonte e Tamanho -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">FONTE:</span>
+                                                <select class="sei-font-family" onchange="changeFont(this.value)" title="Família da Fonte">
+                                                    <option value="Arial">Arial</option>
+                                                    <option value="Times New Roman" selected>Times New Roman</option>
+                                                    <option value="Calibri">Calibri</option>
+                                                    <option value="Georgia">Georgia</option>
+                                                    <option value="Verdana">Verdana</option>
+                                                    <option value="Courier New">Courier New</option>
+                                                </select>
+                                                <select class="sei-font-size" onchange="changeFontSize(this.value)" title="Tamanho da Fonte">
+                                                    <option value="1">8px</option>
+                                                    <option value="2">10px</option>
+                                                    <option value="3" selected>12px</option>
+                                                    <option value="4">14px</option>
+                                                    <option value="5">18px</option>
+                                                    <option value="6">24px</option>
+                                                    <option value="7">36px</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Formatação de Texto -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">TEXTO:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('bold')" title="Negrito">
+                                                    <i class="fas fa-bold"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('italic')" title="Itálico">
+                                                    <i class="fas fa-italic"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('underline')" title="Sublinhado">
+                                                    <i class="fas fa-underline"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('strikeThrough')" title="Riscado">
+                                                    <i class="fas fa-strikethrough"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('subscript')" title="Subscrito">
+                                                    <i class="fas fa-subscript"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('superscript')" title="Sobrescrito">
+                                                    <i class="fas fa-superscript"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                                <button type="button" class="sei-toolbar-btn" onclick="toUpperCase()" title="Maiúsculas">
+                                                    <i class="fas fa-text-height"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="toLowerCase()" title="Minúsculas">
+                                                    <i class="fas fa-text-width"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="capitalizeFirst()" title="Capitalizar">
+                                                    <i class="fas fa-text-size"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Cores -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">CORES:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="changeTextColor()" title="Cor do Texto">
+                                                    <i class="fas fa-font"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="changeBackgroundColor()" title="Cor de Fundo">
+                                                    <i class="fas fa-highlighter"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Alinhamento -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">ALINHAR:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyLeft')" title="Alinhar à Esquerda">
+                                                    <i class="fas fa-align-left"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyCenter')" title="Centralizar">
+                                                    <i class="fas fa-align-center"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyRight')" title="Alinhar à Direita">
+                                                    <i class="fas fa-align-right"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('justifyFull')" title="Justificar">
+                                                    <i class="fas fa-align-justify"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Títulos -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">TÍTULOS:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('formatBlock', 'h1')" title="Título 1">
+                                                    H1
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('formatBlock', 'h2')" title="Título 2">
+                                                    H2
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('formatBlock', 'h3')" title="Título 3">
+                                                    H3
+                                                </button>
+                                            </div>
+
+                                            <!-- Logo -->
+                                            <div class="sei-toolbar-group">
+                                                <div class="sei-logo">ABMEPI</div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Segunda Linha da Toolbar -->
+                                        <div class="sei-toolbar-row">
+                                            <!-- Listas e Recuo -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">LISTAS:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('insertUnorderedList')" title="Lista com Marcadores">
+                                                    <i class="fas fa-list-ul"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('insertOrderedList')" title="Lista Numerada">
+                                                    <i class="fas fa-list-ol"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('outdent')" title="Diminuir Recuo">
+                                                    <i class="fas fa-outdent"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('indent')" title="Aumentar Recuo">
+                                                    <i class="fas fa-indent"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Inserir Elementos -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">INSERIR:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertImage()" title="Inserir Imagem">
+                                                    <i class="fas fa-image"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertTable()" title="Inserir Tabela">
+                                                    <i class="fas fa-table"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertLink()" title="Inserir Link">
+                                                    <i class="fas fa-link"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('insertHorizontalRule')" title="Linha Horizontal">
+                                                    <i class="fas fa-minus"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('insertParagraph')" title="Quebra de Linha">
+                                                    <i class="fas fa-paragraph"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertPageBreak()" title="Quebra de Página">
+                                                    <i class="fas fa-file-break"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertBlankLine()" title="Linha em Branco">
+                                                    <i class="fas fa-arrows-alt-v"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="duplicateLine()" title="Duplicar Linha">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Edição -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">EDIÇÃO:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('undo')" title="Desfazer">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('redo')" title="Refazer">
+                                                    <i class="fas fa-redo"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('copy')" title="Copiar">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('cut')" title="Cortar">
+                                                    <i class="fas fa-cut"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('paste')" title="Colar">
+                                                    <i class="fas fa-paste"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Ferramentas -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">FERRAMENTAS:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('removeFormat')" title="Remover Formatação">
+                                                    <i class="fas fa-remove-format"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="execCommand('selectAll')" title="Selecionar Tudo">
+                                                    <i class="fas fa-check-square"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="toggleSourceCode()" title="Código Fonte">
+                                                    <i class="fas fa-code"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="toggleFullscreen()" title="Tela Cheia">
+                                                    <i class="fas fa-expand"></i>
+                                                </button>
+                                                <div class="sei-separator"></div>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertCurrentDate()" title="Inserir Data">
+                                                    <i class="fas fa-calendar"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertCurrentTime()" title="Inserir Hora">
+                                                    <i class="fas fa-clock"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertSpecialChar()" title="Caracteres Especiais">
+                                                    <i class="fas fa-symbols"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="insertEmoji()" title="Emoji">
+                                                    <i class="fas fa-smile"></i>
+                                                </button>
+                                            </div>
+
+                                            <!-- Busca e Configurações -->
+                                            <div class="sei-toolbar-group">
+                                                <span style="font-size: 11px; color: #7f8c8d; margin-right: 8px; font-weight: 600;">CONFIG:</span>
+                                                <button type="button" class="sei-toolbar-btn" onclick="find()" title="Buscar">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="replace()" title="Substituir">
+                                                    <i class="fas fa-exchange-alt"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="showTemplates()" title="Modelos">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="showAutoText()" title="AutoTexto">
+                                                    <i class="fas fa-magic"></i>
+                                                </button>
+                                                <button type="button" class="sei-toolbar-btn" onclick="showSettings()" title="Configurações">
+                                                    <i class="fas fa-cog"></i>
+                                                </button>
+                                                <select class="sei-zoom-select">
+                                                    <option value="50">50%</option>
+                                                    <option value="75">75%</option>
+                                                    <option value="100" selected>100%</option>
+                                                    <option value="125">125%</option>
+                                                    <option value="150">150%</option>
+                                                    <option value="200">200%</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Editor Principal -->
+                                    <div class="sei-editor-container">
+                                        <div id="conteudo_editor" 
+                                             class="sei-editor-content" 
+                                             contenteditable="true" 
+                                             data-placeholder="Digite o conteúdo completo da notícia aqui...">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Campo Hidden para salvar o HTML -->
+                                {{ form.conteudo }}
+                                {% if form.conteudo.errors %}
+                                    <div class="text-danger mt-1">
+                                        {% for error in form.conteudo.errors %}
+                                            <small>{{ error }}</small>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <div class="form-text">{{ form.conteudo.help_text|default:"" }}</div>
+                            </div>
+                        </div>
+
+                        <!-- Seção: Configurações de Exibição -->
+                        <div class="form-section">
+                            <h6>
+                                <i class="fas fa-cog me-2 text-primary"></i>Configurações de Exibição
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.icone.id_for_label }}" class="form-label">
+                                            <i class="fas fa-image me-1"></i>{{ form.icone.label }}
+                                        </label>
+                                        {{ form.icone }}
+                                        {% if form.icone.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.icone.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="icon-preview" id="iconPreview">
+                                            <i class="fas fa-gavel"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.prioridade.id_for_label }}" class="form-label">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>{{ form.prioridade.label }}
+                                        </label>
+                                        {{ form.prioridade }}
+                                        {% if form.prioridade.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.prioridade.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="mt-2">
+                                            <span class="badge bg-info priority-badge" id="priorityBadge">Média</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="{{ form.ordem_exibicao.id_for_label }}" class="form-label">
+                                            <i class="fas fa-sort-numeric-up me-1"></i>{{ form.ordem_exibicao.label }}
+                                        </label>
+                                        {{ form.ordem_exibicao }}
+                                        {% if form.ordem_exibicao.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.ordem_exibicao.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Menor número = maior prioridade</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção: Configurações Avançadas -->
+                        <div class="form-section">
+                            <h6>
+                                <i class="fas fa-sliders-h me-2 text-primary"></i>Configurações Avançadas
+                            </h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.link_externo.id_for_label }}" class="form-label">
+                                            <i class="fas fa-external-link-alt me-1"></i>{{ form.link_externo.label }}
+                                        </label>
+                                        {{ form.link_externo }}
+                                        {% if form.link_externo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.link_externo.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">{{ form.link_externo.help_text|default:"" }}</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="{{ form.tags.id_for_label }}" class="form-label">
+                                            <i class="fas fa-tags me-1"></i>{{ form.tags.label }}
+                                        </label>
+                                        {{ form.tags }}
+                                        {% if form.tags.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.tags.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">{{ form.tags.help_text|default:"" }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.destaque }}
+                                            <label class="form-check-label" for="{{ form.destaque.id_for_label }}">
+                                                <i class="fas fa-star me-1"></i>{{ form.destaque.label }}
+                                            </label>
+                                        </div>
+                                        {% if form.destaque.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.destaque.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Notícias em destaque aparecem primeiro</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            {{ form.ativo }}
+                                            <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                                <i class="fas fa-toggle-on me-1"></i>{{ form.ativo.label }}
+                                            </label>
+                                        </div>
+                                        {% if form.ativo.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.ativo.errors %}
+                                            {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Notícias inativas não são exibidas</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <a href="{% url 'core:assejur_news_list' %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+                                        </a>
+                                        <a href="{% url 'core:institucional_edit' %}" class="btn btn-outline-primary ms-2">
+                                            <i class="fas fa-home me-2"></i>Voltar ao Institucional
+                                        </a>
+                                    </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-save me-2"></i>
+                                            {% if action == 'create' %}Criar Notícia{% else %}Salvar Alterações{% endif %}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Funções globais para o editor
+function execCommand(command, value = null) {
+    const editor = document.getElementById('conteudo_editor');
+    editor.focus();
+    
+    if (value) {
+        document.execCommand(command, false, value);
+    } else {
+        document.execCommand(command, false, null);
+    }
+    
+    syncEditorContent('conteudo');
+    updateToolbarState();
+}
+
+function applyStyleToSelection(styleProperty, value) {
+    const editor = document.getElementById('conteudo_editor');
+    editor.focus();
+    
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        if (!range.collapsed) {
+            // Há texto selecionado - aplicar estilo ao texto selecionado
+            const span = document.createElement('span');
+            span.style[styleProperty] = value;
+            try {
+                range.surroundContents(span);
+            } catch (e) {
+                // Se não conseguir envolver, inserir o span
+                range.deleteContents();
+                range.insertNode(span);
+            }
+        } else {
+            // Não há seleção - aplicar estilo ao próximo texto digitado
+            const span = document.createElement('span');
+            span.style[styleProperty] = value;
+            span.innerHTML = '&nbsp;';
+            range.insertNode(span);
+            // Mover cursor para dentro do span
+            range.setStartAfter(span);
+            range.setEndAfter(span);
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    } else {
+        // Fallback - aplicar estilo ao editor inteiro
+        editor.style[styleProperty] = value;
+    }
+    
+    syncEditorContent('conteudo');
+    updateToolbarState();
+}
+
+function changeFont(fontName) {
+    applyStyleToSelection('fontFamily', fontName);
+}
+
+function changeFontSize(size) {
+    // Mapa de tamanhos
+    const sizeMap = {
+        '1': '8px',
+        '2': '10px', 
+        '3': '12px',
+        '4': '14px',
+        '5': '18px',
+        '6': '24px',
+        '7': '36px'
+    };
+    
+    const fontSize = sizeMap[size] || '12px';
+    applyStyleToSelection('fontSize', fontSize);
+}
+
+
+// Função para sincronizar conteúdo do editor com o campo hidden
+function syncEditorContent(fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    const hiddenField = document.getElementById('id_' + fieldName);
+    
+    if (editor && hiddenField) {
+        // Manter HTML formatado
+        const htmlContent = editor.innerHTML || '';
+        hiddenField.value = htmlContent;
+        console.log('Conteúdo sincronizado (' + fieldName + '):', htmlContent.length, 'caracteres (HTML)');
+    }
+}
+
+// Função para atualizar estado visual dos botões
+function updateToolbarState() {
+    const editor = document.getElementById('conteudo_editor');
+    if (!editor) return;
+    
+    // Atualizar botões de formatação
+    const boldBtn = document.querySelector('[onclick="execCommand(\'bold\')"]');
+    const italicBtn = document.querySelector('[onclick="execCommand(\'italic\')"]');
+    const underlineBtn = document.querySelector('[onclick="execCommand(\'underline\')"]');
+    const strikeBtn = document.querySelector('[onclick="execCommand(\'strikeThrough\')"]');
+    
+    if (boldBtn) boldBtn.classList.toggle('active', document.queryCommandState('bold'));
+    if (italicBtn) italicBtn.classList.toggle('active', document.queryCommandState('italic'));
+    if (underlineBtn) underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
+    if (strikeBtn) strikeBtn.classList.toggle('active', document.queryCommandState('strikeThrough'));
+    
+    // Atualizar botões de alinhamento
+    const leftBtn = document.querySelector('[onclick="execCommand(\'justifyLeft\')"]');
+    const centerBtn = document.querySelector('[onclick="execCommand(\'justifyCenter\')"]');
+    const rightBtn = document.querySelector('[onclick="execCommand(\'justifyRight\')"]');
+    const justifyBtn = document.querySelector('[onclick="execCommand(\'justifyFull\')"]');
+    
+    if (leftBtn) leftBtn.classList.toggle('active', document.queryCommandState('justifyLeft'));
+    if (centerBtn) centerBtn.classList.toggle('active', document.queryCommandState('justifyCenter'));
+    if (rightBtn) rightBtn.classList.toggle('active', document.queryCommandState('justifyRight'));
+    if (justifyBtn) justifyBtn.classList.toggle('active', document.queryCommandState('justifyFull'));
+}
+
+// Função principal para executar comandos
+function execCommand(command, value = null) {
+    const editor = document.getElementById('conteudo_editor');
+    editor.focus();
+    document.execCommand(command, false, value);
+    syncEditorContent('conteudo');
+    updateToolbarState();
+}
+
+// Funções de inserção
+function insertLink() {
+    const url = prompt('Digite a URL do link:');
+    if (url) {
+        execCommand('createLink', url);
+    }
+}
+
+function insertImage() {
+    const url = prompt('Digite a URL da imagem:');
+    if (url) {
+        const img = `<img src="${url}" alt="Imagem" style="max-width: 100%; height: auto;">`;
+        execCommand('insertHTML', img);
+    }
+}
+
+function insertTable() {
+    const rows = prompt('Número de linhas:', '3');
+    const cols = prompt('Número de colunas:', '3');
+    if (rows && cols) {
+        let table = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+        for (let i = 0; i < parseInt(rows); i++) {
+            table += '<tr>';
+            for (let j = 0; j < parseInt(cols); j++) {
+                table += '<td style="padding: 8px; border: 1px solid #000;">&nbsp;</td>';
+            }
+            table += '</tr>';
+        }
+        table += '</table>';
+        execCommand('insertHTML', table);
+    }
+}
+
+// Funções de cores
+function changeTextColor() {
+    const color = prompt('Digite a cor (ex: #FF0000 ou red):', '#000000');
+    if (color) {
+        execCommand('foreColor', color);
+    }
+}
+
+function changeBackgroundColor() {
+    const color = prompt('Digite a cor de fundo (ex: #FFFF00 ou yellow):', '#FFFFFF');
+    if (color) {
+        execCommand('backColor', color);
+    }
+}
+
+// Funções de inserção de elementos
+function insertPageBreak() {
+    execCommand('insertHTML', '<div style="page-break-before: always;"></div>');
+}
+
+function insertBlankLine() {
+    execCommand('insertHTML', '<br><br>');
+}
+
+function duplicateLine() {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const selectedText = range.toString();
+        if (selectedText) {
+            execCommand('insertText', selectedText + '\n' + selectedText);
+        }
+    }
+}
+
+function insertCurrentDate() {
+    const today = new Date();
+    const dateStr = today.toLocaleDateString('pt-BR');
+    execCommand('insertText', dateStr);
+}
+
+function insertCurrentTime() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('pt-BR');
+    execCommand('insertText', timeStr);
+}
+
+// Funções de formatação de texto
+function toUpperCase() {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const selectedText = range.toString();
+        if (selectedText) {
+            range.deleteContents();
+            range.insertNode(document.createTextNode(selectedText.toUpperCase()));
+        }
+    }
+}
+
+function toLowerCase() {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const selectedText = range.toString();
+        if (selectedText) {
+            range.deleteContents();
+            range.insertNode(document.createTextNode(selectedText.toLowerCase()));
+        }
+    }
+}
+
+function capitalizeFirst() {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        const selectedText = range.toString();
+        if (selectedText) {
+            const capitalized = selectedText.charAt(0).toUpperCase() + selectedText.slice(1).toLowerCase();
+            range.deleteContents();
+            range.insertNode(document.createTextNode(capitalized));
+        }
+    }
+}
+
+// Funções de busca e substituição
+function find() {
+    const searchText = prompt('Digite o texto a ser buscado:');
+    if (searchText) {
+        const editor = document.getElementById('conteudo_editor');
+        const content = editor.innerHTML;
+        const index = content.toLowerCase().indexOf(searchText.toLowerCase());
+        if (index !== -1) {
+            alert(`Texto encontrado na posição ${index}`);
+            const highlightedContent = content.replace(
+                new RegExp(searchText, 'gi'), 
+                `<mark style="background-color: yellow;">${searchText}</mark>`
+            );
+            editor.innerHTML = highlightedContent;
+        } else {
+            alert('Texto não encontrado');
+        }
+    }
+}
+
+function replace() {
+    const searchText = prompt('Digite o texto a ser substituído:');
+    if (searchText) {
+        const replaceText = prompt('Digite o texto de substituição:');
+        if (replaceText) {
+            const editor = document.getElementById('conteudo_editor');
+            const content = editor.innerHTML;
+            const newContent = content.replace(new RegExp(searchText, 'gi'), replaceText);
+            editor.innerHTML = newContent;
+            syncEditorContent('conteudo');
+        }
+    }
+}
+
+// Funções de caracteres especiais e emoji
+function insertSpecialChar() {
+    const specialChars = [
+        '©', '®', '™', '€', '£', '¥', '¢', '§', '¶', '†', '‡', '•', '…', '‰', '′', '″', '‹', '›', '«', '»',
+        '¡', '¿', 'À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ', 'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ',
+        'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'Þ', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ',
+        'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û',
+        'ü', 'ý', 'þ', 'ÿ', 'α', 'β', 'γ', 'δ', 'ε', 'ζ', 'η', 'θ', 'ι', 'κ', 'λ', 'μ', 'ν', 'ξ', 'ο', 'π',
+        'ρ', 'σ', 'τ', 'υ', 'φ', 'χ', 'ψ', 'ω', 'Α', 'Β', 'Γ', 'Δ', 'Ε', 'Ζ', 'Η', 'Θ', 'Ι', 'Κ', 'Λ', 'Μ',
+        'Ν', 'Ξ', 'Ο', 'Π', 'Ρ', 'Σ', 'Τ', 'Υ', 'Φ', 'Χ', 'Ψ', 'Ω'
+    ];
+    
+    const choice = prompt('Escolha um caractere especial (digite o número):\n' + 
+        specialChars.map((char, i) => `${i + 1}. ${char}`).join('\n'));
+    const index = parseInt(choice) - 1;
+    
+    if (index >= 0 && index < specialChars.length) {
+        execCommand('insertText', specialChars[index]);
+    }
+}
+
+function insertEmoji() {
+    const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓'];
+    
+    const choice = prompt('Escolha um emoji (digite o número):\n' + 
+        emojis.map((emoji, i) => `${i + 1}. ${emoji}`).join(' '));
+    const index = parseInt(choice) - 1;
+    
+    if (index >= 0 && index < emojis.length) {
+        execCommand('insertText', emojis[index]);
+    }
+}
+
+// Funções de modelos e configurações
+function showTemplates() {
+    const templates = [
+        'Modelo 1: Cabeçalho',
+        'Modelo 2: Parágrafo',
+        'Modelo 3: Lista',
+        'Modelo 4: Tabela',
+        'Modelo 5: Citação',
+        'Modelo 6: Nota de rodapé'
+    ];
+    
+    const choice = prompt('Escolha um modelo:\n' + templates.map((t, i) => `${i + 1}. ${t}`).join('\n'));
+    const index = parseInt(choice) - 1;
+    
+    if (index >= 0 && index < templates.length) {
+        switch(index) {
+            case 0:
+                execCommand('insertHTML', '<h2>Cabeçalho</h2><p>Conteúdo do cabeçalho...</p>');
+                break;
+            case 1:
+                execCommand('insertHTML', '<p>Este é um parágrafo de exemplo. Você pode editar este texto conforme necessário.</p>');
+                break;
+            case 2:
+                execCommand('insertHTML', '<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>');
+                break;
+            case 3:
+                execCommand('insertHTML', '<table border="1" style="border-collapse: collapse; width: 100%;"><tr><th style="border: 1px solid #000; padding: 8px;">Cabeçalho 1</th><th style="border: 1px solid #000; padding: 8px;">Cabeçalho 2</th></tr><tr><td style="border: 1px solid #000; padding: 8px;">Dado 1</td><td style="border: 1px solid #000; padding: 8px;">Dado 2</td></tr></table>');
+                break;
+            case 4:
+                execCommand('insertHTML', '<blockquote style="border-left: 4px solid #ccc; margin: 1em 0; padding-left: 1em; font-style: italic;">"Esta é uma citação de exemplo."</blockquote>');
+                break;
+            case 5:
+                execCommand('insertHTML', '<p>Texto principal<sup>1</sup></p><p><small>1. Esta é uma nota de rodapé.</small></p>');
+                break;
+        }
+    }
+}
+
+function showAutoText() {
+    const autoTexts = [
+        'ABMEPI - Associação Brasileira dos Militares Estaduais da Polícia Militar',
+        'Data: ' + new Date().toLocaleDateString('pt-BR'),
+        'Assinatura: _________________',
+        'Atenciosamente,'
+    ];
+    
+    const choice = prompt('Escolha um autotexto:\n' + autoTexts.map((t, i) => `${i + 1}. ${t}`).join('\n'));
+    const index = parseInt(choice) - 1;
+    
+    if (index >= 0 && index < autoTexts.length) {
+        execCommand('insertText', autoTexts[index]);
+    }
+}
+
+function showSettings() {
+    const settings = [
+        '1. Configurar fonte padrão',
+        '2. Configurar tamanho padrão',
+        '3. Configurar cor padrão',
+        '4. Configurar alinhamento padrão'
+    ];
+    
+    const choice = prompt('Escolha uma configuração:\n' + settings.join('\n'));
+    
+    switch(choice) {
+        case '1':
+            const font = prompt('Digite a fonte padrão:', 'Times New Roman');
+            if (font) {
+                document.querySelector('.sei-font-family').value = font;
+                execCommand('fontName', font);
+            }
+            break;
+        case '2':
+            const size = prompt('Digite o tamanho padrão (1-7):', '3');
+            if (size) {
+                document.querySelector('.sei-font-size').value = size;
+                execCommand('fontSize', size);
+            }
+            break;
+        case '3':
+            const color = prompt('Digite a cor padrão (ex: #000000):', '#000000');
+            if (color) {
+                execCommand('foreColor', color);
+            }
+            break;
+        case '4':
+            const align = prompt('Escolha o alinhamento (left, center, right, justify):', 'left');
+            if (align) {
+                execCommand('justify' + align.charAt(0).toUpperCase() + align.slice(1));
+            }
+            break;
+    }
+}
+
+// Funções de visualização
+function toggleSourceCode() {
+    const editor = document.getElementById('conteudo_editor');
+    const isSourceMode = editor.getAttribute('data-source-mode') === 'true';
+    
+    if (isSourceMode) {
+        // Voltar ao modo visual
+        editor.innerHTML = editor.textContent;
+        editor.setAttribute('data-source-mode', 'false');
+        editor.contentEditable = 'true';
+    } else {
+        // Ir para modo código fonte
+        editor.textContent = editor.innerHTML;
+        editor.setAttribute('data-source-mode', 'true');
+        editor.contentEditable = 'false';
+    }
+}
+
+function toggleFullscreen() {
+    const editor = document.getElementById('conteudo_editor');
+    if (!document.fullscreenElement) {
+        editor.requestFullscreen().catch(err => {
+            alert('Erro ao entrar em tela cheia: ' + err.message);
+        });
+    } else {
+        document.exitFullscreen();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Atualizar preview do ícone
+    const iconSelect = document.getElementById('{{ form.icone.id_for_label }}');
+    const iconPreview = document.getElementById('iconPreview');
+    
+    function updateIconPreview() {
+        const selectedIcon = iconSelect.value;
+        iconPreview.innerHTML = `<i class="${selectedIcon}"></i>`;
+    }
+    
+    iconSelect.addEventListener('change', updateIconPreview);
+    updateIconPreview(); // Executar na carga inicial
+    
+    // Atualizar badge de prioridade
+    const prioritySelect = document.getElementById('{{ form.prioridade.id_for_label }}');
+    const priorityBadge = document.getElementById('priorityBadge');
+    
+    function updatePriorityBadge() {
+        const selectedPriority = prioritySelect.value;
+        const priorityText = prioritySelect.options[prioritySelect.selectedIndex].text;
+        
+        // Remover classes de cor anteriores
+        priorityBadge.className = 'badge priority-badge';
+        
+        // Adicionar classe de cor baseada na prioridade
+        switch(selectedPriority) {
+            case 'baixa':
+                priorityBadge.classList.add('bg-info');
+                break;
+            case 'media':
+                priorityBadge.classList.add('bg-warning');
+                break;
+            case 'alta':
+                priorityBadge.classList.add('bg-danger');
+                break;
+            case 'urgente':
+                priorityBadge.classList.add('bg-dark');
+                break;
+            default:
+                priorityBadge.classList.add('bg-secondary');
+        }
+        
+        priorityBadge.textContent = priorityText;
+    }
+    
+    prioritySelect.addEventListener('change', updatePriorityBadge);
+    updatePriorityBadge(); // Executar na carga inicial
+    
+    // Validação do formulário
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const titulo = document.getElementById('{{ form.titulo.id_for_label }}').value.trim();
+        const resumo = document.getElementById('{{ form.resumo.id_for_label }}').value.trim();
+        
+        if (!titulo) {
+            e.preventDefault();
+            alert('Por favor, preencha o título da notícia.');
+            return false;
+        }
+        
+        if (!resumo) {
+            e.preventDefault();
+            alert('Por favor, preencha o resumo da notícia.');
+            return false;
+        }
+        
+        if (resumo.length > 500) {
+            e.preventDefault();
+            alert('O resumo deve ter no máximo 500 caracteres.');
+            return false;
+        }
+    });
+    
+    // ===== EDITOR SEI - FUNÇÕES DA ATA =====
+    
+    // Função principal para executar comandos
+    function execCommand(command, value = null) {
+        const editor = document.getElementById('conteudo_editor');
+        editor.focus();
+        document.execCommand(command, false, value);
+        syncEditorContent('conteudo');
+        updateToolbarState();
+    }
+    
+    // Função para inserir link
+    function insertLink() {
+        const url = prompt('Digite a URL do link:');
+        if (url) {
+            execCommand('createLink', url);
+        }
+    }
+    
+    // Função para inserir imagem
+    function insertImage() {
+        const url = prompt('Digite a URL da imagem:');
+        if (url) {
+            const img = `<img src="${url}" alt="Imagem" style="max-width: 100%; height: auto;">`;
+            execCommand('insertHTML', img);
+        }
+    }
+    
+    // Função para inserir tabela
+    function insertTable() {
+        const rows = prompt('Número de linhas:', '3');
+        const cols = prompt('Número de colunas:', '3');
+        if (rows && cols) {
+            let table = '<table border="1" style="border-collapse: collapse; width: 100%;">';
+            for (let i = 0; i < parseInt(rows); i++) {
+                table += '<tr>';
+                for (let j = 0; j < parseInt(cols); j++) {
+                    table += '<td style="padding: 8px; border: 1px solid #000;">&nbsp;</td>';
+                }
+                table += '</tr>';
+            }
+            table += '</table>';
+            execCommand('insertHTML', table);
+        }
+    }
+    
+    // Função para alterar cor do texto
+    function changeTextColor() {
+        const color = prompt('Digite a cor do texto (ex: #ff0000 ou red):');
+        if (color) {
+            execCommand('foreColor', color);
+        }
+    }
+    
+    // Função para alterar cor de fundo
+    function changeBackgroundColor() {
+        const color = prompt('Digite a cor de fundo (ex: #ffff00 ou yellow):');
+        if (color) {
+            execCommand('backColor', color);
+        }
+    }
+    
+    // Função para mostrar AutoTexto
+    function showAutoText() {
+        alert('AutoTexto:\n\n• [DATA] - Data atual\n• [HORA] - Hora atual\n• [NOME] - Nome do usuário\n• [ASSINATURA] - Assinatura digital');
+    }
+    
+    // Função para inserir caracteres especiais
+    function insertSpecialChar() {
+        const chars = ['©', '®', '™', '€', '£', '¥', '§', '¶', '†', '‡', '•', '…', '‰', '′', '″', '‴', '※', '‼', '‽', '‾', '⁰', '¹', '²', '³', '⁴', '⁵', '⁶', '⁷', '⁸', '⁹'];
+        let options = 'Caracteres especiais:\n\n';
+        chars.forEach((char, index) => {
+            options += `${index + 1}. ${char}\n`;
+        });
+        const selected = prompt(options + '\nDigite o número do caractere:');
+        if (selected && selected >= 1 && selected <= chars.length) {
+            execCommand('insertText', chars[selected - 1]);
+        }
+    }
+    
+    // Função para mostrar modelos
+    function showTemplates() {
+        alert('Modelos disponíveis:\n\n• Ata de Reunião\n• Ofício\n• Memorando\n• Circular\n• Relatório\n\nEm desenvolvimento...');
+    }
+    
+    // Função para mostrar configurações
+    function showSettings() {
+        alert('Configurações do Editor:\n\n• Fonte padrão: Times New Roman\n• Tamanho padrão: 12pt\n• Salvar automaticamente: Ativado\n• Verificação ortográfica: Ativada\n• Atalhos de teclado: Ativados');
+    }
+    
+    // Função para alternar código fonte
+    function toggleSourceCode() {
+        const editor = document.getElementById('conteudo_editor');
+        const isSourceMode = editor.getAttribute('data-source-mode') === 'true';
+        
+        if (isSourceMode) {
+            // Voltar ao modo visual
+            editor.innerHTML = editor.textContent;
+            editor.setAttribute('data-source-mode', 'false');
+            editor.contentEditable = 'true';
+        } else {
+            // Modo código fonte
+            editor.textContent = editor.innerHTML;
+            editor.setAttribute('data-source-mode', 'true');
+            editor.contentEditable = 'true';
+        }
+    }
+    
+    // Função para tela cheia
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    }
+    
+    // Atualizar estado da toolbar
+    function updateToolbarState() {
+        const editor = document.getElementById('conteudo_editor');
+        
+        // Atualizar botões de formatação
+        const boldBtn = document.querySelector('[onclick="execCommand(\'bold\')"]');
+        const italicBtn = document.querySelector('[onclick="execCommand(\'italic\')"]');
+        const underlineBtn = document.querySelector('[onclick="execCommand(\'underline\')"]');
+        
+        if (boldBtn) boldBtn.classList.toggle('active', document.queryCommandState('bold'));
+        if (italicBtn) italicBtn.classList.toggle('active', document.queryCommandState('italic'));
+        if (underlineBtn) underlineBtn.classList.toggle('active', document.queryCommandState('underline'));
+    }
+    
+    // Função para limpar formatação
+    function clearFormatting(fieldName) {
+        const editor = document.getElementById(fieldName + '_editor');
+        if (editor) {
+            // Remover todas as formatações
+            document.execCommand('removeFormat', false, null);
+            // Remover tags de formatação específicas
+            const content = editor.innerHTML;
+            const cleanContent = content
+                .replace(/<strong>/g, '')
+                .replace(/<\/strong>/g, '')
+                .replace(/<em>/g, '')
+                .replace(/<\/em>/g, '')
+                .replace(/<u>/g, '')
+                .replace(/<\/u>/g, '')
+                .replace(/<b>/g, '')
+                .replace(/<\/b>/g, '')
+                .replace(/<i>/g, '')
+                .replace(/<\/i>/g, '');
+            editor.innerHTML = cleanContent;
+            syncEditorContent(fieldName);
+        }
+    }
+    
+    // Função para limpar conteúdo
+    function clearContent(fieldName) {
+        if (confirm('Tem certeza que deseja limpar todo o conteúdo do editor?')) {
+            const editor = document.getElementById(fieldName + '_editor');
+            if (editor) {
+                editor.innerHTML = '';
+                syncEditorContent(fieldName);
+            }
+        }
+    }
+    
+    
+    // Inicializar editor de conteúdo
+    const editorConteudo = document.getElementById('conteudo_editor');
+    const hiddenFieldConteudo = document.getElementById('id_conteudo');
+    
+    if (editorConteudo && hiddenFieldConteudo) {
+        // Carregar conteúdo inicial se existir
+        if (hiddenFieldConteudo.value) {
+            editorConteudo.innerHTML = hiddenFieldConteudo.value;
+            console.log('Conteúdo inicial carregado (conteúdo):', hiddenFieldConteudo.value.length, 'caracteres');
+        }
+        
+        // Sincronizar em tempo real
+        editorConteudo.addEventListener('input', function() {
+            syncEditorContent('conteudo');
+        });
+        
+        editorConteudo.addEventListener('paste', function() {
+            setTimeout(function() {
+                syncEditorContent('conteudo');
+            }, 100);
+        });
+        
+        editorConteudo.addEventListener('keyup', function() {
+            syncEditorContent('conteudo');
+        });
+        
+        // Sincronizar conteúdo inicial
+        syncEditorContent('conteudo');
+    }
+    
+    // Adicionar suporte para atalhos de teclado
+    editorConteudo.addEventListener('keydown', function(e) {
+        // Ctrl+B para negrito
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+            execCommand('bold');
+        }
+        // Ctrl+I para itálico
+        if (e.ctrlKey && e.key === 'i') {
+            e.preventDefault();
+            execCommand('italic');
+        }
+        // Ctrl+U para sublinhado
+        if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+            execCommand('underline');
+        }
+        // Ctrl+K para inserir link
+        if (e.ctrlKey && e.key === 'k') {
+            e.preventDefault();
+            insertLink();
+        }
+        // Ctrl+Shift+H para linha horizontal
+        if (e.ctrlKey && e.shiftKey && e.key === 'H') {
+            e.preventDefault();
+            execCommand('insertHorizontalRule');
+        }
+        // Ctrl+Shift+D para inserir data
+        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            e.preventDefault();
+            const hoje = new Date();
+            const data = hoje.toLocaleDateString('pt-BR');
+            execCommand('insertText', data);
+        }
+    });
+    
+    // ===== EDITOR SEI - FUNÇÕES =====
+    
+    // Função principal para executar comandos
+    function execCommand(command, value = null) {
+        const editor = document.getElementById('conteudo_editor');
+        editor.focus();
+        
+        // Tratamento especial para comandos de fonte
+        if (command === 'fontName') {
+            document.execCommand('fontName', false, value);
+        } else if (command === 'fontSize') {
+            // Converter número para tamanho em pixels
+            const sizeMap = {
+                '1': '8px',
+                '2': '10px', 
+                '3': '12px',
+                '4': '14px',
+                '5': '18px',
+                '6': '24px',
+                '7': '36px'
+            };
+            const fontSize = sizeMap[value] || '12px';
+            document.execCommand('fontSize', false, value);
+            // Aplicar o tamanho real
+            document.execCommand('styleWithCSS', false, true);
+            document.execCommand('fontSize', false, value);
+        } else {
+            document.execCommand(command, false, value);
+        }
+        
+        syncEditorContent('conteudo');
+        updateToolbarState();
+    }
+    
+    // Função para inserir link
+    function insertLink() {
+        const url = prompt('Digite a URL do link:');
+        if (url) {
+            execCommand('createLink', url);
+        }
+    }
+    
+    // Função para inserir imagem
+    function insertImage() {
+        const url = prompt('Digite a URL da imagem:');
+        if (url) {
+            const img = `<img src="${url}" alt="Imagem" style="max-width: 100%; height: auto;">`;
+            execCommand('insertHTML', img);
+        }
+    }
+    
+    
+    
+    // Inicializar editor
+    const editor = document.getElementById('conteudo_editor');
+    const hiddenField = document.getElementById('id_conteudo');
+    
+    if (editor && hiddenField) {
+        // Carregar conteúdo inicial
+        if (hiddenField.value) {
+            editor.innerHTML = hiddenField.value;
+        }
+        
+        // Sincronizar ao digitar
+        editor.addEventListener('input', function() {
+            syncEditorContent('conteudo');
+        });
+        
+        // Sincronizar ao colar
+        editor.addEventListener('paste', function() {
+            setTimeout(() => {
+                syncEditorContent('conteudo');
+            }, 100);
+        });
+        
+        // Atualizar estado dos botões ao selecionar texto
+        editor.addEventListener('mouseup', updateToolbarState);
+        editor.addEventListener('keyup', updateToolbarState);
+        editor.addEventListener('selectionchange', updateToolbarState);
+        
+        // Atalhos de teclado
+        editor.addEventListener('keydown', function(e) {
+            // Ctrl+B para negrito
+            if (e.ctrlKey && e.key === 'b') {
+                e.preventDefault();
+                execCommand('bold');
+            }
+            // Ctrl+I para itálico
+            if (e.ctrlKey && e.key === 'i') {
+                e.preventDefault();
+                execCommand('italic');
+            }
+            // Ctrl+U para sublinhado
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                execCommand('underline');
+            }
+            // Ctrl+K para inserir link
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                insertLink();
+            }
+            // Ctrl+Z para desfazer
+            if (e.ctrlKey && e.key === 'z' && !e.shiftKey) {
+                e.preventDefault();
+                execCommand('undo');
+            }
+            // Ctrl+Y ou Ctrl+Shift+Z para refazer
+            if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'Z')) {
+                e.preventDefault();
+                execCommand('redo');
+            }
+            // Ctrl+A para selecionar tudo
+            if (e.ctrlKey && e.key === 'a') {
+                e.preventDefault();
+                execCommand('selectAll');
+            }
+            // Ctrl+C para copiar
+            if (e.ctrlKey && e.key === 'c') {
+                // Deixar o comportamento padrão
+            }
+            // Ctrl+X para cortar
+            if (e.ctrlKey && e.key === 'x') {
+                // Deixar o comportamento padrão
+            }
+            // Ctrl+V para colar
+            if (e.ctrlKey && e.key === 'v') {
+                // Deixar o comportamento padrão
+            }
+            // Ctrl+F para buscar
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                find();
+            }
+            // Ctrl+H para substituir
+            if (e.ctrlKey && e.key === 'h') {
+                e.preventDefault();
+                replace();
+            }
+            // F11 para tela cheia
+            if (e.key === 'F11') {
+                e.preventDefault();
+                toggleFullscreen();
+            }
+        });
+    }
+    
+    // Função para inserir linha horizontal
+    function insertHorizontalRule() {
+        execCommand('insertHorizontalRule');
+    }
+    
+    // Função para inserir parágrafo
+    function insertParagraph() {
+        execCommand('insertParagraph');
+    }
+    
+    // Função para desfazer
+    function undo() {
+        execCommand('undo');
+    }
+    
+    // Função para refazer
+    function redo() {
+        execCommand('redo');
+    }
+    
+    // Função para copiar
+    function copy() {
+        execCommand('copy');
+    }
+    
+    // Função para cortar
+    function cut() {
+        execCommand('cut');
+    }
+    
+    // Função para colar
+    function paste() {
+        execCommand('paste');
+    }
+    
+    // Função para remover formatação
+    function removeFormat() {
+        execCommand('removeFormat');
+    }
+    
+    // Função para selecionar tudo
+    function selectAll() {
+        execCommand('selectAll');
+    }
+    
+    // Função para buscar
+    function find() {
+        const searchText = prompt('Digite o texto a ser buscado:');
+        if (searchText) {
+            // Implementar busca simples
+            const editor = document.getElementById('conteudo_editor');
+            const content = editor.innerHTML;
+            const index = content.toLowerCase().indexOf(searchText.toLowerCase());
+            if (index !== -1) {
+                alert(`Texto encontrado na posição ${index}`);
+                // Destacar o texto encontrado
+                const highlightedContent = content.replace(
+                    new RegExp(searchText, 'gi'), 
+                    `<mark style="background-color: yellow;">${searchText}</mark>`
+                );
+                editor.innerHTML = highlightedContent;
+            } else {
+                alert('Texto não encontrado');
+            }
+        }
+    }
+    
+    // Função para substituir
+    function replace() {
+        const searchText = prompt('Digite o texto a ser substituído:');
+        if (searchText) {
+            const replaceText = prompt('Digite o texto de substituição:');
+            if (replaceText) {
+                const editor = document.getElementById('conteudo_editor');
+                const content = editor.innerHTML;
+                const newContent = content.replace(new RegExp(searchText, 'gi'), replaceText);
+                editor.innerHTML = newContent;
+                syncEditorContent('conteudo');
+            }
+        }
+    }
+    
+    // Função para zoom
+    function changeZoom() {
+        const zoom = document.querySelector('.sei-zoom-select').value;
+        const editor = document.getElementById('conteudo_editor');
+        editor.style.zoom = zoom + '%';
+    }
+    
+    
+    // Função para inserir data atual
+    function insertCurrentDate() {
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('pt-BR');
+        execCommand('insertText', dateStr);
+    }
+    
+    // Função para inserir hora atual
+    function insertCurrentTime() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('pt-BR');
+        execCommand('insertText', timeStr);
+    }
+    
+    // Função para inserir data e hora
+    function insertDateTime() {
+        const now = new Date();
+        const dateTimeStr = now.toLocaleString('pt-BR');
+        execCommand('insertText', dateTimeStr);
+    }
+    
+    // Função para inserir quebra de página
+    function insertPageBreak() {
+        execCommand('insertHTML', '<div style="page-break-before: always;"></div>');
+    }
+    
+    // Função para inserir linha em branco
+    function insertBlankLine() {
+        execCommand('insertHTML', '<br><br>');
+    }
+    
+    // Função para duplicar linha
+    function duplicateLine() {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+            if (selectedText) {
+                execCommand('insertText', selectedText + '\n' + selectedText);
+            }
+        }
+    }
+    
+    // Função para converter para maiúsculas
+    function toUpperCase() {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+            if (selectedText) {
+                range.deleteContents();
+                range.insertNode(document.createTextNode(selectedText.toUpperCase()));
+            }
+        }
+    }
+    
+    // Função para converter para minúsculas
+    function toLowerCase() {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+            if (selectedText) {
+                range.deleteContents();
+                range.insertNode(document.createTextNode(selectedText.toLowerCase()));
+            }
+        }
+    }
+    
+    // Função para capitalizar primeira letra
+    function capitalizeFirst() {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const selectedText = range.toString();
+            if (selectedText) {
+                const capitalized = selectedText.charAt(0).toUpperCase() + selectedText.slice(1).toLowerCase();
+                range.deleteContents();
+                range.insertNode(document.createTextNode(capitalized));
+            }
+        }
+    }
+    
+    // Função para inserir emoji
+    function insertEmoji() {
+        const emojis = ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓'];
+        
+        const choice = prompt('Escolha um emoji (digite o número):\n' + 
+            emojis.map((emoji, i) => `${i + 1}. ${emoji}`).join(' '));
+        const index = parseInt(choice) - 1;
+        
+        if (index >= 0 && index < emojis.length) {
+            execCommand('insertText', emojis[index]);
+        }
+    }
+    
+    // Adicionar event listener para zoom
+    document.addEventListener('DOMContentLoaded', function() {
+        const zoomSelect = document.querySelector('.sei-zoom-select');
+        if (zoomSelect) {
+            zoomSelect.addEventListener('change', changeZoom);
+        }
+    });
+});
+</script>
+{% endblock %}

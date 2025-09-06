@@ -1,0 +1,164 @@
+{
+    "module_name": "Hotel de Trânsito",
+    "version": "1.0.0",
+    "description": "Módulo para gerenciamento de hotel de trânsito, permitindo hospedagem de associados e não associados",
+    "author": "Sistema ABMEPI",
+    "created_date": "2024-01-01",
+    "dependencies": [
+        "django>=4.2.0",
+        "associados"
+    ],
+    "models": [
+        {
+            "name": "Quarto",
+            "description": "Cadastro de quartos com características e status",
+            "fields": [
+                "numero", "tipo", "capacidade", "valor_diaria", "status",
+                "ar_condicionado", "tv", "wifi", "banheiro_privativo", "frigobar"
+            ]
+        },
+        {
+            "name": "Hospede",
+            "description": "Cadastro de hóspedes (associados ou não associados)",
+            "fields": [
+                "tipo_hospede", "associado", "nome_completo", "data_nascimento",
+                "tipo_documento", "numero_documento", "telefone", "email", "endereco"
+            ]
+        },
+        {
+            "name": "Reserva",
+            "description": "Sistema de reservas de quartos",
+            "fields": [
+                "codigo_reserva", "quarto", "hospede", "data_entrada", "data_saida",
+                "valor_diaria", "quantidade_diarias", "valor_total", "status"
+            ]
+        },
+        {
+            "name": "Hospedagem",
+            "description": "Controle de hospedagens efetivas",
+            "fields": [
+                "reserva", "quarto", "hospede", "data_entrada_real", "data_saida_real",
+                "valor_diaria_real", "quantidade_diarias_real", "valor_total_real", "status"
+            ]
+        },
+        {
+            "name": "ServicoAdicional",
+            "description": "Catálogo de serviços oferecidos",
+            "fields": [
+                "nome", "tipo", "descricao", "valor", "ativo"
+            ]
+        },
+        {
+            "name": "ServicoUtilizado",
+            "description": "Registro de serviços utilizados pelos hóspedes",
+            "fields": [
+                "hospedagem", "servico", "quantidade", "valor_unitario", "valor_total"
+            ]
+        }
+    ],
+    "features": [
+        "Dashboard com estatísticas em tempo real",
+        "Gestão completa de quartos",
+        "Cadastro de hóspedes associados e não associados",
+        "Sistema de reservas com verificação de disponibilidade",
+        "Controle de check-in e check-out",
+        "Serviços adicionais e controle de custos",
+        "Relatórios e estatísticas",
+        "Interface responsiva com modais",
+        "Validações automáticas",
+        "Integração com módulo de associados"
+    ],
+    "urls": [
+        "/hotel-transito/",
+        "/hotel-transito/quartos/",
+        "/hotel-transito/hospedes/",
+        "/hotel-transito/reservas/",
+        "/hotel-transito/hospedagens/",
+        "/hotel-transito/servicos/",
+        "/hotel-transito/buscar-quartos/",
+        "/hotel-transito/relatorios/"
+    ],
+    "admin_models": [
+        "QuartoAdmin",
+        "HospedeAdmin", 
+        "ReservaAdmin",
+        "HospedagemAdmin",
+        "ServicoAdicionalAdmin",
+        "ServicoUtilizadoAdmin"
+    ],
+    "static_files": [
+        "css/modais.css",
+        "js/modais.js"
+    ],
+    "templates": [
+        "dashboard.html",
+        "quarto_list.html",
+        "quarto_detail.html",
+        "quarto_form.html",
+        "hospede_list.html",
+        "hospede_detail.html",
+        "hospede_form.html",
+        "reserva_list.html",
+        "reserva_detail.html",
+        "reserva_form.html",
+        "hospedagem_list.html",
+        "hospedagem_detail.html",
+        "hospedagem_form.html"
+    ],
+    "permissions": [
+        "hotel_transito.view_quarto",
+        "hotel_transito.add_quarto",
+        "hotel_transito.change_quarto",
+        "hotel_transito.delete_quarto",
+        "hotel_transito.view_hospede",
+        "hotel_transito.add_hospede",
+        "hotel_transito.change_hospede",
+        "hotel_transito.delete_hospede",
+        "hotel_transito.view_reserva",
+        "hotel_transito.add_reserva",
+        "hotel_transito.change_reserva",
+        "hotel_transito.delete_reserva",
+        "hotel_transito.view_hospedagem",
+        "hotel_transito.add_hospedagem",
+        "hotel_transito.change_hospedagem",
+        "hotel_transito.delete_hospedagem"
+    ],
+    "installation_steps": [
+        "1. Adicionar 'hotel_transito.apps.HotelTransitoConfig' ao INSTALLED_APPS",
+        "2. Incluir 'hotel-transito/' nas URLs principais",
+        "3. Executar 'python manage.py makemigrations hotel_transito'",
+        "4. Executar 'python manage.py migrate'",
+        "5. Criar superusuário se necessário"
+    ],
+    "usage_instructions": [
+        "1. Acesse /hotel-transito/ para o dashboard principal",
+        "2. Cadastre quartos disponíveis",
+        "3. Cadastre hóspedes (associados ou não)",
+        "4. Crie reservas para períodos específicos",
+        "5. Realize check-in e check-out",
+        "6. Gerencie serviços adicionais",
+        "7. Acesse relatórios e estatísticas"
+    ],
+    "technical_details": {
+        "django_version": "4.2+",
+        "python_version": "3.8+",
+        "database": "PostgreSQL/SQLite",
+        "frontend": "Bootstrap 5, JavaScript ES6+",
+        "architecture": "MVC (Model-View-Controller)",
+        "api": "Views baseadas em classes e funções",
+        "security": "Login required, CSRF protection",
+        "performance": "Select related, pagination, caching ready"
+    },
+    "maintenance": {
+        "backup": "Backup regular do banco de dados",
+        "updates": "Verificar compatibilidade com Django",
+        "monitoring": "Logs de operações críticas",
+        "optimization": "Análise de queries e índices"
+    },
+    "support": {
+        "documentation": "README.md e README_MODAIS.md",
+        "code_comments": "Comentários detalhados no código",
+        "examples": "Templates e formulários de exemplo",
+        "troubleshooting": "Seção de problemas comuns"
+    }
+}

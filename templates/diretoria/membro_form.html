@@ -1,0 +1,266 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if membro %}Editar{% else %}Novo{% endif %} Membro da Diretoria - ABMEPI
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-user-plus me-2"></i>
+                        {% if membro %}Editar{% else %}Novo{% endif %} Membro da Diretoria
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if membro %}
+                            Editando: <strong>{{ membro.associado.nome }}</strong>
+                        {% else %}
+                            Adicione um novo membro à diretoria
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:membro_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados do Membro
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Associado -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.associado_nome.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Associado <span class="text-danger">*</span>
+                                </label>
+                                <div class="position-relative">
+                                    {{ form.associado_nome }}
+                                    {{ form.associado }}  <!-- Campo oculto para o ID -->
+                                    <div id="suggestions-associado" class="list-group position-absolute w-100" style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
+                                        <!-- Sugestões aparecerão aqui -->
+                                    </div>
+                                </div>
+                                {% if form.associado_nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.associado_nome.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Digite o nome do associado e selecione da lista de sugestões
+                                </small>
+                            </div>
+
+                            <!-- Cargo -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.cargo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-briefcase me-1"></i>
+                                    Cargo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cargo }}
+                                {% if form.cargo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.cargo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Data de Início -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_inicio.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data de Início <span class="text-danger">*</span>
+                                </label>
+                                {{ form.data_inicio }}
+                                {% if form.data_inicio.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_inicio.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Data de Fim -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.data_fim.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data de Fim
+                                </label>
+                                {{ form.data_fim }}
+                                {% if form.data_fim.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_fim.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Deixe em branco se o membro ainda está ativo
+                                </small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Status -->
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    {{ form.ativo }}
+                                    <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Membro Ativo
+                                    </label>
+                                </div>
+                                {% if form.ativo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.ativo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    Observações
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{% url 'diretoria:membro_list' %}" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancelar
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if membro %}Atualizar Membro{% else %}Criar Membro{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Autocomplete para associado
+document.addEventListener('DOMContentLoaded', function() {
+    const inputAssociado = document.getElementById('id_associado_nome');
+    const hiddenInputAssociado = document.getElementById('id_associado');
+    const suggestionsAssociado = document.getElementById('suggestions-associado');
+    let timeoutIdAssociado;
+
+    if (inputAssociado) {
+        inputAssociado.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            // Limpar timeout anterior
+            if (timeoutIdAssociado) {
+                clearTimeout(timeoutIdAssociado);
+            }
+            
+            // Se a query for muito curta, esconder sugestões
+            if (query.length < 2) {
+                suggestionsAssociado.style.display = 'none';
+                hiddenInputAssociado.value = '';
+                return;
+            }
+            
+            // Debounce: aguardar 300ms após parar de digitar
+            timeoutIdAssociado = setTimeout(() => {
+                buscarAssociados(query);
+            }, 300);
+        });
+        
+        // Esconder sugestões quando clicar fora
+        document.addEventListener('click', function(e) {
+            if (!inputAssociado.contains(e.target) && !suggestionsAssociado.contains(e.target)) {
+                suggestionsAssociado.style.display = 'none';
+            }
+        });
+        
+        // Esconder sugestões quando pressionar Escape
+        inputAssociado.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                suggestionsAssociado.style.display = 'none';
+            }
+        });
+    }
+    
+    function buscarAssociados(query) {
+        fetch(`{% url 'diretoria:buscar_associados_ajax' %}?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                mostrarSugestoesAssociado(data.results);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar associados:', error);
+            });
+    }
+    
+    function mostrarSugestoesAssociado(results) {
+        suggestionsAssociado.innerHTML = '';
+        
+        if (results.length === 0) {
+            suggestionsAssociado.style.display = 'none';
+            return;
+        }
+        
+        results.forEach(result => {
+            const item = document.createElement('div');
+            item.className = 'list-group-item list-group-item-action';
+            item.style.cursor = 'pointer';
+            item.textContent = result.text;
+            
+            item.addEventListener('click', function() {
+                inputAssociado.value = result.text.split(' - ')[0]; // Pegar apenas o nome
+                hiddenInputAssociado.value = result.id;
+                suggestionsAssociado.style.display = 'none';
+            });
+            
+            // Destacar texto pesquisado
+            const highlightedText = result.text.replace(
+                new RegExp(inputAssociado.value, 'gi'), 
+                `<mark>$&</mark>`
+            );
+            item.innerHTML = highlightedText;
+            
+            suggestionsAssociado.appendChild(item);
+        });
+        
+        suggestionsAssociado.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

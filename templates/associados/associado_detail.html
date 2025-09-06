@@ -1,0 +1,1530 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ associado.nome }} - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user me-2"></i>
+        {{ associado.nome }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-warning" onclick="openAssociadoEditModal({{ associado.pk }})">
+                <i class="fas fa-edit me-1"></i>
+                Editar
+            </button>
+        </div>
+        <div class="btn-group me-2">
+            <a href="{% url 'associados:associado_delete' associado.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash me-1"></i>
+                Excluir
+            </a>
+        </div>
+        <a href="{% url 'associados:associado_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informações principais -->
+    <div class="col-lg-8">
+        <!-- Dados Pessoais -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user me-2"></i>
+                    Dados Pessoais
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nome:</strong> {{ associado.nome }}</p>
+                        <p><strong>CPF:</strong> {{ associado.cpf }}</p>
+                        <p><strong>RG:</strong> {{ associado.rg }}</p>
+                        <p><strong>Data de Nascimento:</strong> {{ associado.data_nascimento|date:"d/m/Y" }}</p>
+                        <p><strong>Idade:</strong> {{ associado.get_idade }} anos</p>
+                        <p><strong>Sexo:</strong> {{ associado.get_sexo_display }}</p>
+                        <p><strong>Estado Civil:</strong> {{ associado.get_estado_civil_display }}</p>
+                        <p><strong>Naturalidade:</strong> {{ associado.naturalidade|default:"Não informado" }}</p>
+                        <p><strong>Nacionalidade:</strong> {{ associado.nacionalidade }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>E-mail:</strong> 
+                            {% if associado.email %}
+                                <a href="mailto:{{ associado.email }}" class="text-decoration-none">
+                                    <i class="fas fa-envelope me-1"></i>{{ associado.email }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Telefone:</strong> 
+                            {% if associado.telefone %}
+                                <a href="tel:{{ associado.telefone }}" class="text-decoration-none">
+                                    <i class="fas fa-phone me-1"></i>{{ associado.telefone }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Celular:</strong> 
+                            {% if associado.celular %}
+                                <a href="tel:{{ associado.celular }}" class="text-decoration-none">
+                                    <i class="fas fa-mobile-alt me-1"></i>{{ associado.celular }}
+                                </a>
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Nome Civil:</strong> 
+                            {% if associado.nome_civil %}
+                                {{ associado.nome_civil }}
+                            {% else %}
+                                <span class="text-muted">Igual ao nome militar</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    Endereço
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>CEP:</strong> {{ associado.cep }}</p>
+                        <p><strong>Rua:</strong> {{ associado.rua }}</p>
+                        <p><strong>Número:</strong> {{ associado.numero }}</p>
+                        <p><strong>Complemento:</strong> 
+                            {% if associado.complemento %}
+                                {{ associado.complemento }}
+                            {% else %}
+                                <span class="text-muted">Não informado</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Bairro:</strong> {{ associado.bairro }}</p>
+                        <p><strong>Cidade:</strong> {{ associado.cidade }}</p>
+                        <p><strong>Estado:</strong> {{ associado.get_estado_display }}</p>
+                        <p><strong>Endereço Completo:</strong></p>
+                        <p class="mb-0 text-muted small">{{ associado.get_endereco_completo }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dados Funcionais -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Dados Funcionais
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Tipo de Sócio:</strong> 
+                            <span class="badge bg-primary">{{ associado.get_tipo_socio_display }}</span>
+                        </p>
+                        <p><strong>Tipo de Profissional:</strong> 
+                            <span class="badge bg-info">{{ associado.get_tipo_profissional_display }}</span>
+                        </p>
+                        <p><strong>Matrícula Militar:</strong> 
+                            <span class="badge bg-secondary">{{ associado.matricula_militar }}</span>
+                        </p>
+                        <p><strong>Posto/Graduação:</strong> 
+                            <span class="badge bg-secondary">{{ associado.get_posto_graduacao_display }}</span>
+                        </p>
+                        {% if associado.nome_civil %}
+                        <p><strong>Nome Civil:</strong> 
+                            <span class="text-muted">{{ associado.nome_civil }}</span>
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Unidade de Lotação:</strong> {{ associado.unidade_lotacao }}</p>
+                        <p><strong>Data de Ingresso:</strong> {{ associado.data_ingresso|date:"d/m/Y" }}</p>
+                        <p><strong>Situação:</strong> 
+                            <span class="badge bg-{% if associado.situacao == 'ativo' %}success{% elif associado.situacao == 'reserva' %}info{% elif associado.situacao == 'reformado' %}warning{% else %}secondary{% endif %}">
+                                {{ associado.get_situacao_display }}
+                            </span>
+                        </p>
+                        <p><strong>Status:</strong> 
+                            {% if associado.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Data de Cadastro:</strong> {{ associado.data_cadastro|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Última Atualização:</strong> {{ associado.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        {% if associado.observacoes %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-sticky-note me-2"></i>
+                    Observações
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ associado.observacoes|linebreaks }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Informações do Sistema -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-cogs me-2"></i>
+                    Informações do Sistema
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Data de Cadastro:</strong> {{ associado.data_cadastro|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Última Atualização:</strong> {{ associado.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Usuário do Sistema:</strong> 
+                            {% if associado.usuario %}
+                                <span class="badge bg-info">{{ associado.usuario.username }}</span>
+                            {% else %}
+                                <span class="text-muted">Não vinculado</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>ID do Registro:</strong> <code>{{ associado.pk }}</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar com informações adicionais -->
+    <div class="col-lg-4">
+        <!-- Foto do associado -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-camera me-2"></i>
+                    Foto
+                </h6>
+            </div>
+            <div class="card-body text-center">
+                {% if associado.foto %}
+                    <img src="{{ associado.foto.url }}" alt="Foto de {{ associado.nome }}" class="img-fluid rounded foto-associado" style="max-width: 200px;">
+                {% else %}
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center mx-auto foto-associado" style="width: 200px; height: 200px;">
+                        <i class="fas fa-user fa-4x text-white"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Ações rápidas -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-bolt me-2"></i>
+                    Ações Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="openDocumentoModal({{ associado.pk }})">
+                        <i class="fas fa-file-upload me-1"></i>
+                        Adicionar Documento
+                    </button>
+                    <button type="button" class="btn btn-outline-success btn-sm" onclick="openDependenteModal({{ associado.pk }})">
+                        <i class="fas fa-user-plus me-1"></i>
+                        Adicionar Dependente
+                    </button>
+                    <button type="button" class="btn btn-outline-warning btn-sm" onclick="openAssociadoEditModal({{ associado.pk }})">
+                        <i class="fas fa-edit me-1"></i>
+                        Editar Associado
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm" onclick="window.print()">
+                        <i class="fas fa-print me-1"></i>
+                        Imprimir Ficha
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumo Financeiro -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-credit-card me-2"></i>
+                    Resumo Financeiro
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">Total Mensalidades</h6>
+                            <h4 class="text-primary mb-0">{{ total_mensalidades|default:"0" }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Mensalidades Pagas</h6>
+                        <h4 class="text-success mb-0">{{ mensalidades_pagas|default:"0" }}</h4>
+                    </div>
+                </div>
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">Mensalidades Pendentes</h6>
+                            <h4 class="text-warning mb-0">{{ mensalidades_pendentes|default:"0" }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Valor Total</h6>
+                        <h4 class="text-info mb-0">R$ {{ valor_total|default:"0,00" }}</h4>
+                    </div>
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'financeiro:mensalidade_list' %}?associado={{ associado.pk }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-list me-1"></i>
+                        Ver Mensalidades
+                    </a>
+                    <a href="{% url 'financeiro:mensalidade_create' %}?associado={{ associado.pk }}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-plus me-1"></i>
+                        Nova Mensalidade
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="card shadow mb-4 estatistica-card">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Estatísticas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">Dependentes</h6>
+                            <h4 class="text-success mb-0">{{ dependentes.count|default:"0" }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Documentos</h6>
+                        <h4 class="text-info mb-0">{{ documentos.count|default:"0" }}</h4>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">Tempo de Associação</h6>
+                            <h6 class="text-primary mb-0">
+                                {% if associado.data_ingresso %}
+                                    {{ associado.data_ingresso|timesince }}
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </h6>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Idade</h6>
+                        <h6 class="text-secondary mb-0">{{ associado.get_idade }} anos</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Documentos -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-file me-2"></i>
+                    Documentos
+                </h6>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openDocumentoModal({{ associado.pk }})">
+                    <i class="fas fa-plus me-1"></i>
+                    Novo Documento
+                </button>
+            </div>
+            <div class="card-body">
+                {% if documentos %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                    <th>Arquivo</th>
+                                    <th>Data Upload</th>
+                                    <th>Tamanho</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for documento in documentos %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">{{ documento.get_tipo_display }}</span>
+                                    </td>
+                                    <td>
+                                        {% if documento.descricao %}
+                                            {{ documento.descricao }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">{{ documento.arquivo.name|slice:"25:" }}</small>
+                                    </td>
+                                    <td>{{ documento.data_upload|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ documento.arquivo.size|filesizeformat }}</span>
+                                    </td>
+                                    <td>
+                                        {% if documento.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ documento.arquivo.url }}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               target="_blank"
+                                               data-bs-toggle="tooltip" 
+                                               title="Visualizar/Download">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="confirmarExclusaoDocumento({{ documento.pk }}, '{{ documento.arquivo.name|slice:"25:" }}')"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">Nenhum documento anexado</h6>
+                        <p class="text-muted small">Clique em "Novo Documento" para anexar o primeiro documento.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dependentes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-users me-2"></i>
+                    Dependentes
+                </h6>
+                <button type="button" class="btn btn-primary btn-sm" onclick="openDependenteModal({{ associado.pk }})">
+                    <i class="fas fa-plus me-1"></i>
+                    Novo Dependente
+                </button>
+            </div>
+            <div class="card-body">
+                {% if dependentes %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nome</th>
+                                    <th>Parentesco</th>
+                                    <th>Data Nascimento</th>
+                                    <th>Idade</th>
+                                    <th>CPF</th>
+                                    <th>E-mail</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dependente in dependentes %}
+                                <tr>
+                                    <td>
+                                        {% if dependente.foto %}
+                                            <img src="{{ dependente.foto.url }}" alt="{{ dependente.nome }}" 
+                                                 class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                                        {% else %}
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center" 
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <strong>{{ dependente.nome }}</strong>
+                                        {% if dependente.observacoes %}
+                                            <i class="fas fa-info-circle text-muted ms-1" 
+                                               data-bs-toggle="tooltip" 
+                                               title="{{ dependente.observacoes }}"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ dependente.get_parentesco_display }}</span>
+                                    </td>
+                                    <td>{{ dependente.data_nascimento|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ dependente.get_idade }} anos</span>
+                                    </td>
+                                    <td>{{ dependente.cpf|default:"-" }}</td>
+                                    <td>
+                                        {% if dependente.email %}
+                                            <a href="mailto:{{ dependente.email }}" class="text-decoration-none" 
+                                               data-bs-toggle="tooltip" title="Clique para enviar e-mail">
+                                                <i class="fas fa-envelope me-1"></i>{{ dependente.email }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if dependente.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                    onclick="openDependenteDetailModal({{ dependente.pk }})"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Ver Detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                    onclick="openDependenteEditModal({{ dependente.pk }})"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="confirmarExclusaoDependente({{ dependente.pk }}, '{{ dependente.nome }}')"
+                                                    data-bs-toggle="tooltip" 
+                                                    title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">Nenhum dependente cadastrado</h6>
+                        <p class="text-muted small">Clique em "Novo Dependente" para adicionar o primeiro dependente.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/error-styles.css' %}">
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        transition: all 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 0.5rem 2rem 0 rgba(58, 59, 69, 0.2);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+    }
+    
+    .badge {
+        font-size: 0.75em;
+        padding: 0.5em 0.75em;
+    }
+    
+    .btn-toolbar .btn {
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .table th {
+        background-color: #f8f9fc;
+        border-top: none;
+        font-weight: 600;
+        color: #5a5c69;
+    }
+    
+    .table td {
+        vertical-align: middle;
+    }
+    
+    .foto-associado {
+        border: 4px solid #fff;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    .estatistica-card {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .estatistica-card .card-header {
+        background: transparent;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .estatistica-card .text-muted {
+        color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    @media print {
+        .btn-toolbar, .sidebar, .modal, .btn {
+            display: none !important;
+        }
+        
+        .card {
+            box-shadow: none;
+            border: 1px solid #ddd;
+        }
+        
+        .card-header {
+            background: #f8f9fc !important;
+            color: #333 !important;
+        }
+    }
+    
+    /* Estilos para campos com erro */
+    .form-control.is-invalid,
+    .form-select.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        background-color: #fff5f5 !important;
+    }
+    
+    .form-group.has-error .form-label {
+        color: #dc3545 !important;
+        font-weight: bold !important;
+    }
+    
+    .invalid-feedback {
+        display: block !important;
+        color: #dc3545 !important;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .invalid-feedback i {
+        color: #dc3545;
+    }
+    
+    /* Estilos para alertas de erro */
+    .alert-danger {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .alert-danger .alert-heading {
+        color: #721c24;
+    }
+    
+    /* Animação para campos com erro */
+    .is-invalid {
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    /* Estilo para botões de ação */
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+    
+    /* Estilo para o resumo de erros */
+    .error-summary {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border: 1px solid #feb2b2;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'associados/js/modais.js' %}"></script>
+<script>
+// Função para abrir modal de edição usando Bootstrap diretamente
+function openAssociadoEditModal(associadoId) {
+    console.log('Abrindo modal para associado:', associadoId);
+    
+    // Fazer requisição para obter o formulário
+    fetch(`/associados/associados/modal/${associadoId}/editar/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.form_html) {
+                // Criar modal dinamicamente
+                const modalId = 'editModal_' + associadoId;
+                const modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="${modalId}Label">
+                                        <i class="fas fa-edit me-2"></i>Editar Associado
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${data.form_html}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </button>
+                                    <button type="submit" form="associadoForm" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Remover modal anterior se existir
+                const existingModal = document.getElementById(modalId);
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                // Adicionar novo modal ao body
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                // Configurar envio do formulário
+                const form = document.getElementById('associadoForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        submitAssociadoForm(form, associadoId, modalId);
+                    });
+                }
+                
+                // Abrir modal
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                
+            } else {
+                throw new Error('Formulário não recebido do servidor');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao abrir modal:', error);
+            if (typeof showErrorMessage === 'function') {
+                showErrorMessage('Erro ao abrir modal: ' + error.message);
+            } else {
+                alert('Erro ao abrir modal: ' + error.message);
+            }
+        });
+}
+
+// Função para abrir modal de documento
+function openDocumentoModal(associadoId) {
+    console.log('Abrindo modal de documento para associado:', associadoId);
+    
+    fetch(`/associados/documentos/modal/novo/?associado=${associadoId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.form_html) {
+                const modalId = 'documentoModal_' + Date.now();
+                const modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="${modalId}Label">
+                                        <i class="fas fa-file-upload me-2"></i>Novo Documento
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${data.form_html}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </button>
+                                    <button type="submit" form="documentoForm" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                const form = document.getElementById('documentoForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        submitDocumentoForm(form, associadoId, modalId);
+                    });
+                }
+                
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                
+            } else {
+                throw new Error('Formulário não recebido do servidor');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao abrir modal:', error);
+            if (typeof showErrorMessage === 'function') {
+                showErrorMessage('Erro ao abrir modal: ' + error.message);
+            } else {
+                alert('Erro ao abrir modal: ' + error.message);
+            }
+        });
+}
+
+// Função para abrir modal de dependente
+function openDependenteModal(associadoId) {
+    console.log('Abrindo modal de dependente para associado:', associadoId);
+    
+    fetch(`/associados/dependentes/modal/novo/?associado=${associadoId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.form_html) {
+                const modalId = 'dependenteModal_' + Date.now();
+                const modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="${modalId}Label">
+                                        <i class="fas fa-user-plus me-2"></i>Novo Dependente
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${data.form_html}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </button>
+                                    <button type="submit" form="dependenteForm" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                const form = document.getElementById('dependenteForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        submitDependenteForm(form, associadoId, modalId);
+                    });
+                }
+                
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                
+            } else {
+                throw new Error('Formulário não recebido do servidor');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao abrir modal:', error);
+            alert('Erro ao abrir modal: ' + error.message);
+        });
+}
+
+// Função para abrir modal de edição de dependente
+function openDependenteEditModal(dependenteId) {
+    console.log('Abrindo modal de edição de dependente:', dependenteId);
+    
+    fetch(`/associados/dependentes/modal/${dependenteId}/editar/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.form_html) {
+                const modalId = 'dependenteEditModal_' + dependenteId;
+                const modalHtml = `
+                    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="${modalId}Label">
+                                        <i class="fas fa-edit me-2"></i>Editar Dependente
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ${data.form_html}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-times me-2"></i>Cancelar
+                                    </button>
+                                    <button type="submit" form="dependenteForm" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Salvar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const existingModal = document.getElementById(modalId);
+                if (existingModal) {
+                    existingModal.remove();
+                }
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+                
+                const form = document.getElementById('dependenteForm');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        submitDependenteEditForm(form, dependenteId, modalId);
+                    });
+                }
+                
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                
+            } else {
+                throw new Error('Formulário não recebido do servidor');
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao abrir modal:', error);
+            alert('Erro ao abrir modal: ' + error.message);
+        });
+}
+
+// Função para abrir modal de detalhes do dependente
+function openDependenteDetailModal(dependenteId) {
+    console.log('Abrindo modal de detalhes do dependente:', dependenteId);
+    
+    fetch(`/associados/dependentes/${dependenteId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Criar um DOM temporário para processar o HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+            
+            // Remover o menu lateral (sidebar) se existir
+            const sidebar = tempDiv.querySelector('.col-lg-4, .sidebar, [class*="sidebar"], [class*="col-"]');
+            if (sidebar) {
+                sidebar.remove();
+            }
+            
+            // Remover botões de ação do cabeçalho se existirem
+            const btnToolbar = tempDiv.querySelector('.btn-toolbar');
+            if (btnToolbar) {
+                btnToolbar.remove();
+            }
+            
+            // Remover breadcrumbs se existirem
+            const breadcrumb = tempDiv.querySelector('.breadcrumb, nav[aria-label="breadcrumb"]');
+            if (breadcrumb) {
+                breadcrumb.remove();
+            }
+            
+            // Remover elementos de navegação desnecessários
+            const navElements = tempDiv.querySelectorAll('nav, .navbar, .navigation');
+            navElements.forEach(el => el.remove());
+            
+            // Processar botões de ação para usar modais
+            const editButtons = tempDiv.querySelectorAll('a[href*="editar"], a[href*="update"]');
+            editButtons.forEach(button => {
+                const href = button.getAttribute('href');
+                if (href && href.includes('dependente')) {
+                    // Extrair ID do dependente da URL
+                    const match = href.match(/\/(\d+)\//);
+                    if (match && match[1]) {
+                        const depId = match[1];
+                        // Converter para botão que abre modal
+                        button.outerHTML = `
+                            <button type="button" class="btn btn-warning btn-sm" 
+                                    onclick="openDependenteEditModal(${depId})"
+                                    data-bs-toggle="tooltip" 
+                                    title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        `;
+                    }
+                }
+            });
+            
+            // Processar botões de exclusão
+            const deleteButtons = tempDiv.querySelectorAll('a[href*="excluir"], a[href*="delete"]');
+            deleteButtons.forEach(button => {
+                const href = button.getAttribute('href');
+                if (href && href.includes('dependente')) {
+                    const match = href.match(/\/(\d+)\//);
+                    if (match && match[1]) {
+                        const depId = match[1];
+                        // Extrair nome do dependente do texto do botão ou do contexto
+                        const depName = button.textContent.trim() || 'Dependente';
+                        // Converter para botão que confirma exclusão
+                        button.outerHTML = `
+                            <button type="button" class="btn btn-danger btn-sm" 
+                                    onclick="confirmarExclusaoDependente(${depId}, '${depName}')"
+                                    data-bs-toggle="tooltip" 
+                                    title="Excluir">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        `;
+                    }
+                }
+            });
+            
+            // Extrair apenas o conteúdo principal
+            let contentHtml = '';
+            const mainContent = tempDiv.querySelector('.col-lg-8, .main-content, [class*="col-lg-8"], .card, .row');
+            
+            if (mainContent) {
+                // Se encontrar conteúdo principal, usar apenas ele
+                contentHtml = mainContent.outerHTML;
+            } else {
+                // Se não encontrar, usar todo o conteúdo processado
+                contentHtml = tempDiv.innerHTML;
+            }
+            
+            const modalId = 'dependenteDetailModal_' + dependenteId;
+            const modalHtml = `
+                <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="${modalId}Label">
+                                    <i class="fas fa-eye me-2"></i>Detalhes do Dependente
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${contentHtml}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const existingModal = document.getElementById(modalId);
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            const modal = new bootstrap.Modal(document.getElementById(modalId));
+            modal.show();
+            
+        })
+        .catch(error => {
+            console.error('Erro ao abrir modal:', error);
+            alert('Erro ao abrir modal: ' + error.message);
+        });
+}
+
+// Função para enviar formulário de associado
+function submitAssociadoForm(form, associadoId, modalId) {
+    const formData = new FormData(form);
+    
+    fetch(`/associados/associados/modal/${associadoId}/editar/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(data.message || 'Associado atualizado com sucesso!');
+            } else {
+                alert(data.message || 'Associado atualizado com sucesso!');
+            }
+            if (data.reload) {
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } else {
+            // Erro de validação - aplicar visualização de erros
+            if (data.errors && Object.keys(data.errors).length > 0) {
+                console.log('❌ Erros de validação detectados:', data.errors);
+                
+                // Exibir resumo dos erros no topo do modal
+                showErrorSummaryInModal(data.errors, Object.keys(data.errors).length, data.message);
+                
+                // Aplicar estilos de erro aos campos
+                setTimeout(() => {
+                    applyErrorStylesToFields(data.errors);
+                    scrollToFirstError();
+                }, 100);
+            } else {
+                if (typeof showErrorMessage === 'function') {
+                    showErrorMessage(data.message || 'Erro na validação do formulário.');
+                } else {
+                    alert(data.message || 'Erro na validação do formulário.');
+                }
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        alert('Erro ao enviar formulário: ' + error.message);
+    });
+}
+
+// Função para enviar formulário de documento
+function submitDocumentoForm(form, associadoId, modalId) {
+    const formData = new FormData(form);
+    
+    fetch(`/associados/documentos/modal/novo/?associado=${associadoId}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(data.message || 'Documento criado com sucesso!');
+            } else {
+                alert(data.message || 'Documento criado com sucesso!');
+            }
+            if (data.reload) {
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } else {
+            if (typeof showErrorMessage === 'function') {
+                showErrorMessage(data.message || 'Erro na validação do formulário.');
+            } else {
+                alert(data.message || 'Erro na validação do formulário.');
+            }
+            if (data.errors) {
+                console.error('Erros de validação:', data.errors);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        if (typeof showErrorMessage === 'function') {
+            showErrorMessage('Erro ao enviar formulário: ' + error.message);
+        } else {
+            alert('Erro ao enviar formulário: ' + error.message);
+        }
+    });
+}
+
+// Função para enviar formulário de dependente
+function submitDependenteForm(form, associadoId, modalId) {
+    const formData = new FormData(form);
+    
+    fetch(`/associados/dependentes/modal/novo/?associado=${associadoId}`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(data.message || 'Dependente criado com sucesso!');
+            } else {
+                alert(data.message || 'Dependente criado com sucesso!');
+            }
+            if (data.reload) {
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } else {
+            if (typeof showErrorMessage === 'function') {
+                showErrorMessage(data.message || 'Erro na validação do formulário.');
+            } else {
+                alert(data.message || 'Erro na validação do formulário.');
+            }
+            if (data.errors) {
+                console.error('Erros de validação:', data.errors);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        if (typeof showErrorMessage === 'function') {
+            showErrorMessage('Erro ao enviar formulário: ' + error.message);
+        } else {
+            alert('Erro ao enviar formulário: ' + error.message);
+        }
+    });
+}
+
+// Função para enviar formulário de edição de dependente
+function submitDependenteEditForm(form, dependenteId, modalId) {
+    const formData = new FormData(form);
+    
+    fetch(`/associados/dependentes/modal/${dependenteId}/editar/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+            modal.hide();
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(data.message || 'Dependente atualizado com sucesso!');
+            } else {
+                alert(data.message || 'Dependente atualizado com sucesso!');
+            }
+            if (data.reload) {
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        } else {
+            if (typeof showErrorMessage === 'function') {
+                showErrorMessage(data.message || 'Erro na validação do formulário.');
+            } else {
+                alert(data.message || 'Erro na validação do formulário.');
+            }
+            if (data.errors) {
+                console.error('Erros de validação:', data.errors);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao enviar formulário:', error);
+        if (typeof showErrorMessage === 'function') {
+            showErrorMessage('Erro ao enviar formulário: ' + error.message);
+        } else {
+            alert('Erro ao enviar formulário: ' + error.message);
+        }
+    });
+}
+
+// Função para confirmar exclusão de dependente
+function confirmarExclusaoDependente(dependenteId, nome) {
+    if (confirm(`Tem certeza que deseja excluir o dependente "${nome}"?`)) {
+        fetch(`/associados/dependentes/${dependenteId}/excluir/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                if (typeof showSuccessMessage === 'function') {
+                    showSuccessMessage('Dependente excluído com sucesso!');
+                } else {
+                    alert('Dependente excluído com sucesso!');
+                }
+                window.location.reload();
+            } else {
+                throw new Error('Erro ao excluir dependente');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+                            if (typeof showErrorMessage === 'function') {
+                    showErrorMessage('Erro ao excluir dependente: ' + error.message);
+                } else {
+                    alert('Erro ao excluir dependente: ' + error.message);
+                }
+        });
+    }
+}
+
+// Função para confirmar exclusão de documento
+function confirmarExclusaoDocumento(documentoId, nome) {
+    if (confirm(`Tem certeza que deseja excluir o documento "${nome}"?`)) {
+        fetch(`/associados/documentos/${documentoId}/excluir/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                if (typeof showSuccessMessage === 'function') {
+                    showSuccessMessage('Documento excluído com sucesso!');
+                } else {
+                    alert('Documento excluído com sucesso!');
+                }
+                window.location.reload();
+            } else {
+                throw new Error('Erro ao excluir documento');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+                            if (typeof showErrorMessage === 'function') {
+                    showErrorMessage('Erro ao excluir documento: ' + error.message);
+                } else {
+                    alert('Erro ao excluir documento: ' + error.message);
+                }
+        });
+    }
+}
+
+// Verificar se Bootstrap está disponível
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Verificando sistema de modais...');
+    console.log('Bootstrap disponível:', typeof bootstrap);
+});
+
+// ============================================================================
+// FUNÇÕES DE VISUALIZAÇÃO DE ERROS PARA MODAIS
+// ============================================================================
+
+// Função para exibir resumo de erros no topo do modal
+function showErrorSummaryInModal(errors, errorCount, errorSummary) {
+    console.log('🔍 showErrorSummaryInModal chamada com:', { errors, errorCount, errorSummary });
+    
+    // Encontrar o modal atual
+    const modal = document.querySelector('.modal.show');
+    if (!modal) {
+        console.warn('⚠️ Modal não encontrado');
+        return;
+    }
+    
+    const modalBody = modal.querySelector('.modal-body');
+    if (!modalBody) {
+        console.warn('⚠️ Modal body não encontrado');
+        return;
+    }
+    
+    // Remover alertas de erro anteriores
+    const existingAlerts = modalBody.querySelectorAll('.alert-danger.border-danger');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    // Criar alerta de erro estilizado
+    const errorAlert = document.createElement('div');
+    errorAlert.className = 'alert alert-danger border-danger mb-4';
+    errorAlert.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+            <div>
+                <h5 class="alert-heading mb-2">
+                    <i class="fas fa-times-circle me-2"></i>Formulário com Erros de Validação
+                </h5>
+                <p class="mb-2">${errorSummary || `Foram encontrados ${errorCount} erro(s) no formulário.`}</p>
+                <p class="mb-0 small text-muted">Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+            </div>
+        </div>
+    `;
+    
+    // Inserir no topo do modal
+    modalBody.insertBefore(errorAlert, modalBody.firstChild);
+    console.log('✅ Resumo de erros inserido no modal');
+    
+    // Adicionar botão para fechar o alerta
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close position-absolute top-0 end-0 m-3';
+    closeButton.setAttribute('aria-label', 'Fechar');
+    closeButton.onclick = () => errorAlert.remove();
+    errorAlert.style.position = 'relative';
+    errorAlert.appendChild(closeButton);
+}
+
+// Função para aplicar estilos de erro aos campos
+function applyErrorStylesToFields(errors) {
+    if (!errors) {
+        console.warn('⚠️ Nenhum erro fornecido para applyErrorStylesToFields');
+        return;
+    }
+    
+    console.log('🔍 Aplicando estilos de erro para:', errors);
+    console.log('🔍 Total de campos com erro:', Object.keys(errors).length);
+    
+    let camposProcessados = 0;
+    let camposComErro = 0;
+    
+    Object.keys(errors).forEach(fieldName => {
+        console.log(`🔍 Procurando campo: ${fieldName}`);
+        
+        // Tentar diferentes seletores para encontrar o campo
+        let field = document.querySelector(`[name="${fieldName}"]`);
+        
+        if (!field) {
+            // Tentar por ID
+            field = document.getElementById(fieldName);
+        }
+        
+        if (!field) {
+            // Tentar por nome com diferentes variações
+            field = document.querySelector(`input[name="${fieldName}"], select[name="${fieldName}"], textarea[name="${fieldName}"]`);
+        }
+        
+        if (field) {
+            console.log(`✅ Campo encontrado: ${fieldName}`, field);
+            camposComErro++;
+            
+            // Adicionar classe de erro
+            field.classList.add('is-invalid');
+            
+            // Adicionar classe de erro ao grupo do campo
+            const formGroup = field.closest('.form-group, .mb-3, .col-md-6, .col-md-4, .col-md-3');
+            if (formGroup) {
+                formGroup.classList.add('has-error');
+                console.log(`✅ Grupo do campo marcado com erro:`, formGroup);
+            }
+            
+            // Criar mensagem de erro abaixo do campo
+            createFieldErrorMessage(field, errors[fieldName]);
+        } else {
+            console.warn(`⚠️ Campo não encontrado: ${fieldName}`);
+        }
+        
+        camposProcessados++;
+    });
+    
+    console.log(`📊 Resumo: ${camposProcessados} campos processados, ${camposComErro} campos com erro aplicado`);
+}
+
+// Função para criar mensagem de erro para um campo específico
+function createFieldErrorMessage(field, errorMessages) {
+    if (!field || !errorMessages) return;
+    
+    // Remover mensagens de erro anteriores
+    const existingError = field.parentNode.querySelector('.invalid-feedback');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Criar nova mensagem de erro
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'invalid-feedback';
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle me-1"></i>
+        ${Array.isArray(errorMessages) ? errorMessages.join(', ') : errorMessages}
+    `;
+    
+    // Inserir após o campo
+    field.parentNode.insertBefore(errorDiv, field.nextSibling);
+    console.log(`✅ Mensagem de erro criada para ${field.name}:`, errorMessages);
+}
+
+// Função para rolar para o primeiro campo com erro
+function scrollToFirstError() {
+    const firstErrorField = document.querySelector('.is-invalid');
+    if (firstErrorField) {
+        firstErrorField.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        console.log('✅ Rolado para o primeiro campo com erro');
+    } else {
+        console.warn('⚠️ Nenhum campo com erro encontrado para rolar');
+    }
+}
+</script>
+{% endblock %}

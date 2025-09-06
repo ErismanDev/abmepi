@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ advogado.nome }} - ASEJUS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-balance-scale me-2"></i>
+        {{ advogado.nome }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'assejus:advogado_list' %}" class="btn btn-sm btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Voltar
+            </a>
+            {% if user.tipo_usuario == 'administrador_sistema' %}
+                <button type="button" class="btn btn-sm btn-warning" onclick="openAdvogadoEditModal({{ advogado.pk }})">
+                    <i class="fas fa-edit me-1"></i>
+                    Editar
+                </button>
+                <a href="{% url 'assejus:advogado_delete' advogado.pk %}" class="btn btn-sm btn-danger">
+                    <i class="fas fa-trash me-1"></i>
+                    Excluir
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informações Principais -->
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user me-2"></i>
+                    Informações do Advogado
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Dados Pessoais</h6>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Nome:</strong></td>
+                                        <td>{{ advogado.nome }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>CPF:</strong></td>
+                                        <td>{{ advogado.cpf }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>OAB:</strong></td>
+                                        <td>{{ advogado.oab }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>UF OAB:</strong></td>
+                                        <td>{{ advogado.uf_oab }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-primary">Dados Profissionais</h6>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td><strong>Inscrição OAB:</strong></td>
+                                        <td>{{ advogado.data_inscricao_oab|date:"d/m/Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Experiência:</strong></td>
+                                        <td>{{ advogado.experiencia_anos }} anos</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Status:</strong></td>
+                                        <td>
+                                            {% if advogado.ativo %}
+                                                <span class="badge bg-success">Ativo</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Inativo</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <h6 class="text-primary mb-3">Foto</h6>
+                        {% if advogado.foto %}
+                            <img src="{{ advogado.foto.url }}" alt="{{ advogado.nome }}" 
+                                 class="img-fluid rounded" style="max-width: 150px;">
+                        {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                 style="width: 150px; height: 150px; margin: 0 auto;">
+                                <i class="fas fa-user fa-3x text-muted"></i>
+                            </div>
+                            <p class="text-muted mt-2 small">Nenhuma foto cadastrada</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Especialidades</h6>
+                        <div class="mb-3">
+                            {% for especialidade in advogado.get_especialidades_list %}
+                                <span class="badge bg-primary me-1 mb-1">{{ especialidade }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if advogado.observacoes %}
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6 class="text-primary">Observações</h6>
+                        <p class="mb-0">{{ advogado.observacoes }}</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    Endereço
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-1"><strong>{{ advogado.endereco }}</strong></p>
+                <p class="mb-1">{{ advogado.cidade }} - {{ advogado.estado }}</p>
+                <p class="mb-0">CEP: {{ advogado.cep }}</p>
+            </div>
+        </div>
+
+        <!-- Contato -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-address-book me-2"></i>
+                    Informações de Contato
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-envelope me-2 text-primary"></i>
+                            <strong>E-mail:</strong><br>
+                            <a href="mailto:{{ advogado.email }}">{{ advogado.email }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="mb-2">
+                            <i class="fas fa-phone me-2 text-primary"></i>
+                            <strong>Telefone:</strong><br>
+                            {{ advogado.telefone }}
+                        </p>
+                    </div>
+                </div>
+                {% if advogado.celular %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-0">
+                            <i class="fas fa-mobile-alt me-2 text-primary"></i>
+                            <strong>Celular:</strong><br>
+                            {{ advogado.celular }}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar com Estatísticas -->
+    <div class="col-lg-4">
+        <!-- Estatísticas -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Estatísticas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-right">
+                            <h4 class="text-primary">{{ total_casos }}</h4>
+                            <p class="small text-muted mb-0">Total de Casos</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h4 class="text-success">{{ casos_ativos|length }}</h4>
+                        <p class="small text-muted mb-0">Casos Ativos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Casos Ativos -->
+        {% if casos_ativos %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-folder-open me-2"></i>
+                    Casos Ativos
+                </h6>
+            </div>
+            <div class="card-body">
+                {% for caso in casos_ativos %}
+                <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                    <h6 class="mb-1">{{ caso.titulo }}</h6>
+                    <p class="small text-muted mb-1">
+                        <i class="fas fa-user me-1"></i>{{ caso.associado.nome }}
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-{{ caso.get_prioridade_display|lower }}">{{ caso.get_prioridade_display }}</span>
+                        <small class="text-muted">{{ caso.data_abertura|date:"d/m/Y" }}</small>
+                    </div>
+                </div>
+                {% endfor %}
+                {% if total_casos > 5 %}
+                <div class="text-center">
+                    <a href="#" class="btn btn-sm btn-outline-primary">
+                        Ver todos os {{ total_casos }} casos
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Informações do Sistema -->
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informações do Sistema
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="small text-muted">
+                    <p class="mb-1">
+                        <strong>Cadastrado em:</strong><br>
+                        {{ advogado.data_cadastro|date:"d/m/Y H:i" }}
+                    </p>
+                    <p class="mb-1">
+                        <strong>Última atualização:</strong><br>
+                        {{ advogado.data_atualizacao|date:"d/m/Y H:i" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+.border-right {
+    border-right: 1px solid #e3e6f0 !important;
+}
+.border-bottom {
+    border-bottom: 1px solid #e3e6f0 !important;
+}
+</style>
+{% endblock %}

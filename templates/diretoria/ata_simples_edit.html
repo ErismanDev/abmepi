@@ -1,0 +1,287 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Ata - {{ ata.titulo }} - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Ata
+                    </h1>
+                    <p class="text-muted mb-0">{{ ata.titulo }}</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'diretoria:ata_simples_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Lista
+                    </a>
+                    <a href="{% url 'diretoria:ata_editor' pk=ata.pk %}" class="btn btn-primary">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Inserir Ata
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status da ata -->
+            <div class="alert alert-{% if ata.status == 'rascunho' %}warning{% elif ata.status == 'finalizada' %}success{% elif ata.status == 'assinada' %}info{% endif %} mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="alert-heading mb-1">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Status da Ata
+                        </h6>
+                        <p class="mb-0">
+                            <strong>Status atual:</strong> {{ ata.get_status_display }}
+                            {% if ata.status == 'rascunho' %}
+                                - Você pode editar os dados básicos e o conteúdo da ata
+                            {% elif ata.status == 'finalizada' %}
+                                - Ata finalizada, mas ainda pode ser editada
+                            {% elif ata.status == 'assinada' %}
+                                - Ata assinada e oficializada
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        {% if ata.status == 'rascunho' %}
+                            <a href="{% url 'diretoria:finalizar_ata' pk=ata.pk %}" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>
+                                Finalizar Ata
+                            </a>
+                        {% elif ata.status == 'finalizada' %}
+                            <a href="{% url 'diretoria:assinar_ata' pk=ata.pk %}" class="btn btn-primary">
+                                <i class="fas fa-signature me-2"></i>
+                                Assinar Ata
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Dados da Ata
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                        {{ form.titulo.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.titulo }}
+                                    {% if form.titulo.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.titulo.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="{{ form.tipo_reuniao.id_for_label }}" class="form-label">
+                                        {{ form.tipo_reuniao.label }}
+                                    </label>
+                                    {{ form.tipo_reuniao }}
+                                    {% if form.tipo_reuniao.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.tipo_reuniao.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.data_reuniao.id_for_label }}" class="form-label">
+                                        {{ form.data_reuniao.label }}
+                                    </label>
+                                    {{ form.data_reuniao }}
+                                    {% if form.data_reuniao.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.data_reuniao.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.local.id_for_label }}" class="form-label">
+                                        {{ form.local.label }}
+                                    </label>
+                                    {{ form.local }}
+                                    {% if form.local.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.local.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.presidente.id_for_label }}" class="form-label">
+                                        {{ form.presidente.label }}
+                                    </label>
+                                    {{ form.presidente }}
+                                    {% if form.presidente.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.presidente.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.secretario.id_for_label }}" class="form-label">
+                                        {{ form.secretario.label }}
+                                    </label>
+                                    {{ form.secretario }}
+                                    {% if form.secretario.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.secretario.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.membros_presentes.id_for_label }}" class="form-label">
+                                        {{ form.membros_presentes.label }} <span class="text-danger">*</span>
+                                    </label>
+                                    {{ form.membros_presentes }}
+                                    {% if form.membros_presentes.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.membros_presentes.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="{{ form.membros_ausentes.id_for_label }}" class="form-label">
+                                        {{ form.membros_ausentes.label }}
+                                    </label>
+                                    {{ form.membros_ausentes }}
+                                    {% if form.membros_ausentes.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.membros_ausentes.errors %}
+                                                <div>{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.pauta.id_for_label }}" class="form-label">
+                                {{ form.pauta.label }}
+                            </label>
+                            {{ form.pauta }}
+                            {% if form.pauta.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.pauta.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.deliberacoes.id_for_label }}" class="form-label">
+                                {{ form.deliberacoes.label }}
+                            </label>
+                            {{ form.deliberacoes }}
+                            {% if form.deliberacoes.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.deliberacoes.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                {{ form.observacoes.label }}
+                            </label>
+                            {{ form.observacoes }}
+                            {% if form.observacoes.errors %}
+                                <div class="text-danger small mt-1">
+                                    {% for error in form.observacoes.errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{% url 'diretoria:ata_simples_list' %}" class="btn btn-secondary">
+                                    <i class="fas fa-times me-2"></i>
+                                    Cancelar
+                                </a>
+                                <a href="{% url 'diretoria:regenerar_html' pk=ata.pk %}" class="btn btn-warning">
+                                    <i class="fas fa-sync me-2"></i>
+                                    Regenerar HTML
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    Salvar Alterações
+                                </button>
+                                <a href="{% url 'diretoria:ata_editor' pk=ata.pk %}" class="btn btn-success">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editor de Texto
+                                </a>
+                                <a href="{% url 'diretoria:ata_editor_avancado' pk=ata.pk %}" class="btn btn-info">
+                                    <i class="fas fa-code me-2"></i>
+                                    Editor Avançado
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

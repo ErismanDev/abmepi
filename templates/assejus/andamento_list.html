@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Andamentos Jurídicos - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        Andamentos Jurídicos
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie todos os andamentos dos atendimentos jurídicos
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:andamento_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Andamento
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros de busca -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Título ou descrição">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="atendimento" class="form-label">Atendimento</label>
+                            <select class="form-select" id="atendimento" name="atendimento">
+                                <option value="">Todos os Atendimentos</option>
+                                {% for atend in atendimentos %}
+                                    <option value="{{ atend.id }}" {% if atendimento == atend.id %}selected{% endif %}>
+                                        {{ atend.titulo|truncatechars:50 }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">&nbsp;</label>
+                            <div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-1"></i>
+                                    Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de andamentos -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Andamentos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Processo</th>
+                                        <th>Tipo</th>
+                                        <th>Descrição</th>
+                                        <th>Data</th>
+                                        <th>Usuário</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for andamento in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'assejus:processo_detail' pk=andamento.processo.pk %}" 
+                                               class="text-decoration-none">
+                                                <strong>{{ andamento.processo.numero_processo }}</strong>
+                                            </a>
+                                            <br>
+                                            <small class="text-muted">{{ andamento.processo.parte_cliente.nome }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ andamento.get_tipo_andamento_display }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ andamento.descricao_detalhada|truncatechars:80 }}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ andamento.data_andamento|date:"d/m/Y H:i" }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if andamento.usuario_registro %}
+                                                <span class="badge bg-secondary">
+                                                    {{ andamento.usuario_registro.username }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">N/A</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'assejus:andamento_detail' pk=andamento.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Ver detalhes">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'assejus:andamento_update' pk=andamento.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning" 
+                                                   title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'assejus:andamento_delete' pk=andamento.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger" 
+                                                   title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if page_obj.has_other_pages %}
+                        <nav aria-label="Navegação de páginas" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if atendimento %}&atendimento={{ atendimento }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if atendimento %}&atendimento={{ atendimento }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if atendimento %}&atendimento={{ atendimento }}{% endif %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if atendimento %}&atendimento={{ atendimento }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if atendimento %}&atendimento={{ atendimento }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-tasks fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum andamento encontrado</h5>
+                            <p class="text-muted">
+                                {% if search or atendimento %}
+                                    Tente ajustar os filtros de busca ou
+                                {% endif %}
+                                <a href="{% url 'assejus:andamento_create' %}" class="text-decoration-none">
+                                    crie o primeiro andamento
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-submit do formulário quando os filtros mudarem
+    document.getElementById('atendimento').addEventListener('change', function() {
+        this.form.submit();
+    });
+</script>
+{% endblock %}

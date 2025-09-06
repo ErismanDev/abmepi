@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Administrativo - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        Dashboard Administrativo
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie eventos, comunicados e atividades administrativas
+                    </p>
+                </div>
+            </div>
+
+            <!-- Cards de estatísticas -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Total de Eventos
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_eventos }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Eventos Ativos
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ eventos_ativos }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Eventos Hoje
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ eventos_hoje }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-clock fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Comunicados Ativos
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ comunicados_ativos }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-bullhorn fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações rápidas -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bolt me-2"></i>
+                                Ações Rápidas
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 mb-3">
+                                    <a href="{% url 'administrativo:evento_create' %}" class="btn btn-primary w-100">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Novo Evento
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="{% url 'administrativo:comunicado_create' %}" class="btn btn-success w-100">
+                                        <i class="fas fa-bullhorn me-2"></i>
+                                        Novo Comunicado
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="{% url 'administrativo:lista_presenca_create' %}" class="btn btn-info w-100">
+                                        <i class="fas fa-clipboard-list me-2"></i>
+                                        Nova Lista de Presença
+                                    </a>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <a href="{% url 'administrativo:evento_list' %}" class="btn btn-outline-primary w-100">
+                                        <i class="fas fa-list me-2"></i>
+                                        Ver Todos os Eventos
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conteúdo principal -->
+            <div class="row">
+                <!-- Próximos eventos -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Próximos Eventos
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if proximos_eventos %}
+                                <div class="list-group list-group-flush">
+                                    {% for evento in proximos_eventos %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ evento.titulo }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ evento.data_inicio|date:"d/m/Y H:i" }}
+                                                </small>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    {{ evento.local }}
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <span class="badge bg-{% if evento.status == 'agendado' %}primary{% elif evento.status == 'em_andamento' %}warning{% elif evento.status == 'concluido' %}success{% else %}secondary{% endif %}">
+                                                    {{ evento.get_status_display }}
+                                                </span>
+                                                <br>
+                                                <a href="{% url 'administrativo:evento_detail' pk=evento.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary mt-1">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="{% url 'administrativo:evento_list' %}" class="btn btn-outline-primary">
+                                        Ver Todos os Eventos
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">Nenhum evento próximo</h6>
+                                    <p class="text-muted">Não há eventos agendados para os próximos dias.</p>
+                                    <a href="{% url 'administrativo:evento_create' %}" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Criar Evento
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comunicados recentes -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-bullhorn me-2"></i>
+                                Comunicados Recentes
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            {% if comunicados_recentes %}
+                                <div class="list-group list-group-flush">
+                                    {% for comunicado in comunicados_recentes %}
+                                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1">{{ comunicado.titulo }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-user me-1"></i>
+                                                    {{ comunicado.autor.username|default:"Sistema" }}
+                                                </small>
+                                                <br>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ comunicado.data_publicacao|date:"d/m/Y H:i" }}
+                                                </small>
+                                            </div>
+                                            <div>
+                                                <span class="badge bg-{% if comunicado.prioridade == 'urgente' %}danger{% elif comunicado.prioridade == 'alta' %}warning{% elif comunicado.prioridade == 'normal' %}primary{% else %}secondary{% endif %}">
+                                                    {{ comunicado.get_prioridade_display }}
+                                                </span>
+                                                <br>
+                                                <a href="#" 
+                                                   class="btn btn-sm btn-outline-success mt-1"
+                                                   onclick="openComunicadoModalFromLink(event, {{ comunicado.pk }})">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="text-center mt-3">
+                                    <a href="{% url 'administrativo:comunicado_list' %}" class="btn btn-outline-success">
+                                        Ver Todos os Comunicados
+                                    </a>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-bullhorn fa-3x text-muted mb-3"></i>
+                                    <h6 class="text-muted">Nenhum comunicado</h6>
+                                    <p class="text-muted">Não há comunicados publicados recentemente.</p>
+                                    <a href="{% url 'administrativo:comunicado_create' %}" class="btn btn-success">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Criar Comunicado
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

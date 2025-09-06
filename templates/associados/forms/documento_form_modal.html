@@ -1,0 +1,50 @@
+{% load crispy_forms_tags %}
+
+<form method="post" enctype="multipart/form-data" id="documentoForm" novalidate>
+    {% csrf_token %}
+    
+    {% if form.associado_info or form.dependente_info or associado or dependente %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        {% if form.associado_info %}
+            <strong>Associado:</strong> {{ form.associado_info.nome }}
+        {% elif form.dependente_info %}
+            <strong>Dependente:</strong> {{ form.dependente_info.nome }} ({{ form.dependente_info.associado.nome }})
+        {% elif associado %}
+            <strong>Associado:</strong> {{ associado.nome }}
+        {% elif dependente %}
+            <strong>Dependente:</strong> {{ dependente.nome }} ({{ dependente.associado.nome }})
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <div class="row mb-3">
+        <!-- Tipo de Documento -->
+        <div class="col-md-6">
+            {{ form.tipo|as_crispy_field }}
+        </div>
+
+        <!-- Descrição -->
+        <div class="col-md-6">
+            {{ form.descricao|as_crispy_field }}
+        </div>
+    </div>
+
+    <!-- Tipo Personalizado (aparece quando "Outro" é selecionado) -->
+    <div class="row mb-3" id="tipo-personalizado-row" style="display: none;">
+        <div class="col-12">
+            {{ form.tipo_personalizado|as_crispy_field }}
+        </div>
+    </div>
+
+    <!-- Arquivo -->
+    <div class="row mb-3">
+        <div class="col-12">
+            {{ form.arquivo|as_crispy_field }}
+        </div>
+    </div>
+</form>
+
+
+
+

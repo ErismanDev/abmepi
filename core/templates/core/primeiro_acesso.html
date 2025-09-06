@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Primeiro Acesso - Alterar Senha{% endblock %}
+
+{% block extra_css %}
+<style>
+    .primeiro-acesso-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .primeiro-acesso-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 2rem;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .primeiro-acesso-header {
+        margin-bottom: 2rem;
+    }
+    
+    .primeiro-acesso-icon {
+        font-size: 4rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .primeiro-acesso-title {
+        color: #333;
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .primeiro-acesso-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    
+    .form-control {
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 2rem;
+        font-size: 1rem;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .help-text {
+        font-size: 0.875rem;
+        color: #666;
+        margin-top: 0.25rem;
+    }
+    
+    .alert {
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border: none;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border-left: 4px solid #ffc107;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+    }
+    
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="primeiro-acesso-container">
+    <div class="primeiro-acesso-card">
+        <div class="primeiro-acesso-header">
+            <div class="primeiro-acesso-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h1 class="primeiro-acesso-title">Primeiro Acesso</h1>
+            <p class="primeiro-acesso-subtitle">
+                Por segurança, você deve alterar sua senha padrão
+            </p>
+        </div>
+        
+        <!-- Informações de Acesso -->
+        <div class="alert alert-info mb-4">
+            <h6 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>Suas Credenciais de Acesso
+            </h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Usuário:</strong> <code>{{ username }}</code>
+                </div>
+                <div class="col-md-6">
+                    <strong>Senha Padrão:</strong> <code>{{ senha_padrao }}</code>
+                </div>
+            </div>
+            <hr class="my-2">
+            <small class="text-muted">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Esta é sua senha temporária. Você deve alterá-la agora para continuar.
+            </small>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <form method="post" novalidate>
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.nova_senha.id_for_label }}" class="form-label">
+                    <i class="fas fa-lock me-2"></i>{{ form.nova_senha.label }}
+                </label>
+                {{ form.nova_senha }}
+                {% if form.nova_senha.help_text %}
+                    <div class="help-text">{{ form.nova_senha.help_text }}</div>
+                {% endif %}
+                {% if form.nova_senha.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.nova_senha.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.confirmar_senha.id_for_label }}" class="form-label">
+                    <i class="fas fa-check-circle me-2"></i>{{ form.confirmar_senha.label }}
+                </label>
+                {{ form.confirmar_senha }}
+                {% if form.confirmar_senha.errors %}
+                    <div class="alert alert-danger">
+                        {% for error in form.confirmar_senha.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Alterar Senha
+                </button>
+            </div>
+        </form>
+        
+        <div class="mt-4">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Sua senha deve ter pelo menos 8 caracteres e não pode conter apenas números.
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focar no campo de nova senha
+        const novaSenhaField = document.getElementById('{{ form.nova_senha.id_for_label }}');
+        const confirmarSenhaField = document.getElementById('{{ form.confirmar_senha.id_for_label }}');
+        
+        // Senha padrão do contexto Django
+        const senhaPadrao = '{{ senha_padrao }}';
+        
+        if (novaSenhaField) {
+            // Pré-preencher com a senha padrão
+            novaSenhaField.value = senhaPadrao;
+            
+            // Focar no campo
+            novaSenhaField.focus();
+            
+            // Destacar o campo
+            novaSenhaField.classList.add('border-warning', 'bg-light');
+            
+            // Remover destaque quando o usuário começar a digitar
+            novaSenhaField.addEventListener('input', function() {
+                if (this.value !== senhaPadrao) {
+                    this.classList.remove('border-warning', 'bg-light');
+                    this.classList.add('border-success');
+                } else {
+                    this.classList.remove('border-success');
+                    this.classList.add('border-warning', 'bg-light');
+                }
+            });
+        }
+        
+        if (confirmarSenhaField) {
+            // Pré-preencher com a senha padrão
+            confirmarSenhaField.value = senhaPadrao;
+            
+            // Destacar o campo de confirmação
+            confirmarSenhaField.classList.add('border-warning', 'bg-light');
+            
+            // Remover destaque quando o usuário começar a digitar
+            confirmarSenhaField.addEventListener('input', function() {
+                if (this.value !== senhaPadrao) {
+                    this.classList.remove('border-warning', 'bg-light');
+                    this.classList.add('border-success');
+                } else {
+                    this.classList.remove('border-success');
+                    this.classList.add('border-warning', 'bg-light');
+                }
+            });
+        }
+        
+        // Validação adicional: não permitir usar a senha padrão
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            const novaSenha = novaSenhaField.value;
+            const confirmarSenha = confirmarSenhaField.value;
+            
+            if (novaSenha === senhaPadrao) {
+                e.preventDefault();
+                alert('Por segurança, você deve escolher uma senha diferente da senha padrão.');
+                novaSenhaField.focus();
+                return false;
+            }
+            
+            if (novaSenha !== confirmarSenha) {
+                e.preventDefault();
+                alert('As senhas não coincidem. Por favor, verifique.');
+                confirmarSenhaField.focus();
+                return false;
+            }
+            
+            if (novaSenha.length < 8) {
+                e.preventDefault();
+                alert('A senha deve ter pelo menos 8 caracteres.');
+                novaSenhaField.focus();
+                return false;
+            }
+            
+            if (/^\d+$/.test(novaSenha)) {
+                e.preventDefault();
+                alert('A senha não pode conter apenas números.');
+                novaSenhaField.focus();
+                return false;
+            }
+        });
+        
+        // Mostrar mensagem de sucesso quando os campos são preenchidos
+        console.log('✅ Campos pré-preenchidos com sucesso!');
+        console.log('🔑 Senha padrão:', senhaPadrao);
+        console.log('👤 Usuário:', '{{ username }}');
+    });
+</script>
+{% endblock %}

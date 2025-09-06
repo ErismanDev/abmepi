@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Associado - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-trash me-2"></i>
+        Excluir Associado
+    </h1>
+    <a href="{% url 'associados:associado_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>
+        Voltar
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header py-3 bg-danger text-white">
+                <h6 class="m-0 font-weight-bold">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmação de Exclusão
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h5 class="alert-heading">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Atenção!
+                    </h5>
+                    <p class="mb-0">
+                        Você está prestes a excluir o associado <strong>{{ associado.nome }}</strong>. 
+                        Esta ação não pode ser desfeita e todos os dados relacionados serão perdidos.
+                    </p>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6>Dados do Associado:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Nome:</strong> {{ associado.nome }}</li>
+                            <li><strong>CPF:</strong> {{ associado.cpf }}</li>
+                            <li><strong>Matrícula:</strong> {{ associado.matricula_militar }}</li>
+                            <li><strong>Situação:</strong> {{ associado.get_situacao_display }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Dados Relacionados:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Documentos:</strong> {{ associado.documentos.count }}</li>
+                            <li><strong>Dependentes:</strong> {{ associado.dependentes.count }}</li>
+                            <li><strong>Recebíveis:</strong> {{ associado.mensalidades.count }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'associados:associado_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>
+                            Confirmar Exclusão
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,2470 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if procuracao %}Editar{% else %}Nova{% endif %} Procuração Ad Judicia - ASSEJUS
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .editor-container {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        min-height: 200px;
+        background: white;
+    }
+    
+    .editor-toolbar {
+        background: #f8f9fa;
+        border-bottom: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .editor-content {
+        min-height: 150px;
+        padding: 15px;
+        outline: none;
+        font-family: Arial, sans-serif;
+        line-height: 1.5;
+    }
+    
+    .editor-content:empty:before {
+        content: attr(data-placeholder);
+        color: #999;
+        font-style: italic;
+    }
+    
+    .btn-toolbar {
+        margin-right: 5px;
+        margin-bottom: 5px;
+    }
+    
+    .form-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .editor-texto {
+        display: none; /* Ocultar o textarea original */
+    }
+    
+    /* Estilos para checkboxes - marcadores pretos */
+    .form-check-input {
+        border-color: #000 !important;
+    }
+    
+    .form-check-input:checked {
+        background-color: #000 !important;
+        border-color: #000 !important;
+    }
+    
+    .form-check-input:focus {
+        border-color: #000 !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+    }
+    
+    .form-check-input:checked:focus {
+        background-color: #000 !important;
+        border-color: #000 !important;
+        box-shadow: 0 0 0 0.25rem rgba(0, 0, 0, 0.25) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        {% if procuracao %}Editar{% else %}Nova{% endif %} Procuração Ad Judicia
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {% if procuracao %}
+                            Editando procuração de: <strong>{{ procuracao.outorgante.nome }}</strong>
+                        {% else %}
+                            Crie uma nova procuração ad judicia
+                        {% endif %}
+                    </p>
+                </div>
+                <div>
+                    {% if procuracao %}
+                        <a href="{% url 'assejus:procuracao_detail' pk=procuracao.pk %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à Procuração
+                        </a>
+                    {% else %}
+                        <a href="{% url 'assejus:procuracao_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar à Lista
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Dados da Procuração
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <!-- Outorgante -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.outorgante_nome.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user me-1"></i>
+                                    Outorgante (Associado) <span class="text-danger">*</span>
+                                </label>
+                                <div class="position-relative">
+                                    {{ form.outorgante_nome }}
+                                    {{ form.outorgante }}  <!-- Campo oculto para o ID -->
+                                    <div id="suggestions-outorgante" class="list-group position-absolute w-100" style="z-index: 1000; display: none; max-height: 200px; overflow-y: auto;">
+                                        <!-- Sugestões aparecerão aqui -->
+                                    </div>
+                                </div>
+                                {% if form.outorgante_nome.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.outorgante_nome.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Digite o nome do associado e selecione da lista de sugestões
+                                </small>
+                            </div>
+
+                            <!-- Tipo de Poderes -->
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tipo_poderes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-gavel me-1"></i>
+                                    Tipo de Poderes <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_poderes }}
+                                {% if form.tipo_poderes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_poderes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Advogados -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Advogado(s) Outorgado(s) <span class="text-danger">*</span>
+                                </label>
+                                <div class="row">
+                                    {% for choice in form.outorgados %}
+                                        <div class="col-md-4 mb-2">
+                                            <div class="form-check">
+                                                {{ choice.tag }}
+                                                <label class="form-check-label" for="{{ choice.id_for_label }}">
+                                                    {{ choice.choice_label }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                {% if form.outorgados.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.outorgados.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Os dados dos advogados selecionados serão preenchidos automaticamente
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Informações dos Advogados Outorgados -->
+                        <div id="advogados-info" class="row" style="display: none;">
+                            <div class="col-12 mb-3">
+                                <div class="card border-info">
+                                    <div class="card-header bg-info text-white">
+                                        <h6 class="card-title mb-0">
+                                            <i class="fas fa-gavel me-2"></i>
+                                            Dados dos Advogados Outorgados
+                                        </h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="advogados-details">
+                                            <!-- Dados dos advogados serão inseridos aqui via JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Processo Específico -->
+                        <div id="processo-especifico" class="row" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.processo_especifico.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    Processo Cadastrado (Opcional)
+                                </label>
+                                {{ form.processo_especifico }}
+                                {% if form.processo_especifico.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.processo_especifico.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Selecione um processo já cadastrado no sistema (opcional)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Dados Militares -->
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.cargo_militar.id_for_label }}" class="form-label">
+                                    <i class="fas fa-shield-alt me-1"></i>
+                                    Cargo Militar <span class="text-danger">*</span>
+                                </label>
+                                {{ form.cargo_militar }}
+                                {% if form.cargo_militar.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.cargo_militar.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.matricula_funcional.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-card me-1"></i>
+                                    Matrícula Funcional <span class="text-danger">*</span>
+                                </label>
+                                {{ form.matricula_funcional }}
+                                {% if form.matricula_funcional.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.matricula_funcional.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.rgpmpi.id_for_label }}" class="form-label">
+                                    <i class="fas fa-id-badge me-1"></i>
+                                    RGPMPI <span class="text-danger">*</span>
+                                </label>
+                                {{ form.rgpmpi }}
+                                {% if form.rgpmpi.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.rgpmpi.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Contatos -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.telefone_contato.id_for_label }}" class="form-label">
+                                    <i class="fas fa-phone me-1"></i>
+                                    Telefone de Contato <span class="text-danger">*</span>
+                                </label>
+                                {{ form.telefone_contato }}
+                                {% if form.telefone_contato.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.telefone_contato.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email_contato.id_for_label }}" class="form-label">
+                                    <i class="fas fa-envelope me-1"></i>
+                                    E-mail de Contato <span class="text-danger">*</span>
+                                </label>
+                                {{ form.email_contato }}
+                                {% if form.email_contato.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.email_contato.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Endereço -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.endereco_completo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Endereço Completo <span class="text-danger">*</span>
+                                </label>
+                                {{ form.endereco_completo }}
+                                {% if form.endereco_completo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.endereco_completo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Poderes da Procuração -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.poderes_gerais.id_for_label }}" class="form-label">
+                                    <i class="fas fa-gavel me-1"></i>
+                                    Poderes Gerais
+                                </label>
+                                <div class="editor-container">
+                                    <div class="editor-toolbar">
+                                        <!-- Fonte e Tamanho -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <select class="form-select form-select-sm" onchange="changeFontFamily(this.value, 'poderes_gerais')" title="Família da fonte">
+                                                <option value="">Fonte</option>
+                                                <option value="Arial, sans-serif">Arial</option>
+                                                <option value="Times New Roman, serif">Times New Roman</option>
+                                                <option value="Georgia, serif">Georgia</option>
+                                                <option value="Verdana, sans-serif">Verdana</option>
+                                                <option value="Courier New, monospace">Courier New</option>
+                                                <option value="Helvetica, sans-serif">Helvetica</option>
+                                            </select>
+                                            <select class="form-select form-select-sm" onchange="changeFontSize(this.value, 'poderes_gerais')" title="Tamanho da fonte">
+                                                <option value="">Tamanho</option>
+                                                <option value="8px">8px</option>
+                                                <option value="9px">9px</option>
+                                                <option value="10px">10px</option>
+                                                <option value="11px">11px</option>
+                                                <option value="12px">12px</option>
+                                                <option value="14px">14px</option>
+                                                <option value="16px">16px</option>
+                                                <option value="18px">18px</option>
+                                                <option value="20px">20px</option>
+                                                <option value="24px">24px</option>
+                                                <option value="28px">28px</option>
+                                                <option value="32px">32px</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Formatação de texto -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold', 'poderes_gerais')" title="Negrito">
+                                                <i class="fas fa-bold"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic', 'poderes_gerais')" title="Itálico">
+                                                <i class="fas fa-italic"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline', 'poderes_gerais')" title="Sublinhado">
+                                                <i class="fas fa-underline"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('strikeThrough', 'poderes_gerais')" title="Riscado">
+                                                <i class="fas fa-strikethrough"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Cores -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <input type="color" class="form-control form-control-sm" onchange="changeTextColor(this.value, 'poderes_gerais')" title="Cor do texto" style="width: 40px; height: 31px;">
+                                            <input type="color" class="form-control form-control-sm" onchange="changeBackgroundColor(this.value, 'poderes_gerais')" title="Cor de fundo" style="width: 40px; height: 31px;">
+                                        </div>
+                                        
+                                        <!-- Alinhamento -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyLeft', 'poderes_gerais')" title="Alinhar à esquerda">
+                                                <i class="fas fa-align-left"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyCenter', 'poderes_gerais')" title="Centralizar">
+                                                <i class="fas fa-align-center"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyRight', 'poderes_gerais')" title="Alinhar à direita">
+                                                <i class="fas fa-align-right"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyFull', 'poderes_gerais')" title="Justificar">
+                                                <i class="fas fa-align-justify"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Títulos -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <select class="form-select form-select-sm" onchange="formatHeading(this.value, 'poderes_gerais')" title="Formato do texto">
+                                                <option value="">Formato</option>
+                                                <option value="h1">Título 1</option>
+                                                <option value="h2">Título 2</option>
+                                                <option value="h3">Título 3</option>
+                                                <option value="h4">Título 4</option>
+                                                <option value="h5">Título 5</option>
+                                                <option value="h6">Título 6</option>
+                                                <option value="p">Parágrafo</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Listas -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertUnorderedList', 'poderes_gerais')" title="Lista com marcadores">
+                                                <i class="fas fa-list-ul"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertOrderedList', 'poderes_gerais')" title="Lista numerada">
+                                                <i class="fas fa-list-ol"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Modelos -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="saveModeloPoderesGerais()" title="Salvar modelo de poderes gerais">
+                                                <i class="fas fa-save me-1"></i>Salvar Modelo
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirModalModelosPoderesGerais()" title="Procurar modelos de poderes gerais">
+                                                <i class="fas fa-search me-1"></i>Procurar Modelos
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Ações -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="clearFormatting('poderes_gerais')" title="Limpar formatação">
+                                                <i class="fas fa-remove-format"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearContent('poderes_gerais')" title="Limpar conteúdo">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="editor-content" id="poderes_gerais_editor" contenteditable="true" data-placeholder="Descreva os poderes gerais da procuração...">
+                                    </div>
+                                </div>
+                                {{ form.poderes_gerais }}
+                                {% if form.poderes_gerais.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.poderes_gerais.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Descreva os poderes gerais que o advogado poderá realizar
+                                </small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.poderes_especificos.id_for_label }}" class="form-label">
+                                    <i class="fas fa-balance-scale me-1"></i>
+                                    Poderes Específicos
+                                </label>
+                                <div class="editor-container">
+                                    <div class="editor-toolbar">
+                                        <!-- Fonte e Tamanho -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <select class="form-select form-select-sm" onchange="changeFontFamily(this.value, 'poderes_especificos')" title="Família da fonte">
+                                                <option value="">Fonte</option>
+                                                <option value="Arial, sans-serif">Arial</option>
+                                                <option value="Times New Roman, serif">Times New Roman</option>
+                                                <option value="Georgia, serif">Georgia</option>
+                                                <option value="Verdana, sans-serif">Verdana</option>
+                                                <option value="Courier New, monospace">Courier New</option>
+                                                <option value="Helvetica, sans-serif">Helvetica</option>
+                                            </select>
+                                            <select class="form-select form-select-sm" onchange="changeFontSize(this.value, 'poderes_especificos')" title="Tamanho da fonte">
+                                                <option value="">Tamanho</option>
+                                                <option value="8px">8px</option>
+                                                <option value="9px">9px</option>
+                                                <option value="10px">10px</option>
+                                                <option value="11px">11px</option>
+                                                <option value="12px">12px</option>
+                                                <option value="14px">14px</option>
+                                                <option value="16px">16px</option>
+                                                <option value="18px">18px</option>
+                                                <option value="20px">20px</option>
+                                                <option value="24px">24px</option>
+                                                <option value="28px">28px</option>
+                                                <option value="32px">32px</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Formatação de texto -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold', 'poderes_especificos')" title="Negrito">
+                                                <i class="fas fa-bold"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic', 'poderes_especificos')" title="Itálico">
+                                                <i class="fas fa-italic"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline', 'poderes_especificos')" title="Sublinhado">
+                                                <i class="fas fa-underline"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('strikeThrough', 'poderes_especificos')" title="Riscado">
+                                                <i class="fas fa-strikethrough"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Cores -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <input type="color" class="form-control form-control-sm" onchange="changeTextColor(this.value, 'poderes_especificos')" title="Cor do texto" style="width: 40px; height: 31px;">
+                                            <input type="color" class="form-control form-control-sm" onchange="changeBackgroundColor(this.value, 'poderes_especificos')" title="Cor de fundo" style="width: 40px; height: 31px;">
+                                        </div>
+                                        
+                                        <!-- Alinhamento -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyLeft', 'poderes_especificos')" title="Alinhar à esquerda">
+                                                <i class="fas fa-align-left"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyCenter', 'poderes_especificos')" title="Centralizar">
+                                                <i class="fas fa-align-center"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyRight', 'poderes_especificos')" title="Alinhar à direita">
+                                                <i class="fas fa-align-right"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyFull', 'poderes_especificos')" title="Justificar">
+                                                <i class="fas fa-align-justify"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Títulos -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <select class="form-select form-select-sm" onchange="formatHeading(this.value, 'poderes_especificos')" title="Formato do texto">
+                                                <option value="">Formato</option>
+                                                <option value="h1">Título 1</option>
+                                                <option value="h2">Título 2</option>
+                                                <option value="h3">Título 3</option>
+                                                <option value="h4">Título 4</option>
+                                                <option value="h5">Título 5</option>
+                                                <option value="h6">Título 6</option>
+                                                <option value="p">Parágrafo</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Listas -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertUnorderedList', 'poderes_especificos')" title="Lista com marcadores">
+                                                <i class="fas fa-list-ul"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertOrderedList', 'poderes_especificos')" title="Lista numerada">
+                                                <i class="fas fa-list-ol"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Modelos -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-success" onclick="saveModeloPoderesEspecificos()" title="Salvar modelo de poderes específicos">
+                                                <i class="fas fa-save me-1"></i>Salvar Modelo
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-info" onclick="abrirModalModelosPoderesEspecificos()" title="Procurar modelos de poderes específicos">
+                                                <i class="fas fa-search me-1"></i>Procurar Modelos
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Ações -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="clearFormatting('poderes_especificos')" title="Limpar formatação">
+                                                <i class="fas fa-remove-format"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearContent('poderes_especificos')" title="Limpar conteúdo">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="editor-content" id="poderes_especificos_editor" contenteditable="true" data-placeholder="Descreva os poderes específicos da procuração...">
+                                    </div>
+                                </div>
+                                {{ form.poderes_especificos }}
+                                {% if form.poderes_especificos.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.poderes_especificos.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Descreva os poderes específicos relacionados ao processo
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Texto Personalizado -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.texto_personalizado.id_for_label }}" class="form-label">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Texto Personalizado da Procuração
+                                </label>
+                                
+                                <!-- Editor Avançado -->
+                                <div class="editor-container">
+                                    <div class="editor-toolbar">
+                                        <!-- Fonte e Tamanho -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <select class="form-select form-select-sm" onchange="changeFontFamily(this.value)" title="Família da fonte">
+                                                <option value="">Fonte</option>
+                                                <option value="Arial, sans-serif">Arial</option>
+                                                <option value="Times New Roman, serif">Times New Roman</option>
+                                                <option value="Georgia, serif">Georgia</option>
+                                                <option value="Verdana, sans-serif">Verdana</option>
+                                                <option value="Courier New, monospace">Courier New</option>
+                                                <option value="Helvetica, sans-serif">Helvetica</option>
+                                            </select>
+                                            <select class="form-select form-select-sm" onchange="changeFontSize(this.value)" title="Tamanho da fonte">
+                                                <option value="">Tamanho</option>
+                                                <option value="8px">8px</option>
+                                                <option value="9px">9px</option>
+                                                <option value="10px">10px</option>
+                                                <option value="11px">11px</option>
+                                                <option value="12px">12px</option>
+                                                <option value="14px">14px</option>
+                                                <option value="16px">16px</option>
+                                                <option value="18px">18px</option>
+                                                <option value="20px">20px</option>
+                                                <option value="24px">24px</option>
+                                                <option value="28px">28px</option>
+                                                <option value="32px">32px</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Formatação de texto -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('bold')" title="Negrito">
+                                                <i class="fas fa-bold"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('italic')" title="Itálico">
+                                                <i class="fas fa-italic"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('underline')" title="Sublinhado">
+                                                <i class="fas fa-underline"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('strikeThrough')" title="Riscado">
+                                                <i class="fas fa-strikethrough"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Cores -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <input type="color" class="form-control form-control-sm" id="textColor" onchange="changeTextColor(this.value)" title="Cor do texto" style="width: 40px; height: 31px;">
+                                            <input type="color" class="form-control form-control-sm" id="backgroundColor" onchange="changeBackgroundColor(this.value)" title="Cor de fundo" style="width: 40px; height: 31px;">
+                                        </div>
+                                        
+                                        <!-- Alinhamento -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyLeft')" title="Alinhar à esquerda">
+                                                <i class="fas fa-align-left"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyCenter')" title="Centralizar">
+                                                <i class="fas fa-align-center"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyRight')" title="Alinhar à direita">
+                                                <i class="fas fa-align-right"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="formatText('justifyFull')" title="Justificar">
+                                                <i class="fas fa-align-justify"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Títulos -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <select class="form-select form-select-sm" onchange="formatHeading(this.value)" title="Formato do texto">
+                                                <option value="">Formato</option>
+                                                <option value="h1">Título 1</option>
+                                                <option value="h2">Título 2</option>
+                                                <option value="h3">Título 3</option>
+                                                <option value="h4">Título 4</option>
+                                                <option value="h5">Título 5</option>
+                                                <option value="h6">Título 6</option>
+                                                <option value="p">Parágrafo</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <!-- Listas -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertUnorderedList')" title="Lista com marcadores">
+                                                <i class="fas fa-list-ul"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertList('insertOrderedList')" title="Lista numerada">
+                                                <i class="fas fa-list-ol"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Elementos -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertTable()" title="Inserir tabela">
+                                                <i class="fas fa-table"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertLink()" title="Inserir link">
+                                                <i class="fas fa-link"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="insertImage()" title="Inserir imagem">
+                                                <i class="fas fa-image"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Ações -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="clearFormatting()" title="Limpar formatação">
+                                                <i class="fas fa-remove-format"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearContent()" title="Limpar conteúdo">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Visualização -->
+                                        <div class="btn-group me-2 mb-2" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-info" onclick="togglePreview()" title="Alternar visualização">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="editor-content" id="editorContent" contenteditable="true" data-placeholder="Digite o texto personalizado da procuração aqui...">
+                                    </div>
+                                </div>
+                                
+                                <!-- Campo oculto para sincronizar com o formulário -->
+                                <div style="display: none;">
+                                    {{ form.texto_personalizado }}
+                                </div>
+                                
+                                {% if form.texto_personalizado.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.texto_personalizado.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Deixe em branco para usar o texto padrão. Use as variáveis: {outorgante_nome}, {outorgante_cpf}, {outorgante_cargo}, {outorgante_matricula}, {outorgante_rgpmpi}, {outorgante_endereco}, {outorgante_telefone}, {outorgante_email}, {outorgados_nomes}, {outorgados_oab}, {processo_numero}, {processo_vara}, {data_atual}
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-sticky-note me-1"></i>
+                                    Observações Adicionais
+                                </label>
+                                {{ form.observacoes }}
+                                {% if form.observacoes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.observacoes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Botões de ação -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                {% if procuracao %}
+                                    <a href="{% url 'assejus:procuracao_detail' pk=procuracao.pk %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'assejus:procuracao_list' %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>
+                                    {% if procuracao %}Atualizar Procuração{% else %}Criar Procuração{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Procurar Modelos - Poderes Gerais -->
+<div class="modal fade" id="modelosPoderesGeraisModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-search me-2"></i>Modelos de Poderes Gerais
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Filtros e Controles -->
+                <div class="row mb-4">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-search text-primary"></i>
+                            </span>
+                            <input type="text" class="form-control" id="searchModelosPoderesGerais" 
+                                   placeholder="Buscar por nome ou descrição..." 
+                                   onkeyup="searchModelosPoderesGerais()">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="categoriaFilterPoderesGerais" onchange="filterByCategoryPoderesGerais()">
+                            <option value="">Todas as categorias</option>
+                            <option value="geral">Geral</option>
+                            <option value="civil">Civil</option>
+                            <option value="criminal">Criminal</option>
+                            <option value="trabalhista">Trabalhista</option>
+                            <option value="administrativo">Administrativo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="statusFilterPoderesGerais" onchange="filterByStatusPoderesGerais()">
+                            <option value="">Todos</option>
+                            <option value="publico">Públicos</option>
+                            <option value="privado">Privados</option>
+                            <option value="meus">Meus Modelos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="loadModelosPoderesGerais()" title="Atualizar lista">
+                            <i class="fas fa-sync-alt me-1"></i>Atualizar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Estatísticas -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <strong>Dica:</strong> Use os filtros acima para encontrar rapidamente o modelo desejado. 
+                                Clique em "Usar Modelo" para aplicar o conteúdo ao editor.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading indicator -->
+                <div id="modelosPoderesGeraisLoading" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Carregando modelos...</p>
+                </div>
+                
+                <!-- Lista de modelos -->
+                <div class="row" id="modelosPoderesGeraisList">
+                    <!-- Modelos serão carregados aqui -->
+                </div>
+                
+                <!-- Mensagem quando não há modelos -->
+                <div id="noModelosPoderesGerais" class="text-center py-5" style="display: none;">
+                    <div class="card border-0 bg-light">
+                        <div class="card-body py-5">
+                            <i class="fas fa-save fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted mb-3">Nenhum modelo encontrado</h4>
+                            <p class="text-muted mb-4">Tente ajustar os filtros de busca ou criar um novo modelo.</p>
+                            <button type="button" class="btn btn-primary" onclick="saveModeloPoderesGerais()">
+                                <i class="fas fa-plus me-2"></i>Criar Primeiro Modelo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between w-100">
+                    <div class="text-muted small">
+                        <i class="fas fa-lightbulb me-1"></i>
+                        Dica: Você pode editar ou excluir apenas os modelos que criou
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Fechar
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="saveModeloPoderesGerais()">
+                            <i class="fas fa-plus me-1"></i>Novo Modelo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Salvar Modelo - Poderes Gerais -->
+<div class="modal fade" id="saveModeloPoderesGeraisModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-save me-2"></i>Salvar Modelo de Poderes Gerais
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="saveModeloPoderesGeraisForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="modeloPoderesGeraisNome" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Nome do Modelo *
+                                </label>
+                                <input type="text" class="form-control" id="modeloPoderesGeraisNome" 
+                                       placeholder="Digite um nome descritivo para o modelo" required>
+                                <div class="form-text">Escolha um nome que identifique claramente o modelo.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="modeloPoderesGeraisCategoria" class="form-label">
+                                    <i class="fas fa-folder me-1"></i>Categoria
+                                </label>
+                                <select class="form-select" id="modeloPoderesGeraisCategoria">
+                                    <option value="geral">Geral</option>
+                                    <option value="civil">Civil</option>
+                                    <option value="criminal">Criminal</option>
+                                    <option value="trabalhista">Trabalhista</option>
+                                    <option value="administrativo">Administrativo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modeloPoderesGeraisDescricao" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Descrição
+                        </label>
+                        <textarea class="form-control" id="modeloPoderesGeraisDescricao" rows="3" 
+                                  placeholder="Descreva brevemente o que este modelo contém..."></textarea>
+                        <div class="form-text">Uma descrição ajuda outros usuários a entenderem quando usar este modelo.</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="modeloPoderesGeraisPublico">
+                                <label class="form-check-label" for="modeloPoderesGeraisPublico">
+                                    <i class="fas fa-globe me-1"></i>Modelo Público
+                                </label>
+                                <div class="form-text">Outros usuários poderão usar este modelo</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmarSalvarModeloPoderesGerais()">
+                    <i class="fas fa-save me-1"></i>Salvar Modelo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Procurar Modelos - Poderes Específicos -->
+<div class="modal fade" id="modelosPoderesEspecificosModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-search me-2"></i>Procurar Modelos de Poderes Específicos
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Filtros e Controles -->
+                <div class="row mb-4">
+                    <div class="col-md-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-search text-primary"></i>
+                            </span>
+                            <input type="text" class="form-control" id="searchModelosPoderesEspecificos" 
+                                   placeholder="Buscar por nome ou descrição..." 
+                                   onkeyup="searchModelosPoderesEspecificos()">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="categoriaFilterPoderesEspecificos" onchange="filterByCategoryPoderesEspecificos()">
+                            <option value="">Todas as categorias</option>
+                            <option value="geral">Geral</option>
+                            <option value="civil">Civil</option>
+                            <option value="criminal">Criminal</option>
+                            <option value="trabalhista">Trabalhista</option>
+                            <option value="administrativo">Administrativo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-select" id="statusFilterPoderesEspecificos" onchange="filterByStatusPoderesEspecificos()">
+                            <option value="">Todos</option>
+                            <option value="publico">Públicos</option>
+                            <option value="privado">Privados</option>
+                            <option value="meus">Meus Modelos</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="loadModelosPoderesEspecificos()" title="Atualizar lista">
+                            <i class="fas fa-sync-alt me-1"></i>Atualizar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Estatísticas -->
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <div>
+                                <strong>Dica:</strong> Use os filtros acima para encontrar rapidamente o modelo desejado. 
+                                Clique em "Usar Modelo" para aplicar o conteúdo ao editor.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Loading indicator -->
+                <div id="modelosPoderesEspecificosLoading" class="text-center py-4" style="display: none;">
+                    <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                    <p class="mt-2">Carregando modelos...</p>
+                </div>
+                
+                <!-- Lista de modelos -->
+                <div class="row" id="modelosPoderesEspecificosList">
+                    <!-- Modelos serão carregados aqui -->
+                </div>
+                
+                <!-- Mensagem quando não há modelos -->
+                <div id="noModelosPoderesEspecificos" class="text-center py-5" style="display: none;">
+                    <i class="fas fa-save fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhum modelo encontrado</h5>
+                    <p class="text-muted">Tente ajustar os filtros de busca ou criar um novo modelo.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Fechar
+                </button>
+                <button type="button" class="btn btn-primary" onclick="saveModeloPoderesEspecificos()">
+                    <i class="fas fa-plus me-1"></i>Novo Modelo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Salvar Modelo - Poderes Específicos -->
+<div class="modal fade" id="saveModeloPoderesEspecificosModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-save me-2"></i>Salvar Modelo de Poderes Específicos
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="saveModeloPoderesEspecificosForm">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="modeloPoderesEspecificosNome" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Nome do Modelo *
+                                </label>
+                                <input type="text" class="form-control" id="modeloPoderesEspecificosNome" 
+                                       placeholder="Digite um nome descritivo para o modelo" required>
+                                <div class="form-text">Escolha um nome que identifique claramente o modelo.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="modeloPoderesEspecificosCategoria" class="form-label">
+                                    <i class="fas fa-folder me-1"></i>Categoria
+                                </label>
+                                <select class="form-select" id="modeloPoderesEspecificosCategoria">
+                                    <option value="geral">Geral</option>
+                                    <option value="civil">Civil</option>
+                                    <option value="criminal">Criminal</option>
+                                    <option value="trabalhista">Trabalhista</option>
+                                    <option value="administrativo">Administrativo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="modeloPoderesEspecificosDescricao" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>Descrição
+                        </label>
+                        <textarea class="form-control" id="modeloPoderesEspecificosDescricao" rows="3" 
+                                  placeholder="Descreva brevemente o que este modelo contém..."></textarea>
+                        <div class="form-text">Uma descrição ajuda outros usuários a entenderem quando usar este modelo.</div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="modeloPoderesEspecificosPublico">
+                                <label class="form-check-label" for="modeloPoderesEspecificosPublico">
+                                    <i class="fas fa-globe me-1"></i>Modelo Público
+                                </label>
+                                <div class="form-text">Outros usuários poderão usar este modelo</div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmarSalvarModeloPoderesEspecificos()">
+                    <i class="fas fa-save me-1"></i>Salvar Modelo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Função para mostrar/ocultar campo de processo específico
+    function toggleProcessoEspecifico() {
+        const tipoPoderes = document.getElementById('{{ form.tipo_poderes.id_for_label }}');
+        const processoEspecifico = document.getElementById('processo-especifico');
+        
+        if (tipoPoderes && processoEspecifico) {
+            if (tipoPoderes.value === 'especificos' || tipoPoderes.value === 'ambos') {
+                processoEspecifico.style.display = 'block';
+            } else {
+                processoEspecifico.style.display = 'none';
+            }
+        }
+    }
+    
+    // Executar na inicialização
+    toggleProcessoEspecifico();
+    
+    // Adicionar listener para mudanças no tipo de poderes
+    const tipoPoderesSelect = document.getElementById('{{ form.tipo_poderes.id_for_label }}');
+    if (tipoPoderesSelect) {
+        tipoPoderesSelect.addEventListener('change', toggleProcessoEspecifico);
+    }
+});
+
+// Função global para ser chamada pelo onchange do select
+function toggleProcessoEspecifico() {
+    const tipoPoderes = document.getElementById('{{ form.tipo_poderes.id_for_label }}');
+    const processoEspecifico = document.getElementById('processo-especifico');
+    
+    if (tipoPoderes && processoEspecifico) {
+        if (tipoPoderes.value === 'especificos' || tipoPoderes.value === 'ambos') {
+            processoEspecifico.style.display = 'block';
+        } else {
+            processoEspecifico.style.display = 'none';
+        }
+    }
+}
+
+
+// Função para preencher dados do outorgante automaticamente
+function preencherDadosOutorgante() {
+    const associadoId = document.getElementById('id_outorgante').value;
+    
+    if (associadoId) {
+        // Fazer requisição AJAX para buscar dados do associado
+        fetch(`{% url 'assejus:get_associado_data' associado_id=0 %}`.replace('0', associadoId))
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erro ao buscar dados do associado:', data.error);
+                    return;
+                }
+                
+                // Preencher campos automaticamente (apenas se estiverem vazios)
+                const cargoMilitar = document.getElementById('id_cargo_militar');
+                const matriculaFuncional = document.getElementById('id_matricula_funcional');
+                const rgpmpi = document.getElementById('id_rgpmpi');
+                const enderecoCompleto = document.getElementById('id_endereco_completo');
+                const telefoneContato = document.getElementById('id_telefone_contato');
+                const emailContato = document.getElementById('id_email_contato');
+                
+                if (cargoMilitar && !cargoMilitar.value && data.cargo_militar) {
+                    cargoMilitar.value = data.cargo_militar;
+                }
+                
+                if (matriculaFuncional && !matriculaFuncional.value && data.matricula_funcional) {
+                    matriculaFuncional.value = data.matricula_funcional;
+                }
+                
+                if (rgpmpi && !rgpmpi.value && data.rgpmpi) {
+                    rgpmpi.value = data.rgpmpi;
+                }
+                
+                if (enderecoCompleto && !enderecoCompleto.value && data.endereco_completo) {
+                    enderecoCompleto.value = data.endereco_completo;
+                }
+                
+                if (telefoneContato && !telefoneContato.value && data.telefone) {
+                    telefoneContato.value = data.telefone;
+                }
+                
+                if (emailContato && !emailContato.value && data.email) {
+                    emailContato.value = data.email;
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição AJAX:', error);
+            });
+    }
+}
+
+// Função para preencher dados dos advogados outorgados automaticamente
+function preencherDadosAdvogados() {
+    const checkboxes = document.querySelectorAll('input[name="outorgados"]:checked');
+    const advogadosInfo = document.getElementById('advogados-info');
+    const advogadosDetails = document.getElementById('advogados-details');
+    
+    if (checkboxes.length === 0) {
+        advogadosInfo.style.display = 'none';
+        return;
+    }
+    
+    advogadosInfo.style.display = 'block';
+    advogadosDetails.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando dados dos advogados...</div>';
+    
+    // Buscar dados de todos os advogados selecionados
+    const promises = Array.from(checkboxes).map(checkbox => {
+        const advogadoId = checkbox.value;
+        return fetch(`{% url 'assejus:get_advogado_data' advogado_id=0 %}`.replace('0', advogadoId))
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Erro ao buscar dados do advogado:', data.error);
+                    return null;
+                }
+                return data;
+            })
+            .catch(error => {
+                console.error('Erro na requisição AJAX:', error);
+                return null;
+            });
+    });
+    
+    Promise.all(promises).then(results => {
+        const validResults = results.filter(result => result !== null);
+        
+        if (validResults.length === 0) {
+            advogadosDetails.innerHTML = '<div class="alert alert-warning">Erro ao carregar dados dos advogados.</div>';
+            return;
+        }
+        
+        let html = '';
+        validResults.forEach((data, index) => {
+            // Formatar endereço para o padrão jurídico
+            const enderecoFormatado = data.endereco_completo.replace(/CEP: \d{5}-\d{3}/, '').trim();
+            
+            html += `
+                <div class="row mb-3 ${index > 0 ? 'border-top pt-3' : ''}">
+                    <div class="col-12">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h6 class="card-title mb-0">
+                                    <i class="fas fa-user-tie me-2"></i>
+                                    OUTORGADO ${index + 1}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <p class="mb-2 text-justify">
+                                            <strong>OUTORGADO:</strong> ${data.nome.toUpperCase()}, brasileiro, advogado, 
+                                            inscrito na OAB/${data.uf_oab}, sob o nº ${data.oab}, 
+                                            com escritório profissional na ${enderecoFormatado}.
+                                        </p>
+                                        <p class="mb-1"><strong>CPF:</strong> ${data.cpf}</p>
+                                        <p class="mb-1"><strong>E-mail:</strong> ${data.email}</p>
+                                        <p class="mb-1"><strong>Telefone:</strong> ${data.telefone}</p>
+                                        ${data.celular && data.celular !== data.telefone ? `<p class="mb-1"><strong>Celular:</strong> ${data.celular}</p>` : ''}
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="text-center">
+                                            <span class="badge bg-success fs-6 mb-2">${data.situacao}</span>
+                                            ${data.especialidades ? `
+                                                <div class="mt-2">
+                                                    <small class="text-muted"><strong>Especialidades:</strong></small>
+                                                    <p class="small mb-0">${data.especialidades}</p>
+                                                </div>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        advogadosDetails.innerHTML = html;
+    });
+}
+
+// Adicionar listeners para os checkboxes dos advogados
+document.addEventListener('DOMContentLoaded', function() {
+    const advogadoCheckboxes = document.querySelectorAll('input[name="outorgados"]');
+    advogadoCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', preencherDadosAdvogados);
+    });
+    
+});
+
+// Autocomplete para outorgante
+document.addEventListener('DOMContentLoaded', function() {
+    const inputOutorgante = document.getElementById('id_outorgante_nome');
+    const hiddenInputOutorgante = document.getElementById('id_outorgante');
+    const suggestionsOutorgante = document.getElementById('suggestions-outorgante');
+    let timeoutIdOutorgante;
+
+    if (inputOutorgante) {
+        inputOutorgante.addEventListener('input', function() {
+            const query = this.value.trim();
+            
+            // Limpar timeout anterior
+            if (timeoutIdOutorgante) {
+                clearTimeout(timeoutIdOutorgante);
+            }
+            
+            // Se a query for muito curta, esconder sugestões
+            if (query.length < 2) {
+                suggestionsOutorgante.style.display = 'none';
+                hiddenInputOutorgante.value = '';
+                return;
+            }
+            
+            // Debounce: aguardar 300ms após parar de digitar
+            timeoutIdOutorgante = setTimeout(() => {
+                buscarAssociados(query);
+            }, 300);
+        });
+        
+        // Esconder sugestões quando clicar fora
+        document.addEventListener('click', function(e) {
+            if (!inputOutorgante.contains(e.target) && !suggestionsOutorgante.contains(e.target)) {
+                suggestionsOutorgante.style.display = 'none';
+            }
+        });
+        
+        // Esconder sugestões quando pressionar Escape
+        inputOutorgante.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                suggestionsOutorgante.style.display = 'none';
+            }
+        });
+    }
+    
+    function buscarAssociados(query) {
+        fetch(`{% url 'assejus:buscar_associados_ajax' %}?q=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                mostrarSugestoesOutorgante(data.results);
+            })
+            .catch(error => {
+                console.error('Erro ao buscar associados:', error);
+            });
+    }
+    
+    function mostrarSugestoesOutorgante(results) {
+        suggestionsOutorgante.innerHTML = '';
+        
+        if (results.length === 0) {
+            suggestionsOutorgante.style.display = 'none';
+            return;
+        }
+        
+        results.forEach(result => {
+            const item = document.createElement('div');
+            item.className = 'list-group-item list-group-item-action';
+            item.style.cursor = 'pointer';
+            item.textContent = result.text;
+            
+            item.addEventListener('click', function() {
+                inputOutorgante.value = result.text.split(' - ')[0]; // Pegar apenas o nome
+                hiddenInputOutorgante.value = result.id;
+                suggestionsOutorgante.style.display = 'none';
+                
+                // Chamar a função de preenchimento automático
+                preencherDadosOutorgante();
+            });
+            
+            // Destacar texto pesquisado
+            const highlightedText = result.text.replace(
+                new RegExp(inputOutorgante.value, 'gi'), 
+                `<mark>$&</mark>`
+            );
+            item.innerHTML = highlightedText;
+            
+            suggestionsOutorgante.appendChild(item);
+        });
+        
+        suggestionsOutorgante.style.display = 'block';
+    }
+});
+
+// Funções para os editores de texto
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar editores
+    initEditor('poderes_gerais');
+    initEditor('poderes_especificos');
+});
+
+function initEditor(fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    const hiddenField = document.getElementById('id_' + fieldName);
+    
+    if (!editor || !hiddenField) {
+        console.error('Elementos não encontrados para:', fieldName);
+        return;
+    }
+    
+    // Carregar conteúdo inicial se existir
+    if (hiddenField.value) {
+        editor.innerHTML = hiddenField.value;
+    }
+    
+    // Função de sincronização
+    function syncContent() {
+        const content = editor.innerHTML;
+        hiddenField.value = content;
+    }
+    
+    // Sincronizar em tempo real
+    editor.addEventListener('input', syncContent);
+    editor.addEventListener('paste', () => setTimeout(syncContent, 100));
+    editor.addEventListener('keyup', syncContent);
+    
+    // Sincronizar antes do submit
+    document.querySelector('form').addEventListener('submit', function() {
+        syncContent();
+    });
+}
+
+// Funções de formatação
+function formatText(command, fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    if (editor) {
+        editor.focus();
+        document.execCommand(command, false, null);
+        // Sincronizar com campo oculto
+        syncEditorContent(fieldName);
+    }
+}
+
+function insertList(type, fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    if (editor) {
+        editor.focus();
+        if (type === 'insertUnorderedList') {
+            const list = '<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>';
+            document.execCommand('insertHTML', false, list);
+        } else {
+            const list = '<ol><li>Item 1</li><li>Item 2</li><li>Item 3</li></ol>';
+            document.execCommand('insertHTML', false, list);
+        }
+        // Sincronizar com campo oculto
+        syncEditorContent(fieldName);
+    }
+}
+
+function formatHeading(tag, fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    if (editor && tag) {
+        editor.focus();
+        document.execCommand('formatBlock', false, tag);
+        // Sincronizar com campo oculto
+        syncEditorContent(fieldName);
+    }
+}
+
+function clearFormatting(fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    if (editor) {
+        editor.focus();
+        document.execCommand('removeFormat', false, null);
+        // Sincronizar com campo oculto
+        syncEditorContent(fieldName);
+    }
+}
+
+function clearContent(fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    if (editor && confirm('Tem certeza que deseja limpar todo o conteúdo do editor?')) {
+        editor.innerHTML = '';
+        editor.focus();
+        // Sincronizar com campo oculto
+        syncEditorContent(fieldName);
+    }
+}
+
+function syncEditorContent(fieldName) {
+    const editor = document.getElementById(fieldName + '_editor');
+    const hiddenField = document.getElementById('id_' + fieldName);
+    
+    if (editor && hiddenField) {
+        hiddenField.value = editor.innerHTML;
+    }
+}
+
+// Editor Avançado - Inicialização
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar editores de poderes
+    const editoresPoderes = ['poderes_gerais', 'poderes_especificos'];
+    
+    editoresPoderes.forEach(function(fieldName) {
+        const editor = document.getElementById(fieldName + '_editor');
+        if (editor) {
+            // Adicionar event listeners para sincronização automática
+            editor.addEventListener('input', function() {
+                syncEditorContent(fieldName);
+            });
+            
+            editor.addEventListener('paste', function() {
+                setTimeout(function() {
+                    syncEditorContent(fieldName);
+                }, 100);
+            });
+            
+            // Sincronizar conteúdo inicial
+            syncEditorContent(fieldName);
+        }
+    });
+    
+    // Inicializar editor de texto personalizado
+    const editor = document.getElementById('editorContent');
+    const hiddenField = document.getElementById('id_texto_personalizado');
+    
+    if (editor && hiddenField) {
+        // Carregar conteúdo inicial se existir
+        if (hiddenField.value) {
+            editor.innerHTML = hiddenField.value;
+            console.log('Conteúdo inicial carregado (texto personalizado):', hiddenField.value.length, 'caracteres');
+        }
+        
+        // Função de sincronização
+        function syncContent() {
+            const content = editor.innerHTML;
+            hiddenField.value = content;
+            console.log('Sincronizado (texto personalizado):', content.length, 'caracteres');
+        }
+        
+        // Sincronizar em tempo real
+        editor.addEventListener('input', syncContent);
+        editor.addEventListener('paste', () => setTimeout(syncContent, 100));
+        editor.addEventListener('keyup', syncContent);
+    }
+    
+    // Inicializar editor de poderes gerais
+    const editorPoderesGerais = document.getElementById('poderes_gerais_editor');
+    const hiddenFieldPoderesGerais = document.getElementById('id_poderes_gerais');
+    
+    if (editorPoderesGerais && hiddenFieldPoderesGerais) {
+        // Carregar conteúdo inicial se existir
+        if (hiddenFieldPoderesGerais.value) {
+            editorPoderesGerais.innerHTML = hiddenFieldPoderesGerais.value;
+            console.log('Conteúdo inicial carregado (poderes gerais):', hiddenFieldPoderesGerais.value.length, 'caracteres');
+        }
+        
+        // Função de sincronização
+        function syncPoderesGerais() {
+            const content = editorPoderesGerais.innerHTML;
+            hiddenFieldPoderesGerais.value = content;
+            console.log('Sincronizado (poderes gerais):', content.length, 'caracteres');
+        }
+        
+        // Sincronizar em tempo real
+        editorPoderesGerais.addEventListener('input', syncPoderesGerais);
+        editorPoderesGerais.addEventListener('paste', () => setTimeout(syncPoderesGerais, 100));
+        editorPoderesGerais.addEventListener('keyup', syncPoderesGerais);
+    }
+    
+    // Inicializar editor de poderes específicos
+    const editorPoderesEspecificos = document.getElementById('poderes_especificos_editor');
+    const hiddenFieldPoderesEspecificos = document.getElementById('id_poderes_especificos');
+    
+    if (editorPoderesEspecificos && hiddenFieldPoderesEspecificos) {
+        // Carregar conteúdo inicial se existir
+        if (hiddenFieldPoderesEspecificos.value) {
+            editorPoderesEspecificos.innerHTML = hiddenFieldPoderesEspecificos.value;
+            console.log('Conteúdo inicial carregado (poderes específicos):', hiddenFieldPoderesEspecificos.value.length, 'caracteres');
+        }
+        
+        // Função de sincronização
+        function syncPoderesEspecificos() {
+            const content = editorPoderesEspecificos.innerHTML;
+            hiddenFieldPoderesEspecificos.value = content;
+            console.log('Sincronizado (poderes específicos):', content.length, 'caracteres');
+        }
+        
+        // Sincronizar em tempo real
+        editorPoderesEspecificos.addEventListener('input', syncPoderesEspecificos);
+        editorPoderesEspecificos.addEventListener('paste', () => setTimeout(syncPoderesEspecificos, 100));
+        editorPoderesEspecificos.addEventListener('keyup', syncPoderesEspecificos);
+    }
+    
+    // Sincronizar todos os editores antes do submit
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log('=== SUBMIT INICIADO ===');
+            
+            // Sincronizar todos os editores
+            if (editor && hiddenField) {
+                const content = editor.innerHTML;
+                hiddenField.value = content;
+                console.log('✅ Texto personalizado sincronizado:', content.length, 'caracteres');
+            }
+            
+            if (editorPoderesGerais && hiddenFieldPoderesGerais) {
+                const content = editorPoderesGerais.innerHTML;
+                hiddenFieldPoderesGerais.value = content;
+                console.log('✅ Poderes gerais sincronizados:', content.length, 'caracteres');
+            }
+            
+            if (editorPoderesEspecificos && hiddenFieldPoderesEspecificos) {
+                const content = editorPoderesEspecificos.innerHTML;
+                hiddenFieldPoderesEspecificos.value = content;
+                console.log('✅ Poderes específicos sincronizados:', content.length, 'caracteres');
+            }
+            
+            console.log('=== SUBMIT FINALIZADO ===');
+        });
+    }
+    
+    console.log('Editores avançados inicializados com sucesso!');
+});
+
+
+// Funções de fonte
+function changeFontFamily(fontFamily, editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor && fontFamily) {
+        editor.focus();
+        document.execCommand('fontName', false, fontFamily);
+    }
+}
+
+function changeFontSize(fontSize, editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor && fontSize) {
+        editor.focus();
+        document.execCommand('fontSize', false, '7'); // Comando fontSize usa números 1-7
+        // Aplicar o tamanho real via CSS
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            const range = selection.getRangeAt(0);
+            const span = document.createElement('span');
+            span.style.fontSize = fontSize;
+            
+            try {
+                range.surroundContents(span);
+            } catch (e) {
+                // Se não conseguir envolver, inserir o span
+                range.insertNode(span);
+            }
+        }
+    }
+}
+
+function changeTextColor(color, editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor) {
+        editor.focus();
+        document.execCommand('foreColor', false, color);
+    }
+}
+
+function changeBackgroundColor(color, editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor) {
+        editor.focus();
+        document.execCommand('backColor', false, color);
+    }
+}
+
+function formatHeading(tag, editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor && tag) {
+        editor.focus();
+        document.execCommand('formatBlock', false, tag);
+    }
+}
+
+
+function insertTable(editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor) {
+        editor.focus();
+        const table = `
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Coluna 1</th>
+                        <th>Coluna 2</th>
+                        <th>Coluna 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Dados 1</td>
+                        <td>Dados 2</td>
+                        <td>Dados 3</td>
+                    </tr>
+                    <tr>
+                        <td>Dados 4</td>
+                        <td>Dados 5</td>
+                        <td>Dados 6</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        document.execCommand('insertHTML', false, table);
+    }
+}
+
+function insertLink(editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor) {
+        editor.focus();
+        const url = prompt('Digite a URL do link:');
+        if (url) {
+            const text = prompt('Digite o texto do link:', url);
+            const link = `<a href="${url}" target="_blank">${text || url}</a>`;
+            document.execCommand('insertHTML', false, link);
+        }
+    }
+}
+
+function insertImage(editorId = 'editorContent') {
+    const editor = document.getElementById(editorId);
+    if (editor) {
+        editor.focus();
+        const url = prompt('Digite a URL da imagem:');
+        if (url) {
+            const alt = prompt('Digite o texto alternativo da imagem:');
+            const img = `<img src="${url}" alt="${alt || ''}" class="img-fluid" style="max-width: 100%;">`;
+            document.execCommand('insertHTML', false, img);
+        }
+    }
+}
+
+
+function togglePreview() {
+    const editor = document.getElementById('editorContent');
+    const isPreview = editor.style.pointerEvents === 'none';
+    
+    if (isPreview) {
+        editor.style.pointerEvents = 'auto';
+        editor.contentEditable = 'true';
+        editor.style.border = '1px solid #ddd';
+    } else {
+        editor.style.pointerEvents = 'none';
+        editor.contentEditable = 'false';
+        editor.style.border = '2px solid #007bff';
+    }
+}
+
+// ===== FUNÇÕES GLOBAIS PARA MODELOS =====
+
+
+// ===== FUNÇÕES PARA MODELOS DE PODERES GERAIS =====
+
+function abrirModalModelosPoderesGerais() {
+    const modal = new bootstrap.Modal(document.getElementById('modelosPoderesGeraisModal'));
+    modal.show();
+    loadModelosPoderesGerais();
+}
+
+function loadModelosPoderesGerais() {
+    const modelosList = document.getElementById('modelosPoderesGeraisList');
+    const loadingDiv = document.getElementById('modelosPoderesGeraisLoading');
+    const noModelosDiv = document.getElementById('noModelosPoderesGerais');
+    
+    // Mostrar loading
+    loadingDiv.style.display = 'block';
+    modelosList.innerHTML = '';
+    noModelosDiv.style.display = 'none';
+    
+    // Carregar modelos reais da API
+    fetch('{% url "assejus:modelos_poderes_list" tipo="gerais" %}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Extrair modelos do HTML retornado
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const cards = doc.querySelectorAll('.modelo-card');
+            
+            loadingDiv.style.display = 'none';
+            
+            if (cards.length > 0) {
+                modelosList.innerHTML = '';
+                cards.forEach(card => {
+                    // Adicionar funcionalidade de usar modelo
+                    const useButton = card.querySelector('button[onclick*="useModeloPoderes"]');
+                    if (useButton) {
+                        useButton.onclick = function() {
+                            const onclickAttr = this.getAttribute('onclick');
+                            const match = onclickAttr.match(/useModeloPoderes\((\d+), '(\w+)'\)/);
+                            if (match) {
+                                useModeloPoderes(parseInt(match[1]), match[2]);
+                            }
+                        };
+                    }
+                    modelosList.appendChild(card.cloneNode(true));
+                });
+            } else {
+                noModelosDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelos:', error);
+            loadingDiv.style.display = 'none';
+            noModelosDiv.style.display = 'block';
+        });
+}
+
+function searchModelosPoderesGerais() {
+    const searchTerm = document.getElementById('searchModelosPoderesGerais').value.toLowerCase();
+    const cards = document.querySelectorAll('#modelosPoderesGeraisList .modelo-card');
+    
+    cards.forEach(card => {
+        const nome = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+        const descricao = card.querySelector('.card-text')?.textContent.toLowerCase() || '';
+        
+        if (nome.includes(searchTerm) || descricao.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Verificar se há resultados visíveis
+    const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+    const noModelosDiv = document.getElementById('noModelosPoderesGerais');
+    
+    if (visibleCards.length === 0 && searchTerm !== '') {
+        noModelosDiv.innerHTML = `
+            <div class="card border-0 bg-light">
+                <div class="card-body py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">Nenhum modelo encontrado</h4>
+                    <p class="text-muted mb-4">Nenhum modelo corresponde ao termo "${searchTerm}".</p>
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('searchModelosPoderesGerais').value=''; searchModelosPoderesGerais();">
+                        <i class="fas fa-times me-2"></i>Limpar Busca
+                    </button>
+                </div>
+            </div>
+        `;
+        noModelosDiv.style.display = 'block';
+    } else {
+        noModelosDiv.style.display = 'none';
+    }
+}
+
+function filterByCategoryPoderesGerais() {
+    const categoria = document.getElementById('categoriaFilterPoderesGerais').value;
+    const status = document.getElementById('statusFilterPoderesGerais').value;
+    const cards = document.querySelectorAll('#modelosPoderesGeraisList .modelo-card');
+    
+    cards.forEach(card => {
+        let showCard = true;
+        
+        // Filtro por categoria
+        if (categoria) {
+            const categoriaBadge = card.querySelector('.badge.bg-primary');
+            const categoriaText = categoriaBadge?.textContent.toLowerCase() || '';
+            const categoriaMap = {
+                'geral': 'geral',
+                'civil': 'civil',
+                'criminal': 'criminal',
+                'trabalhista': 'trabalhista',
+                'administrativo': 'administrativo'
+            };
+            
+            if (categoriaText !== categoriaMap[categoria]) {
+                showCard = false;
+            }
+        }
+        
+        // Filtro por status
+        if (status && showCard) {
+            const statusBadge = card.querySelector('.badge.bg-success, .badge.bg-info');
+            const isPublico = statusBadge?.classList.contains('bg-success');
+            const isPrivado = statusBadge?.classList.contains('bg-info');
+            const isMeu = card.querySelector('.text-muted small')?.textContent.includes('{{ request.user.get_full_name|default:request.user.username }}');
+            
+            if (status === 'publico' && !isPublico) {
+                showCard = false;
+            } else if (status === 'privado' && !isPrivado) {
+                showCard = false;
+            } else if (status === 'meus' && !isMeu) {
+                showCard = false;
+            }
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+    
+    // Verificar se há resultados visíveis
+    const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+    const noModelosDiv = document.getElementById('noModelosPoderesGerais');
+    
+    if (visibleCards.length === 0) {
+        let mensagem = 'Nenhum modelo encontrado';
+        if (categoria || status) {
+            mensagem += ' com os filtros aplicados';
+        }
+        
+        noModelosDiv.innerHTML = `
+            <div class="card border-0 bg-light">
+                <div class="card-body py-5">
+                    <i class="fas fa-filter fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">${mensagem}</h4>
+                    <p class="text-muted mb-4">Tente ajustar os filtros ou criar um novo modelo.</p>
+                    <button type="button" class="btn btn-outline-primary" onclick="limparFiltrosPoderesGerais()">
+                        <i class="fas fa-times me-2"></i>Limpar Filtros
+                    </button>
+                </div>
+            </div>
+        `;
+        noModelosDiv.style.display = 'block';
+    } else {
+        noModelosDiv.style.display = 'none';
+    }
+}
+
+function saveModeloPoderesGerais() {
+    const modal = new bootstrap.Modal(document.getElementById('saveModeloPoderesGeraisModal'));
+    modal.show();
+}
+
+function confirmarSalvarModeloPoderesGerais() {
+    const nome = document.getElementById('modeloPoderesGeraisNome').value.trim();
+    const descricao = document.getElementById('modeloPoderesGeraisDescricao').value.trim();
+    const categoria = document.getElementById('modeloPoderesGeraisCategoria').value;
+    const publico = document.getElementById('modeloPoderesGeraisPublico').checked;
+    
+    // Validações
+    if (!nome) {
+        alert('Por favor, digite o nome do modelo.');
+        document.getElementById('modeloPoderesGeraisNome').focus();
+        return;
+    }
+    
+    const conteudo = document.getElementById('poderes_gerais_editor').innerHTML;
+    if (!conteudo || conteudo.trim() === '' || conteudo === '<div><br></div>') {
+        alert('Por favor, adicione algum conteúdo aos poderes gerais antes de salvar como modelo.');
+        return;
+    }
+    
+    // Mostrar loading no botão
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Salvando...';
+    button.disabled = true;
+    
+    // Salvar modelo real via API
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('descricao', descricao);
+    formData.append('categoria', categoria);
+    formData.append('tipo', 'gerais');
+    formData.append('conteudo', conteudo);
+    formData.append('publico', publico);
+    
+    fetch('{% url "assejus:api_salvar_modelo_poderes" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            button.innerHTML = originalText;
+            button.disabled = false;
+            bootstrap.Modal.getInstance(document.getElementById('saveModeloPoderesGeraisModal')).hide();
+            alert('Modelo de poderes gerais salvo com sucesso!');
+            // Recarregar lista de modelos
+            loadModelosPoderesGerais();
+        } else {
+            throw new Error(data.message || 'Erro desconhecido');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar modelo:', error);
+        button.innerHTML = originalText;
+        button.disabled = false;
+        alert('Erro ao salvar modelo: ' + error.message);
+    });
+}
+
+// ===== FUNÇÕES PARA MODELOS DE PODERES ESPECÍFICOS =====
+
+function abrirModalModelosPoderesEspecificos() {
+    const modal = new bootstrap.Modal(document.getElementById('modelosPoderesEspecificosModal'));
+    modal.show();
+    loadModelosPoderesEspecificos();
+}
+
+function loadModelosPoderesEspecificos() {
+    const modelosList = document.getElementById('modelosPoderesEspecificosList');
+    const loadingDiv = document.getElementById('modelosPoderesEspecificosLoading');
+    const noModelosDiv = document.getElementById('noModelosPoderesEspecificos');
+    
+    // Mostrar loading
+    loadingDiv.style.display = 'block';
+    modelosList.innerHTML = '';
+    noModelosDiv.style.display = 'none';
+    
+    // Carregar modelos reais da API
+    fetch('{% url "assejus:modelos_poderes_list" tipo="especificos" %}')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na requisição: ' + response.status);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // Extrair modelos do HTML retornado
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const cards = doc.querySelectorAll('.modelo-card');
+            
+            loadingDiv.style.display = 'none';
+            
+            if (cards.length > 0) {
+                modelosList.innerHTML = '';
+                cards.forEach(card => {
+                    // Adicionar funcionalidade de usar modelo
+                    const useButton = card.querySelector('button[onclick*="useModeloPoderes"]');
+                    if (useButton) {
+                        useButton.onclick = function() {
+                            const onclickAttr = this.getAttribute('onclick');
+                            const match = onclickAttr.match(/useModeloPoderes\((\d+), '(\w+)'\)/);
+                            if (match) {
+                                useModeloPoderes(parseInt(match[1]), match[2]);
+                            }
+                        };
+                    }
+                    modelosList.appendChild(card.cloneNode(true));
+                });
+            } else {
+                noModelosDiv.style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelos:', error);
+            loadingDiv.style.display = 'none';
+            noModelosDiv.style.display = 'block';
+        });
+}
+
+function searchModelosPoderesEspecificos() {
+    const searchTerm = document.getElementById('searchModelosPoderesEspecificos').value.toLowerCase();
+    const cards = document.querySelectorAll('#modelosPoderesEspecificosList .modelo-card');
+    
+    cards.forEach(card => {
+        const nome = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+        const descricao = card.querySelector('.card-text')?.textContent.toLowerCase() || '';
+        
+        if (nome.includes(searchTerm) || descricao.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+    
+    // Verificar se há resultados visíveis
+    const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+    const noModelosDiv = document.getElementById('noModelosPoderesEspecificos');
+    
+    if (visibleCards.length === 0 && searchTerm !== '') {
+        noModelosDiv.innerHTML = `
+            <div class="card border-0 bg-light">
+                <div class="card-body py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">Nenhum modelo encontrado</h4>
+                    <p class="text-muted mb-4">Nenhum modelo corresponde ao termo "${searchTerm}".</p>
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('searchModelosPoderesEspecificos').value=''; searchModelosPoderesEspecificos();">
+                        <i class="fas fa-times me-2"></i>Limpar Busca
+                    </button>
+                </div>
+            </div>
+        `;
+        noModelosDiv.style.display = 'block';
+    } else {
+        noModelosDiv.style.display = 'none';
+    }
+}
+
+function filterByCategoryPoderesEspecificos() {
+    const categoria = document.getElementById('categoriaFilterPoderesEspecificos').value;
+    const status = document.getElementById('statusFilterPoderesEspecificos').value;
+    const cards = document.querySelectorAll('#modelosPoderesEspecificosList .modelo-card');
+    
+    cards.forEach(card => {
+        let showCard = true;
+        
+        // Filtro por categoria
+        if (categoria) {
+            const categoriaBadge = card.querySelector('.badge.bg-primary');
+            const categoriaText = categoriaBadge?.textContent.toLowerCase() || '';
+            const categoriaMap = {
+                'geral': 'geral',
+                'civil': 'civil',
+                'criminal': 'criminal',
+                'trabalhista': 'trabalhista',
+                'administrativo': 'administrativo'
+            };
+            
+            if (categoriaText !== categoriaMap[categoria]) {
+                showCard = false;
+            }
+        }
+        
+        // Filtro por status
+        if (status && showCard) {
+            const statusBadge = card.querySelector('.badge.bg-success, .badge.bg-info');
+            const isPublico = statusBadge?.classList.contains('bg-success');
+            const isPrivado = statusBadge?.classList.contains('bg-info');
+            const isMeu = card.querySelector('.text-muted small')?.textContent.includes('{{ request.user.get_full_name|default:request.user.username }}');
+            
+            if (status === 'publico' && !isPublico) {
+                showCard = false;
+            } else if (status === 'privado' && !isPrivado) {
+                showCard = false;
+            } else if (status === 'meus' && !isMeu) {
+                showCard = false;
+            }
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+    
+    // Verificar se há resultados visíveis
+    const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+    const noModelosDiv = document.getElementById('noModelosPoderesEspecificos');
+    
+    if (visibleCards.length === 0) {
+        let mensagem = 'Nenhum modelo encontrado';
+        if (categoria || status) {
+            mensagem += ' com os filtros aplicados';
+        }
+        
+        noModelosDiv.innerHTML = `
+            <div class="card border-0 bg-light">
+                <div class="card-body py-5">
+                    <i class="fas fa-filter fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted mb-3">${mensagem}</h4>
+                    <p class="text-muted mb-4">Tente ajustar os filtros ou criar um novo modelo.</p>
+                    <button type="button" class="btn btn-outline-primary" onclick="limparFiltrosPoderesEspecificos()">
+                        <i class="fas fa-times me-2"></i>Limpar Filtros
+                    </button>
+                </div>
+            </div>
+        `;
+        noModelosDiv.style.display = 'block';
+    } else {
+        noModelosDiv.style.display = 'none';
+    }
+}
+
+function filterByStatusPoderesEspecificos() {
+    filterByCategoryPoderesEspecificos();
+}
+
+function saveModeloPoderesEspecificos() {
+    const modal = new bootstrap.Modal(document.getElementById('saveModeloPoderesEspecificosModal'));
+    modal.show();
+}
+
+function confirmarSalvarModeloPoderesEspecificos() {
+    const nome = document.getElementById('modeloPoderesEspecificosNome').value.trim();
+    const descricao = document.getElementById('modeloPoderesEspecificosDescricao').value.trim();
+    const categoria = document.getElementById('modeloPoderesEspecificosCategoria').value;
+    const publico = document.getElementById('modeloPoderesEspecificosPublico').checked;
+    
+    // Validações
+    if (!nome) {
+        alert('Por favor, digite o nome do modelo.');
+        document.getElementById('modeloPoderesEspecificosNome').focus();
+        return;
+    }
+    
+    const conteudo = document.getElementById('poderes_especificos_editor').innerHTML;
+    if (!conteudo || conteudo.trim() === '' || conteudo === '<div><br></div>') {
+        alert('Por favor, adicione algum conteúdo aos poderes específicos antes de salvar como modelo.');
+        return;
+    }
+    
+    // Mostrar loading no botão
+    const button = event.target;
+    const originalText = button.innerHTML;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Salvando...';
+    button.disabled = true;
+    
+    // Salvar modelo real via API
+    const formData = new FormData();
+    formData.append('nome', nome);
+    formData.append('descricao', descricao);
+    formData.append('categoria', categoria);
+    formData.append('tipo', 'especificos');
+    formData.append('conteudo', conteudo);
+    formData.append('publico', publico);
+    
+    fetch('{% url "assejus:api_salvar_modelo_poderes" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na requisição: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            button.innerHTML = originalText;
+            button.disabled = false;
+            bootstrap.Modal.getInstance(document.getElementById('saveModeloPoderesEspecificosModal')).hide();
+            alert('Modelo de poderes específicos salvo com sucesso!');
+            // Recarregar lista de modelos
+            loadModelosPoderesEspecificos();
+        } else {
+            throw new Error(data.message || 'Erro desconhecido');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao salvar modelo:', error);
+        button.innerHTML = originalText;
+        button.disabled = false;
+        alert('Erro ao salvar modelo: ' + error.message);
+    });
+}
+
+// ===== FUNÇÕES AUXILIARES =====
+
+function limparFiltrosPoderesGerais() {
+    document.getElementById('searchModelosPoderesGerais').value = '';
+    document.getElementById('categoriaFilterPoderesGerais').value = '';
+    document.getElementById('statusFilterPoderesGerais').value = '';
+    
+    // Mostrar todos os cards
+    const cards = document.querySelectorAll('#modelosPoderesGeraisList .modelo-card');
+    cards.forEach(card => {
+        card.style.display = 'block';
+    });
+    
+    // Ocultar mensagem de "nenhum modelo"
+    document.getElementById('noModelosPoderesGerais').style.display = 'none';
+}
+
+function limparFiltrosPoderesEspecificos() {
+    document.getElementById('searchModelosPoderesEspecificos').value = '';
+    document.getElementById('categoriaFilterPoderesEspecificos').value = '';
+    document.getElementById('statusFilterPoderesEspecificos').value = '';
+    
+    // Mostrar todos os cards
+    const cards = document.querySelectorAll('#modelosPoderesEspecificosList .modelo-card');
+    cards.forEach(card => {
+        card.style.display = 'block';
+    });
+    
+    // Ocultar mensagem de "nenhum modelo"
+    document.getElementById('noModelosPoderesEspecificos').style.display = 'none';
+}
+
+// ===== FUNÇÕES DE AÇÃO DOS MODELOS =====
+
+function editarModeloPoderes(modeloId, tipo) {
+    // Buscar dados do modelo
+    fetch(`{% url "assejus:api_obter_modelo_poderes" modelo_id=0 %}`.replace('0', modeloId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Preencher formulário de edição
+                document.getElementById(`modelo${tipo === 'gerais' ? 'PoderesGerais' : 'PoderesEspecificos'}Nome`).value = data.modelo.nome;
+                document.getElementById(`modelo${tipo === 'gerais' ? 'PoderesGerais' : 'PoderesEspecificos'}Descricao`).value = data.modelo.descricao;
+                document.getElementById(`modelo${tipo === 'gerais' ? 'PoderesGerais' : 'PoderesEspecificos'}Categoria`).value = data.modelo.categoria;
+                document.getElementById(`modelo${tipo === 'gerais' ? 'PoderesGerais' : 'PoderesEspecificos'}Publico`).checked = data.modelo.publico;
+                
+                // Preencher editor com conteúdo do modelo
+                const editorId = tipo === 'gerais' ? 'poderes_gerais_editor' : 'poderes_especificos_editor';
+                document.getElementById(editorId).innerHTML = data.modelo.conteudo;
+                
+                // Abrir modal de salvar (que funcionará como edição)
+                const modalId = tipo === 'gerais' ? 'saveModeloPoderesGeraisModal' : 'saveModeloPoderesEspecificosModal';
+                const modal = new bootstrap.Modal(document.getElementById(modalId));
+                modal.show();
+                
+                // Alterar título do modal para indicar edição
+                const modalTitle = document.querySelector(`#${modalId} .modal-title`);
+                modalTitle.innerHTML = `<i class="fas fa-edit me-2"></i>Editar Modelo de Poderes ${tipo === 'gerais' ? 'Gerais' : 'Específicos'}`;
+                
+                // Armazenar ID do modelo para edição
+                window.editingModeloId = modeloId;
+            } else {
+                alert('Erro ao carregar modelo: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelo:', error);
+            alert('Erro ao carregar modelo para edição');
+        });
+}
+
+function previewModeloPoderes(modeloId, tipo) {
+    // Buscar dados do modelo
+    fetch(`{% url "assejus:api_obter_modelo_poderes" modelo_id=0 %}`.replace('0', modeloId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Criar modal de visualização
+                const previewModal = document.createElement('div');
+                previewModal.className = 'modal fade';
+                previewModal.id = 'previewModeloModal';
+                previewModal.innerHTML = `
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-eye me-2"></i>Visualizar Modelo: ${data.modelo.nome}
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Categoria:</strong> ${data.modelo.categoria_display}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Status:</strong> 
+                                        <span class="badge ${data.modelo.publico ? 'bg-success' : 'bg-info'}">
+                                            ${data.modelo.publico ? 'Público' : 'Privado'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <strong>Descrição:</strong>
+                                    <p class="text-muted">${data.modelo.descricao || 'Sem descrição'}</p>
+                                </div>
+                                <div class="border rounded p-3 bg-light">
+                                    <strong>Conteúdo:</strong>
+                                    <div class="mt-2">${data.modelo.conteudo}</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" onclick="useModeloPoderes(${modeloId}, '${tipo}')">
+                                    <i class="fas fa-download me-1"></i>Usar Modelo
+                                </button>
+                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-1"></i>Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Adicionar modal ao DOM e mostrar
+                document.body.appendChild(previewModal);
+                const modal = new bootstrap.Modal(previewModal);
+                modal.show();
+                
+                // Remover modal do DOM quando fechado
+                previewModal.addEventListener('hidden.bs.modal', () => {
+                    document.body.removeChild(previewModal);
+                });
+            } else {
+                alert('Erro ao carregar modelo: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelo:', error);
+            alert('Erro ao carregar modelo para visualização');
+        });
+}
+
+function excluirModeloPoderes(modeloId, tipo) {
+    if (confirm('Tem certeza que deseja excluir este modelo? Esta ação não pode ser desfeita.')) {
+        fetch(`{% url "assejus:excluir_modelo_poderes" modelo_id=0 %}`.replace('0', modeloId), {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Modelo excluído com sucesso!');
+                // Recarregar lista de modelos
+                if (tipo === 'gerais') {
+                    loadModelosPoderesGerais();
+                } else {
+                    loadModelosPoderesEspecificos();
+                }
+            } else {
+                alert('Erro ao excluir modelo: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao excluir modelo:', error);
+            alert('Erro ao excluir modelo');
+        });
+    }
+}
+
+// ===== FUNÇÃO PARA USAR MODELO =====
+
+function useModeloPoderes(modeloId, tipo) {
+    // Buscar dados do modelo
+    fetch(`{% url "assejus:api_obter_modelo_poderes" modelo_id=0 %}`.replace('0', modeloId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Aplicar conteúdo ao editor correspondente
+                const editorId = tipo === 'gerais' ? 'poderes_gerais_editor' : 'poderes_especificos_editor';
+                document.getElementById(editorId).innerHTML = data.modelo.conteudo;
+                
+                // Fechar modal
+                const modalId = tipo === 'gerais' ? 'modelosPoderesGeraisModal' : 'modelosPoderesEspecificosModal';
+                const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                // Mostrar mensagem de sucesso
+                alert('Modelo aplicado com sucesso!');
+            } else {
+                alert('Erro ao carregar modelo: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar modelo:', error);
+            alert('Erro ao carregar modelo');
+        });
+}
+</script>
+{% endblock %}

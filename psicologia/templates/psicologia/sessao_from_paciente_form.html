@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Editar Sessão{% else %}Nova Sessão{% endif %} - {{ paciente.associado.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">{% if form.instance.pk %}Editar Sessão{% else %}Nova Sessão{% endif %}</h1>
+                <div>
+                    <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar à Ficha
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">{% if form.instance.pk %}Editar Sessão{% else %}Agendar Sessão{% endif %} para {{ paciente.associado.nome }}</h6>
+                </div>
+                <div class="card-body">
+                    <!-- Informações do Paciente -->
+                    <div class="row mb-4">
+                        <div class="col-md-3 text-center">
+                            {% if paciente.associado.foto %}
+                                <img src="{{ paciente.associado.foto.url }}" alt="Foto de {{ paciente.associado.nome }}" 
+                                     class="img-fluid rounded-circle mb-3" style="width: 100px; height: 100px; object-fit: cover;">
+                            {% else %}
+                                <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" 
+                                     style="width: 100px; height: 100px;">
+                                    <i class="fas fa-user fa-3x text-white"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <h6 class="text-primary">Informações do Paciente</h6>
+                            <p><strong>Nome:</strong> {{ paciente.associado.nome }}</p>
+                            <p><strong>CPF:</strong> {{ paciente.associado.cpf }}</p>
+                            <p><strong>Psicólogo Responsável:</strong> 
+                                {% if paciente.psicologo_responsavel %}
+                                    {{ paciente.psicologo_responsavel.nome_completo }}
+                                {% else %}
+                                    <span class="text-warning">Não atribuído</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Informações da Sessão (quando editando) -->
+                    {% if form.instance.pk %}
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Informações da Sessão</h6>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Data/Hora Original:</strong> {{ form.instance.data_hora|date:"d/m/Y H:i" }}</p>
+                                        <p><strong>Psicólogo:</strong> {{ form.instance.psicologo.nome_completo|default:"Não definido" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Tipo:</strong> {{ form.instance.get_tipo_sessao_display }}</p>
+                                        <p><strong>Status:</strong> {{ form.instance.get_status_display }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Formulário da Sessão -->
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.data_hora.id_for_label }}">{{ form.data_hora.label }}</label>
+                                    {{ form.data_hora }}
+                                    {% if form.data_hora.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.data_hora.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.duracao.id_for_label }}">{{ form.duracao.label }}</label>
+                                    {{ form.duracao }}
+                                    {% if form.duracao.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.duracao.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.tipo_sessao.id_for_label }}">{{ form.tipo_sessao.label }}</label>
+                                    {{ form.tipo_sessao }}
+                                    {% if form.tipo_sessao.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.tipo_sessao.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.status.id_for_label }}">{{ form.status.label }}</label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.valor.id_for_label }}">{{ form.valor.label }}</label>
+                                    {{ form.valor }}
+                                    {% if form.valor.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.valor.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="{{ form.observacoes.id_for_label }}">{{ form.observacoes.label }}</label>
+                            {{ form.observacoes }}
+                            {% if form.observacoes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.observacoes.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> {% if form.instance.pk %}Atualizar{% else %}Agendar{% endif %} Sessão
+                            </button>
+                            <a href="{% url 'psicologia:paciente_detail' paciente.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Informações Adicionais -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Histórico Rápido</h6>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-info">Últimas Sessões</h6>
+                    {% if paciente.sessao_set.all %}
+                        <div class="list-group list-group-flush">
+                            {% for sessao in paciente.sessao_set.all|slice:":3" %}
+                            <div class="list-group-item px-0">
+                                <small class="text-muted">{{ sessao.data_hora|date:"d/m/Y H:i" }}</small>
+                                <p class="mb-1">{{ sessao.get_tipo_sessao_display }}</p>
+                                <span class="badge bg-{% if sessao.status == 'realizada' %}success{% elif sessao.status == 'agendada' %}warning{% else %}info{% endif %} text-white fw-bold">
+                                    {{ sessao.get_status_display }}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted">Nenhuma sessão anterior.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Dicas</h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-info-circle text-info"></i> A duração padrão é de 50 minutos</li>
+                        <li><i class="fas fa-info-circle text-info"></i> O psicólogo responsável será preenchido automaticamente</li>
+                        <li><i class="fas fa-info-circle text-info"></i> Você pode alterar o status da sessão posteriormente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

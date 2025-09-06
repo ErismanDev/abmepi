@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Tipo de Recebível - {{ object.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir Tipo de Recebível
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Confirmando exclusão de: <strong>{{ object.nome }}</strong>
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'financeiro:tipo_mensalidade_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card de confirmação -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Atenção!
+                        </h6>
+                        <p class="mb-0">
+                            Você está prestes a excluir o tipo de mensalidade <strong>{{ object.nome }}</strong>.
+                            Esta ação não pode ser desfeita e pode afetar mensalidades existentes.
+                        </p>
+                    </div>
+
+                    <!-- Informações do tipo -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Dados do Tipo</h6>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>Nome:</strong></td>
+                                    <td>{{ object.nome }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Valor:</strong></td>
+                                    <td>R$ {{ object.valor }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Recorrente:</strong></td>
+                                    <td>
+                                        {% if object.recorrente %}
+                                            <span class="badge bg-primary">Sim</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Não</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        {% if object.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Descrição</h6>
+                            {% if object.descricao %}
+                                <p>{{ object.descricao|linebreaks }}</p>
+                            {% else %}
+                                <p class="text-muted">Nenhuma descrição fornecida.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Verificação de dependências -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="alert alert-info" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Verificação de Dependências
+                                </h6>
+                                <p class="mb-0">
+                                    <strong>Mensalidades existentes:</strong> 
+                                                    {% if object.mensalidades.exists %}
+                    <span class="badge bg-warning">{{ object.mensalidades.count }} mensalidade(s)</span>
+                                        <br>
+                                        <small class="text-muted">
+                                            Existem mensalidades associadas a este tipo. 
+                                            A exclusão pode causar inconsistências no sistema.
+                                        </small>
+                                    {% else %}
+                                        <span class="badge bg-success">Nenhuma</span>
+                                        <br>
+                                        <small class="text-muted">
+                                            Não há mensalidades associadas a este tipo.
+                                        </small>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulário de confirmação -->
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'financeiro:tipo_mensalidade_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>
+                                Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

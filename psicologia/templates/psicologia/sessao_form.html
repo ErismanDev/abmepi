@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Sessão{% else %}Nova Sessão{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-calendar-alt text-primary"></i> 
+                    {% if form.instance.pk %}Editar Sessão{% else %}Nova Sessão{% endif %}
+                </h1>
+                <div>
+                    {% if form.instance.pk and form.instance.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' form.instance.paciente.pk %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar aos Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        {% if form.instance.pk %}Editar Sessão{% else %}Agendar Nova Sessão{% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <!-- Campos paciente e psicólogo sempre visíveis -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.paciente|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.psicologo|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.data_hora|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.duracao|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.tipo_sessao|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.status|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.valor|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                <!-- Campo reservado para futuras expansões -->
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                {{ form.observacoes|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> 
+                                    {% if form.instance.pk %}Atualizar{% else %}Agendar{% endif %}
+                                </button>
+                                {% if form.instance.pk and form.instance.paciente %}
+                                    <a href="{% url 'psicologia:paciente_detail' form.instance.paciente.pk %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar com Informações -->
+        <div class="col-lg-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Informações</h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Dicas para Sessões</h6>
+                        <ul class="mb-0">
+                            <li><strong>Data/Hora:</strong> Escolha horários disponíveis</li>
+                            <li><strong>Duração:</strong> Padrão é 50 minutos</li>
+                            <li><strong>Tipo:</strong> Defina o tipo de atendimento</li>
+                            <li><strong>Status:</strong> Acompanhe o progresso</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading"><i class="fas fa-exclamation-triangle"></i> Importante</h6>
+                        <ul class="mb-0">
+                            <li>Verifique disponibilidade do psicólogo</li>
+                            <li>Confirme com o paciente</li>
+                            <li>Mantenha agenda atualizada</li>
+                            <li>Registre observações importantes</li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-success">
+                        <h6 class="alert-heading"><i class="fas fa-check-circle"></i> Boas Práticas</h6>
+                        <ul class="mb-0">
+                            <li>Agende com antecedência</li>
+                            <li>Confirme presença</li>
+                            <li>Registre evoluções</li>
+                            <li>Mantenha sigilo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Focar no primeiro campo
+    $('input:first, textarea:first').focus();
+    
+    // Auto-resize para campos de texto
+    $('textarea').on('input', function() {
+        this.style.height = 'auto';
+        this.style.height = (this.scrollHeight) + 'px';
+    });
+});
+</script>
+{% endblock %}

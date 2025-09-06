@@ -1,0 +1,533 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}{{ ata.titulo }} - Visualizar Ata - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .ata-content {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .ata-header {
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .ata-title {
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ata-meta {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .ata-section {
+        margin-bottom: 2rem;
+    }
+    
+    .ata-section h3 {
+        color: #495057;
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .ata-section h4 {
+        color: #6c757d;
+        margin-bottom: 0.75rem;
+    }
+    
+    .participants-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .participants-list li {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+    
+    .participants-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .participants-list li i {
+        color: #007bff;
+        margin-right: 0.5rem;
+    }
+    
+    .content-display {
+        line-height: 1.8;
+        font-size: 1rem;
+    }
+    
+    .content-display h1,
+    .content-display h2,
+    .content-display h3 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+    
+    .content-display h1 {
+        font-size: 1.8rem;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 0.5rem;
+    }
+    
+    .content-display h2 {
+        font-size: 1.5rem;
+        color: #495057;
+    }
+    
+    .content-display h3 {
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+    
+    .content-display p {
+        margin-bottom: 1rem;
+    }
+    
+    .content-display ul,
+    .content-display ol {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+    }
+    
+    .content-display li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .content-display table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
+    }
+    
+    .content-display table th,
+    .content-display table td {
+        border: 1px solid #dee2e6;
+        padding: 0.75rem;
+        text-align: left;
+    }
+    
+    .content-display table th {
+        background: #f8f9fa;
+        font-weight: 600;
+    }
+    
+    .content-display blockquote {
+        border-left: 4px solid #007bff;
+        padding-left: 1rem;
+        margin: 1rem 0;
+        font-style: italic;
+        color: #6c757d;
+    }
+    
+    .content-display code {
+        background: #f8f9fa;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+    }
+    
+    .content-display pre {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        overflow-x: auto;
+        margin-bottom: 1rem;
+    }
+    
+    .content-display pre code {
+        background: none;
+        padding: 0;
+    }
+    
+    .badge-custom {
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .btn-group-custom {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .btn-custom {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-primary-custom {
+        background: #007bff;
+        color: white;
+    }
+    
+    .btn-primary-custom:hover {
+        background: #0056b3;
+        color: white;
+    }
+    
+    .btn-success-custom {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-success-custom:hover {
+        background: #1e7e34;
+        color: white;
+    }
+    
+    .btn-secondary-custom {
+        background: #6c757d;
+        color: white;
+    }
+    
+    .btn-secondary-custom:hover {
+        background: #545b62;
+        color: white;
+    }
+    
+    .btn-info-custom {
+        background: #17a2b8;
+        color: white;
+    }
+    
+    .btn-info-custom:hover {
+        background: #138496;
+        color: white;
+    }
+    
+    .info-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .info-card h6 {
+        color: #495057;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #6c757d;
+    }
+    
+    .info-value {
+        color: #333;
+    }
+    
+    @media (max-width: 768px) {
+        .btn-group-custom {
+            flex-direction: column;
+        }
+        
+        .btn-custom {
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-eye me-2"></i>
+                        Visualizar Ata
+                    </h1>
+                    <p class="text-muted mb-0">
+                        {{ ata.titulo }}
+                    </p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'diretoria:ata_editor_personalizado_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Lista
+                    </a>
+                    {% if can_edit %}
+                    <a href="{% url 'diretoria:ata_editor_personalizado_edit' ata.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Informações da Ata -->
+            <div class="info-card">
+                <h6>
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informações da Ata
+                </h6>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <span class="info-label">Título:</span>
+                            <span class="info-value">{{ ata.titulo }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Tipo:</span>
+                            <span class="info-value">
+                                <span class="badge bg-{% if ata.tipo_reuniao == 'ordinaria' %}primary{% elif ata.tipo_reuniao == 'extraordinaria' %}warning{% elif ata.tipo_reuniao == 'emergencia' %}danger{% else %}info{% endif %} badge-custom">
+                                    {{ ata.get_tipo_reuniao_display }}
+                                </span>
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Data:</span>
+                            <span class="info-value">{{ ata.data_reuniao|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Local:</span>
+                            <span class="info-value">{{ ata.local }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <span class="info-label">Presidente:</span>
+                            <span class="info-value">
+                                {% if ata.presidente %}
+                                    {{ ata.presidente.associado.nome }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Secretário:</span>
+                            <span class="info-value">
+                                {% if ata.secretario %}
+                                    {{ ata.secretario.associado.nome }}
+                                {% else %}
+                                    <span class="text-muted">Não informado</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Criada em:</span>
+                            <span class="info-value">{{ ata.data_criacao|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Atualizada em:</span>
+                            <span class="info-value">{{ ata.data_atualizacao|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Participantes -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                Membros Presentes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if ata.membros_presentes.all %}
+                                <ul class="participants-list">
+                                    {% for membro in ata.membros_presentes.all %}
+                                        <li>
+                                            <i class="fas fa-user-check"></i>
+                                            {{ membro.associado.nome }}
+                                            <small class="text-muted">({{ membro.cargo.nome }})</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted mb-0">Nenhum membro presente informado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="mb-0">
+                                <i class="fas fa-user-times me-2"></i>
+                                Membros Ausentes
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if ata.membros_ausentes.all %}
+                                <ul class="participants-list">
+                                    {% for membro in ata.membros_ausentes.all %}
+                                        <li>
+                                            <i class="fas fa-user-times"></i>
+                                            {{ membro.associado.nome }}
+                                            <small class="text-muted">({{ membro.cargo.nome }})</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="text-muted mb-0">Nenhum membro ausente informado</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conteúdo da Ata -->
+            <div class="ata-content">
+                <div class="ata-header">
+                    <h1 class="ata-title">{{ ata.titulo }}</h1>
+                    <div class="ata-meta">
+                        <strong>{{ ata.get_tipo_reuniao_display }}</strong> • 
+                        {{ ata.data_reuniao|date:"d/m/Y H:i" }} • 
+                        {{ ata.local }}
+                    </div>
+                </div>
+
+                <!-- Pauta -->
+                {% if ata.pauta %}
+                <div class="ata-section">
+                    <h3>
+                        <i class="fas fa-list me-2"></i>
+                        Pauta
+                    </h3>
+                    <div class="content-display">
+                        {{ ata.pauta|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Deliberações -->
+                {% if ata.deliberacoes %}
+                <div class="ata-section">
+                    <h3>
+                        <i class="fas fa-gavel me-2"></i>
+                        Deliberações
+                    </h3>
+                    <div class="content-display">
+                        {{ ata.deliberacoes|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Observações -->
+                {% if ata.observacoes %}
+                <div class="ata-section">
+                    <h3>
+                        <i class="fas fa-sticky-note me-2"></i>
+                        Observações
+                    </h3>
+                    <div class="content-display">
+                        {{ ata.observacoes|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Conteúdo Completo -->
+                {% if ata.conteudo_completo %}
+                <div class="ata-section">
+                    <h3>
+                        <i class="fas fa-file-alt me-2"></i>
+                        Conteúdo Completo
+                    </h3>
+                    <div class="content-display">
+                        {{ ata.conteudo_completo|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Arquivo da Ata -->
+                {% if ata.arquivo_ata %}
+                <div class="ata-section">
+                    <h3>
+                        <i class="fas fa-paperclip me-2"></i>
+                        Arquivo da Ata
+                    </h3>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                        <div>
+                            <h6 class="mb-1">{{ ata.arquivo_ata.name|filename }}</h6>
+                            <small class="text-muted">
+                                <a href="{{ ata.arquivo_ata.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-download me-1"></i>
+                                    Baixar Arquivo
+                                </a>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="btn-group-custom">
+                        {% if can_edit %}
+                        <a href="{% url 'diretoria:ata_editor_personalizado_edit' ata.pk %}" class="btn-custom btn-primary-custom">
+                            <i class="fas fa-edit me-2"></i>
+                            Editar Ata
+                        </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'diretoria:ata_editor_personalizado_list' %}" class="btn-custom btn-secondary-custom">
+                            <i class="fas fa-list me-2"></i>
+                            Voltar para Lista
+                        </a>
+                        
+                        <a href="{% url 'diretoria:ata_detail' ata.pk %}" class="btn-custom btn-info-custom">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Visualização Básica
+                        </a>
+                        
+                        {% if ata.arquivo_ata %}
+                        <a href="{{ ata.arquivo_ata.url }}" target="_blank" class="btn-custom btn-success-custom">
+                            <i class="fas fa-download me-2"></i>
+                            Baixar PDF
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

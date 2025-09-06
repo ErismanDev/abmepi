@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resoluções da Diretoria - ABMEPI{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'associados/css/modais.css' %}">
+<style>
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+/* Estilos para campos com erro */
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+    background-color: #fff5f5 !important;
+}
+
+.form-group.has-error .form-label {
+    color: #dc3545 !important;
+    font-weight: bold !important;
+}
+
+.invalid-feedback {
+    display: block !important;
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.invalid-feedback i {
+    color: #dc3545;
+}
+
+/* Estilos para alertas de erro */
+.alert-danger {
+    border-left: 4px solid #dc3545;
+}
+
+.alert-danger .alert-heading {
+    color: #721c24;
+}
+
+/* Animação para campos com erro */
+.is-invalid {
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Estilo para botões de ação */
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+/* Estilo para o resumo de erros */
+.error-summary {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.error-summary h6 {
+    color: #721c24;
+    margin-bottom: 0.5rem;
+}
+
+.error-summary ul {
+    margin-bottom: 0;
+    padding-left: 1.5rem;
+}
+
+.error-summary li {
+    color: #721c24;
+    margin-bottom: 0.25rem;
+}
+
+/* Avatar styles */
+.avatar-rectangular {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 0.375rem;
+    border: 2px solid #e3e6f0;
+}
+
+.avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: #f8f9fc;
+    border: 2px solid #e3e6f0;
+    border-radius: 0.375rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5a5c69;
+}
+
+/* Table styles */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #5a5c69;
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.table td {
+    vertical-align: middle;
+    border-top: 1px solid #e3e6f0;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Badge styles */
+.badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* Button group styles */
+.btn-group .btn {
+    margin-right: 0.25rem;
+}
+
+.btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Pagination styles */
+.pagination .page-link {
+    color: #4e73df;
+    border-color: #e3e6f0;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.pagination .page-link:hover {
+    color: #2e59d9;
+    background-color: #eaecf4;
+    border-color: #e3e6f0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-contract me-2"></i>
+                        Resoluções da Diretoria
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie as resoluções da diretoria
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:resolucao_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Nova Resolução
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ request.GET.search }}" placeholder="Título, número ou conteúdo...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">Todos os status</option>
+                                <option value="rascunho" {% if request.GET.status == "rascunho" %}selected{% endif %}>Rascunho</option>
+                                <option value="aprovada" {% if request.GET.status == "aprovada" %}selected{% endif %}>Aprovada</option>
+                                <option value="revogada" {% if request.GET.status == "revogada" %}selected{% endif %}>Revogada</option>
+                                <option value="suspensa" {% if request.GET.status == "suspensa" %}selected{% endif %}>Suspensa</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio" 
+                                   value="{{ request.GET.data_inicio }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="data_fim" name="data_fim" 
+                                   value="{{ request.GET.data_fim }}">
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-outline-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de resoluções -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Resoluções
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if resolucoes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Título</th>
+                                        <th>Status</th>
+                                        <th>Data Resolução</th>
+                                        <th>Data Publicação</th>
+                                        <th>Ata</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resolucao in resolucoes %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary">{{ resolucao.numero_resolucao }}</span>
+                                        </td>
+                                        <td>
+                                            <h6 class="mb-0">{{ resolucao.titulo }}</h6>
+                                            {% if resolucao.conteudo %}
+                                                <small class="text-muted">{{ resolucao.conteudo|truncatechars:50 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if resolucao.status == 'aprovada' %}success{% elif resolucao.status == 'rascunho' %}warning{% elif resolucao.status == 'revogada' %}danger{% else %}secondary{% endif %}">
+                                                {{ resolucao.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ resolucao.data_resolucao|date:"d/m/Y" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if resolucao.data_publicacao %}
+                                                <small class="text-muted">{{ resolucao.data_publicacao|date:"d/m/Y" }}</small>
+                                            {% else %}
+                                                <small class="text-muted">-</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if resolucao.ata_reuniao %}
+                                                <a href="{% url 'diretoria:ata_detail' resolucao.ata_reuniao.pk %}" class="text-decoration-none">
+                                                    <small class="text-muted">{{ resolucao.ata_reuniao.titulo|truncatechars:30 }}</small>
+                                                </a>
+                                            {% else %}
+                                                <small class="text-muted">-</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'diretoria:resolucao_detail' resolucao.pk %}" 
+                                                   class="btn btn-sm btn-outline-info" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:resolucao_update' resolucao.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:resolucao_delete' resolucao.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Paginação -->
+                        {% if is_paginated %}
+                        <nav aria-label="Paginação">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-contract fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhuma resolução encontrada</h5>
+                            <p class="text-muted">
+                                {% if request.GET.search or request.GET.status or request.GET.data_inicio or request.GET.data_fim %}
+                                    Tente ajustar os filtros de busca.
+                                {% else %}
+                                    Comece criando a primeira resolução da diretoria.
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'diretoria:resolucao_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Criar Resolução
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

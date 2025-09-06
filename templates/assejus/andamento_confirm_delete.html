@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Andamento - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:processos_list' %}">Processos</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:andamento_detail' pk=andamento.pk %}">{{ andamento.titulo|truncatechars:50 }}</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Excluir</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-trash me-2 text-danger"></i>
+                        Excluir Andamento
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Confirme a exclusão deste andamento jurídico
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:andamento_detail' pk=andamento.pk %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar aos Detalhes
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Confirmação de Exclusão
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning" role="alert">
+                                <h6 class="alert-heading">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Atenção!
+                                </h6>
+                                <p class="mb-0">
+                                    Você está prestes a excluir permanentemente este andamento jurídico. 
+                                    Esta ação não pode ser desfeita.
+                                </p>
+                            </div>
+
+                            <h6 class="text-muted mb-3">Dados do Andamento a ser Excluído:</h6>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Título</h6>
+                                    <p class="mb-3">{{ andamento.titulo }}</p>
+                                    
+                                    <h6 class="text-muted mb-2">Data do Andamento</h6>
+                                    <p class="mb-3">
+                                        <span class="badge bg-info">
+                                            {{ andamento.data_andamento|date:"d/m/Y H:i" }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Usuário Responsável</h6>
+                                    <p class="mb-3">
+                                        {% if andamento.usuario_registro %}
+                                            <span class="badge bg-secondary">
+                                                {{ andamento.usuario_registro.username }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">Não informado</span>
+                                        {% endif %}
+                                    </p>
+                                    
+                                    <h6 class="text-muted mb-2">Atendimento Relacionado</h6>
+                                    <p class="mb-3">
+                                        <a href="{% url 'assejus:atendimento_detail' pk=andamento.atendimento.pk %}" 
+                                           class="text-decoration-none">
+                                            <strong>{{ andamento.atendimento.titulo|truncatechars:40 }}</strong>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <h6 class="text-muted mb-2">Descrição</h6>
+                            <div class="border rounded p-3 bg-light mb-4">
+                                {{ andamento.descricao|linebreaks }}
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'assejus:andamento_detail' pk=andamento.pk %}" class="btn btn-secondary">
+                                        <i class="fas fa-times me-2"></i>
+                                        Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash me-2"></i>
+                                        Confirmar Exclusão
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informações do atendimento relacionado -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-gavel me-2"></i>
+                                Atendimento Relacionado
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Título</h6>
+                            <p class="mb-3">
+                                <a href="{% url 'assejus:atendimento_detail' pk=andamento.atendimento.pk %}" 
+                                   class="text-decoration-none">
+                                    <strong>{{ andamento.atendimento.titulo }}</strong>
+                                </a>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Associado</h6>
+                            <p class="mb-3">
+                                <span class="badge bg-primary">
+                                    {{ andamento.atendimento.associado.nome }}
+                                </span>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Status</h6>
+                            <p class="mb-3">
+                                {% if andamento.atendimento.status == 'em_andamento' %}
+                                    <span class="badge bg-warning">Em Andamento</span>
+                                {% elif andamento.atendimento.status == 'concluido' %}
+                                    <span class="badge bg-success">Concluído</span>
+                                {% elif andamento.atendimento.status == 'cancelado' %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                {% elif andamento.atendimento.status == 'aguardando' %}
+                                    <span class="badge bg-secondary">Aguardando</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ andamento.atendimento.status|title }}</span>
+                                {% endif %}
+                            </p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'assejus:atendimento_detail' pk=andamento.atendimento.pk %}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-eye me-2"></i>
+                                    Ver Atendimento Completo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Impacto da Exclusão
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">O que será perdido:</h6>
+                            <ul class="text-muted small">
+                                <li>Histórico do andamento</li>
+                                <li>Data e hora do registro</li>
+                                <li>Descrição detalhada</li>
+                                <li>Usuário responsável</li>
+                            </ul>
+                            
+                            <h6 class="text-muted mb-2">Alternativas:</h6>
+                            <ul class="text-muted small">
+                                <li>Editar o andamento</li>
+                                <li>Marcar como cancelado</li>
+                                <li>Arquivar temporariamente</li>
+                            </ul>
+                            
+                            <div class="alert alert-info mt-3" role="alert">
+                                <small>
+                                    <i class="fas fa-lightbulb me-2"></i>
+                                    <strong>Dica:</strong> Considere editar o andamento ao invés de excluí-lo 
+                                    para manter o histórico completo do caso.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

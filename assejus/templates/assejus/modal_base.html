@@ -1,0 +1,605 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'assejus/css/error-styles.css' %}">
+
+<!-- Modal Base para Formulários ASEJUS -->
+<div class="modal fade" id="formModal" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="formModalLabel">
+                    <i class="fas fa-edit me-2"></i>Título do Modal
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="formModalBody">
+                <!-- Conteúdo do formulário será inserido aqui -->
+                <div class="text-center p-5">
+                    <p class="text-muted">Modal base carregado com sucesso!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="assejusModalSubmit">
+                    <i class="fas fa-save me-2"></i>Salvar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalhes do Advogado -->
+<div class="modal fade" id="advogadoDetailModal" tabindex="-1" aria-labelledby="advogadoDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="advogadoDetailModalLabel">Detalhes do Advogado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="advogadoDetailModalBody">
+                <!-- Conteúdo será carregado via AJAX -->
+                <div class="text-center p-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Carregando detalhes do advogado...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fechar</button>
+                <button type="button" class="btn btn-primary" id="editAdvogadoBtn">Editar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="confirmModalBody">
+                <!-- Mensagem de confirmação será inserida aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmModalConfirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Mensagem -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageModalLabel">Mensagem</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="messageModalBody">
+                <!-- Mensagem será inserida aqui -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sistema de Visualização de Erros -->
+<script src="{% static 'js/error-handling.js' %}"></script>
+
+<script>
+console.log('🚀 Template base de modais ASEJUS carregado');
+
+// Função para abrir modal de formulário
+window.openFormModal = function(titulo, conteudo, formId, actionUrl) {
+    console.log('🚀 openFormModal chamada:', { titulo, formId, actionUrl });
+    
+    // Atualizar título e conteúdo do modal
+    const titleEl = document.getElementById('formModalLabel');
+    const bodyEl = document.getElementById('formModalBody');
+    
+    if (titleEl) titleEl.innerHTML = titulo;
+    if (bodyEl) bodyEl.innerHTML = conteudo;
+    
+    // Aguardar um pouco para o DOM ser atualizado
+    setTimeout(() => {
+        // Configurar o formulário
+        const form = document.getElementById(formId);
+        console.log('🔍 Procurando formulário com ID:', formId);
+        console.log('🔍 Formulário encontrado:', form);
+        
+        if (form && actionUrl) {
+            form.action = actionUrl;
+            console.log('✅ Formulário configurado com action:', form.action);
+            
+            // Configurar o botão salvar
+            const submitBtn = document.getElementById('assejusModalSubmit');
+            console.log('🔍 Botão salvar encontrado:', submitBtn);
+            
+            if (submitBtn) {
+                // Remover listeners anteriores
+                submitBtn.onclick = null;
+                
+                // Adicionar novo listener
+                submitBtn.onclick = function(e) {
+                    e.preventDefault();
+                    console.log('🔘 Botão salvar clicado!');
+                    console.log('🔍 Formulário a ser enviado:', form);
+                    console.log('🔍 Action do formulário:', form.action);
+                    
+                    if (form) {
+                        console.log('✅ Chamando submitForm...');
+                        submitForm(form);
+                    } else {
+                        console.error('❌ Formulário não encontrado no onclick');
+                    }
+                };
+                
+                console.log('✅ Botão salvar configurado com sucesso');
+            } else {
+                console.error('❌ Botão salvar não encontrado');
+            }
+        } else {
+            console.error('❌ Formulário ou actionUrl inválidos');
+            console.error('Form:', form);
+            console.error('ActionUrl:', actionUrl);
+        }
+    }, 100);
+    
+    // Abrir modal
+    const modalElement = document.getElementById('formModal');
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+        console.log('✅ Modal aberto');
+    }
+};
+
+// Função para submeter formulário
+window.submitForm = function(form) {
+    console.log('🚀 submitForm chamada');
+    console.log('🔍 Formulário recebido:', form);
+    console.log('🔍 Action do formulário:', form.action);
+    console.log('🔍 ID do formulário:', form.id);
+    console.log('🔍 Método do formulário:', form.method);
+    
+    if (!form) {
+        console.error('❌ Formulário é null ou undefined');
+        alert('Erro: Formulário inválido');
+        return;
+    }
+    
+    if (!form.action) {
+        console.error('❌ Formulário não tem action definida');
+        alert('Erro: URL de envio não definida');
+        return;
+    }
+    
+    // Verificar se o formulário tem campos
+    const formFields = form.querySelectorAll('input, select, textarea');
+    console.log('🔍 Campos encontrados no formulário:', formFields.length);
+    
+    // Verificar CSRF token
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (!csrfToken) {
+        console.error('❌ CSRF token não encontrado');
+        alert('Erro: Token de segurança não encontrado');
+        return;
+    }
+    
+    console.log('✅ CSRF token encontrado');
+    
+    const formData = new FormData(form);
+    
+    // Log dos dados do formulário
+    console.log('🔍 Dados do formulário:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`  ${key}: ${value}`);
+    }
+    
+    console.log('📤 Enviando requisição para:', form.action);
+    
+    // Mostrar indicador de carregamento no botão
+    let submitBtn = document.getElementById('assejusModalSubmit');
+    if (!submitBtn) {
+        submitBtn = document.querySelector('#formModal .modal-footer .btn-primary');
+    }
+    if (!submitBtn) {
+        submitBtn = document.querySelector('#formModal .modal-footer button[type="submit"]');
+    }
+    if (!submitBtn) {
+        submitBtn = document.querySelector('.modal.show .modal-footer .btn-primary');
+    }
+    
+    console.log('🔍 Botão submit encontrado:', submitBtn);
+    
+    if (submitBtn) {
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
+        submitBtn.disabled = true;
+        
+        // Restaurar botão após resposta
+        const restoreButton = () => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        };
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken.value
+            }
+        })
+        .then(response => {
+            console.log('📥 Resposta recebida:', response);
+            console.log('📊 Status:', response.status);
+            console.log('📊 OK:', response.ok);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ Dados da resposta:', data);
+            restoreButton();
+            
+            if (data.success) {
+                console.log('🎉 Sucesso! Mensagem:', data.message);
+                alert('Sucesso: ' + data.message);
+                
+                if (data.reload) {
+                    console.log('🔄 Recarregando página...');
+                    location.reload();
+                } else {
+                    console.log('✅ Página não será recarregada');
+                    // Fechar modal
+                    const modalElement = document.getElementById('formModal');
+                    if (modalElement) {
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) {
+                            modal.hide();
+                        }
+                    }
+                }
+            } else {
+                console.error('❌ Erro na resposta:', data.message);
+                
+                // Log detalhado dos erros
+                if (data.errors) {
+                    console.error('❌ Detalhes dos erros:');
+                    Object.keys(data.errors).forEach(fieldName => {
+                        const fieldErrors = data.errors[fieldName];
+                        console.error(`  • ${fieldName}: ${fieldErrors.join(', ')}`);
+                    });
+                    
+                    // Mostrar resumo dos erros
+                    if (data.error_count) {
+                        console.error(`📊 Total de erros: ${data.error_count}`);
+                    }
+                    if (data.error_summary) {
+                        console.error(`📋 Resumo: ${data.error_summary}`);
+                    }
+                } else {
+                    console.error('❌ Sem detalhes dos erros disponíveis');
+                    console.error('📊 Resposta completa:', data);
+                }
+                
+                // Se houver form_html na resposta, atualizar o modal
+                if (data.form_html) {
+                    const modalBody = document.getElementById('formModalBody');
+                    if (modalBody) {
+                        modalBody.innerHTML = data.form_html;
+                        console.log('✅ Formulário atualizado com erros');
+                        
+                        // Debug: verificar estrutura do modal
+                        console.log('🔍 Debug do modal:');
+                        console.log('  - Modal body encontrado:', !!document.getElementById('formModalBody'));
+                        console.log('  - Modal body HTML length:', document.getElementById('formModalBody')?.innerHTML?.length);
+                        console.log('  - Modal body children count:', document.getElementById('formModalBody')?.children?.length);
+                        
+                        // Exibir resumo dos erros no topo do modal
+                        if (data.errors && Object.keys(data.errors).length > 0) {
+                            console.log('🔍 Chamando showErrorSummaryInModal...');
+                            showErrorSummaryInModal(data.errors, data.error_count, data.error_summary);
+                        }
+                        
+                        // Aplicar estilos de erro aos campos com pequeno delay para garantir DOM atualizado
+                        setTimeout(() => {
+                            console.log('🔍 Chamando applyErrorStylesToFields...');
+                            applyErrorStylesToFields(data.errors);
+                            
+                            // Rolar para o primeiro campo com erro
+                            console.log('🔍 Chamando scrollToFirstError...');
+                            scrollToFirstError();
+                        }, 100);
+                    }
+                } else {
+                    // Se não houver form_html, mostrar erro em um alerta estilizado
+                    showErrorAlertInModal(data.message, data.errors);
+                }
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição:', error);
+            console.error('❌ Stack trace:', error.stack);
+            restoreButton();
+            showErrorAlertInModal('Erro ao processar solicitação: ' + error.message);
+        });
+    } else {
+        console.error('❌ Botão submit não encontrado');
+        console.error('❌ Tentando fallback...');
+        
+        // Fallback sem indicador de carregamento
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrfToken.value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Sucesso: ' + data.message);
+                if (data.reload) {
+                    location.reload();
+                }
+            } else {
+                alert('Erro: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Erro na requisição:', error);
+            alert('Erro ao processar solicitação: ' + error.message);
+        });
+    }
+};
+
+console.log('✅ Funções básicas carregadas');
+
+// ============================================================================
+// FUNÇÕES PARA EXIBIR ERROS NO MODAL
+// ============================================================================
+
+// Função para exibir resumo de erros no topo do modal
+function showErrorSummaryInModal(errors, errorCount, errorSummary) {
+    console.log('🔍 showErrorSummaryInModal chamada com:', { errors, errorCount, errorSummary });
+    
+    const modalBody = document.getElementById('formModalBody');
+    if (!modalBody) {
+        console.warn('⚠️ Modal body não encontrado');
+        return;
+    }
+    
+    // Remover alertas de erro anteriores
+    const existingAlerts = modalBody.querySelectorAll('.alert-danger.border-danger');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    // Criar alerta de erro estilizado
+    const errorAlert = document.createElement('div');
+    errorAlert.className = 'alert alert-danger border-danger mb-4';
+    errorAlert.innerHTML = `
+        <div class="d-flex align-items-center">
+            <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+            <div>
+                <h5 class="alert-heading mb-2">
+                    <i class="fas fa-times-circle me-2"></i>Formulário com Erros de Validação
+                </h5>
+                <p class="mb-2">${errorSummary || `Foram encontrados ${errorCount || Object.keys(errors).length} erro(s) no formulário.`}</p>
+                <p class="mb-0 small text-muted">Por favor, corrija os campos destacados em vermelho e tente novamente.</p>
+            </div>
+        </div>
+    `;
+    
+    // Inserir no topo do modal
+    modalBody.insertBefore(errorAlert, modalBody.firstChild);
+    console.log('✅ Resumo de erros inserido no modal');
+    
+    // Adicionar botão para fechar o alerta
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close position-absolute top-0 end-0 m-3';
+    closeButton.setAttribute('aria-label', 'Fechar');
+    closeButton.onclick = () => errorAlert.remove();
+    errorAlert.style.position = 'relative';
+    errorAlert.appendChild(closeButton);
+}
+
+// Função para exibir alerta de erro quando não há form_html
+function showErrorAlertInModal(message, errors = null) {
+    const modalBody = document.getElementById('formModalBody');
+    if (!modalBody) return;
+    
+    let errorContent = `
+        <div class="alert alert-danger border-danger">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
+                <div>
+                    <h5 class="alert-heading mb-2">
+                        <i class="fas fa-times-circle me-2"></i>Erro no Sistema
+                    </h5>
+                    <p class="mb-2">${message}</p>
+    `;
+    
+    // Se houver erros específicos, mostrar detalhes
+    if (errors && Object.keys(errors).length > 0) {
+        errorContent += `
+            <hr class="my-3">
+            <h6 class="mb-2">Detalhes dos Erros:</h6>
+            <ul class="mb-0 small">
+        `;
+        
+        Object.keys(errors).forEach(fieldName => {
+            const fieldErrors = errors[fieldName];
+            fieldErrors.forEach(error => {
+                errorContent += `<li><strong>${fieldName}:</strong> ${error}</li>`;
+            });
+        });
+        
+        errorContent += `</ul>`;
+    }
+    
+    errorContent += `
+                </div>
+            </div>
+            <div class="mt-3">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="closeModal()">
+                    <i class="fas fa-times me-2"></i>Fechar Modal
+                </button>
+                <button type="button" class="btn btn-primary btn-sm ms-2" onclick="retryForm()">
+                    <i class="fas fa-redo me-2"></i>Tentar Novamente
+                </button>
+            </div>
+        </div>
+    `;
+    
+    modalBody.innerHTML = errorContent;
+}
+
+// Função para aplicar estilos de erro aos campos
+function applyErrorStylesToFields(errors) {
+    if (!errors) {
+        console.warn('⚠️ Nenhum erro fornecido para applyErrorStylesToFields');
+        return;
+    }
+    
+    console.log('🔍 Aplicando estilos de erro para:', errors);
+    console.log('🔍 Total de campos com erro:', Object.keys(errors).length);
+    
+    let camposProcessados = 0;
+    let camposComErro = 0;
+    
+    Object.keys(errors).forEach(fieldName => {
+        console.log(`🔍 Procurando campo: ${fieldName}`);
+        
+        // Tentar diferentes seletores para encontrar o campo
+        let field = document.querySelector(`[name="${fieldName}"]`);
+        
+        if (!field) {
+            // Tentar por ID
+            field = document.getElementById(fieldName);
+        }
+        
+        if (!field) {
+            // Tentar por nome com diferentes variações
+            field = document.querySelector(`input[name="${fieldName}"], select[name="${fieldName}"], textarea[name="${fieldName}"]`);
+        }
+        
+        if (field) {
+            console.log(`✅ Campo encontrado: ${fieldName}`, field);
+            camposComErro++;
+            
+            // Adicionar classe de erro
+            field.classList.add('is-invalid');
+            
+            // Adicionar classe de erro ao grupo do campo
+            const formGroup = field.closest('.form-group, .mb-3, .col-md-6, .col-md-4, .col-md-3');
+            if (formGroup) {
+                formGroup.classList.add('has-error');
+                console.log(`✅ Grupo do campo marcado com erro:`, formGroup);
+            }
+            
+            // Criar mensagem de erro abaixo do campo
+            createFieldErrorMessage(field, errors[fieldName]);
+        } else {
+            console.warn(`⚠️ Campo não encontrado: ${fieldName}`);
+        }
+        
+        camposProcessados++;
+    });
+    
+    console.log(`📊 Resumo: ${camposProcessados} campos processados, ${camposComErro} campos com erro aplicado`);
+}
+
+// Função para criar mensagem de erro para um campo específico
+function createFieldErrorMessage(field, errorMessages) {
+    console.log(`🔍 Criando mensagem de erro para campo:`, field.name, errorMessages);
+    
+    if (!field || !field.parentNode) {
+        console.warn(`⚠️ Campo ou parentNode inválido para:`, field);
+        return;
+    }
+    
+    // Remover mensagens de erro anteriores
+    const existingError = field.parentNode.querySelector('.invalid-feedback');
+    if (existingError) {
+        existingError.remove();
+        console.log(`✅ Mensagem de erro anterior removida`);
+    }
+    
+    // Criar nova mensagem de erro
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'invalid-feedback d-block text-danger mt-1';
+    
+    if (Array.isArray(errorMessages)) {
+        errorMessages.forEach((error, index) => {
+            const errorItem = document.createElement('div');
+            errorItem.innerHTML = `<i class="fas fa-times-circle me-1"></i>${error}`;
+            errorDiv.appendChild(errorItem);
+        });
+    } else {
+        errorDiv.innerHTML = `<i class="fas fa-times-circle me-1"></i>${errorMessages}`;
+    }
+    
+    // Inserir após o campo
+    const parentNode = field.parentNode;
+    if (parentNode) {
+        parentNode.appendChild(errorDiv);
+        console.log(`✅ Mensagem de erro inserida após campo:`, field.name);
+        
+        // Verificar se foi inserido corretamente
+        const insertedError = parentNode.querySelector('.invalid-feedback');
+        if (insertedError) {
+            console.log(`✅ Mensagem de erro confirmada no DOM:`, insertedError);
+        } else {
+            console.warn(`⚠️ Mensagem de erro não encontrada no DOM após inserção`);
+        }
+    } else {
+        console.warn(`⚠️ Não foi possível inserir mensagem de erro para:`, field.name);
+    }
+}
+
+// Função para rolar para o primeiro campo com erro
+function scrollToFirstError() {
+    const firstErrorField = document.querySelector('.is-invalid');
+    if (firstErrorField) {
+        firstErrorField.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        firstErrorField.focus();
+    }
+}
+
+// Função para fechar o modal
+function closeModal() {
+    const modalElement = document.getElementById('formModal');
+    if (modalElement) {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+            modal.hide();
+        }
+    }
+}
+
+// Função para tentar novamente
+function retryForm() {
+    // Recarregar o formulário
+    if (typeof retryFormSubmission === 'function') {
+        retryFormSubmission();
+    } else {
+        // Fallback: recarregar a página
+        location.reload();
+    }
+}
+</script>

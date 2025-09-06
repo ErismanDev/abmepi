@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ andamento.get_tipo_andamento_display }} - {{ andamento.processo.numero_processo }} - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a href="{% url 'assejus:processos_list' %}">Processos</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">{{ andamento.get_tipo_andamento_display|truncatechars:50 }}</li>
+                        </ol>
+                    </nav>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        {{ andamento.get_tipo_andamento_display }}
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Detalhes do andamento jurídico
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'assejus:andamento_update' pk=andamento.pk %}" class="btn btn-warning me-2">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar
+                    </a>
+                    <a href="{% url 'assejus:andamento_delete' pk=andamento.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Informações principais -->
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Informações do Andamento
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Tipo de Andamento</h6>
+                                    <p class="mb-3">
+                                        <span class="badge bg-primary">
+                                            {{ andamento.get_tipo_andamento_display }}
+                                        </span>
+                                    </p>
+                                    
+                                    <h6 class="text-muted mb-2">Data do Andamento</h6>
+                                    <p class="mb-3">
+                                        <span class="badge bg-info">
+                                            {{ andamento.data_andamento|date:"d/m/Y H:i" }}
+                                        </span>
+                                    </p>
+                                    
+                                    <h6 class="text-muted mb-2">Data de Cadastro</h6>
+                                    <p class="mb-3">
+                                        <small class="text-muted">
+                                            {{ andamento.data_cadastro|date:"d/m/Y H:i:s" }}
+                                        </small>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Usuário que Registrou</h6>
+                                    <p class="mb-3">
+                                        {% if andamento.usuario_registro %}
+                                            <span class="badge bg-secondary">
+                                                {{ andamento.usuario_registro.get_full_name|default:andamento.usuario_registro.username }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">Não informado</span>
+                                        {% endif %}
+                                    </p>
+                                    
+                                    <h6 class="text-muted mb-2">Última Atualização</h6>
+                                    <p class="mb-3">
+                                        <small class="text-muted">
+                                            {{ andamento.data_atualizacao|date:"d/m/Y H:i:s" }}
+                                        </small>
+                                    </p>
+                                    
+                                    <h6 class="text-muted mb-2">Cliente Visualizou</h6>
+                                    <p class="mb-3">
+                                        {% if andamento.cliente_visualizou %}
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>
+                                                Sim
+                                            </span>
+                                            {% if andamento.data_visualizacao_cliente %}
+                                                <br><small class="text-muted">
+                                                    Em: {{ andamento.data_visualizacao_cliente|date:"d/m/Y H:i" }}
+                                                </small>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Não
+                                            </span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <h6 class="text-muted mb-2">Descrição Detalhada</h6>
+                            <div class="border rounded p-3 bg-light mb-3">
+                                {{ andamento.descricao_detalhada|linebreaks }}
+                            </div>
+                            
+                            {% if andamento.observacoes_cliente %}
+                            <h6 class="text-muted mb-2">Observações para o Cliente</h6>
+                            <div class="border rounded p-3 bg-info bg-opacity-10">
+                                <i class="fas fa-user me-2 text-info"></i>
+                                {{ andamento.observacoes_cliente|linebreaks }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Anexos do Andamento -->
+                    {% if andamento.anexos.all %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-paperclip me-2"></i>
+                                Anexos do Andamento
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for anexo in andamento.anexos.all %}
+                                <div class="list-group-item px-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ anexo.titulo }}</h6>
+                                            <small class="text-muted">{{ anexo.get_tipo_display }}</small>
+                                        </div>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ anexo.arquivo.url }}" 
+                                               class="btn btn-sm btn-outline-primary" 
+                                               target="_blank" title="Visualizar">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ anexo.arquivo.url }}" 
+                                               class="btn btn-sm btn-outline-success" 
+                                               download title="Download">
+                                                <i class="fas fa-download"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ anexo.data_upload|date:"d/m/Y H:i" }}
+                                    </small>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Informações do processo relacionado -->
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-gavel me-2"></i>
+                                Processo Relacionado
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="text-muted mb-2">Número do Processo</h6>
+                            <p class="mb-3">
+                                <a href="{% url 'assejus:processo_detail' pk=andamento.processo.pk %}" 
+                                   class="text-decoration-none">
+                                    <strong>{{ andamento.processo.numero_processo }}</strong>
+                                </a>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Cliente</h6>
+                            <p class="mb-3">
+                                <span class="badge bg-primary">
+                                    {{ andamento.processo.parte_cliente.nome }}
+                                </span>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Tipo de Ação</h6>
+                            <p class="mb-3">
+                                <span class="badge bg-info">
+                                    {{ andamento.processo.get_tipo_acao_display }}
+                                </span>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Situação Atual</h6>
+                            <p class="mb-3">
+                                {% if andamento.processo.situacao_atual == 'andamento' %}
+                                    <span class="badge bg-warning">Em Andamento</span>
+                                {% elif andamento.processo.situacao_atual == 'concluido' %}
+                                    <span class="badge bg-success">Concluído</span>
+                                {% elif andamento.processo.situacao_atual == 'suspenso' %}
+                                    <span class="badge bg-secondary">Suspenso</span>
+                                {% elif andamento.processo.situacao_atual == 'arquivado' %}
+                                    <span class="badge bg-dark">Arquivado</span>
+                                {% elif andamento.processo.situacao_atual == 'transitado_julgado' %}
+                                    <span class="badge bg-primary">Transitado em Julgado</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">{{ andamento.processo.situacao_atual|title }}</span>
+                                {% endif %}
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Vara/Tribunal</h6>
+                            <p class="mb-3">
+                                <small class="text-muted">{{ andamento.processo.vara_tribunal }}</small>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Parte Contrária</h6>
+                            <p class="mb-3">
+                                <small class="text-muted">{{ andamento.processo.parte_contraria }}</small>
+                            </p>
+                            
+                            <h6 class="text-muted mb-2">Advogado Responsável</h6>
+                            <p class="mb-3">
+                                {% if andamento.processo.advogado_responsavel %}
+                                    <span class="badge bg-primary">
+                                        {{ andamento.processo.advogado_responsavel.get_full_name|default:andamento.processo.advogado_responsavel.username }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">Não atribuído</span>
+                                {% endif %}
+                            </p>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'assejus:processo_detail' pk=andamento.processo.pk %}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-eye me-2"></i>
+                                    Ver Processo Completo
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão para voltar ao processo -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-start">
+                        <a href="{% url 'assejus:processo_detail' pk=andamento.processo.pk %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Voltar ao Processo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Empresas Parceiras - Benefícios{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Início</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Empresas Parceiras</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-building me-2 text-primary"></i>
+                Empresas Parceiras
+            </h1>
+            <p class="text-muted mb-0">Gerencie as empresas parceiras e seus convênios</p>
+        </div>
+        <a href="{% url 'beneficios:empresa_create' %}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Nova Empresa
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    <select name="estado" id="estado" class="form-select">
+                        <option value="">Todos os Estados</option>
+                        {% for estado in estados %}
+                            <option value="{{ estado }}" {% if request.GET.estado == estado %}selected{% endif %}>
+                                {{ estado }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="ativo" class="form-label">Status</label>
+                    <select name="ativo" id="ativo" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="true" {% if request.GET.ativo == 'true' %}selected{% endif %}>Ativas</option>
+                        <option value="false" {% if request.GET.ativo == 'false' %}selected{% endif %}>Inativas</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Buscar</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ request.GET.search }}" placeholder="Nome, cidade ou razão social...">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Filtrar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de Empresas -->
+    <div class="card shadow">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                Empresas Parceiras ({{ page_obj.paginator.count }})
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if page_obj %}
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Cidade/Estado</th>
+                                <th>Telefone</th>
+                                <th>E-mail</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for empresa in page_obj %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ empresa.nome }}</strong>
+                                        {% if empresa.razao_social %}
+                                            <br><small class="text-muted">{{ empresa.razao_social }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ empresa.cidade }}/{{ empresa.estado }}
+                                        {% if empresa.cep %}
+                                            <br><small class="text-muted">CEP: {{ empresa.cep }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if empresa.telefone %}
+                                            {{ empresa.telefone }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if empresa.email %}
+                                            <a href="mailto:{{ empresa.email }}">{{ empresa.email }}</a>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if empresa.ativo %}
+                                            <span class="badge bg-success">Ativa</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativa</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'beneficios:empresa_detail' empresa.pk %}" 
+                                               class="btn btn-sm btn-outline-primary" title="Ver Detalhes">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'beneficios:empresa_update' empresa.pk %}" 
+                                               class="btn btn-sm btn-outline-warning" title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'beneficios:empresa_delete' empresa.pk %}" 
+                                               class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                {% if page_obj.has_other_pages %}
+                    <nav aria-label="Navegação de páginas">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                        <i class="fas fa-angle-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                        <i class="fas fa-angle-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ num }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                            {{ num }}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                        <i class="fas fa-angle-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.estado %}&estado={{ request.GET.estado }}{% endif %}{% if request.GET.ativo %}&ativo={{ request.GET.ativo }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">
+                                        <i class="fas fa-angle-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-building fa-3x text-gray-300 mb-3"></i>
+                    <h5 class="text-gray-500">Nenhuma empresa encontrada</h5>
+                    <p class="text-gray-400">Comece cadastrando a primeira empresa parceira.</p>
+                    <a href="{% url 'beneficios:empresa_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Cadastrar Empresa
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

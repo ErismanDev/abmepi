@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ ata.titulo }} - Visualizar Ata - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-eye me-2"></i>
+                        Visualizar Ata
+                    </h1>
+                    <p class="text-muted mb-0">{{ ata.titulo }}</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'diretoria:ata_simples_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Lista
+                    </a>
+                    <a href="{% url 'diretoria:ata_simples_edit' ata.pk %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Dados
+                    </a>
+                    <a href="{% url 'diretoria:ata_editor' ata.pk %}" class="btn btn-primary">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Inserir Ata
+                    </a>
+                </div>
+            </div>
+
+            <!-- Status da ata -->
+            <div class="alert alert-{% if ata.status == 'rascunho' %}warning{% elif ata.status == 'finalizada' %}success{% elif ata.status == 'assinada' %}info{% endif %} mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="alert-heading mb-1">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Status da Ata
+                        </h6>
+                        <p class="mb-0">
+                            <strong>Status:</strong> {{ ata.get_status_display }}
+                            <br>
+                            <strong>Criada em:</strong> {{ ata.data_criacao|date:"d/m/Y H:i" }}
+                            <br>
+                            <strong>Última atualização:</strong> {{ ata.data_atualizacao|date:"d/m/Y H:i" }}
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        {% if ata.status == 'rascunho' %}
+                            <a href="{% url 'diretoria:finalizar_ata' ata.pk %}" class="btn btn-success">
+                                <i class="fas fa-check me-2"></i>
+                                Finalizar Ata
+                            </a>
+                        {% elif ata.status == 'finalizada' %}
+                            <a href="{% url 'diretoria:assinar_ata' ata.pk %}" class="btn btn-primary">
+                                <i class="fas fa-signature me-2"></i>
+                                Assinar Ata
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Conteúdo da ata -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Conteúdo da Ata
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if ata.conteudo_html %}
+                        <div class="ata-content">
+                            {{ ata.conteudo_html|safe }}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Conteúdo não disponível</h5>
+                            <p class="text-muted">
+                                O conteúdo HTML desta ata ainda não foi gerado.
+                                <a href="{% url 'diretoria:ata_editor' ata.pk %}" class="btn btn-primary">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    Gerar Conteúdo
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mb-3">
+                                <i class="fas fa-edit me-2"></i>
+                                Edição
+                            </h6>
+                            <div class="btn-group-vertical w-100" role="group">
+                                <a href="{% url 'diretoria:ata_simples_edit' ata.pk %}" class="btn btn-outline-primary mb-2">
+                                    <i class="fas fa-edit me-2"></i>
+                                    Editar Dados Básicos
+                                </a>
+                                <a href="{% url 'diretoria:ata_editor' ata.pk %}" class="btn btn-primary mb-2">
+                                    <i class="fas fa-file-alt me-2"></i>
+                                    Inserir/Editar Conteúdo
+                                </a>
+                                <a href="{% url 'diretoria:regenerar_html' ata.pk %}" class="btn btn-warning">
+                                    <i class="fas fa-sync me-2"></i>
+                                    Regenerar HTML
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6 class="mb-3">
+                                <i class="fas fa-eye me-2"></i>
+                                Visualização e Impressão
+                            </h6>
+                            <div class="btn-group-vertical w-100" role="group">
+                                <a href="{% url 'diretoria:visualizar_ata_html' ata.pk %}" class="btn btn-info mb-2" target="_blank">
+                                    <i class="fas fa-external-link-alt me-2"></i>
+                                    Abrir em Nova Aba
+                                </a>
+                                <a href="{% url 'diretoria:imprimir_ata' ata.pk %}" class="btn btn-success mb-2" target="_blank">
+                                    <i class="fas fa-print me-2"></i>
+                                    Imprimir Ata
+                                </a>
+                                <a href="{% url 'diretoria:baixar_ata_html' ata.pk %}" class="btn btn-secondary">
+                                    <i class="fas fa-download me-2"></i>
+                                    Baixar HTML
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.ata-content {
+    padding: 2rem;
+    font-family: 'Times New Roman', serif;
+    line-height: 1.8;
+}
+
+.ata-content h1,
+.ata-content h2,
+.ata-content h3 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.ata-content h1 {
+    font-size: 1.8rem;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0.5rem;
+    text-align: center;
+}
+
+.ata-content h2 {
+    font-size: 1.5rem;
+    color: #495057;
+}
+
+.ata-content h3 {
+    font-size: 1.2rem;
+    color: #6c757d;
+}
+
+.ata-content p {
+    margin-bottom: 1rem;
+}
+
+.ata-content ul,
+.ata-content ol {
+    margin-bottom: 1rem;
+    padding-left: 2rem;
+}
+
+.ata-content li {
+    margin-bottom: 0.5rem;
+}
+
+.ata-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.ata-content table th,
+.ata-content table td {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.ata-content table th {
+    background: #f8f9fa;
+    font-weight: 600;
+}
+
+.ata-content blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: #6c757d;
+}
+
+@media print {
+    .btn-group,
+    .card-header,
+    .alert {
+        display: none !important;
+    }
+    
+    .ata-content {
+        padding: 0;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}Editor Personalizado de Atas - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Editor Personalizado de Atas
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Editor personalizado com formatação avançada e salvamento automático
+                    </p>
+                </div>
+                <div class="btn-group" role="group">
+                    <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar para Lista Básica
+                    </a>
+                    <a href="{% url 'diretoria:ata_editor_personalizado_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Nova Ata
+                    </a>
+                </div>
+            </div>
+
+            <!-- Informações sobre o Editor Personalizado -->
+            <div class="alert alert-info mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h6 class="alert-heading mb-1">
+                            <i class="fas fa-magic me-2"></i>
+                            Editor Personalizado
+                        </h6>
+                        <p class="mb-0">
+                            Use o <strong>Editor Personalizado</strong> para criar atas com formatação profissional, 
+                            salvamento automático, contadores de palavras e recursos avançados de edição.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="{% url 'diretoria:ata_editor_personalizado_create' %}" class="btn btn-info">
+                            <i class="fas fa-edit me-2"></i>
+                            Criar Nova Ata
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros de busca -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-search me-2"></i>
+                        Filtros de Busca
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ request.GET.search }}" placeholder="Título, pauta ou deliberações...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo de Reunião</label>
+                            <select class="form-select" id="tipo" name="tipo">
+                                <option value="">Todos os tipos</option>
+                                <option value="ordinaria" {% if request.GET.tipo == 'ordinaria' %}selected{% endif %}>Ordinária</option>
+                                <option value="extraordinaria" {% if request.GET.tipo == 'extraordinaria' %}selected{% endif %}>Extraordinária</option>
+                                <option value="emergencia" {% if request.GET.tipo == 'emergencia' %}selected{% endif %}>Emergência</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_inicio" class="form-label">Data Início</label>
+                            <input type="date" class="form-control" id="data_inicio" name="data_inicio" 
+                                   value="{{ request.GET.data_inicio }}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="data_fim" class="form-label">Data Fim</label>
+                            <input type="date" class="form-control" id="data_fim" name="data_fim" 
+                                   value="{{ request.GET.data_fim }}">
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Estatísticas -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ total_atas }}</h4>
+                                    <small>Total de Atas</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-file-alt fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ atas|length }}</h4>
+                                    <small>Atas Encontradas</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-search fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">{{ atas|length|floatformat:0 }}</h4>
+                                    <small>Página Atual</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-list fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h4 class="mb-0">100%</h4>
+                                    <small>Editor Personalizado</small>
+                                </div>
+                                <div class="align-self-center">
+                                    <i class="fas fa-magic fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de atas -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Atas
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    {% if atas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Local</th>
+                                        <th>Presidente</th>
+                                        <th>Secretário</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ata in atas %}
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>{{ ata.data_reuniao|date:"d/m/Y" }}</strong>
+                                            </div>
+                                            <small class="text-muted">{{ ata.data_reuniao|date:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            <h6 class="mb-0">{{ ata.titulo }}</h6>
+                                            {% if ata.pauta %}
+                                                <small class="text-muted">{{ ata.pauta|truncatechars:50 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if ata.tipo_reuniao == 'ordinaria' %}primary{% elif ata.tipo_reuniao == 'extraordinaria' %}warning{% elif ata.tipo_reuniao == 'emergencia' %}danger{% else %}info{% endif %}">
+                                                {{ ata.get_tipo_reuniao_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{{ ata.local|truncatechars:30 }}</small>
+                                        </td>
+                                        <td>
+                                            {% if ata.presidente %}
+                                                <small class="text-muted">{{ ata.presidente.associado.nome }}</small>
+                                            {% else %}
+                                                <small class="text-muted">-</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if ata.secretario %}
+                                                <small class="text-muted">{{ ata.secretario.associado.nome }}</small>
+                                            {% else %}
+                                                <small class="text-muted">-</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'diretoria:ata_editor_personalizado_edit' ata.pk %}" 
+                                                   class="btn btn-sm btn-primary" title="Editar com Editor Personalizado">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_editor_personalizado_detail' ata.pk %}" 
+                                                   class="btn btn-sm btn-info" title="Visualizar">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'diretoria:ata_detail' ata.pk %}" 
+                                                   class="btn btn-sm btn-secondary" title="Visualizar Básico">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhuma ata encontrada</h5>
+                            <p class="text-muted">
+                                {% if request.GET.search or request.GET.tipo or request.GET.data_inicio or request.GET.data_fim %}
+                                    Tente ajustar os filtros de busca ou
+                                {% endif %}
+                                <a href="{% url 'diretoria:ata_editor_personalizado_create' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus me-2"></i>
+                                    Criar Nova Ata
+                                </a>
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Paginação -->
+            {% if is_paginated %}
+                <nav aria-label="Paginação das atas" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.data_inicio %}&data_inicio={{ request.GET.data_inicio }}{% endif %}{% if request.GET.data_fim %}&data_fim={{ request.GET.data_fim }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

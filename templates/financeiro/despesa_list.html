@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}Despesas - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-receipt me-2"></i>
+            Despesas
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="{% url 'financeiro:despesa_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>
+                    Nova Despesa
+                </a>
+                <a href="{% url 'financeiro:export_despesas_csv' %}" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i>
+                    Exportar CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cards de estatísticas -->
+    <div class="row mb-4">
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total de Despesas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ total_despesas|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-receipt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Despesas Pagas
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ despesas_pagas|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Despesas Pendentes
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                R$ {{ despesas_pendentes|floatformat:2 }}
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros e busca -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-filter me-2"></i>
+                Filtros e Busca
+            </h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="descricao" class="form-label">Descrição</label>
+                    {{ search_form.descricao }}
+                </div>
+                <div class="col-md-2">
+                    <label for="categoria" class="form-label">Categoria</label>
+                    {{ search_form.categoria }}
+                </div>
+                <div class="col-md-2">
+                    <label for="fornecedor" class="form-label">Fornecedor</label>
+                    {{ search_form.fornecedor }}
+                </div>
+                <div class="col-md-2">
+                    <label for="pago" class="form-label">Status</label>
+                    {{ search_form.pago }}
+                </div>
+                <div class="col-md-1">
+                    <label for="data_inicio" class="form-label">Data Início</label>
+                    {{ search_form.data_inicio }}
+                </div>
+                <div class="col-md-1">
+                    <label for="data_fim" class="form-label">Data Fim</label>
+                    {{ search_form.data_fim }}
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>
+                        Filtrar
+                    </button>
+                    <a href="{% url 'financeiro:despesa_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-2"></i>
+                        Limpar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de despesas -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list me-2"></i>
+                Despesas
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if despesas %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Descrição</th>
+                                <th>Categoria</th>
+                                <th>Valor</th>
+                                <th>Data</th>
+                                <th>Vencimento</th>
+                                <th>Status</th>
+                                <th>Fornecedor</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for despesa in despesas %}
+                            <tr>
+                                <td>
+                                    <strong>{{ despesa.descricao }}</strong>
+                                    {% if despesa.observacoes %}
+                                        <br>
+                                        <small class="text-muted">{{ despesa.observacoes|truncatewords:10 }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-{% if despesa.categoria == 'administrativa' %}primary{% elif despesa.categoria == 'operacional' %}info{% elif despesa.categoria == 'manutencao' %}warning{% elif despesa.categoria == 'eventos' %}success{% else %}secondary{% endif %}">
+                                        {{ despesa.get_categoria_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <strong class="text-danger">
+                                        <i class="fas fa-dollar-sign me-1"></i>
+                                        R$ {{ despesa.valor|floatformat:2 }}
+                                    </strong>
+                                    <br>
+                                    <small class="text-muted">BRL</small>
+                                </td>
+                                <td>
+                                    {{ despesa.data_despesa|date:"d/m/Y" }}
+                                </td>
+                                <td>
+                                    {% if despesa.data_vencimento %}
+                                        {{ despesa.data_vencimento|date:"d/m/Y" }}
+                                        {% if despesa.data_vencimento < today and not despesa.pago %}
+                                            <br>
+                                            <span class="badge bg-danger">Vencida</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if despesa.pago %}
+                                        <span class="badge bg-success">Pago</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if despesa.fornecedor %}
+                                        {{ despesa.fornecedor }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'financeiro:despesa_detail' despesa.pk %}" 
+                                           class="btn btn-sm btn-outline-info"
+                                           data-bs-toggle="tooltip" 
+                                           title="Visualizar">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{% url 'financeiro:despesa_update' despesa.pk %}" 
+                                           class="btn btn-sm btn-outline-warning"
+                                           data-bs-toggle="tooltip" 
+                                           title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        {% if not despesa.pago %}
+                                            <form method="post" action="{% url 'financeiro:dar_baixa_despesa' despesa.pk %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-success"
+                                                        data-bs-toggle="tooltip" 
+                                                        title="Dar Baixa (Marcar como Paga)"
+                                                        onclick="return confirm('Confirmar que esta despesa foi paga?')">
+                                                    <i class="fas fa-check-circle"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <a href="{% url 'financeiro:despesa_delete' despesa.pk %}" 
+                                           class="btn btn-sm btn-outline-danger"
+                                           data-bs-toggle="tooltip" 
+                                           title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                {% if is_paginated %}
+                <nav aria-label="Paginação">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1">&laquo; Primeira</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">Nenhuma despesa encontrada</h5>
+                    <p class="text-muted">Não há despesas cadastradas no sistema.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicializar tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+{% endblock %}

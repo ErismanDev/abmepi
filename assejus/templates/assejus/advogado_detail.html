@@ -1,0 +1,756 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ advogado.nome }} - ABMEPI ASEJUS{% endblock %}
+
+{% block content %}
+<!-- Template base de modais temporariamente removido para teste -->
+<!-- {% include 'assejus/modal_base.html' %} -->
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-balance-scale me-2"></i>
+        {{ advogado.nome }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <button type="button" class="btn btn-warning" id="editarAdvogadoBtn" data-advogado-id="{{ advogado.pk }}">
+                <i class="fas fa-edit me-1"></i>
+                Editar
+            </button>
+        </div>
+        <div class="btn-group me-2">
+            <a href="{% url 'assejus:advogado_delete' advogado.pk %}" class="btn btn-danger">
+                <i class="fas fa-trash me-1"></i>
+                Excluir
+            </a>
+        </div>
+        <a href="{% url 'assejus:advogado_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>
+            Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informações principais -->
+    <div class="col-lg-8">
+        <!-- Dados Pessoais -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user me-2"></i>
+                    Dados Pessoais
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nome:</strong> {{ advogado.nome }}</p>
+                        <p><strong>CPF:</strong> {{ advogado.cpf }}</p>
+                        {% if advogado.data_nascimento %}
+                        <p><strong>Data de Nascimento:</strong> {{ advogado.data_nascimento|date:"d/m/Y" }}</p>
+                        {% endif %}
+                        <p><strong>Status:</strong> 
+                            {% if advogado.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </p>
+                        <p><strong>Situação:</strong> 
+                            <span class="badge bg-{% if advogado.situacao == 'ativo' %}success{% elif advogado.situacao == 'inativo' %}danger{% elif advogado.situacao == 'suspenso' %}warning{% else %}secondary{% endif %}">
+                                {{ advogado.get_situacao_display }}
+                            </span>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>OAB:</strong> 
+                            <span class="badge bg-primary">{{ advogado.oab }}/{{ advogado.uf_oab }}</span>
+                        </p>
+                        {% if advogado.data_inscricao_oab %}
+                        <p><strong>Data de Inscrição OAB:</strong> {{ advogado.data_inscricao_oab|date:"d/m/Y" }}</p>
+                        {% endif %}
+                        {% if advogado.experiencia_anos %}
+                        <p><strong>Experiência:</strong> {{ advogado.experiencia_anos }} anos</p>
+                        {% endif %}
+                        <p><strong>Data de Cadastro:</strong> {{ advogado.data_cadastro|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Última Atualização:</strong> {{ advogado.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações Profissionais -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-briefcase me-2"></i>
+                    Informações Profissionais
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Número OAB:</strong> {{ advogado.oab }}</p>
+                        <p><strong>UF OAB:</strong> {{ advogado.uf_oab }}</p>
+                        {% if advogado.data_inscricao_oab %}
+                        <p><strong>Inscrição OAB:</strong> {{ advogado.data_inscricao_oab|date:"d/m/Y" }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if advogado.experiencia_anos %}
+                        <p><strong>Anos de Experiência:</strong> {{ advogado.experiencia_anos }} anos</p>
+                        {% endif %}
+                        {% if advogado.especialidades %}
+                        <p><strong>Especialidades:</strong></p>
+                        <div class="mb-2">
+                            {% for especialidade in advogado.get_especialidades_list %}
+                                <span class="badge bg-info me-1 mb-1">{{ especialidade }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações de Contato -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-address-book me-2"></i>
+                    Informações de Contato
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if advogado.email %}
+                        <p><strong>E-mail:</strong> 
+                            <a href="mailto:{{ advogado.email }}" class="text-decoration-none">
+                                <i class="fas fa-envelope me-2"></i>{{ advogado.email }}
+                            </a>
+                        </p>
+                        {% endif %}
+                        {% if advogado.telefone %}
+                        <p><strong>Telefone:</strong> 
+                            <a href="tel:{{ advogado.telefone }}" class="text-decoration-none">
+                                <i class="fas fa-phone me-2"></i>{{ advogado.telefone }}
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if advogado.celular %}
+                        <p><strong>Celular:</strong> 
+                            <a href="tel:{{ advogado.celular }}" class="text-decoration-none">
+                                <i class="fas fa-mobile-alt me-2"></i>{{ advogado.celular }}
+                            </a>
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Endereço -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    Endereço
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if advogado.endereco %}
+                        <p><strong>Logradouro:</strong> {{ advogado.endereco }}</p>
+                        {% endif %}
+                        {% if advogado.cidade %}
+                        <p><strong>Cidade:</strong> {{ advogado.cidade }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if advogado.estado %}
+                        <p><strong>Estado:</strong> {{ advogado.estado }}</p>
+                        {% endif %}
+                        {% if advogado.cep %}
+                        <p><strong>CEP:</strong> {{ advogado.cep }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observações -->
+        {% if advogado.observacoes %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-sticky-note me-2"></i>
+                    Observações
+                </h6>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ advogado.observacoes|linebreaks }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Informações do Sistema -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-cogs me-2"></i>
+                    Informações do Sistema
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Data de Cadastro:</strong> {{ advogado.data_cadastro|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Última Atualização:</strong> {{ advogado.data_atualizacao|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>ID do Registro:</strong> <code>{{ advogado.pk }}</code></p>
+                        <p><strong>Status do Sistema:</strong> 
+                            {% if advogado.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                            {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar com informações adicionais -->
+    <div class="col-lg-4">
+        <!-- Foto do advogado -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-camera me-2"></i>
+                    Foto
+                </h6>
+            </div>
+            <div class="card-body text-center">
+                {% if advogado.foto %}
+                    <img src="{{ advogado.foto.url }}" alt="Foto de {{ advogado.nome }}" class="img-fluid rounded foto-advogado" style="max-width: 200px;">
+                {% else %}
+                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center mx-auto foto-advogado" style="width: 200px; height: 200px;">
+                        <i class="fas fa-balance-scale fa-4x text-white"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Ações rápidas -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-bolt me-2"></i>
+                    Ações Rápidas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary" onclick="openAdvogadoEditModal({{ advogado.pk }})">
+                        <i class="fas fa-edit me-2"></i>
+                        Editar Advogado
+                    </button>
+                    <a href="{% url 'assejus:atendimento_create' %}?advogado={{ advogado.pk }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Atendimento
+                    </a>
+                    <a href="{% url 'assejus:advogado_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Advogados
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estatísticas -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Estatísticas
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">Total de Casos</h6>
+                            <h4 class="text-primary mb-0">{{ total_casos|default:"0" }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Em Andamento</h6>
+                        <h4 class="text-warning mb-0">{{ casos_em_andamento|default:"0" }}</h4>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="border-end">
+                            <h6 class="text-muted mb-1">Concluídos</h6>
+                            <h4 class="text-success mb-0">{{ casos_concluidos|default:"0" }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted mb-1">Experiência</h6>
+                        <h6 class="text-info mb-0">
+                            {% if advogado.experiencia_anos %}
+                                {{ advogado.experiencia_anos }} anos
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Atendimentos Jurídicos -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-gavel me-2"></i>
+                    Atendimentos Jurídicos
+                </h6>
+                <a href="{% url 'assejus:atendimento_create' %}?advogado={{ advogado.pk }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus me-1"></i>
+                    Novo Atendimento
+                </a>
+            </div>
+            <div class="card-body">
+                {% if atendimentos %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Associado</th>
+                                    <th>Tipo de Demanda</th>
+                                    <th>Status</th>
+                                    <th>Data de Abertura</th>
+                                    <th>Data de Conclusão</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for atendimento in atendimentos %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ atendimento.associado.nome }}</strong>
+                                        {% if atendimento.observacoes %}
+                                            <i class="fas fa-info-circle text-muted ms-1" 
+                                               data-bs-toggle="tooltip" 
+                                               title="{{ atendimento.observacoes }}"></i>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ atendimento.get_tipo_demanda_display }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if atendimento.status == 'em_andamento' %}warning{% elif atendimento.status == 'concluido' %}success{% elif atendimento.status == 'em_analise' %}info{% else %}secondary{% endif %}">
+                                            {{ atendimento.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ atendimento.data_abertura|date:"d/m/Y" }}</td>
+                                    <td>
+                                        {% if atendimento.data_conclusao %}
+                                            {{ atendimento.data_conclusao|date:"d/m/Y" }}
+                                        {% else %}
+                                            <span class="text-muted">Em andamento</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'assejus:atendimento_detail' atendimento.pk %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye me-1"></i>
+                                            Ver
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-warning" onclick="openAtendimentoEditModal({{ atendimento.pk }})">
+                                            <i class="fas fa-edit me-1"></i>
+                                            Editar
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">Nenhum atendimento encontrado</h5>
+                        <p class="text-muted">Este advogado ainda não possui atendimentos jurídicos registrados.</p>
+                        <a href="{% url 'assejus:atendimento_create' %}?advogado={{ advogado.pk }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            Criar Primeiro Atendimento
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.foto-advogado {
+    border: 3px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.border-end {
+    border-right: 1px solid #dee2e6 !important;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-top: none;
+    font-weight: 600;
+    color: #495057;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Scripts específicos da página -->
+<script>
+// ============================================================================
+// SISTEMA DE MENSAGENS FLUTUANTES (IGUAL AO DE ASSOCIADOS)
+// ============================================================================
+
+/**
+ * Exibir mensagem de sucesso
+ */
+function showSuccessMessage(message) {
+    console.log('✅ Sucesso:', message);
+    
+    // Remover mensagens anteriores
+    removeMessages();
+    
+    // Criar mensagem de sucesso
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    successDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    successDiv.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(successDiv);
+    
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+        if (successDiv.parentNode) {
+            successDiv.remove();
+        }
+    }, 5000);
+}
+
+/**
+ * Exibir mensagem de erro
+ */
+function showErrorMessage(message) {
+    console.log('❌ Erro:', message);
+    
+    // Remover mensagens anteriores
+    removeMessages();
+    
+    // Criar mensagem de erro
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+    errorDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    errorDiv.innerHTML = `
+        <i class="fas fa-exclamation-circle me-2"></i>
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(errorDiv);
+    
+    // Auto-remover após 8 segundos
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 8000);
+}
+
+/**
+ * Remover mensagens existentes
+ */
+function removeMessages() {
+    document.querySelectorAll('.alert.position-fixed').forEach(alert => {
+        alert.remove();
+    });
+}
+
+// ============================================================================
+// FUNÇÃO PRINCIPAL PARA ABRIR MODAIS (IGUAL AO DE ASSOCIADOS)
+// ============================================================================
+
+/**
+ * Função principal para abrir modais de formulário
+ */
+function openFormModal(title, formHtml, formId, submitUrl) {
+    console.log('🔧 Abrindo modal:', title);
+    console.log('🔍 Form ID:', formId);
+    console.log('🔍 Submit URL:', submitUrl);
+    
+    // Remover modal anterior se existir
+    const existingModal = document.querySelector('.modal.show');
+    if (existingModal) {
+        const bsModal = bootstrap.Modal.getInstance(existingModal);
+        if (bsModal) {
+            bsModal.hide();
+        }
+        existingModal.remove();
+    }
+    
+    // Criar ID único para o modal
+    const modalId = 'formModal_' + Date.now();
+    
+    // Criar HTML do modal
+    const modalHtml = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="${modalId}Label">
+                            <i class="fas fa-edit me-2"></i>${title}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ${formHtml}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </button>
+                        <button type="submit" form="${formId}" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Salvar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Inserir modal no body
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    // Configurar envio do formulário
+    const form = document.getElementById(formId);
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            console.log('📝 Formulário submetido:', formId);
+            
+            // Coletar dados do formulário
+            const formData = new FormData(form);
+            
+            // Mostrar loading no botão
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Salvando...';
+            submitBtn.disabled = true;
+            
+            // Enviar dados
+            fetch(submitUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Resposta recebida:', data);
+                
+                if (data.success) {
+                    // Sucesso - mostrar mensagem e fechar modal
+                    showSuccessMessage(data.message || 'Operação realizada com sucesso!');
+                    
+                    // Fechar modal
+                    const modal = form.closest('.modal');
+                    if (modal) {
+                        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+                        if (bootstrapModal) {
+                            bootstrapModal.hide();
+                        }
+                    }
+                    
+                    // Recarregar página após um pequeno delay
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1500);
+                    
+                } else {
+                    // Erro - mostrar mensagem de erro
+                    showErrorMessage(data.message || 'Erro ao processar formulário');
+                    
+                    // Aplicar erros de validação se houver
+                    if (data.errors) {
+                        console.error('Erros de validação:', data.errors);
+                        // Aqui você pode implementar a exibição de erros nos campos
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('❌ Erro ao enviar formulário:', error);
+                showErrorMessage('Erro de conexão. Tente novamente.');
+            })
+            .finally(() => {
+                // Restaurar botão
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+    }
+    
+    // Abrir modal
+    const modal = new bootstrap.Modal(document.getElementById(modalId));
+    modal.show();
+    
+    return modal;
+}
+
+// ============================================================================
+// FUNÇÃO PARA EDITAR ADVOGADO (IGUAL AO DE ASSOCIADOS)
+// ============================================================================
+
+function openAdvogadoEditModal(advogadoId) {
+    console.log('🔍 Abrindo modal de edição para advogado:', advogadoId);
+    
+    fetch(`/assejus/advogados/${advogadoId}/editar/modal/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.form_html) {
+                if (typeof window.openFormModal === 'function') {
+                    openFormModal(
+                        'Editar Advogado',
+                        data.form_html,
+                        'advogadoForm',
+                        `/assejus/advogados/${advogadoId}/editar/modal/`
+                    );
+                } else {
+                    console.error('openFormModal não está disponível');
+                    showErrorMessage('Erro: Sistema de modais não disponível');
+                }
+            } else if (data.errors) {
+                // Se houver erros, exibir mensagem
+                console.error('Erros recebidos:', data.errors);
+                showErrorMessage('Erro ao carregar formulário: ' + (data.message || 'Erro desconhecido'));
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar formulário:', error);
+            showErrorMessage('Erro ao carregar formulário. Tente novamente.');
+        });
+}
+
+// ============================================================================
+// CONFIGURAÇÃO DOS BOTÕES - EXECUTADA QUANDO DOM ESTIVER PRONTO
+// ============================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DOMContentLoaded executado');
+    console.log('✅ openAdvogadoEditModal disponível:', typeof openAdvogadoEditModal);
+    console.log('✅ openFormModal disponível:', typeof openFormModal);
+    
+    // Configurar botão editar advogado
+    const editarAdvogadoBtn = document.getElementById('editarAdvogadoBtn');
+    if (editarAdvogadoBtn) {
+        console.log('🔍 Botão editar encontrado:', editarAdvogadoBtn);
+        
+        // Remover onclick inline se existir
+        editarAdvogadoBtn.removeAttribute('onclick');
+        
+        // Adicionar event listener
+        editarAdvogadoBtn.addEventListener('click', function() {
+            const advogadoId = editarAdvogadoBtn.dataset.advogadoId;
+            console.log('🔘 Botão Editar clicado, ID:', advogadoId);
+            
+            if (typeof openAdvogadoEditModal === 'function') {
+                console.log('✅ Chamando openAdvogadoEditModal...');
+                openAdvogadoEditModal(advogadoId);
+            } else {
+                console.error('❌ openAdvogadoEditModal não disponível');
+                showErrorMessage('Erro: Função não disponível. Recarregue a página.');
+            }
+        });
+        
+        console.log('✅ Botão Editar configurado com sucesso');
+    } else {
+        console.warn('⚠️ Botão editar não encontrado');
+    }
+    
+    // Adicionar botão de teste temporário
+    const testBtn = document.createElement('button');
+    testBtn.innerHTML = '🔧 TESTE MODAL';
+    testBtn.className = 'btn btn-warning btn-sm';
+    testBtn.style.position = 'fixed';
+    testBtn.style.top = '10px';
+    testBtn.style.right = '10px';
+    testBtn.style.zIndex = '9999';
+    testBtn.onclick = function() {
+        console.log('🔧 TESTE: Botão de teste clicado');
+        const advogadoId = {{ advogado.pk }};
+        console.log('🔧 TESTE: ID do advogado:', advogadoId);
+        
+        if (typeof openAdvogadoEditModal === 'function') {
+            console.log('✅ TESTE: Função disponível, chamando...');
+            openAdvogadoEditModal(advogadoId);
+        } else {
+            console.error('❌ TESTE: Função não disponível');
+            showErrorMessage('TESTE: Função não disponível');
+        }
+    };
+    document.body.appendChild(testBtn);
+    console.log('✅ Botão de teste adicionado');
+});
+
+// ============================================================================
+// LOGS DE DEBUG - EXECUTADOS IMEDIATAMENTE
+// ============================================================================
+
+console.log('🔧 DEBUG: Script carregado');
+console.log('🔧 DEBUG: openAdvogadoEditModal definida:', typeof openAdvogadoEditModal);
+console.log('🔧 DEBUG: openFormModal definida:', typeof openFormModal);
+console.log('🔧 DEBUG: Script completamente executado');
+</script>
+{% endblock %}

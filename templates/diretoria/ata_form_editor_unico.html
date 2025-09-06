@@ -1,0 +1,486 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    {% if ata %}Editar{% else %}Nova{% endif %} Ata de Reunião - ABMEPI
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'tinymce/css/prism.css' %}">
+<style>
+    .tox-tinymce {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.375rem !important;
+    }
+    .tox .tox-editor-header {
+        border-bottom: 1px solid #dee2e6 !important;
+    }
+    .tox .tox-toolbar__primary {
+        background: #f8f9fa !important;
+    }
+    .tox .tox-edit-area__iframe {
+        background: white !important;
+    }
+    .editor-container {
+        margin-bottom: 1rem;
+    }
+    .editor-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .editor-help {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    .template-selector {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    .template-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    .template-btn {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: background-color 0.15s ease-in-out;
+    }
+    .template-btn:hover {
+        background: #0056b3;
+    }
+    .template-btn.secondary {
+        background: #6c757d;
+    }
+    .template-btn.secondary:hover {
+        background: #545b62;
+    }
+    .editor-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    .action-btn {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        font-size: 0.875rem;
+        transition: background-color 0.15s ease-in-out;
+    }
+    .action-btn:hover {
+        background: #1e7e34;
+    }
+    .action-btn.secondary {
+        background: #6c757d;
+    }
+    .action-btn.secondary:hover {
+        background: #545b62;
+    }
+    .placeholders-info {
+        background: #e9ecef;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+    }
+    .placeholder-item {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        margin: 0.125rem;
+        font-family: monospace;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        {% if ata %}Editar{% else %}Nova{% endif %} Ata de Reunião
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Editor único com modelos prontos para criação de atas
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Voltar à Lista
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card do formulário -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-edit me-2"></i>
+                        Editor de Ata
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Informações Básicas -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <label for="{{ form.titulo.id_for_label }}" class="form-label">
+                                    <i class="fas fa-heading me-1"></i>
+                                    Título da Ata <span class="text-danger">*</span>
+                                </label>
+                                {{ form.titulo }}
+                                {% if form.titulo.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.titulo.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.tipo_reuniao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Tipo de Reunião <span class="text-danger">*</span>
+                                </label>
+                                {{ form.tipo_reuniao }}
+                                {% if form.tipo_reuniao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.tipo_reuniao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.data_reuniao.id_for_label }}" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Data e Hora <span class="text-danger">*</span>
+                                </label>
+                                {{ form.data_reuniao }}
+                                {% if form.data_reuniao.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.data_reuniao.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.local.id_for_label }}" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    Local <span class="text-danger">*</span>
+                                </label>
+                                {{ form.local }}
+                                {% if form.local.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.local.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.presidente.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-tie me-1"></i>
+                                    Presidente <span class="text-danger">*</span>
+                                </label>
+                                {{ form.presidente }}
+                                {% if form.presidente.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.presidente.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.secretario.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-edit me-1"></i>
+                                    Secretário <span class="text-danger">*</span>
+                                </label>
+                                {{ form.secretario }}
+                                {% if form.secretario.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.secretario.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="{{ form.membros_presentes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-users me-1"></i>
+                                    Membros Presentes <span class="text-danger">*</span>
+                                </label>
+                                {{ form.membros_presentes }}
+                                {% if form.membros_presentes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.membros_presentes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.membros_ausentes.id_for_label }}" class="form-label">
+                                    <i class="fas fa-user-times me-1"></i>
+                                    Membros Ausentes
+                                </label>
+                                {{ form.membros_ausentes }}
+                                {% if form.membros_ausentes.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.membros_ausentes.errors.0 }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Seletor de Templates -->
+                        <div class="template-selector">
+                            <h6 class="mb-3">
+                                <i class="fas fa-file-code me-2"></i>
+                                Modelos Prontos de Ata
+                            </h6>
+                            <div class="template-buttons">
+                                {% for template in templates %}
+                                <button type="button" class="template-btn" onclick="carregarTemplate('{{ template.id }}')">
+                                    <i class="fas fa-file-alt me-1"></i>
+                                    {{ template.nome }}
+                                </button>
+                                {% endfor %}
+                                <button type="button" class="template-btn secondary" onclick="limparEditor()">
+                                    <i class="fas fa-eraser me-1"></i>
+                                    Limpar Editor
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Placeholders Disponíveis -->
+                        <div class="placeholders-info">
+                            <strong>Placeholders disponíveis:</strong>
+                            <span class="placeholder-item">[TITULO]</span>
+                            <span class="placeholder-item">[DATA]</span>
+                            <span class="placeholder-item">[HORA]</span>
+                            <span class="placeholder-item">[LOCAL]</span>
+                            <span class="placeholder-item">[PRESIDENTE]</span>
+                            <span class="placeholder-item">[SECRETARIO]</span>
+                            <span class="placeholder-item">[PRESENTES]</span>
+                            <span class="placeholder-item">[AUSENTES]</span>
+                            <span class="placeholder-item">[TIPO_REUNIAO]</span>
+                        </div>
+
+                        <!-- Ações do Editor -->
+                        <div class="editor-actions">
+                            <button type="button" class="action-btn" onclick="inserirDataAtual()">
+                                <i class="fas fa-calendar-plus me-1"></i>
+                                Inserir Data Atual
+                            </button>
+                            <button type="button" class="action-btn" onclick="inserirHoraAtual()">
+                                <i class="fas fa-clock me-1"></i>
+                                Inserir Hora Atual
+                            </button>
+                            <button type="button" class="action-btn secondary" onclick="previsualizarAta()">
+                                <i class="fas fa-eye me-1"></i>
+                                Pré-visualizar
+                            </button>
+                        </div>
+
+                        <!-- Editor Principal -->
+                        <div class="editor-container">
+                            <label for="{{ form.conteudo_completo.id_for_label }}" class="editor-label">
+                                <i class="fas fa-edit me-1"></i>
+                                Conteúdo Completo da Ata <span class="text-danger">*</span>
+                            </label>
+                            {{ form.conteudo_completo }}
+                            {% if form.conteudo_completo.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.conteudo_completo.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <small class="editor-help">
+                                Use o editor rico para criar toda a ata. Os placeholders serão substituídos automaticamente pelos dados da reunião.
+                            </small>
+                        </div>
+
+                        <!-- Campos Ocultos para Compatibilidade -->
+                        <div style="display: none;">
+                            {{ form.pauta }}
+                            {{ form.deliberacoes }}
+                            {{ form.observacoes }}
+                        </div>
+
+                        <!-- Arquivo da Ata -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <label for="{{ form.arquivo_ata.id_for_label }}" class="form-label">
+                                    <i class="fas fa-file-pdf me-1"></i>
+                                    Arquivo da Ata
+                                </label>
+                                {{ form.arquivo_ata }}
+                                {% if form.arquivo_ata.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form.arquivo_ata.errors.0 }}
+                                    </div>
+                                {% endif %}
+                                <small class="form-text text-muted">
+                                    Arquivo PDF, DOC ou DOCX da ata (opcional)
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-outline-info me-2" onclick="salvarRascunho()">
+                                    <i class="fas fa-save me-2"></i>
+                                    Salvar Rascunho
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-check me-2"></i>
+                                    {% if ata %}Atualizar{% else %}Criar{% endif %} Ata
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ form.media }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Adicionar classes Bootstrap aos campos
+    const campos = document.querySelectorAll('input, select, textarea');
+    campos.forEach(campo => {
+        if (!campo.classList.contains('form-control')) {
+            campo.classList.add('form-control');
+        }
+    });
+
+    // Configurar TinyMCE
+    if (typeof tinymce !== 'undefined') {
+        tinymce.init({
+            selector: 'textarea[id*="conteudo_completo"]',
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
+                'template', 'codesample', 'hr', 'pagebreak', 'nonbreaking', 'toc'
+            ],
+            toolbar: 'undo redo | blocks | ' +
+                     'bold italic backcolor | alignleft aligncenter ' +
+                     'alignright alignjustify | bullist numlist outdent indent | ' +
+                     'removeformat | help | table | link | code | fullscreen | ' +
+                     'emoticons | template | codesample | hr | pagebreak | toc',
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();
+                    // Sincronizar com campos ocultos
+                    sincronizarCampos();
+                });
+            }
+        });
+    }
+});
+
+// Templates de ata carregados do servidor
+const templates = {
+    {% for template in templates %}
+    '{{ template.id }}': `{{ template.conteudo|escapejs }}`,
+    {% endfor %}
+};
+
+function carregarTemplate(templateId) {
+    if (tinymce.get('id_conteudo_completo') && templates[templateId]) {
+        tinymce.get('id_conteudo_completo').setContent(templates[templateId]);
+        sincronizarCampos();
+    }
+}
+
+function limparEditor() {
+    if (tinymce.get('id_conteudo_completo')) {
+        tinymce.get('id_conteudo_completo').setContent('');
+        sincronizarCampos();
+    }
+}
+
+function inserirDataAtual() {
+    const hoje = new Date();
+    const data = hoje.toLocaleDateString('pt-BR');
+    if (tinymce.get('id_conteudo_completo')) {
+        tinymce.get('id_conteudo_completo').insertContent(`<p>Data atual: ${data}</p>`);
+    }
+}
+
+function inserirHoraAtual() {
+    const agora = new Date();
+    const hora = agora.toLocaleTimeString('pt-BR');
+    if (tinymce.get('id_conteudo_completo')) {
+        tinymce.get('id_conteudo_completo').insertContent(`<p>Hora atual: ${hora}</p>`);
+    }
+}
+
+function previsualizarAta() {
+    if (tinymce.get('id_conteudo_completo')) {
+        const conteudo = tinymce.get('id_conteudo_completo').getContent();
+        const janela = window.open('', '_blank', 'width=800,height=600');
+        janela.document.write(`
+            <html>
+                <head>
+                    <title>Pré-visualização da Ata</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        h2 { color: #333; border-bottom: 2px solid #007bff; }
+                        h3 { color: #666; }
+                    </style>
+                </head>
+                <body>
+                    ${conteudo}
+                </body>
+            </html>
+        `);
+    }
+}
+
+function sincronizarCampos() {
+    // Esta função será implementada para sincronizar com os campos individuais
+    // Por enquanto, apenas salva o conteúdo
+}
+
+function salvarRascunho() {
+    // Implementar salvamento de rascunho
+    alert('Funcionalidade de rascunho será implementada em breve!');
+}
+</script>
+{% endblock %}

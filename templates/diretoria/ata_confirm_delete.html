@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Ata - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+                    
+                    <p>Tem certeza que deseja excluir a ata de reunião:</p>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ object.titulo }}</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Data:</strong> {{ object.data_reuniao|date:"d/m/Y" }}
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Tipo:</strong> {{ object.get_tipo_reuniao_display }}
+                                    </small>
+                                </div>
+                            </div>
+                            {% if object.local %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Local:</strong> {{ object.local }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                            {% if object.pauta %}
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <strong>Pauta:</strong> {{ object.pauta|truncatechars:100 }}
+                                    </small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {% if object.resolucoes.exists %}
+                        <div class="alert alert-danger mt-3">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Esta ata possui {{ object.resolucoes.count }} resolução(ões) relacionada(s).</strong>
+                            <br>
+                            Você não pode excluir uma ata que possui resoluções. 
+                            Primeiro, remova ou altere a ata de todas as resoluções relacionadas.
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'diretoria:ata_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancelar
+                            </a>
+                            {% if not object.resolucoes.exists %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-2"></i>
+                                    Sim, Excluir
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-danger" disabled>
+                                    <i class="fas fa-trash me-2"></i>
+                                    Não é possível excluir
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

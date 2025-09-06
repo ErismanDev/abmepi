@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Lista de Presença - {{ lista.evento.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:dashboard' %}">Administrativo</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:lista_presenca_list' %}">Listas de Presença</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:lista_presenca_detail' lista.pk %}">{{ lista.evento.titulo }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Excluir</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-trash fa-3x text-danger mb-3"></i>
+                    
+                    <h4 class="text-danger mb-3">Atenção!</h4>
+                    
+                    <p class="lead">Você está prestes a excluir a lista de presença para o evento:</p>
+                    <h5 class="mb-3">{{ lista.evento.titulo }}</h5>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Esta ação não pode ser desfeita!</strong><br>
+                        A lista de presença e todos os registros serão perdidos permanentemente.
+                    </div>
+
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6">
+                            <strong>Evento:</strong> {{ lista.evento.titulo }}<br>
+                            <strong>Data do Evento:</strong> {{ lista.evento.data_inicio|date:"d/m/Y" }}<br>
+                            <strong>Local:</strong> {{ lista.evento.local|default:"Não informado" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Data de Registro:</strong> {{ lista.data_registro|date:"d/m/Y H:i" }}<br>
+                            <strong>Participantes:</strong> {{ lista.presencas.count }}<br>
+                            <strong>Registrado por:</strong> {{ lista.usuario_registro.get_full_name|default:lista.usuario_registro.username }}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'administrativo:lista_presenca_detail' lista.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações adicionais -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        O que será excluído
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>A lista de presença para "{{ lista.evento.titulo }}"</li>
+                        <li>Todos os registros de presença ({{ lista.presencas.count }})</li>
+                        <li>Observações e configurações da lista</li>
+                        <li>Histórico de controle de presença</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

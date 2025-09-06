@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Evolução{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-trash text-danger"></i> 
+                    Excluir Evolução
+                </h1>
+                <div>
+                    {% if evolucao.sessao and evolucao.sessao.paciente %}
+                        <a href="{% url 'psicologia:paciente_detail' evolucao.sessao.paciente.pk %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar ao Paciente
+                        </a>
+                    {% else %}
+                        <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary shadow-sm">
+                            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar aos Pacientes
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-danger text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Confirmação de Exclusão
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h5 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Atenção!
+                        </h5>
+                        <p class="mb-0">
+                            Você está prestes a excluir permanentemente esta evolução clínica. 
+                            Esta ação não pode ser desfeita.
+                        </p>
+                    </div>
+
+                    <div class="card border-warning mb-3">
+                        <div class="card-header bg-warning text-dark">
+                            <h6 class="mb-0">Detalhes da Evolução</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Data:</strong> {{ evolucao.data_evolucao|date:"d/m/Y" }}</p>
+                                    <p><strong>Paciente:</strong> {{ evolucao.sessao.paciente.associado.nome }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Psicólogo:</strong> {{ evolucao.sessao.psicologo.nome_completo }}</p>
+                                    <p><strong>Sessão:</strong> {{ evolucao.sessao.data_hora|date:"d/m/Y H:i" }}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p><strong>Conteúdo:</strong></p>
+                                    <div class="border rounded p-2 bg-light">
+                                        {{ evolucao.conteudo|truncatewords:30 }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-trash"></i> 
+                                    Confirmar Exclusão
+                                </button>
+                                {% if evolucao.sessao and evolucao.sessao.paciente %}
+                                    <a href="{% url 'psicologia:paciente_detail' evolucao.sessao.paciente.pk %}" class="btn btn-secondary btn-lg ml-2">
+                                        <i class="fas fa-times"></i> 
+                                        Cancelar
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'psicologia:paciente_list' %}" class="btn btn-secondary btn-lg ml-2">
+                                        <i class="fas fa-times"></i> 
+                                        Cancelar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-4">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle"></i> 
+                                Alternativas à Exclusão
+                            </h6>
+                            <ul class="mb-0">
+                                <li><strong>Editar:</strong> Modifique a evolução em vez de excluí-la</li>
+                                <li><strong>Arquivar:</strong> Marque como inativa para manter o histórico</li>
+                                <li><strong>Anotar:</strong> Adicione uma observação sobre a correção</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

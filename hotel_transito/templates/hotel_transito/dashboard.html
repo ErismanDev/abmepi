@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Hotel de Trânsito{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'hotel_transito/css/modais.css' %}">
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stats-card h3 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0;
+    }
+    
+    .stats-card p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    
+    .quick-actions {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .quick-actions h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    
+    .quick-action-btn {
+        display: block;
+        width: 100%;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        text-align: left;
+        border: none;
+        background: #f8f9fa;
+        border-radius: 8px;
+        color: #495057;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-action-btn:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        text-decoration: none;
+    }
+    
+    .recent-activity {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .recent-activity h5 {
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+    
+    .activity-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-item h6 {
+        margin: 0;
+        color: #495057;
+        font-size: 0.9rem;
+    }
+    
+    .activity-item p {
+        margin: 0;
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-ativa { background: #d4edda; color: #155724; }
+    .status-finalizada { background: #cce5ff; color: #004085; }
+    .status-pendente { background: #fff3cd; color: #856404; }
+    .status-confirmada { background: #d1ecf1; color: #0c5460; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Cabeçalho da Página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Hotel de Trânsito</h1>
+            <p class="text-muted">Dashboard de controle e monitoramento</p>
+        </div>
+        <div>
+            <a href="{% url 'hotel_transito:quarto_create' %}" class="btn btn-primary me-2">
+                <i class="fas fa-plus"></i> Novo Quarto
+            </a>
+            <a href="{% url 'hotel_transito:hospede_create' %}" class="btn btn-success me-2">
+                <i class="fas fa-user-plus"></i> Novo Hóspede
+            </a>
+            <a href="{% url 'hotel_transito:reserva_create' %}" class="btn btn-info">
+                <i class="fas fa-calendar-plus"></i> Nova Reserva
+            </a>
+        </div>
+    </div>
+
+    <!-- Estatísticas Principais -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <h3>{{ total_quartos }}</h3>
+                <p>Total de Quartos</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <h3>{{ quartos_disponiveis }}</h3>
+                <p>Quartos Disponíveis</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <h3>{{ hospedagens_ativas }}</h3>
+                <p>Hospedagens Ativas</p>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stats-card">
+                <h3>{{ reservas_pendentes }}</h3>
+                <p>Reservas Pendentes</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Coluna Esquerda -->
+        <div class="col-xl-8">
+            <!-- Ações Rápidas -->
+            <div class="quick-actions">
+                <h5><i class="fas fa-bolt"></i> Ações Rápidas</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <a href="{% url 'hotel_transito:buscar_quartos_disponiveis' %}" class="quick-action-btn">
+                            <i class="fas fa-search"></i> Buscar Quartos Disponíveis
+                        </a>
+                        <a href="{% url 'hotel_transito:hospedagem_create' %}" class="quick-action-btn">
+                            <i class="fas fa-sign-in-alt"></i> Check-in Rápido
+                        </a>
+                        <a href="{% url 'hotel_transito:relatorio_hospedagem' %}" class="quick-action-btn">
+                            <i class="fas fa-chart-bar"></i> Relatórios
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'hotel_transito:quarto_list' %}" class="quick-action-btn">
+                            <i class="fas fa-bed"></i> Gerenciar Quartos
+                        </a>
+                        <a href="{% url 'hotel_transito:hospede_list' %}" class="quick-action-btn">
+                            <i class="fas fa-users"></i> Gerenciar Hóspedes
+                        </a>
+                        <a href="{% url 'hotel_transito:reserva_list' %}" class="quick-action-btn">
+                            <i class="fas fa-calendar-check"></i> Gerenciar Reservas
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas Hospedagens -->
+            <div class="recent-activity">
+                <h5><i class="fas fa-history"></i> Últimas Hospedagens</h5>
+                {% if ultimas_hospedagens %}
+                    {% for hospedagem in ultimas_hospedagens %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>{{ hospedagem.hospede.nome_completo }}</h6>
+                                <p>Quarto {{ hospedagem.quarto.numero }} - {{ hospedagem.data_entrada_real|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <span class="status-badge status-{{ hospedagem.status }}">
+                                {{ hospedagem.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Nenhuma hospedagem registrada.</p>
+                {% endif %}
+            </div>
+
+            <!-- Próximas Reservas -->
+            <div class="recent-activity">
+                <h5><i class="fas fa-calendar-alt"></i> Próximas Reservas</h5>
+                {% if proximas_reservas %}
+                    {% for reserva in proximas_reservas %}
+                    <div class="activity-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>{{ reserva.hospede.nome_completo }}</h6>
+                                <p>Quarto {{ reserva.quarto.numero }} - {{ reserva.data_entrada|date:"d/m/Y" }} a {{ reserva.data_saida|date:"d/m/Y" }}</p>
+                            </div>
+                            <span class="status-badge status-{{ reserva.status }}">
+                                {{ reserva.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted">Nenhuma reserva pendente.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Coluna Direita -->
+        <div class="col-xl-4">
+            <!-- Estatísticas Adicionais -->
+            <div class="recent-activity">
+                <h5><i class="fas fa-chart-pie"></i> Estatísticas</h5>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="p-3">
+                            <h4 class="text-primary">{{ quartos_ocupados }}</h4>
+                            <small class="text-muted">Ocupados</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3">
+                            <h4 class="text-warning">{{ quartos_manutencao }}</h4>
+                            <small class="text-muted">Manutenção</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row text-center">
+                    <div class="col-6">
+                        <div class="p-3">
+                            <h4 class="text-success">{{ reservas_confirmadas }}</h4>
+                            <small class="text-muted">Confirmadas</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3">
+                            <h4 class="text-info">{{ hospedes_associados }}</h4>
+                            <small class="text-muted">Associados</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Receita do Mês -->
+            <div class="recent-activity">
+                <h5><i class="fas fa-dollar-sign"></i> Receita do Mês</h5>
+                <div class="text-center">
+                    <h3 class="text-success">R$ {{ receita_mes|floatformat:2 }}</h3>
+                    <p class="text-muted">Total de hospedagens finalizadas</p>
+                </div>
+            </div>
+
+            <!-- Distribuição de Hóspedes -->
+            <div class="recent-activity">
+                <h5><i class="fas fa-users"></i> Distribuição de Hóspedes</h5>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Associados</span>
+                        <span>{{ hospedes_associados }}</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        {% if hospedes_associados or hospedes_nao_associados %}
+                            <div class="progress-bar bg-primary" style="width: {% widthratio hospedes_associados hospedes_associados|add:hospedes_nao_associados 100 %}%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Não Associados</span>
+                        <span>{{ hospedes_nao_associados }}</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                        {% if hospedes_associados or hospedes_nao_associados %}
+                            <div class="progress-bar bg-secondary" style="width: {% widthratio hospedes_nao_associados hospedes_associados|add:hospedes_nao_associados 100 %}%"></div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Links Úteis -->
+            <div class="recent-activity">
+                <h5><i class="fas fa-link"></i> Links Úteis</h5>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'hotel_transito:servico_adicional_list' %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-concierge-bell"></i> Serviços Adicionais
+                    </a>
+                    <a href="{% url 'hotel_transito:servico_utilizado_list' %}" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-list"></i> Serviços Utilizados
+                    </a>
+                    <a href="{% url 'hotel_transito:hospedagem_list' %}" class="btn btn-outline-success btn-sm">
+                        <i class="fas fa-clipboard-list"></i> Todas as Hospedagens
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'hotel_transito/js/modais.js' %}"></script>
+<script>
+    // Atualizar dashboard a cada 5 minutos
+    setInterval(function() {
+        location.reload();
+    }, 300000);
+
+    // Adicionar tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+{% endblock %}

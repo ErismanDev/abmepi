@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes da Reserva - {{ reserva.codigo_reserva }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-bed me-2"></i>
+        Detalhes da Reserva
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'hotel_transito:reserva_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Voltar
+            </a>
+            {% if reserva.status == 'pendente' and user.tipo_usuario in 'administrador_sistema,atendente_geral' %}
+            <form method="post" action="{% url 'hotel_transito:confirmar_reserva' reserva.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success" onclick="return confirm('Confirmar esta reserva?')">
+                    <i class="fas fa-check me-1"></i>
+                    Autorizar
+                </button>
+            </form>
+            <form method="post" action="{% url 'hotel_transito:cancelar_reserva' reserva.pk %}" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Cancelar esta reserva?')">
+                    <i class="fas fa-times me-1"></i>
+                    Negar
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Informações da Reserva -->
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Informações da Reserva
+                </h6>
+                <span class="badge bg-{% if reserva.status == 'pendente' %}warning{% elif reserva.status == 'confirmada' %}success{% elif reserva.status == 'cancelada' %}danger{% else %}secondary{% endif %} fs-6">
+                    {{ reserva.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Código:</dt>
+                            <dd class="col-sm-8"><strong>{{ reserva.codigo_reserva }}</strong></dd>
+                            
+                            <dt class="col-sm-4">Quarto:</dt>
+                            <dd class="col-sm-8">
+                                <a href="{% url 'hotel_transito:quarto_detail' reserva.quarto.pk %}" class="text-decoration-none">
+                                    {{ reserva.quarto.numero }} - {{ reserva.quarto.get_tipo_display }}
+                                </a>
+                            </dd>
+                            
+                            <dt class="col-sm-4">Data de Entrada:</dt>
+                            <dd class="col-sm-8">{{ reserva.data_entrada|date:"d/m/Y" }} às {{ reserva.hora_entrada|time:"H:i" }}</dd>
+                            
+                            <dt class="col-sm-4">Data de Saída:</dt>
+                            <dd class="col-sm-8">{{ reserva.data_saida|date:"d/m/Y" }} às {{ reserva.hora_saida|time:"H:i" }}</dd>
+                            
+                            <dt class="col-sm-4">Diárias:</dt>
+                            <dd class="col-sm-8">{{ reserva.quantidade_diarias }} dia{{ reserva.quantidade_diarias|pluralize }}</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <dl class="row">
+                            <dt class="col-sm-4">Valor Diária:</dt>
+                            <dd class="col-sm-8">R$ {{ reserva.valor_diaria|floatformat:2 }}</dd>
+                            
+                            <dt class="col-sm-4">Valor Total:</dt>
+                            <dd class="col-sm-8"><strong>R$ {{ reserva.valor_total|floatformat:2 }}</strong></dd>
+                            
+                            <dt class="col-sm-4">Data da Reserva:</dt>
+                            <dd class="col-sm-8">{{ reserva.data_reserva|date:"d/m/Y H:i" }}</dd>
+                            
+                            {% if reserva.data_confirmacao %}
+                            <dt class="col-sm-4">Data Confirmação:</dt>
+                            <dd class="col-sm-8">{{ reserva.data_confirmacao|date:"d/m/Y H:i" }}</dd>
+                            {% endif %}
+                            
+                            {% if reserva.data_cancelamento %}
+                            <dt class="col-sm-4">Data Cancelamento:</dt>
+                            <dd class="col-sm-8">{{ reserva.data_cancelamento|date:"d/m/Y H:i" }}</dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+                
+                {% if reserva.observacoes %}
+                <div class="mt-3">
+                    <h6>Observações:</h6>
+                    <p class="text-muted">{{ reserva.observacoes }}</p>
+                </div>
+                {% endif %}
+                
+                {% if reserva.motivo_cancelamento %}
+                <div class="mt-3">
+                    <h6>Motivo do Cancelamento:</h6>
+                    <p class="text-danger">{{ reserva.motivo_cancelamento }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informações do Hóspede -->
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user me-2"></i>
+                    Informações do Hóspede
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if reserva.hospede.foto %}
+                        <img src="{{ reserva.hospede.foto.url }}" alt="Foto do hóspede" class="rounded-circle" width="80" height="80">
+                    {% else %}
+                        <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user fa-2x text-white"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <dl class="row">
+                    <dt class="col-sm-5">Nome:</dt>
+                    <dd class="col-sm-7"><strong>{{ reserva.hospede.nome_completo }}</strong></dd>
+                    
+                    <dt class="col-sm-5">Tipo:</dt>
+                    <dd class="col-sm-7">{{ reserva.hospede.get_tipo_hospede_display }}</dd>
+                    
+                    {% if reserva.hospede.associado %}
+                    <dt class="col-sm-5">Associado:</dt>
+                    <dd class="col-sm-7">
+                        <a href="{% url 'associados:associado_detail' reserva.hospede.associado.pk %}" class="text-decoration-none">
+                            {{ reserva.hospede.associado.nome }}
+                        </a>
+                    </dd>
+                    {% endif %}
+                    
+                    <dt class="col-sm-5">Documento:</dt>
+                    <dd class="col-sm-7">{{ reserva.hospede.get_tipo_documento_display }}: {{ reserva.hospede.numero_documento }}</dd>
+                    
+                    {% if reserva.hospede.telefone %}
+                    <dt class="col-sm-5">Telefone:</dt>
+                    <dd class="col-sm-7">{{ reserva.hospede.telefone }}</dd>
+                    {% endif %}
+                    
+                    {% if reserva.hospede.email %}
+                    <dt class="col-sm-5">E-mail:</dt>
+                    <dd class="col-sm-7">{{ reserva.hospede.email }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+        
+        <!-- Informações do Quarto -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-bed me-2"></i>
+                    Informações do Quarto
+                </h6>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-5">Número:</dt>
+                    <dd class="col-sm-7"><strong>{{ reserva.quarto.numero }}</strong></dd>
+                    
+                    <dt class="col-sm-5">Tipo:</dt>
+                    <dd class="col-sm-7">{{ reserva.quarto.get_tipo_display }}</dd>
+                    
+                    <dt class="col-sm-5">Capacidade:</dt>
+                    <dd class="col-sm-7">{{ reserva.quarto.capacidade }} pessoa{{ reserva.quarto.capacidade|pluralize }}</dd>
+                    
+                    <dt class="col-sm-5">Valor Diária:</dt>
+                    <dd class="col-sm-7">R$ {{ reserva.quarto.valor_diaria|floatformat:2 }}</dd>
+                    
+                    <dt class="col-sm-5">Status:</dt>
+                    <dd class="col-sm-7">
+                        <span class="badge bg-{% if reserva.quarto.status == 'disponivel' %}success{% elif reserva.quarto.status == 'ocupado' %}danger{% elif reserva.quarto.status == 'reservado' %}warning{% else %}secondary{% endif %}">
+                            {{ reserva.quarto.get_status_display }}
+                        </span>
+                    </dd>
+                </dl>
+                
+                <h6 class="mt-3">Características:</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-{% if reserva.quarto.ar_condicionado %}check text-success{% else %}times text-danger{% endif %} me-2"></i>Ar Condicionado</li>
+                            <li><i class="fas fa-{% if reserva.quarto.tv %}check text-success{% else %}times text-danger{% endif %} me-2"></i>TV</li>
+                            <li><i class="fas fa-{% if reserva.quarto.wifi %}check text-success{% else %}times text-danger{% endif %} me-2"></i>Wi-Fi</li>
+                        </ul>
+                    </div>
+                    <div class="col-6">
+                        <ul class="list-unstyled">
+                            <li><i class="fas fa-{% if reserva.quarto.banheiro_privativo %}check text-success{% else %}times text-danger{% endif %} me-2"></i>Banheiro Privativo</li>
+                            <li><i class="fas fa-{% if reserva.quarto.frigobar %}check text-success{% else %}times text-danger{% endif %} me-2"></i>Frigobar</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

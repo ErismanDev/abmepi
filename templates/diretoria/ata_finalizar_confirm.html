@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Finalizar Ata - {{ ata.titulo }} - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Finalizar Ata
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Confirmação Necessária
+                        </h6>
+                        <p class="mb-0">
+                            Você está prestes a finalizar a ata <strong>"{{ ata.titulo }}"</strong>. 
+                            Esta ação mudará o status da ata para "Finalizada".
+                        </p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6>Detalhes da Ata:</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Título:</strong> {{ ata.titulo }}</li>
+                            <li><strong>Tipo:</strong> {{ ata.get_tipo_reuniao_display }}</li>
+                            <li><strong>Data:</strong> {{ ata.data_reuniao|date:"d/m/Y H:i" }}</li>
+                            <li><strong>Local:</strong> {{ ata.local }}</li>
+                            <li><strong>Status Atual:</strong> {{ ata.get_status_display }}</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            O que acontece ao finalizar?
+                        </h6>
+                        <ul class="mb-0">
+                            <li>A ata será marcada como "Finalizada"</li>
+                            <li>Você ainda poderá editar o conteúdo se necessário</li>
+                            <li>A ata estará pronta para assinatura</li>
+                            <li>O status será visível na lista de atas</li>
+                        </ul>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'diretoria:ata_simples_edit' ata.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-check me-2"></i>
+                                Sim, Finalizar Ata
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

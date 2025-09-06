@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Solicitar Benefício - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'beneficios:dashboard' %}">Benefícios</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Solicitar Benefício</li>
+        </ol>
+    </nav>
+
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-gift me-2"></i>
+                Solicitar Benefício
+            </h1>
+            <p class="text-muted mb-0">
+                Solicite um benefício disponível através dos nossos convênios
+            </p>
+        </div>
+        <a href="{% url 'beneficios:beneficio_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Formulário de Solicitação -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Dados da Solicitação
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="solicitarBeneficioForm">
+                        {% csrf_token %}
+                        
+                        <!-- Campo Convênio -->
+                        <div class="mb-4">
+                            <label for="{{ form.convenio.id_for_label }}" class="form-label">
+                                <strong>Convênio *</strong>
+                            </label>
+                            {{ form.convenio }}
+                            {% if form.convenio.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.convenio.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Selecione o convênio para o qual deseja solicitar o benefício
+                            </small>
+                        </div>
+
+                        <!-- Campo Observações -->
+                        <div class="mb-4">
+                            <label for="{{ form.observacoes.id_for_label }}" class="form-label">
+                                <strong>Observações</strong>
+                            </label>
+                            {{ form.observacoes }}
+                            {% if form.observacoes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {% for error in form.observacoes.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <small class="form-text text-muted">
+                                Descreva detalhes adicionais sobre sua solicitação (opcional)
+                            </small>
+                        </div>
+
+                        <!-- Botões -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% url 'beneficios:beneficio_list' %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Enviar Solicitação
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Informações do Associado -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Seus Dados
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="avatar-circle me-3">
+                            {% if user.associado.foto %}
+                                <img src="{{ user.associado.foto.url }}" alt="Avatar" class="avatar-img">
+                            {% else %}
+                                <i class="fas fa-user"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{ user.associado.nome_completo }}</h6>
+                            <small class="text-muted">{{ user.associado.cpf }}</small>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-2">
+                        <strong>Matrícula:</strong>
+                        <span class="text-muted">{{ user.associado.matricula|default:"-" }}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Status:</strong>
+                        <span class="badge bg-success">{{ user.associado.get_status_display }}</span>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <strong>Data de Associação:</strong>
+                        <span class="text-muted">{{ user.associado.data_associacao|date:"d/m/Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informações sobre Benefícios -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informações
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        <strong>Dica:</strong> Selecione o convênio desejado e descreva sua necessidade. 
+                        Sua solicitação será analisada pela equipe responsável.
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-clock me-2"></i>
+                        <strong>Prazo:</strong> As solicitações são processadas em até 5 dias úteis.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Adicionar classes Bootstrap aos campos do formulário
+    $('#{{ form.convenio.id_for_label }}').addClass('form-select');
+    $('#{{ form.observacoes.id_for_label }}').addClass('form-control');
+    
+    // Validação do formulário
+    $('#solicitarBeneficioForm').on('submit', function(e) {
+        var convenio = $('#{{ form.convenio.id_for_label }}').val();
+        
+        if (!convenio) {
+            e.preventDefault();
+            alert('Por favor, selecione um convênio.');
+            $('#{{ form.convenio.id_for_label }}').focus();
+            return false;
+        }
+        
+        // Mostrar loading no botão
+        var submitBtn = $(this).find('button[type="submit"]');
+        var originalText = submitBtn.html();
+        submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Enviando...');
+        
+        // Reabilitar botão após 5 segundos (caso haja erro)
+        setTimeout(function() {
+            submitBtn.prop('disabled', false).html(originalText);
+        }, 5000);
+    });
+    
+    // Limpar mensagens de erro ao alterar campos
+    $('#{{ form.convenio.id_for_label }}, #{{ form.observacoes.id_for_label }}').on('change input', function() {
+        $(this).removeClass('is-invalid');
+        $(this).siblings('.invalid-feedback').hide();
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eventos - ASSEJUS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Eventos
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie todos os eventos da associação
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'administrativo:evento_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Evento
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros de busca -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Título, descrição ou local...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="tipo" class="form-label">Tipo</label>
+                            <select class="form-control" id="tipo" name="tipo">
+                                <option value="">Todos os tipos</option>
+                                <option value="reuniao" {% if tipo == 'reuniao' %}selected{% endif %}>Reunião</option>
+                                <option value="palestra" {% if tipo == 'palestra' %}selected{% endif %}>Palestra</option>
+                                <option value="workshop" {% if tipo == 'workshop' %}selected{% endif %}>Workshop</option>
+                                <option value="congresso" {% if tipo == 'congresso' %}selected{% endif %}>Congresso</option>
+                                <option value="seminario" {% if tipo == 'seminario' %}selected{% endif %}>Seminário</option>
+                                <option value="treinamento" {% if tipo == 'treinamento' %}selected{% endif %}>Treinamento</option>
+                                <option value="outro" {% if tipo == 'outro' %}selected{% endif %}>Outro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-control" id="status" name="status">
+                                <option value="">Todos os status</option>
+                                <option value="agendado" {% if status == 'agendado' %}selected{% endif %}>Agendado</option>
+                                <option value="em_andamento" {% if status == 'em_andamento' %}selected{% endif %}>Em Andamento</option>
+                                <option value="concluido" {% if status == 'concluido' %}selected{% endif %}>Concluído</option>
+                                <option value="cancelado" {% if status == 'cancelado' %}selected{% endif %}>Cancelado</option>
+                                <option value="adiado" {% if status == 'adiado' %}selected{% endif %}>Adiado</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-2"></i>
+                                    Filtrar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de eventos -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list me-2"></i>
+                        Lista de Eventos
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if page_obj %}
+                        <div class="table-container">
+                            <div class="table-header">
+                                <h5>
+                                    <i class="fas fa-calendar me-2"></i>
+                                    Lista de Eventos
+                                </h5>
+                                <div class="header-actions">
+                                    <span class="text-muted">
+                                        {{ page_obj.start_index|default:1 }}-{{ page_obj.end_index|default:page_obj|length }} de {{ page_obj.paginator.count|default:page_obj|length }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Data/Hora</th>
+                                        <th>Local</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evento in page_obj %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ evento.titulo }}</strong>
+                                            {% if evento.descricao %}
+                                                <br>
+                                                <small class="text-muted">{{ evento.descricao|truncatechars:60 }}</small>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">
+                                                {{ evento.get_tipo_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ evento.data_inicio|date:"d/m/Y" }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ evento.data_inicio|time:"H:i" }} - {{ evento.data_fim|time:"H:i" }}</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <strong>{{ evento.local }}</strong>
+                                                {% if evento.endereco %}
+                                                    <br>
+                                                    <small class="text-muted">{{ evento.endereco|truncatechars:40 }}</small>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{% if evento.status == 'agendado' %}primary{% elif evento.status == 'em_andamento' %}warning{% elif evento.status == 'concluido' %}success{% elif evento.status == 'cancelado' %}danger{% else %}secondary{% endif %}">
+                                                {{ evento.get_status_display }}
+                                            </span>
+                                            <br>
+                                            <small class="text-muted">
+                                                {% if evento.ativo %}
+                                                    <span class="text-success">Ativo</span>
+                                                {% else %}
+                                                    <span class="text-danger">Inativo</span>
+                                                {% endif %}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="{% url 'administrativo:evento_detail' pk=evento.pk %}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye me-1"></i>
+                                                    Ver
+                                                </a>
+                                                <a href="{% url 'administrativo:evento_update' pk=evento.pk %}" 
+                                                   class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit me-1"></i>
+                                                    Editar
+                                                </a>
+                                                <a href="{% url 'administrativo:evento_delete' pk=evento.pk %}" 
+                                                   class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash me-1"></i>
+                                                    Excluir
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginação -->
+                {% if page_obj.has_other_pages %}
+                <div class="pagination-container">
+                    <nav aria-label="Navegação de páginas">
+                        <ul class="pagination">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                                            <i class="fas fa-angle-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                                            <i class="fas fa-angle-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                                                {{ num }}
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                                            <i class="fas fa-angle-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if tipo %}&tipo={{ tipo }}{% endif %}{% if status %}&status={{ status }}{% endif %}">
+                                            <i class="fas fa-angle-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="table-info">
+                        <div class="info-text">
+                            <i class="fas fa-calendar-times"></i>
+                            <span>Nenhum evento encontrado</span>
+                        </div>
+                        <div class="header-actions">
+                            <a href="{% url 'administrativo:evento_create' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Criar Evento
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

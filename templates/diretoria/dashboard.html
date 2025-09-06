@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Diretoria - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-users-cog me-2"></i>
+                        Dashboard - Diretoria
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Gerencie a diretoria, atas de reunião e resoluções
+                    </p>
+                </div>
+                <div>
+                    <a href="{% url 'diretoria:membro_create' %}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Membro
+                    </a>
+                </div>
+            </div>
+
+            <!-- Cards de estatísticas -->
+            <div class="row mb-4">
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-primary shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                        Membros Ativos
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_membros }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-users fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-success shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                        Cargos Cadastrados
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_cargos }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-info shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                        Reuniões Este Mês
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ reunioes_mes }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-md-6 mb-4">
+                    <div class="card border-left-warning shadow h-100 py-2">
+                        <div class="card-body">
+                            <div class="row no-gutters align-items-center">
+                                <div class="col mr-2">
+                                    <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                        Resoluções Este Ano
+                                    </div>
+                                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ resolucoes_ano }}</div>
+                                </div>
+                                <div class="col-auto">
+                                    <i class="fas fa-file-contract fa-2x text-gray-300"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membros da Diretoria -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-users me-2"></i>
+                                Membros da Diretoria
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% if membros_ativos %}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Cargo</th>
+                                                <th>Nome</th>
+                                                <th>Período</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for membro in membros_ativos %}
+                                            <tr>
+                                                <td>
+                                                    <span class="badge badge-primary">{{ membro.cargo.nome }}</span>
+                                                </td>
+                                                <td>{{ membro.associado.nome }}</td>
+                                                <td>
+                                                    {{ membro.data_inicio|date:"d/m/Y" }}
+                                                    {% if membro.data_fim %}
+                                                        - {{ membro.data_fim|date:"d/m/Y" }}
+                                                    {% else %}
+                                                        - Atual
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if membro.ativo %}
+                                                        <span class="badge badge-success">Ativo</span>
+                                                    {% else %}
+                                                        <span class="badge badge-secondary">Inativo</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <a href="{% url 'diretoria:membro_update' membro.pk %}" 
+                                                           class="btn btn-sm btn-outline-primary" title="Editar">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="{% url 'diretoria:membro_delete' membro.pk %}" 
+                                                           class="btn btn-sm btn-outline-danger" title="Excluir">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">Nenhum membro da diretoria cadastrado.</p>
+                                    <a href="{% url 'diretoria:membro_create' %}" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>
+                                        Adicionar Primeiro Membro
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar com links rápidos -->
+                <div class="col-lg-4">
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-tools me-2"></i>
+                                Ações Rápidas
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <a href="{% url 'diretoria:cargo_list' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-briefcase me-2"></i>
+                                    Gerenciar Cargos
+                                </a>
+                                <a href="{% url 'diretoria:membro_list' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-users me-2"></i>
+                                    Gerenciar Membros
+                                </a>
+                                <a href="{% url 'diretoria:ata_list' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-calendar me-2"></i>
+                                    Atas de Reunião
+                                </a>
+                                <a href="{% url 'diretoria:resolucao_list' %}" class="list-group-item list-group-item-action">
+                                    <i class="fas fa-file-contract me-2"></i>
+                                    Resoluções
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Últimas reuniões -->
+                    {% if ultimas_reunioes %}
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-calendar me-2"></i>
+                                Últimas Reuniões
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            {% for reuniao in ultimas_reunioes %}
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-calendar-alt text-primary"></i>
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">{{ reuniao.titulo }}</h6>
+                                    <small class="text-muted">{{ reuniao.data_reuniao|date:"d/m/Y H:i" }}</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            <div class="text-center">
+                                <a href="{% url 'diretoria:ata_list' %}" class="btn btn-sm btn-outline-primary">
+                                    Ver Todas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

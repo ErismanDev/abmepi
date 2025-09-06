@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Excluir Cargo - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning me-2"></i>
+                        <strong>Atenção!</strong> Esta ação não pode ser desfeita.
+                    </div>
+                    
+                    <p>Tem certeza que deseja excluir o cargo:</p>
+                    
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ object.nome }}</h6>
+                            {% if object.descricao %}
+                                <p class="card-text">{{ object.descricao }}</p>
+                            {% endif %}
+                            <div class="row">
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Ordem:</strong> {{ object.ordem_hierarquica }}
+                                    </small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">
+                                        <strong>Status:</strong> 
+                                        {% if object.ativo %}
+                                            <span class="text-success">Ativo</span>
+                                        {% else %}
+                                            <span class="text-secondary">Inativo</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if object.membros.exists %}
+                        <div class="alert alert-danger mt-3">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Este cargo possui {{ object.membros.count }} membro(s) associado(s).</strong>
+                            <br>
+                            Você não pode excluir um cargo que possui membros. 
+                            Primeiro, remova ou altere o cargo de todos os membros associados.
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'diretoria:cargo_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Cancelar
+                            </a>
+                            {% if not object.membros.exists %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fas fa-trash me-2"></i>
+                                    Sim, Excluir
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-danger" disabled>
+                                    <i class="fas fa-trash me-2"></i>
+                                    Não é possível excluir
+                                </button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

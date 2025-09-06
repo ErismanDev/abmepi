@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Modelos de Ata - ABMEPI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Cabeçalho da página -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-save me-2"></i>
+                        Modelos de Ata
+                    </h1>
+                    <p class="text-muted mb-0">Modelos de ata disponíveis para uso</p>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="search" class="form-label">Buscar</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                   value="{{ search }}" placeholder="Nome ou descrição...">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <select class="form-select" id="categoria" name="categoria">
+                                <option value="">Todas as categorias</option>
+                                {% for value, label in categorias %}
+                                    <option value="{{ value }}" {% if categoria_atual == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search me-1"></i>
+                                    Buscar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Lista de modelos -->
+            {% if modelos %}
+                <div class="row">
+                    {% for modelo in modelos %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+                            <div class="card h-100 modelo-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">{{ modelo.nome }}</h6>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                                    data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="#" onclick="useModelo({{ modelo.id }})">
+                                                        <i class="fas fa-download me-2"></i>Usar Modelo
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="#" onclick="previewModelo({{ modelo.id }})">
+                                                        <i class="fas fa-eye me-2"></i>Visualizar
+                                                    </a>
+                                                </li>
+                                                {% if modelo.criado_por == request.user %}
+                                                <li>
+                                                    <a class="dropdown-item text-danger" href="#" onclick="excluirModelo({{ modelo.id }})">
+                                                        <i class="fas fa-trash me-2"></i>Excluir
+                                                    </a>
+                                                </li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text small text-muted mb-3">
+                                        {{ modelo.descricao|truncatechars:100|default:"Sem descrição" }}
+                                    </p>
+                                    
+                                    <div class="row text-center mb-3">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Categoria</small>
+                                            <span class="badge bg-secondary">{{ modelo.get_categoria_display }}</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Status</small>
+                                            {% if modelo.publico %}
+                                                <span class="badge bg-success">Público</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Privado</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>{{ modelo.criado_por.get_full_name|default:modelo.criado_por.username }}
+                                            <br>
+                                            <i class="fas fa-calendar me-1"></i>{{ modelo.data_criacao|date:"d/m/Y" }}
+                                        </small>
+                                        <div>
+                                            <button class="btn btn-sm btn-primary" onclick="useModelo({{ modelo.id }})">
+                                                <i class="fas fa-download me-1"></i>
+                                                Usar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-save fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhum modelo encontrado</h4>
+                    <p class="text-muted">
+                        {% if search or categoria_atual %}
+                            Tente ajustar os filtros de busca.
+                        {% else %}
+                            Não há modelos de ata disponíveis no momento.
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function usarModelo(modeloId) {
+    // Implementar lógica para usar o modelo
+    console.log('Usando modelo:', modeloId);
+    // Aqui você pode redirecionar para uma página de criação de ata com o modelo pré-carregado
+    // window.location.href = '/diretoria/atas/nova/?modelo=' + modeloId;
+}
+
+function excluirModelo(modeloId) {
+    if (confirm('Tem certeza que deseja excluir este modelo?')) {
+        // Implementar lógica para excluir o modelo
+        console.log('Excluindo modelo:', modeloId);
+        // Aqui você pode fazer uma requisição AJAX para excluir o modelo
+    }
+}
+</script>
+{% endblock %}

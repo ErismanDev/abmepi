@@ -1,0 +1,236 @@
+{% load crispy_forms_tags %}
+
+<form method="post" enctype="multipart/form-data" id="associadoForm" novalidate>
+    {% csrf_token %}
+    
+    <!-- Dados Pessoais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-user me-2"></i>
+            <h6 class="mb-0">Dados Pessoais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.nome|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.cpf|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.rg|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.data_nascimento|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.sexo|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.estado_civil|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.foto|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.naturalidade|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.nacionalidade|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Contato -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-address-book me-2"></i>
+            <h6 class="mb-0">Contato</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.email|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.telefone|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.celular|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Dados dos Pais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-users me-2"></i>
+            <h6 class="mb-0">Dados dos Pais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.nome_pai|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.nome_mae|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Endereço -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            <h6 class="mb-0">Endereço</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-3">
+                {{ form.cep|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.rua|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-3">
+                {{ form.numero|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.complemento|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.bairro|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.cidade|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.estado|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Dados Funcionais -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-award me-2"></i>
+            <h6 class="mb-0">Dados Funcionais</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form.tipo_socio|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.tipo_profissional|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.matricula_militar|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.posto_graduacao|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.unidade_lotacao|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.data_ingresso|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.situacao|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.nome_civil|as_crispy_field }}
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.tipo_documento|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Configurações do Associado -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-cog me-2"></i>
+            <h6 class="mb-0">Configurações</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label">
+                        <i class="fas fa-toggle-on me-2"></i>
+                        Status do Associado
+                    </label>
+                    <div class="form-check form-switch">
+                        {{ form.ativo }}
+                        <label class="form-check-label" for="{{ form.ativo.id_for_label }}">
+                            <span class="status-label">
+                                {% if form.ativo.value %}
+                                    <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </span>
+                        </label>
+                    </div>
+                    <div class="form-text">
+                        Marque esta opção para manter o associado ativo no sistema
+                    </div>
+                    <!-- Debug info -->
+                    <small class="text-muted">
+                        Valor atual: {{ form.ativo.value|yesno:"True,False" }} | 
+                        Campo name: {{ form.ativo.name }}
+                    </small>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                {{ form.usuario|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Observações -->
+    <div class="form-section">
+        <div class="form-section-header">
+            <i class="fas fa-sticky-note me-2"></i>
+            <h6 class="mb-0">Observações</h6>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-12">
+                {{ form.observacoes|as_crispy_field }}
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+

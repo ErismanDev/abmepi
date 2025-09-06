@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Atendimentos Jurídicos{% endblock %}
+
+{% block extra_css %}
+<style>
+    .modal-lg {
+        max-width: 800px;
+    }
+    
+    .btn-group .btn {
+        margin-right: 0.25rem;
+    }
+    
+    .btn-group .btn:last-child {
+        margin-right: 0;
+    }
+    
+    /* Estilos para o formulário do modal */
+    .modal-form .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .modal-form .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .modal-form .form-control,
+    .modal-form .form-select,
+    .modal-form textarea {
+        border-radius: 0.375rem;
+        border: 1px solid #ced4da;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .modal-form .form-control:focus,
+    .modal-form .form-select:focus,
+    .modal-form textarea:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .modal-form .invalid-feedback {
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .modal-form .form-text {
+        font-size: 0.8rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .modal-form h6 {
+        color: #0d6efd;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .modal-form .border-bottom {
+        border-color: #dee2e6 !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-gavel me-2"></i>
+                        Atendimentos Jurídicos
+                    </h4>
+                    <button type="button" class="btn btn-primary" onclick="openAtendimentoModal()">
+                        <i class="fas fa-plus me-2"></i>
+                        Novo Atendimento
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if atendimentos %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Associado</th>
+                                        <th>Advogado</th>
+                                        <th>Data</th>
+                                        <th>Status</th>
+                                        <th>Tipo</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for atendimento in atendimentos %}
+                                    <tr>
+                                        <td>{{ atendimento.id }}</td>
+                                        <td>
+                                            <strong>{{ atendimento.associado.nome }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ atendimento.associado.cpf }}</small>
+                                        </td>
+                                        <td>
+                                            <strong>{{ atendimento.advogado.nome }}</strong>
+                                            <br>
+                                            <small class="text-muted">{{ atendimento.advogado.oab }}</small>
+                                        </td>
+                                        <td>
+                                            {{ atendimento.data_atendimento|date:"d/m/Y" }}
+                                            <br>
+                                            <small class="text-muted">{{ atendimento.data_atendimento|date:"H:i" }}</small>
+                                        </td>
+                                        <td>
+                                            {% if atendimento.status == 'pendente' %}
+                                                <span class="badge bg-warning">Pendente</span>
+                                            {% elif atendimento.status == 'em_andamento' %}
+                                                <span class="badge bg-info">Em Andamento</span>
+                                            {% elif atendimento.status == 'concluido' %}
+                                                <span class="badge bg-success">Concluído</span>
+                                            {% elif atendimento.status == 'cancelado' %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ atendimento.status|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if atendimento.tipo_atendimento == 'consulta' %}
+                                                <span class="badge bg-primary">Consulta</span>
+                                            {% elif atendimento.tipo_atendimento == 'processo' %}
+                                                <span class="badge bg-success">Processo</span>
+                                            {% elif atendimento.tipo_atendimento == 'documento' %}
+                                                <span class="badge bg-info">Documento</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ atendimento.tipo_atendimento|title }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                        onclick="openAtendimentoDetailModal({{ atendimento.id }})"
+                                                        title="Visualizar Detalhes">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                        onclick="openAtendimentoEditModal({{ atendimento.id }})"
+                                                        title="Editar Atendimento">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        onclick="confirmarExclusao({{ atendimento.id }})"
+                                                        title="Excluir Atendimento">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum atendimento encontrado</h5>
+                            <p class="text-muted">Clique no botão "Novo Atendimento" para criar o primeiro.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal de confirmação para exclusão -->
+<div class="modal fade" id="confirmacaoModal" tabindex="-1" aria-labelledby="confirmacaoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmacaoModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <i class="fas fa-trash-alt fa-3x text-danger mb-3"></i>
+                    <h6 class="text-danger">Atenção!</h6>
+                    <p>Tem certeza que deseja excluir este atendimento?</p>
+                    <p class="text-danger fw-bold">Esta ação não pode ser desfeita.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarExclusao">
+                    <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Função para confirmar exclusão
+function confirmarExclusao(atendimentoId) {
+    const modal = new bootstrap.Modal(document.getElementById('confirmacaoModal'));
+    modal.show();
+    
+    // Configurar o botão de confirmação
+    document.getElementById('btnConfirmarExclusao').onclick = function() {
+        excluirAtendimento(atendimentoId);
+        modal.hide();
+    };
+}
+
+// Função para excluir atendimento
+function excluirAtendimento(atendimentoId) {
+    if (typeof showProgressMessage === 'function') {
+        showProgressMessage('Excluindo atendimento...');
+    }
+    
+    fetch(`/assejus/atendimentos/${atendimentoId}/delete/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            if (typeof showSuccessMessage === 'function') {
+                showSuccessMessage(data.message || 'Atendimento excluído com sucesso!');
+            } else {
+                alert(data.message || 'Atendimento excluído com sucesso!');
+            }
+            // Recarregar a página para atualizar a lista
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
+        } else {
+            if (typeof showErrorMessage === 'function') {
+                showErrorMessage(data.message || 'Erro ao excluir atendimento.');
+            } else {
+                alert(data.message || 'Erro ao excluir atendimento.');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao excluir atendimento:', error);
+        if (typeof showErrorMessage === 'function') {
+            showErrorMessage('Erro ao excluir atendimento. Tente novamente.');
+        } else {
+            alert('Erro ao excluir atendimento. Tente novamente.');
+        }
+    })
+    .finally(() => {
+        if (typeof removeProgressMessage === 'function') {
+            removeProgressMessage();
+        }
+    });
+}
+
+// Adicionar token CSRF ao DOM
+document.addEventListener('DOMContentLoaded', function() {
+    // Criar token CSRF se não existir
+    if (!document.querySelector('[name=csrfmiddlewaretoken]')) {
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = 'csrfmiddlewaretoken';
+        csrfToken.value = '{{ csrf_token }}';
+        document.body.appendChild(csrfToken);
+    }
+});
+</script>
+
+<!-- Incluir template base de modais -->
+{% include 'assejus/modal_base.html' %}
+
+<script>
+// Funções específicas para o formulário de atendimento
+document.addEventListener('DOMContentLoaded', function() {
+    // Função para inicializar validações do formulário quando o modal for aberto
+    window.initializeAtendimentoForm = function() {
+        const form = document.getElementById('atendimentoForm');
+        if (form) {
+            // Atualizar campo de advogado responsável
+            const advogadoField = form.querySelector('select[name="advogado_responsavel"]');
+            
+            if (advogadoField) {
+                advogadoField.addEventListener('change', function() {
+                    if (this.value) {
+                        console.log('Advogado selecionado:', this.value);
+                    }
+                });
+            }
+            
+            // Validação de data limite
+            const dataLimiteField = form.querySelector('input[name="data_limite"]');
+            if (dataLimiteField) {
+                dataLimiteField.addEventListener('change', function() {
+                    const selectedDate = new Date(this.value);
+                    const today = new Date();
+                    
+                    if (selectedDate < today) {
+                        this.classList.add('is-invalid');
+                        let feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (!feedback) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback d-block';
+                            this.parentNode.appendChild(feedback);
+                        }
+                        feedback.textContent = 'A data limite não pode ser anterior a hoje.';
+                    } else {
+                        this.classList.remove('is-invalid');
+                        const feedback = this.parentNode.querySelector('.invalid-feedback');
+                        if (feedback) {
+                            feedback.remove();
+                        }
+                    }
+                });
+            }
+            
+            // Atualizar status baseado na prioridade
+            const prioridadeField = form.querySelector('select[name="prioridade"]');
+            const statusField = form.querySelector('select[name="status"]');
+            
+            if (prioridadeField && statusField) {
+                prioridadeField.addEventListener('change', function() {
+                    const prioridade = this.value;
+                    
+                    // Se prioridade for alta ou urgente, sugerir status "em_andamento"
+                    if (prioridade === 'alta' || prioridade === 'urgente') {
+                        if (statusField.value === 'aberto') {
+                            statusField.value = 'em_andamento';
+                        }
+                    }
+                });
+            }
+        }
+    };
+});
+</script>
+
+{% endblock %}

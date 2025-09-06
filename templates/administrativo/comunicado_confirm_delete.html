@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Comunicado - {{ comunicado.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:dashboard' %}">Administrativo</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:comunicado_list' %}">Comunicados</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:comunicado_detail' comunicado.pk %}">{{ comunicado.titulo }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Excluir</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-trash fa-3x text-danger mb-3"></i>
+                    
+                    <h4 class="text-danger mb-3">Atenção!</h4>
+                    
+                    <p class="lead">Você está prestes a excluir o comunicado:</p>
+                    <h5 class="mb-3">{{ comunicado.titulo }}</h5>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Esta ação não pode ser desfeita!</strong><br>
+                        O comunicado e todos os seus dados serão perdidos permanentemente.
+                    </div>
+
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6">
+                            <strong>Tipo:</strong> {{ comunicado.get_tipo_display }}<br>
+                            <strong>Prioridade:</strong> {{ comunicado.get_prioridade_display }}<br>
+                            <strong>Status:</strong> 
+                            <span class="badge bg-{{ comunicado.ativo|yesno:'success,danger' }}">
+                                {{ comunicado.get_ativo_display }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Autor:</strong> {{ comunicado.autor.get_full_name|default:comunicado.autor.username }}<br>
+                            <strong>Publicado em:</strong> {{ comunicado.data_publicacao|date:"d/m/Y H:i" }}<br>
+                            <strong>Criado em:</strong> {{ comunicado.data_criacao|date:"d/m/Y H:i" }}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="#" class="btn btn-secondary" onclick="openComunicadoModalFromLink(event, {{ comunicado.pk }})">
+                                <i class="fas fa-eye me-2"></i>Ver Comunicado
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-2"></i>Confirmar Exclusão
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações adicionais -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        O que será excluído
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>O comunicado "{{ comunicado.titulo }}"</li>
+                        <li>Todo o conteúdo e formatação</li>
+                        {% if comunicado.arquivo_anexo %}
+                            <li>O arquivo anexo: {{ comunicado.arquivo_anexo.name|slice:"19:" }}</li>
+                        {% endif %}
+                        <li>Histórico de visualizações</li>
+                        <li>Metadados e configurações</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

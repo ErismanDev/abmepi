@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Participante - {{ participante.nome }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:dashboard' %}">Administrativo</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'administrativo:evento_detail' participante.evento.pk %}">{{ participante.evento.titulo }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Excluir Participante</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Confirmar Exclusão
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <i class="fas fa-user-times fa-3x text-danger mb-3"></i>
+                    
+                    <h4 class="text-danger mb-3">Atenção!</h4>
+                    
+                    <p class="lead">Você está prestes a remover o participante:</p>
+                    <h5 class="mb-3">{{ participante.nome }}</h5>
+                    
+                    <div class="alert alert-warning">
+                        <strong>Esta ação não pode ser desfeita!</strong><br>
+                        O participante será removido do evento permanentemente.
+                    </div>
+
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6">
+                            <strong>Nome:</strong> {{ participante.nome }}<br>
+                            <strong>Email:</strong> {{ participante.email|default:"Não informado" }}<br>
+                            <strong>Telefone:</strong> {{ participante.telefone|default:"Não informado" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Status:</strong> 
+                            <span class="badge bg-{{ participante.status|yesno:'success,warning' }}">
+                                {{ participante.get_status_display }}
+                            </span><br>
+                            <strong>Evento:</strong> {{ participante.evento.titulo }}<br>
+                            <strong>Data do Evento:</strong> {{ participante.evento.data_inicio|date:"d/m/Y" }}
+                        </div>
+                    </div>
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="{% url 'administrativo:evento_detail' participante.evento.pk %}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-user-times me-2"></i>Confirmar Remoção
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Informações adicionais -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        O que acontecerá
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li>O participante "{{ participante.nome }}" será removido do evento</li>
+                        <li>Seu registro de presença (se existir) será excluído</li>
+                        <li>As informações do participante serão perdidas</li>
+                        <li>O participante não aparecerá mais na lista do evento</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

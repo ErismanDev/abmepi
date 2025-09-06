@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documentos{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'psicologia/css/modais.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-file-alt text-success"></i> 
+                    Documentos
+                </h1>
+                <div>
+                    <button type="button" class="btn btn-primary shadow-sm" onclick="openDocumentoModal()">
+                        <i class="fas fa-plus fa-sm text-white-50"></i> Novo Documento
+                    </button>
+                    <a href="{% url 'psicologia:dashboard' %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Lista de Documentos</h6>
+                </div>
+                <div class="card-body">
+                    {% if documentos %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Paciente</th>
+                                        <th>Psicólogo</th>
+                                        <th>Data de Criação</th>
+                                        <th>Arquivo</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for documento in documentos %}
+                                    <tr>
+                                        <td>
+                                            <a href="{% url 'psicologia:documento_detail' documento.pk %}">
+                                                {{ documento.titulo }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary text-white fw-bold">{{ documento.get_tipo_display }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:paciente_detail' documento.paciente.pk %}">
+                                                {{ documento.paciente.associado.nome }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {% if documento.psicologo %}
+                                                {{ documento.psicologo.nome_completo }}
+                                            {% else %}
+                                                <span class="text-muted">Não atribuído</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ documento.data_criacao|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            {% if documento.arquivo %}
+                                                <a href="{{ documento.arquivo.url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download"></i> Download
+                                                </a>
+                                            {% else %}
+                                                <span class="text-muted">Sem arquivo</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'psicologia:documento_detail' documento.pk %}" class="btn btn-sm btn-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-warning" onclick="openDocumentoEditModal({{ documento.pk }})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <a href="{% url 'psicologia:documento_delete' documento.pk %}" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-alt fa-3x text-gray-300 mb-3"></i>
+                            <h5 class="text-gray-500">Nenhum documento encontrado</h5>
+                            <p class="text-gray-400">Clique no botão "Novo Documento" para começar a criar documentos.</p>
+                            <button type="button" class="btn btn-primary" onclick="openDocumentoModal()">
+                                <i class="fas fa-plus"></i> Novo Documento
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'psicologia/js/modais.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('#dataTable').DataTable({
+        "language": {
+            "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json"
+        },
+        "order": [[4, "desc"]], // Ordenar por data de criação decrescente
+        "pageLength": 25,
+        "responsive": true
+    });
+});
+</script>
+{% endblock %}
+
+{% include 'psicologia/modal_base.html' %}

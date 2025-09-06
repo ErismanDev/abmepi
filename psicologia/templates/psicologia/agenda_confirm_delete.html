@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Excluir Horário - {{ agenda.psicologo.nome_completo }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                <h1 class="h3 mb-0 text-gray-800">
+                    <i class="fas fa-trash text-danger"></i> Excluir Horário
+                </h1>
+                <div>
+                    <a href="{% url 'psicologia:agenda_detail' agenda.pk %}" class="btn btn-secondary shadow-sm">
+                        <i class="fas fa-arrow-left fa-sm text-white-50"></i> Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header py-3 bg-danger text-white">
+                    <h6 class="m-0 font-weight-bold">
+                        <i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle"></i> Atenção!
+                        </h6>
+                        <p class="mb-0">
+                            Você está prestes a excluir um horário da agenda. Esta ação não pode ser desfeita.
+                        </p>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Psicólogo</h6>
+                            <p class="mb-3">{{ agenda.psicologo.nome_completo }}</p>
+                            
+                            <h6 class="text-primary">Data</h6>
+                            <p class="mb-3">{{ agenda.data|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Horário</h6>
+                            <p class="mb-3">
+                                {{ agenda.hora_inicio|time:"H:i" }} - {{ agenda.hora_fim|time:"H:i" }}
+                            </p>
+                            
+                            <h6 class="text-primary">Status</h6>
+                            <p class="mb-3">
+                                {% if agenda.disponivel %}
+                                    <span class="badge bg-success text-white">Disponível</span>
+                                {% else %}
+                                    <span class="badge bg-danger text-white">Indisponível</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if agenda.observacoes %}
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="text-primary">Observações</h6>
+                                <p class="mb-3">{{ agenda.observacoes }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Verificar se há sessões agendadas -->
+                    {% if sessoes %}
+                        <div class="alert alert-warning">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-exclamation-triangle"></i> Sessões Agendadas
+                            </h6>
+                            <p class="mb-2">
+                                Existem <strong>{{ sessoes.count }}</strong> sessão(ões) agendada(s) neste horário:
+                            </p>
+                            <ul class="mb-0">
+                                {% for sessao in sessoes %}
+                                    <li>{{ sessao.paciente.associado.nome }} - {{ sessao.get_status_display }}</li>
+                                {% endfor %}
+                            </ul>
+                            <p class="mb-0 mt-2">
+                                <strong>Atenção:</strong> Excluir este horário pode afetar as sessões agendadas.
+                            </p>
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'psicologia:agenda_detail' agenda.pk %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Confirmar Exclusão
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Focar no primeiro campo
+    $('input:first, select:first').focus();
+    
+    // Confirmar antes de enviar o formulário
+    $('form').on('submit', function(e) {
+        if (!confirm('Tem certeza que deseja excluir este horário? Esta ação não pode ser desfeita.')) {
+            e.preventDefault();
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
