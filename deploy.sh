@@ -1,6 +1,5 @@
 #!/bin/bash
 
-<<<<<<< HEAD
 # Script de Deploy para Digital Ocean - ABMEPI
 # Execute este script no servidor Digital Ocean
 
